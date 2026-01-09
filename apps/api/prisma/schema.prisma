@@ -1,0 +1,116 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "./generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  client
+  pro
+  admin
+}
+
+enum BookingStatus {
+  pending
+  accepted
+  rejected
+  completed
+  cancelled
+}
+
+enum ProStatus {
+  pending
+  active
+  suspended
+}
+
+model User {
+  id        String   @id @default(cuid())
+  role      Role     @default(client)
+  createdAt DateTime @default(now())
+
+  // Relations
+  proProfile ProProfile?
+  bookingsAsClient Booking[] @relation("ClientBookings")
+
+  @@index([role])
+  @@map("users")
+}
+
+model ProProfile {
+  id          String     @id @default(cuid())
+  userId      String     @unique
+  displayName String
+  bio         String?
+  hourlyRate  Float
+  status      ProStatus  @default(pending)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  // Relations
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  availability Availability[]
+  bookings    Booking[]    @relation("ProBookings")
+
+  @@index([userId])
+  @@index([status])
+  @@map("pro_profiles")
+}
+
+model Availability {
+  id           String   @id @default(cuid())
+  proProfileId String
+  dayOfWeek    Int      // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+  startTime    String   // Format: "HH:MM" (e.g., "09:00")
+  endTime      String   // Format: "HH:MM" (e.g., "17:00")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  proProfile ProProfile @relation(fields: [proProfileId], references: [id], onDelete: Cascade)
+
+  @@index([proProfileId])
+  @@map("availabilities")
+}
+
+model Booking {
+  id             String        @id @default(cuid())
+  clientUserId   String
+  proProfileId   String?
+  status         BookingStatus @default(pending)
+  scheduledAt    DateTime
+  hoursEstimate  Float
+  addressText    String
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  // Relations
+  client     User         @relation("ClientBookings", fields: [clientUserId], references: [id], onDelete: Cascade)
+  proProfile ProProfile?  @relation("ProBookings", fields: [proProfileId], references: [id], onDelete: SetNull)
+  review     Review?
+
+  @@index([clientUserId])
+  @@index([proProfileId])
+  @@index([status])
+  @@index([scheduledAt])
+  @@map("bookings")
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  bookingId String   @unique
+  rating    Int      // 1-5
+  comment   String?
+  createdAt DateTime @default(now())
+
+  // Relations
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@map("reviews")
+}

@@ -1,4 +1,6 @@
 import { router, publicProcedure } from "../trpc";
+import { bookingRouter } from "./booking.router";
+import { proRouter } from "./pro.router";
 
 export const appRouter = router({
   health: router({
@@ -9,6 +11,8 @@ export const appRouter = router({
       };
     }),
   }),
+  booking: bookingRouter,
+  pro: proRouter,
 });
 
 export type AppRouter = typeof appRouter;

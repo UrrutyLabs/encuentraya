@@ -1,10 +1,12 @@
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
 import { appRouter } from "@/server/routers/_app";
+import { createContext } from "@/server/trpc/context";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, Authorization",
+  "Access-Control-Allow-Headers":
+    "Content-Type, Authorization, x-user-id, x-user-role",
 };
 
 const handler = async (req: Request) => {
@@ -12,7 +14,7 @@ const handler = async (req: Request) => {
     endpoint: "/api/trpc",
     req,
     router: appRouter,
-    createContext: () => ({}),
+    createContext: () => createContext(req),
     onError: ({ error, path }) => {
       console.error(`tRPC Error on '${path}':`, error);
     },
