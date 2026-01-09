@@ -15,7 +15,7 @@ export interface UserEntity {
  * Handles all data access for users
  */
 export interface UserRepository {
-  create(role: Role): Promise<UserEntity>;
+  create(role: Role, id?: string): Promise<UserEntity>;
   findById(id: string): Promise<UserEntity | null>;
   findByRole(role: Role): Promise<UserEntity[]>;
 }
@@ -24,11 +24,17 @@ export interface UserRepository {
  * User repository implementation using Prisma
  */
 class UserRepositoryImpl implements UserRepository {
-  async create(role: Role): Promise<UserEntity> {
+  async create(role: Role, id?: string): Promise<UserEntity> {
     const user = await prisma.user.create({
-      data: {
-        role,
-      },
+      data: id
+        ? {
+            id, // Use provided ID (e.g., Supabase user ID)
+            role,
+          }
+        : {
+            // Let Prisma generate ID
+            role,
+          },
     });
 
     return this.mapPrismaToDomain(user);
