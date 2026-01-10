@@ -1,4 +1,5 @@
 import { View, StyleSheet, ActivityIndicator, ScrollView } from "react-native";
+import { useState } from "react";
 import { useLocalSearchParams } from "expo-router";
 import { Text } from "../../components/ui/Text";
 import { Card } from "../../components/ui/Card";
@@ -6,7 +7,7 @@ import { Badge } from "../../components/ui/Badge";
 import { Button } from "../../components/ui/Button";
 import { useBookingActions } from "../../hooks/useBookingActions";
 import { trpc } from "../../lib/trpc/client";
-import { BookingStatus, Category } from "../../types/domain";
+import { BookingStatus, Category } from "@repo/domain";
 import { theme } from "../../theme";
 
 const categoryLabels: Record<string, string> = {
@@ -35,23 +36,21 @@ const statusVariants: Record<BookingStatus, "success" | "warning" | "danger" | "
 
 export function BookingDetailScreen() {
   const { bookingId } = useLocalSearchParams<{ bookingId: string }>();
-  const { data: booking, isLoading, error, refetch } = (trpc as any).booking.getById.useQuery({
-    id: bookingId!,
+  const [localStatus, setLocalStatus] = useState<BookingStatus | null>(null);
+
+  // Fetch booking by id
+  const { data: booking, isLoading, error, refetch } = trpc.booking.getById.useQuery(
+    { id: bookingId || "" },
+    { enabled: !!bookingId, retry: false }
+  );
+
+  const { acceptBooking, rejectBooking, completeBooking, isAccepting, isRejecting, isCompleting, error: actionError } = useBookingActions(() => {
+    // Refetch booking data after successful action
+    refetch();
   });
 
-  const {
-    acceptBooking,
-    rejectBooking,
-    completeBooking,
-    isAccepting,
-    isRejecting,
-    isCompleting,
-    error: actionError,
-  } = useBookingActions({
-    onSuccess: () => {
-      refetch();
-    },
-  });
+  // Use local status if set, otherwise use booking status
+  const displayStatus = localStatus || booking?.status;
 
   if (isLoading) {
     return (
@@ -74,9 +73,39 @@ export function BookingDetailScreen() {
     );
   }
 
+  const handleAccept = async () => {
+    if (!bookingId) return;
+    try {
+      await acceptBooking(bookingId);
+      setLocalStatus(BookingStatus.ACCEPTED);
+    } catch (err) {
+      // Error handled by hook
+    }
+  };
+
+  const handleReject = async () => {
+    if (!bookingId) return;
+    try {
+      await rejectBooking(bookingId);
+      setLocalStatus(BookingStatus.REJECTED);
+    } catch (err) {
+      // Error handled by hook
+    }
+  };
+
+  const handleComplete = async () => {
+    if (!bookingId) return;
+    try {
+      await completeBooking(bookingId);
+      setLocalStatus(BookingStatus.COMPLETED);
+    } catch (err) {
+      // Error handled by hook
+    }
+  };
+
+  const statusLabel = displayStatus ? statusLabels[displayStatus] : "";
+  const statusVariant = displayStatus ? statusVariants[displayStatus] : "info";
   const categoryLabel = categoryLabels[booking.category] || booking.category;
-  const statusLabel = statusLabels[booking.status as BookingStatus];
-  const statusVariant = statusVariants[booking.status as BookingStatus];
 
   const formattedDate = new Intl.DateTimeFormat("es-UY", {
     day: "numeric",
@@ -86,9 +115,10 @@ export function BookingDetailScreen() {
     minute: "2-digit",
   }).format(new Date(booking.scheduledAt));
 
-  const canAccept = booking.status === BookingStatus.PENDING;
-  const canReject = booking.status === BookingStatus.PENDING;
-  const canComplete = booking.status === BookingStatus.ACCEPTED;
+  const canAccept = displayStatus === BookingStatus.PENDING;
+  const canReject = displayStatus === BookingStatus.PENDING;
+  const canComplete = displayStatus === BookingStatus.ACCEPTED;
+  const isReadOnly = displayStatus === BookingStatus.COMPLETED || displayStatus === BookingStatus.CANCELLED || displayStatus === BookingStatus.REJECTED;
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
@@ -137,47 +167,54 @@ export function BookingDetailScreen() {
         </View>
       </Card>
 
-      {(canAccept || canReject || canComplete) && (
-        <View style={styles.actions}>
+      {/* Actions */}
+      {actionError && (
+        <Card style={styles.errorCard}>
+          <Text variant="small" style={styles.errorText}>
+            {actionError}
+          </Text>
+        </Card>
+      )}
+
+      {!isReadOnly && (
+        <Card style={styles.actionsCard}>
           <Text variant="h2" style={styles.sectionTitle}>
             Acciones
           </Text>
-          {actionError && (
-            <Text variant="small" style={styles.error}>
-              {actionError}
-            </Text>
-          )}
+
           {canAccept && (
             <Button
               variant="primary"
-              onPress={() => acceptBooking(booking.id)}
-              disabled={isAccepting || isRejecting || isCompleting}
+              onPress={handleAccept}
+              disabled={isAccepting || isRejecting}
               style={styles.actionButton}
             >
               {isAccepting ? "Aceptando..." : "Aceptar"}
             </Button>
           )}
+
           {canReject && (
             <Button
               variant="danger"
-              onPress={() => rejectBooking(booking.id)}
-              disabled={isAccepting || isRejecting || isCompleting}
+              onPress={handleReject}
+              disabled={isAccepting || isRejecting}
               style={styles.actionButton}
             >
               {isRejecting ? "Rechazando..." : "Rechazar"}
             </Button>
           )}
+
           {canComplete && (
             <Button
               variant="primary"
-              onPress={() => completeBooking(booking.id)}
-              disabled={isAccepting || isRejecting || isCompleting}
+              onPress={handleComplete}
+              disabled={isCompleting}
               style={styles.actionButton}
             >
               {isCompleting ? "Completando..." : "Marcar como completado"}
             </Button>
           )}
-        </View>
+        </Card>
       )}
     </ScrollView>
   );
@@ -201,9 +238,20 @@ const styles = StyleSheet.create({
     marginTop: theme.spacing[2],
     color: theme.colors.muted,
   },
+  errorCard: {
+    marginBottom: theme.spacing[4],
+    backgroundColor: `${theme.colors.danger}1A`,
+    borderColor: theme.colors.danger,
+  },
+  errorText: {
+    color: theme.colors.danger,
+  },
   error: {
     color: theme.colors.danger,
     marginBottom: theme.spacing[2],
+  },
+  actionsCard: {
+    marginBottom: theme.spacing[4],
   },
   header: {
     flexDirection: "row",

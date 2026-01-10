@@ -4,20 +4,37 @@ import { useRouter } from "expo-router";
 import { Text } from "../../components/ui/Text";
 import { BookingCard } from "../../components/presentational/BookingCard";
 import { trpc } from "../../lib/trpc/client";
-import { BookingStatus } from "../../types/domain";
+import { BookingStatus } from "@repo/domain";
 import { theme } from "../../theme";
 
 export function HomeScreen() {
   const router = useRouter();
-  const { data: bookings, isLoading, error } = (trpc as any).booking.proInbox.useQuery();
+  
+  // Fetch pro inbox bookings
+  const { data: bookings = [], isLoading, error } = trpc.booking.proInbox.useQuery(
+    undefined,
+    { retry: false, refetchOnWindowFocus: false }
+  );
 
-  const pendingBookings = useMemo(() => {
-    return bookings?.filter((b: any) => b.status === BookingStatus.PENDING) || [];
+  // Filter bookings into pending and accepted
+  const { pending, upcoming } = useMemo(() => {
+    const pendingBookings = bookings.filter(
+      (booking) => booking.status === BookingStatus.PENDING
+    );
+    
+    const upcomingBookings = bookings.filter(
+      (booking) => booking.status === BookingStatus.ACCEPTED
+    );
+
+    return {
+      pending: pendingBookings,
+      upcoming: upcomingBookings,
+    };
   }, [bookings]);
 
-  const acceptedBookings = useMemo(() => {
-    return bookings?.filter((b: any) => b.status === BookingStatus.ACCEPTED) || [];
-  }, [bookings]);
+  const handleCardPress = (bookingId: string) => {
+    router.push(`/booking/${bookingId}`);
+  };
 
   if (isLoading) {
     return (
@@ -46,35 +63,36 @@ export function HomeScreen() {
         <Text variant="h2" style={styles.sectionTitle}>
           Solicitudes nuevas
         </Text>
-        {pendingBookings.length === 0 ? (
+        {pending.length === 0 ? (
           <Text variant="body" style={styles.empty}>
             No hay solicitudes nuevas
           </Text>
         ) : (
-          pendingBookings.map((booking: any) => (
+          pending.map((booking) => (
             <BookingCard
               key={booking.id}
               booking={booking}
-              onPress={() => router.push(`/booking/${booking.id}` as any)}
+              onPress={() => handleCardPress(booking.id)}
             />
           ))
         )}
       </View>
 
+      {/* Upcoming Jobs Section */}
       <View style={styles.section}>
         <Text variant="h2" style={styles.sectionTitle}>
           Próximos trabajos
         </Text>
-        {acceptedBookings.length === 0 ? (
+        {upcoming.length === 0 ? (
           <Text variant="body" style={styles.empty}>
             No hay trabajos próximos
           </Text>
         ) : (
-          acceptedBookings.map((booking: any) => (
+          upcoming.map((booking) => (
             <BookingCard
               key={booking.id}
               booking={booking}
-              onPress={() => router.push(`/booking/${booking.id}` as any)}
+              onPress={() => handleCardPress(booking.id)}
             />
           ))
         )}

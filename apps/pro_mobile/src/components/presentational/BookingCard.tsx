@@ -2,8 +2,8 @@ import { TouchableOpacity, StyleSheet, View } from "react-native";
 import { Card } from "../ui/Card";
 import { Text } from "../ui/Text";
 import { Badge } from "../ui/Badge";
-import type { Booking } from "../../types/domain";
-import { BookingStatus, Category } from "../../types/domain";
+import type { Booking } from "@repo/domain";
+import { BookingStatus, Category } from "@repo/domain";
 import { theme } from "../../theme";
 
 interface BookingCardProps {

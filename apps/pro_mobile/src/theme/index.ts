@@ -1,8 +1,14 @@
-import { colors } from "../tokens/colors";
-import { typography } from "../tokens/typography";
-import { spacing } from "../tokens/spacing";
-import { radius } from "../tokens/radius";
-import { shadows } from "../tokens/shadows";
+/**
+ * Theme module for mobile app
+ * Exports design tokens from @repo/ui for use in React Native components
+ */
+import {
+  colors,
+  typography,
+  spacing,
+  radius,
+  shadows,
+} from "@repo/ui";
 
 export const theme = {
   colors,
@@ -11,3 +17,5 @@ export const theme = {
   radius,
   shadows,
 };
+
+export type Theme = typeof theme;

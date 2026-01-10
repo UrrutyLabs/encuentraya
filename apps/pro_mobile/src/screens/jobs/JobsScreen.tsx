@@ -4,20 +4,37 @@ import { useRouter } from "expo-router";
 import { Text } from "../../components/ui/Text";
 import { BookingCard } from "../../components/presentational/BookingCard";
 import { trpc } from "../../lib/trpc/client";
-import { BookingStatus } from "../../types/domain";
+import { BookingStatus } from "@repo/domain";
 import { theme } from "../../theme";
 
 export function JobsScreen() {
   const router = useRouter();
-  const { data: bookings, isLoading, error } = (trpc as any).booking.proJobs.useQuery();
+  
+  // Fetch pro jobs bookings
+  const { data: bookings = [], isLoading, error } = trpc.booking.proJobs.useQuery(
+    undefined,
+    { retry: false, refetchOnWindowFocus: false }
+  );
 
-  const acceptedBookings = useMemo(() => {
-    return bookings?.filter((b: any) => b.status === BookingStatus.ACCEPTED) || [];
+  // Filter bookings into upcoming (accepted) and completed
+  const { upcoming, completed } = useMemo(() => {
+    const upcomingBookings = bookings.filter(
+      (booking) => booking.status === BookingStatus.ACCEPTED
+    );
+    
+    const completedBookings = bookings.filter(
+      (booking) => booking.status === BookingStatus.COMPLETED
+    );
+
+    return {
+      upcoming: upcomingBookings,
+      completed: completedBookings,
+    };
   }, [bookings]);
 
-  const completedBookings = useMemo(() => {
-    return bookings?.filter((b: any) => b.status === BookingStatus.COMPLETED) || [];
-  }, [bookings]);
+  const handleCardPress = (bookingId: string) => {
+    router.push(`/booking/${bookingId}`);
+  };
 
   if (isLoading) {
     return (
@@ -46,35 +63,36 @@ export function JobsScreen() {
         <Text variant="h2" style={styles.sectionTitle}>
           Próximos
         </Text>
-        {acceptedBookings.length === 0 ? (
+        {upcoming.length === 0 ? (
           <Text variant="body" style={styles.empty}>
             No hay trabajos próximos
           </Text>
         ) : (
-          acceptedBookings.map((booking: any) => (
+          upcoming.map((booking) => (
             <BookingCard
               key={booking.id}
               booking={booking}
-              onPress={() => router.push(`/booking/${booking.id}` as any)}
+              onPress={() => handleCardPress(booking.id)}
             />
           ))
         )}
       </View>
 
+      {/* Completed Jobs Section */}
       <View style={styles.section}>
         <Text variant="h2" style={styles.sectionTitle}>
           Completados
         </Text>
-        {completedBookings.length === 0 ? (
+        {completed.length === 0 ? (
           <Text variant="body" style={styles.empty}>
             No hay trabajos completados
           </Text>
         ) : (
-          completedBookings.map((booking: any) => (
+          completed.map((booking) => (
             <BookingCard
               key={booking.id}
               booking={booking}
-              onPress={() => router.push(`/booking/${booking.id}` as any)}
+              onPress={() => handleCardPress(booking.id)}
             />
           ))
         )}

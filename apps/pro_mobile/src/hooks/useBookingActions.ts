@@ -1,50 +1,105 @@
-import { useState } from "react";
 import { trpc } from "../lib/trpc/client";
+import { useState } from "react";
+import { BookingStatus } from "@repo/domain";
 
-interface UseBookingActionsProps {
-  onSuccess?: () => void;
+interface UseBookingActionsReturn {
+  acceptBooking: (bookingId: string) => Promise<void>;
+  rejectBooking: (bookingId: string) => Promise<void>;
+  completeBooking: (bookingId: string) => Promise<void>;
+  isAccepting: boolean;
+  isRejecting: boolean;
+  isCompleting: boolean;
+  error: string | null;
 }
 
-export function useBookingActions({ onSuccess }: UseBookingActionsProps = {}) {
+/**
+ * Hook to encapsulate booking action mutations for pros.
+ * Handles accept, reject, and complete actions.
+ */
+export function useBookingActions(
+  onSuccess?: () => void
+): UseBookingActionsReturn {
   const [error, setError] = useState<string | null>(null);
 
-  const acceptBooking = (trpc as any).booking.accept.useMutation({
+  const acceptMutation = trpc.booking.accept.useMutation({
     onSuccess: () => {
       setError(null);
-      onSuccess?.();
+      if (onSuccess) {
+        onSuccess();
+      }
     },
-    onError: (_err: unknown) => {
-      setError("Error al aceptar la reserva");
+    onError: (err) => {
+      setError(err.message || "Error al aceptar la reserva");
     },
   });
 
-  const rejectBooking = (trpc as any).booking.reject.useMutation({
+  const rejectMutation = trpc.booking.reject.useMutation({
     onSuccess: () => {
       setError(null);
-      onSuccess?.();
+      if (onSuccess) {
+        onSuccess();
+      }
     },
-    onError: (_err: unknown) => {
-      setError("Error al rechazar la reserva");
+    onError: (err) => {
+      setError(err.message || "Error al rechazar la reserva");
     },
   });
 
-  const completeBooking = (trpc as any).booking.complete.useMutation({
+  const completeMutation = trpc.booking.complete.useMutation({
     onSuccess: () => {
       setError(null);
-      onSuccess?.();
+      if (onSuccess) {
+        onSuccess();
+      }
     },
-    onError: (_err: unknown) => {
-      setError("Error al completar la reserva");
+    onError: (err) => {
+      setError(err.message || "Error al completar la reserva");
     },
   });
+
+  const acceptBooking = async (bookingId: string) => {
+    setError(null);
+    try {
+      await acceptMutation.mutateAsync({ bookingId });
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Error al aceptar la reserva";
+      setError(message);
+      throw err;
+    }
+  };
+
+  const rejectBooking = async (bookingId: string) => {
+    setError(null);
+    try {
+      await rejectMutation.mutateAsync({ bookingId });
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Error al rechazar la reserva";
+      setError(message);
+      throw err;
+    }
+  };
+
+  const completeBooking = async (bookingId: string) => {
+    setError(null);
+    try {
+      await completeMutation.mutateAsync({ bookingId });
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Error al completar la reserva";
+      setError(message);
+      throw err;
+    }
+  };
 
   return {
-    acceptBooking: (bookingId: string) => acceptBooking.mutate({ bookingId }),
-    rejectBooking: (bookingId: string) => rejectBooking.mutate({ bookingId }),
-    completeBooking: (bookingId: string) => completeBooking.mutate({ bookingId }),
-    isAccepting: acceptBooking.isPending,
-    isRejecting: rejectBooking.isPending,
-    isCompleting: completeBooking.isPending,
+    acceptBooking,
+    rejectBooking,
+    completeBooking,
+    isAccepting: acceptMutation.isPending,
+    isRejecting: rejectMutation.isPending,
+    isCompleting: completeMutation.isPending,
     error,
   };
 }

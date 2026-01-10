@@ -1,25 +1,20 @@
-import { useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useState } from "react";
 import { trpc } from "./client";
 import { createTRPCLinks } from "./links";
 
-interface TRPCProviderProps {
-  children: React.ReactNode;
-}
-
-export function TRPCProvider({ children }: TRPCProviderProps) {
+export function TRPCProvider({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(() => new QueryClient());
+
   const [trpcClient] = useState(() =>
-    (trpc as any).createClient({
+    trpc.createClient({
       links: createTRPCLinks(),
     })
   );
 
-  const TRPCProviderComponent = (trpc as any).Provider;
-
   return (
-    <TRPCProviderComponent client={trpcClient} queryClient={queryClient}>
+    <trpc.Provider client={trpcClient} queryClient={queryClient}>
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-    </TRPCProviderComponent>
+    </trpc.Provider>
   );
 }
