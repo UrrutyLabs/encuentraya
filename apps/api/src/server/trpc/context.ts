@@ -3,6 +3,7 @@ import { Role } from "@repo/domain";
 import { userRepository } from "../repositories/user.repo";
 import { SupabaseAuthProvider } from "../auth/providers/supabase.provider";
 import type { AuthProvider } from "../auth/provider";
+import { randomUUID } from "crypto";
 
 // Initialize auth provider (can be swapped for other providers)
 const authProvider: AuthProvider = new SupabaseAuthProvider();
@@ -19,21 +20,39 @@ function extractBearerToken(req: Request): string | null {
 }
 
 /**
+ * Generate or extract request ID from headers
+ */
+function getRequestId(req: Request): string {
+  // Check if request ID is provided in headers (useful for tracing)
+  const existingId = req.headers.get("x-request-id");
+  if (existingId) {
+    return existingId;
+  }
+  // Generate a new request ID
+  return randomUUID();
+}
+
+/**
  * Create tRPC context from request
  * Verifies Supabase access token and resolves user from database
+ * Includes request ID for tracing
  */
-export async function createContext(req: Request): Promise<{ actor: Actor | null }> {
+export async function createContext(req: Request): Promise<{
+  actor: Actor | null;
+  requestId: string;
+}> {
+  const requestId = getRequestId(req);
   const token = extractBearerToken(req);
 
   // If no token, return unauthenticated
   if (!token) {
-    return { actor: null };
+    return { actor: null, requestId };
   }
 
   // Verify token with auth provider
   const authResult = await authProvider.verifyAccessToken(token);
   if (!authResult) {
-    return { actor: null };
+    return { actor: null, requestId };
   }
 
   const supabaseUserId = authResult.userId;
@@ -58,5 +77,6 @@ export async function createContext(req: Request): Promise<{ actor: Actor | null
       id: user.id,
       role: user.role,
     },
+    requestId,
   };
 }

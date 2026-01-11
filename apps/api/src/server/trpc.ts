@@ -8,6 +8,7 @@ import { Role } from "@repo/domain";
  */
 export interface Context {
   actor: Actor | null;
+  requestId: string;
 }
 
 /**
