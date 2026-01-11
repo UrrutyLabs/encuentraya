@@ -16,10 +16,12 @@ export function JobsScreen() {
     { retry: false, refetchOnWindowFocus: false }
   );
 
-  // Filter bookings into upcoming (accepted) and completed
+  // Filter bookings into upcoming (accepted and arrived) and completed
   const { upcoming, completed } = useMemo(() => {
     const upcomingBookings = bookings.filter(
-      (booking) => booking.status === BookingStatus.ACCEPTED
+      (booking) =>
+        booking.status === BookingStatus.ACCEPTED ||
+        booking.status === BookingStatus.ARRIVED
     );
     
     const completedBookings = bookings.filter(

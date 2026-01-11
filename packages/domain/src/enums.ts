@@ -15,6 +15,7 @@ export enum Role {
 export enum BookingStatus {
   PENDING = "pending",
   ACCEPTED = "accepted",
+  ARRIVED = "arrived",
   REJECTED = "rejected",
   COMPLETED = "completed",
   CANCELLED = "cancelled",

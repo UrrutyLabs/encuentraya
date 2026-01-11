@@ -155,6 +155,54 @@ export class BookingService {
   }
 
   /**
+   * Mark booking as arrived (ACCEPTED -> ARRIVED)
+   * Authorization: Pro assigned to booking or Admin
+   */
+  async arriveBooking(actor: Actor, bookingId: string): Promise<BookingEntity> {
+    const booking = await this.getBookingOrThrow(bookingId);
+
+    // Validate state transition
+    this.validateStateTransition(booking.status, BookingStatus.ARRIVED);
+
+    // Authorization: Pro must be assigned to booking, or actor must be admin
+    if (actor.role !== Role.ADMIN) {
+      if (actor.role !== Role.PRO) {
+        throw new UnauthorizedBookingActionError(
+          "arrive booking",
+          "Only pros can mark bookings as arrived"
+        );
+      }
+
+      // Get pro profile for actor
+      const proProfile = await proRepository.findByUserId(actor.id);
+      if (!proProfile) {
+        throw new UnauthorizedBookingActionError(
+          "arrive booking",
+          "Pro profile not found"
+        );
+      }
+
+      if (booking.proProfileId !== proProfile.id) {
+        throw new UnauthorizedBookingActionError(
+          "arrive booking",
+          "Booking is not assigned to this pro"
+        );
+      }
+    }
+
+    // Update status
+    const updated = await bookingRepository.updateStatus(
+      bookingId,
+      BookingStatus.ARRIVED
+    );
+    if (!updated) {
+      throw new BookingNotFoundError(bookingId);
+    }
+
+    return updated;
+  }
+
+  /**
    * Cancel a booking (PENDING -> CANCELLED or ACCEPTED -> CANCELLED)
    * Authorization: Client who owns booking, or Admin
    */
@@ -194,7 +242,7 @@ export class BookingService {
   }
 
   /**
-   * Complete a booking (ACCEPTED -> COMPLETED)
+   * Complete a booking (ARRIVED -> COMPLETED)
    * Authorization: Pro assigned to booking or Admin
    */
   async completeBooking(
@@ -328,7 +376,8 @@ export class BookingService {
   /**
    * Validate state transition according to state machine rules:
    * PENDING -> ACCEPTED | REJECTED | CANCELLED
-   * ACCEPTED -> COMPLETED | CANCELLED
+   * ACCEPTED -> ARRIVED | CANCELLED
+   * ARRIVED -> COMPLETED
    */
   private validateStateTransition(
     currentStatus: BookingStatus,
@@ -341,8 +390,11 @@ export class BookingService {
         BookingStatus.CANCELLED,
       ],
       [BookingStatus.ACCEPTED]: [
-        BookingStatus.COMPLETED,
+        BookingStatus.ARRIVED,
         BookingStatus.CANCELLED,
+      ],
+      [BookingStatus.ARRIVED]: [
+        BookingStatus.COMPLETED,
       ],
       [BookingStatus.REJECTED]: [], // Terminal state
       [BookingStatus.COMPLETED]: [], // Terminal state

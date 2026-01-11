@@ -13,6 +13,7 @@ import { BookingStatus } from "@repo/domain";
 const STATUS_LABELS: Record<BookingStatus, string> = {
   [BookingStatus.PENDING]: "Pendiente",
   [BookingStatus.ACCEPTED]: "Aceptada",
+  [BookingStatus.ARRIVED]: "Llegó",
   [BookingStatus.REJECTED]: "Rechazada",
   [BookingStatus.COMPLETED]: "Completada",
   [BookingStatus.CANCELLED]: "Cancelada",
@@ -21,6 +22,7 @@ const STATUS_LABELS: Record<BookingStatus, string> = {
 const STATUS_VARIANTS: Record<BookingStatus, "info" | "success" | "warning" | "danger"> = {
   [BookingStatus.PENDING]: "info",
   [BookingStatus.ACCEPTED]: "success",
+  [BookingStatus.ARRIVED]: "success",
   [BookingStatus.REJECTED]: "danger",
   [BookingStatus.COMPLETED]: "success",
   [BookingStatus.CANCELLED]: "warning",

@@ -19,6 +19,7 @@ enum Role {
 enum BookingStatus {
   pending
   accepted
+  arrived
   rejected
   completed
   cancelled

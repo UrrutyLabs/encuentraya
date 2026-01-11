@@ -21,6 +21,7 @@ const categoryLabels: Record<string, string> = {
 const statusLabels: Record<BookingStatus, string> = {
   [BookingStatus.PENDING]: "Pendiente",
   [BookingStatus.ACCEPTED]: "Aceptada",
+  [BookingStatus.ARRIVED]: "Llegó",
   [BookingStatus.REJECTED]: "Rechazada",
   [BookingStatus.COMPLETED]: "Completada",
   [BookingStatus.CANCELLED]: "Cancelada",
@@ -29,6 +30,7 @@ const statusLabels: Record<BookingStatus, string> = {
 const statusVariants: Record<BookingStatus, "success" | "warning" | "danger" | "info"> = {
   [BookingStatus.PENDING]: "info",
   [BookingStatus.ACCEPTED]: "success",
+  [BookingStatus.ARRIVED]: "success",
   [BookingStatus.REJECTED]: "danger",
   [BookingStatus.COMPLETED]: "success",
   [BookingStatus.CANCELLED]: "warning",
@@ -44,7 +46,7 @@ export function BookingDetailScreen() {
     { enabled: !!bookingId, retry: false }
   );
 
-  const { acceptBooking, rejectBooking, completeBooking, isAccepting, isRejecting, isCompleting, error: actionError } = useBookingActions(() => {
+  const { acceptBooking, rejectBooking, arriveBooking, completeBooking, isAccepting, isRejecting, isArriving, isCompleting, error: actionError } = useBookingActions(() => {
     // Refetch booking data after successful action
     refetch();
   });
@@ -93,6 +95,16 @@ export function BookingDetailScreen() {
     }
   };
 
+  const handleArrive = async () => {
+    if (!bookingId) return;
+    try {
+      await arriveBooking(bookingId);
+      setLocalStatus(BookingStatus.ARRIVED);
+    } catch (err) {
+      // Error handled by hook
+    }
+  };
+
   const handleComplete = async () => {
     if (!bookingId) return;
     try {
@@ -117,7 +129,8 @@ export function BookingDetailScreen() {
 
   const canAccept = displayStatus === BookingStatus.PENDING;
   const canReject = displayStatus === BookingStatus.PENDING;
-  const canComplete = displayStatus === BookingStatus.ACCEPTED;
+  const canArrive = displayStatus === BookingStatus.ACCEPTED;
+  const canComplete = displayStatus === BookingStatus.ARRIVED;
   const isReadOnly = displayStatus === BookingStatus.COMPLETED || displayStatus === BookingStatus.CANCELLED || displayStatus === BookingStatus.REJECTED;
 
   return (
@@ -201,6 +214,17 @@ export function BookingDetailScreen() {
               style={styles.actionButton}
             >
               {isRejecting ? "Rechazando..." : "Rechazar"}
+            </Button>
+          )}
+
+          {canArrive && (
+            <Button
+              variant="primary"
+              onPress={handleArrive}
+              disabled={isArriving}
+              style={styles.actionButton}
+            >
+              {isArriving ? "Marcando..." : "Marcar como llegado"}
             </Button>
           )}
 

@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { StyleSheet, ScrollView, ActivityIndicator, View } from "react-native";
-import { useRouter } from "expo-router";
 import { Card } from "../../components/ui/Card";
 import { Input } from "../../components/ui/Input";
 import { Button } from "../../components/ui/Button";
@@ -13,7 +12,6 @@ import { Category } from "@repo/domain";
 import { supabase } from "../../lib/supabase/client";
 
 export function OnboardingScreen() {
-  const router = useRouter();
   const { session, loading: sessionLoading } = useAuth();
   const { submitOnboarding, isLoading, error } = useOnboarding();
 
