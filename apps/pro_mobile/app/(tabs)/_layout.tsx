@@ -36,6 +36,13 @@ export default function TabsLayout() {
           tabBarLabel: "Disponibilidad",
         }}
       />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: "Perfil",
+          tabBarLabel: "Perfil",
+        }}
+      />
     </Tabs>
   );
 }
