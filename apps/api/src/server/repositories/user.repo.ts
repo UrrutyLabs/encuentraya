@@ -18,6 +18,7 @@ export interface UserRepository {
   create(role: Role, id?: string): Promise<UserEntity>;
   findById(id: string): Promise<UserEntity | null>;
   findByRole(role: Role): Promise<UserEntity[]>;
+  updateRole(id: string, role: Role): Promise<UserEntity>;
 }
 
 /**
@@ -55,6 +56,15 @@ class UserRepositoryImpl implements UserRepository {
     });
 
     return users.map(this.mapPrismaToDomain);
+  }
+
+  async updateRole(id: string, role: Role): Promise<UserEntity> {
+    const user = await prisma.user.update({
+      where: { id },
+      data: { role },
+    });
+
+    return this.mapPrismaToDomain(user);
   }
 
   private mapPrismaToDomain(prismaUser: {

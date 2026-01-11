@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { router, publicProcedure, proProcedure } from "../trpc";
+import { router, publicProcedure, protectedProcedure, proProcedure } from "../trpc";
 import { proService } from "../services/pro.service";
 import {
   proOnboardInputSchema,
@@ -18,6 +18,22 @@ export const proRouter = router({
           code: "INTERNAL_SERVER_ERROR",
           message:
             error instanceof Error ? error.message : "Failed to onboard pro",
+        });
+      }
+    }),
+
+  convertToPro: protectedProcedure
+    .input(proOnboardInputSchema)
+    .mutation(async ({ input, ctx }) => {
+      try {
+        return await proService.convertUserToPro(ctx.actor.id, input);
+      } catch (error) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message:
+            error instanceof Error
+              ? error.message
+              : "Failed to convert user to pro",
         });
       }
     }),

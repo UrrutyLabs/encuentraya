@@ -41,6 +41,52 @@ export class ProService {
   }
 
   /**
+   * Convert an existing user to PRO role and create their pro profile
+   * Used when a user signs up via pro_mobile app
+   * Business rules:
+   * - User must exist (created by context on first API call)
+   * - User must not already have a pro profile
+   * - User role will be updated from CLIENT to PRO (if not already PRO)
+   */
+  async convertUserToPro(
+    userId: string,
+    input: ProOnboardInput
+  ): Promise<Pro> {
+    // Check if user already has a pro profile
+    const existingPro = await proRepository.findByUserId(userId);
+    if (existingPro) {
+      // If pro profile exists, return it
+      return this.mapToDomain(existingPro);
+    }
+
+    // Get user to check current role
+    const user = await userRepository.findById(userId);
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    // Update user role to PRO if not already PRO
+    if (user.role !== Role.PRO) {
+      await userRepository.updateRole(userId, Role.PRO);
+    }
+
+    // Create pro profile
+    const proProfile = await proRepository.create({
+      userId,
+      displayName: input.name,
+      email: input.email,
+      phone: input.phone,
+      bio: undefined,
+      hourlyRate: input.hourlyRate,
+      categories: input.categories.map((c) => c as string),
+      serviceArea: input.serviceArea,
+    });
+
+    // Map to domain type
+    return this.mapToDomain(proProfile);
+  }
+
+  /**
    * Get pro by ID
    */
   async getProById(id: string): Promise<Pro | null> {
