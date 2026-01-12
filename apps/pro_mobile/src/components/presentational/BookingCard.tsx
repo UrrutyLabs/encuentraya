@@ -20,8 +20,10 @@ const categoryLabels: Record<string, string> = {
 };
 
 const statusLabels: Record<BookingStatus, string> = {
+  [BookingStatus.PENDING_PAYMENT]: "Pago pendiente",
   [BookingStatus.PENDING]: "Pendiente",
   [BookingStatus.ACCEPTED]: "Aceptada",
+  [BookingStatus.ON_MY_WAY]: "En camino",
   [BookingStatus.ARRIVED]: "Llegó",
   [BookingStatus.REJECTED]: "Rechazada",
   [BookingStatus.COMPLETED]: "Completada",
@@ -29,8 +31,10 @@ const statusLabels: Record<BookingStatus, string> = {
 };
 
 const statusVariants: Record<BookingStatus, "success" | "warning" | "danger" | "info"> = {
+  [BookingStatus.PENDING_PAYMENT]: "warning",
   [BookingStatus.PENDING]: "info",
   [BookingStatus.ACCEPTED]: "success",
+  [BookingStatus.ON_MY_WAY]: "info",
   [BookingStatus.ARRIVED]: "success",
   [BookingStatus.REJECTED]: "danger",
   [BookingStatus.COMPLETED]: "success",

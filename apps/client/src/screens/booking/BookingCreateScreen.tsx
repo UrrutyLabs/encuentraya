@@ -6,8 +6,9 @@ import { Text } from "@/components/ui/Text";
 import { Card } from "@/components/ui/Card";
 import { Navigation } from "@/components/presentational/Navigation";
 import { BookingForm } from "@/components/forms/BookingForm";
-import { trpc } from "@/lib/trpc/client";
-import { Category, BookingStatus } from "@repo/domain";
+import { useProDetail } from "@/hooks/useProDetail";
+import { useCreateBooking } from "@/hooks/useCreateBooking";
+import { Category } from "@repo/domain";
 
 export function BookingCreateScreen() {
   const router = useRouter();
@@ -21,26 +22,10 @@ export function BookingCreateScreen() {
   const [category, setCategory] = useState<Category | "">("");
 
   // Fetch pro details to get hourly rate
-  const { data: pro, isLoading: isLoadingPro } = trpc.pro.getById.useQuery(
-    { id: proId! },
-    {
-      enabled: !!proId,
-      retry: false,
-    }
-  );
+  const { pro, isLoading: isLoadingPro } = useProDetail(proId || undefined);
 
-  // Booking creation mutation
-  const createBooking = trpc.booking.create.useMutation({
-    onSuccess: (data) => {
-      // TODO: Make this conditional based on actual booking status when available
-      // For now, redirect to checkout by default since payment is required
-      if (data.status === BookingStatus.PENDING_PAYMENT) {
-        router.push(`/checkout?bookingId=${data.id}`);
-      } else {
-        router.push(`/my-bookings/${data.id}`);
-      }
-    },
-  });
+  // Booking creation hook
+  const { createBooking, isPending, error: createError } = useCreateBooking();
 
   // Calculate estimated cost
   const estimatedCost =
@@ -57,14 +42,14 @@ export function BookingCreateScreen() {
     const scheduledAt = new Date(`${date}T${time}`);
 
     try {
-      await createBooking.mutateAsync({
+      await createBooking({
         proId,
         category: category as Category,
         description: `Servicio en ${address}`,
         scheduledAt,
         estimatedHours: parseFloat(hours),
       });
-      // Success - mutation's onSuccess will handle redirect
+      // Success - hook's onSuccess will handle redirect
     } catch (error) {
       console.error("Error creating booking:", error);
     }
@@ -164,8 +149,8 @@ export function BookingCreateScreen() {
               onHoursChange={setHours}
               onCategoryChange={setCategory}
               onSubmit={handleSubmit}
-              loading={createBooking.isPending}
-              error={createBooking.error?.message}
+              loading={isPending}
+              error={createError?.message}
               estimatedCost={estimatedCost}
             />
           </Card>

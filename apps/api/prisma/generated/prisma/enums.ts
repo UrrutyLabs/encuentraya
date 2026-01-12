@@ -22,6 +22,7 @@ export const BookingStatus = {
   pending_payment: 'pending_payment',
   pending: 'pending',
   accepted: 'accepted',
+  on_my_way: 'on_my_way',
   arrived: 'arrived',
   rejected: 'rejected',
   completed: 'completed',

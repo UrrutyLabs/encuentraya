@@ -7,14 +7,15 @@ import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { Navigation } from "@/components/presentational/Navigation";
-import { trpc } from "@/lib/trpc/client";
 import { BookingStatus, formatCurrency } from "@repo/domain";
-import { useSmartPolling } from "@/hooks/useSmartPolling";
+import { useBookingDetail } from "@/hooks/useBookingDetail";
+import { useCancelBooking } from "@/hooks/useCancelBooking";
 
 const STATUS_LABELS: Record<BookingStatus, string> = {
   [BookingStatus.PENDING_PAYMENT]: "Pago pendiente",
   [BookingStatus.PENDING]: "Pendiente",
   [BookingStatus.ACCEPTED]: "Aceptada",
+  [BookingStatus.ON_MY_WAY]: "En camino",
   [BookingStatus.ARRIVED]: "Llegó",
   [BookingStatus.REJECTED]: "Rechazada",
   [BookingStatus.COMPLETED]: "Completada",
@@ -25,6 +26,7 @@ const STATUS_VARIANTS: Record<BookingStatus, "info" | "success" | "warning" | "d
   [BookingStatus.PENDING_PAYMENT]: "warning",
   [BookingStatus.PENDING]: "info",
   [BookingStatus.ACCEPTED]: "success",
+  [BookingStatus.ON_MY_WAY]: "info",
   [BookingStatus.ARRIVED]: "success",
   [BookingStatus.REJECTED]: "danger",
   [BookingStatus.COMPLETED]: "success",
@@ -62,55 +64,12 @@ export function BookingDetailScreen() {
   const router = useRouter();
   const bookingId = params.bookingId as string;
 
-  // Smart polling: pauses when page is hidden, resumes when visible
-  const pollingOptions = useSmartPolling({
-    interval: 5000, // Poll every 5 seconds when page is visible (more frequent for detail view)
-    enabled: !!bookingId,
-    refetchOnForeground: true,
-  });
+  // Fetch booking and related data via hook
+  const { booking, pro, existingReview, payment, isLoading, error } =
+    useBookingDetail(bookingId);
 
-  const { data: booking, isLoading, error } = trpc.booking.getById.useQuery(
-    { id: bookingId },
-    {
-      enabled: !!bookingId,
-      retry: false,
-      ...pollingOptions, // Spread smart polling options
-    }
-  );
-
-  // Fetch pro details
-  const { data: pro } = trpc.pro.getById.useQuery(
-    { id: booking?.proId || "" },
-    {
-      enabled: !!booking?.proId,
-      retry: false,
-    }
-  );
-
-  // Fetch existing review for this booking
-  const { data: existingReview } = trpc.review.byBooking.useQuery(
-    { bookingId },
-    {
-      enabled: !!bookingId && booking?.status === BookingStatus.COMPLETED,
-      retry: false,
-    }
-  );
-
-  // Fetch payment info for PENDING_PAYMENT bookings
-  const { data: payment } = trpc.payment.getByBooking.useQuery(
-    { bookingId },
-    {
-      enabled: !!bookingId && booking?.status === BookingStatus.PENDING_PAYMENT,
-      retry: false,
-    }
-  );
-
-  // Cancel mutation
-  const cancelBooking = trpc.booking.cancel.useMutation({
-    onSuccess: () => {
-      router.push("/my-bookings");
-    },
-  });
+  // Cancel booking hook
+  const { cancelBooking, isPending: isCancelling } = useCancelBooking();
 
   const canCancel =
     booking &&
@@ -123,10 +82,10 @@ export function BookingDetailScreen() {
 
     if (confirm("¿Estás seguro de que querés cancelar esta reserva?")) {
       try {
-        await cancelBooking.mutateAsync({ bookingId: booking.id });
-        // Success - mutation's onSuccess will handle redirect
+        await cancelBooking(booking.id);
+        // Success - hook's onSuccess will handle redirect
       } catch (error) {
-        // Error is handled by mutation state
+        // Error is handled by hook state
         console.error("Error cancelling booking:", error);
       }
     }
@@ -176,8 +135,8 @@ export function BookingDetailScreen() {
     );
   }
 
-  const statusLabel = STATUS_LABELS[booking.status];
-  const statusVariant = STATUS_VARIANTS[booking.status];
+  const statusLabel = STATUS_LABELS[booking.status as BookingStatus];
+  const statusVariant = STATUS_VARIANTS[booking.status as BookingStatus];
   const categoryLabel = CATEGORY_LABELS[booking.category] || booking.category;
 
   // Extract address from description (assuming format "Servicio en {address}")
@@ -340,10 +299,10 @@ export function BookingDetailScreen() {
               <Button
                 variant="danger"
                 onClick={handleCancel}
-                disabled={cancelBooking.isPending}
+                disabled={isCancelling}
                 className="w-full md:w-auto"
               >
-                {cancelBooking.isPending ? "Cancelando..." : "Cancelar reserva"}
+                {isCancelling ? "Cancelando..." : "Cancelar reserva"}
               </Button>
             </Card>
           )}

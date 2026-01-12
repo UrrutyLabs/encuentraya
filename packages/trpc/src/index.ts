@@ -43,3 +43,10 @@ export { superjson };
 export type ExtractRouterType<T> = T extends { $inferRouter: infer R }
   ? R
   : never;
+
+/**
+ * Export AppRouter type for use in client apps
+ * This allows both client and mobile apps to import the type
+ * without needing to resolve the API's internal path aliases
+ */
+export type { AppRouter } from "./router";

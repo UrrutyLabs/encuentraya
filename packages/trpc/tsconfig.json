@@ -1,8 +1,19 @@
 {
   "extends": "@repo/typescript-config/base.json",
   "compilerOptions": {
-    "outDir": "dist"
+    "outDir": "dist",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "skipLibCheck": true,
+    "paths": {
+      "@/*": ["../../apps/api/src/*"],
+      "@modules/*": ["../../apps/api/src/server/modules/*"],
+      "@infra/*": ["../../apps/api/src/server/infrastructure/*"],
+      "@shared/*": ["../../apps/api/src/server/shared/*"]
+    }
   },
-  "include": ["src"],
+  "include": ["src", "../../apps/api/src/server/routers/_app.ts"],
   "exclude": ["node_modules", "dist"]
 }

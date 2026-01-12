@@ -3,38 +3,24 @@ import { View, StyleSheet, ActivityIndicator, ScrollView } from "react-native";
 import { useRouter } from "expo-router";
 import { Text } from "../../components/ui/Text";
 import { BookingCard } from "../../components/presentational/BookingCard";
-import { trpc } from "../../lib/trpc/client";
-import { BookingStatus } from "@repo/domain";
+import { Booking, BookingStatus } from "@repo/domain";
 import { theme } from "../../theme";
-import { useSmartPolling } from "../../hooks/useSmartPolling";
+import { useProInbox } from "../../hooks/useProInbox";
 
 export function HomeScreen() {
   const router = useRouter();
   
-  // Smart polling: pauses when app is in background, resumes in foreground
-  const pollingOptions = useSmartPolling({
-    interval: 10000, // Poll every 10 seconds when in foreground
-    enabled: true,
-    refetchOnForeground: true,
-  });
-  
-  // Fetch pro inbox bookings with smart polling for near real-time updates
-  const { data: bookings = [], isLoading, error } = trpc.booking.proInbox.useQuery(
-    undefined,
-    { 
-      retry: false,
-      ...pollingOptions, // Spread smart polling options
-    }
-  );
+  // Fetch pro inbox bookings via hook
+  const { bookings, isLoading, error } = useProInbox();
 
   // Filter bookings into pending and accepted
   const { pending, upcoming } = useMemo(() => {
     const pendingBookings = bookings.filter(
-      (booking) => booking.status === BookingStatus.PENDING
+      (booking: Booking) => booking.status === BookingStatus.PENDING
     );
     
     const upcomingBookings = bookings.filter(
-      (booking) => booking.status === BookingStatus.ACCEPTED
+      (booking: Booking) => booking.status === BookingStatus.ACCEPTED
     );
 
     return {
@@ -79,7 +65,7 @@ export function HomeScreen() {
             No hay solicitudes nuevas
           </Text>
         ) : (
-          pending.map((booking) => (
+          pending.map((booking: Booking) => (
             <BookingCard
               key={booking.id}
               booking={booking}
@@ -99,7 +85,7 @@ export function HomeScreen() {
             No hay trabajos próximos
           </Text>
         ) : (
-          upcoming.map((booking) => (
+          upcoming.map((booking: Booking) => (
             <BookingCard
               key={booking.id}
               booking={booking}

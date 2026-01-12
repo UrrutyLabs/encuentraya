@@ -5,7 +5,10 @@
     "paths": {
       "@/*": [
         "./*"
-      ]
+      ],
+      "@modules/*": ["../api/src/server/modules/*"],
+      "@infra/*": ["../api/src/server/infrastructure/*"],
+      "@shared/*": ["../api/src/server/shared/*"]
     }
   },
   "include": [

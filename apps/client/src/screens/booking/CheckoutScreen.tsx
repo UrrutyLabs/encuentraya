@@ -1,8 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { trpc } from "@/lib/trpc/client";
+import { useCheckout } from "@/hooks/useCheckout";
 import { Text } from "@/components/ui/Text";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -83,7 +82,7 @@ export function CheckoutScreen() {
   }
 
   // Loading state
-  if (isLoadingBooking || isLoadingPayment) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-bg">
         <Navigation showLogin={false} showProfile={true} />
@@ -223,10 +222,10 @@ export function CheckoutScreen() {
           <div className="flex gap-4">
             <Button
               variant="primary"
-              onClick={handleAuthorizePayment}
-              disabled={createPreauth.isPending || !bookingId}
+              onClick={authorizePayment}
+              disabled={isAuthorizing || !bookingId}
             >
-              {createPreauth.isPending ? "Cargando..." : "Autorizar pago"}
+              {isAuthorizing ? "Cargando..." : "Autorizar pago"}
             </Button>
             <Link href="/my-bookings">
               <Button variant="ghost">Volver a mis reservas</Button>

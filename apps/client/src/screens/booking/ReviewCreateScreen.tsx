@@ -1,17 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { useParams, useRouter } from "next/navigation";
-import { trpc } from "@/lib/trpc/client";
+import { useParams } from "next/navigation";
 import { Text } from "@/components/ui/Text";
 import { Card } from "@/components/ui/Card";
 import { Navigation } from "@/components/presentational/Navigation";
 import { ReviewForm } from "@/components/forms/ReviewForm";
-import { BookingStatus } from "@repo/domain";
+import { useReviewForm } from "@/hooks/useReviewForm";
 
 export function ReviewCreateScreen() {
   const params = useParams();
-  const router = useRouter();
   const bookingId = params.bookingId as string;
 
   const [rating, setRating] = useState(0);
@@ -19,50 +17,33 @@ export function ReviewCreateScreen() {
   const [wantsSupportContact, setWantsSupportContact] = useState(false);
   const [whatHappened, setWhatHappened] = useState("");
 
-  // Fetch booking to verify it exists
-  const { data: booking, isLoading: isLoadingBooking } = trpc.booking.getById.useQuery(
-    { id: bookingId },
-    {
-      enabled: !!bookingId,
-      retry: false,
-    }
-  );
-
-  // Fetch existing review for this booking
-  const { data: existingReview, isLoading: isLoadingReview } = trpc.review.byBooking.useQuery(
-    { bookingId },
-    {
-      enabled: !!bookingId,
-      retry: false,
-    }
-  );
-
-  const createReview = trpc.review.create.useMutation({
-    onSuccess: () => {
-      router.push(`/my-bookings/${bookingId}`);
-    },
-  });
+  const {
+    booking,
+    existingReview,
+    isLoading,
+    createReview,
+    isPending,
+    error: createError,
+    canCreateReview,
+  } = useReviewForm(bookingId);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
-      await createReview.mutateAsync({
-        bookingId,
-        rating,
-        comment: comment || undefined,
-      });
-      // Success - mutation's onSuccess will handle redirect
-    } catch (err) {
-      // Error is handled by mutation state
+      await createReview(rating, comment || undefined);
+      // Success - hook's onSuccess will handle redirect
+    } catch {
+      // Error is handled by hook state
     }
   };
 
   const handleCancel = () => {
-    router.push(`/my-bookings/${bookingId}`);
+    // Navigation handled by hook
+    window.history.back();
   };
 
-  if (isLoadingBooking || isLoadingReview) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-bg">
         <Navigation showLogin={false} showProfile={true} />
@@ -93,7 +74,7 @@ export function ReviewCreateScreen() {
                 La reserva que buscas no existe.
               </Text>
               <button
-                onClick={() => router.push("/my-bookings")}
+                onClick={() => window.history.back()}
                 className="px-4 py-2 bg-primary text-white rounded-md hover:opacity-90"
               >
                 Volver a mis reservas
@@ -105,8 +86,8 @@ export function ReviewCreateScreen() {
     );
   }
 
-  // Gating: Check if booking is not completed
-  if (booking.status !== BookingStatus.COMPLETED) {
+  // Gating: Check if review can be created
+  if (booking && !canCreateReview) {
     return (
       <div className="min-h-screen bg-bg">
         <Navigation showLogin={false} showProfile={true} />
@@ -168,8 +149,8 @@ export function ReviewCreateScreen() {
               onWhatHappenedChange={setWhatHappened}
               onSubmit={handleSubmit}
               onCancel={handleCancel}
-              loading={createReview.isPending}
-              error={createReview.error?.message}
+              loading={isPending}
+              error={createError?.message}
             />
           </Card>
         </div>

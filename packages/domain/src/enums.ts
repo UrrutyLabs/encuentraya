@@ -16,6 +16,7 @@ export enum BookingStatus {
   PENDING_PAYMENT = "pending_payment",
   PENDING = "pending",
   ACCEPTED = "accepted",
+  ON_MY_WAY = "on_my_way",
   ARRIVED = "arrived",
   REJECTED = "rejected",
   COMPLETED = "completed",

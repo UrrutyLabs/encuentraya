@@ -1,14 +1,15 @@
 import { trpc } from "../lib/trpc/client";
 import { useState } from "react";
-import { BookingStatus } from "@repo/domain";
 
 interface UseBookingActionsReturn {
   acceptBooking: (bookingId: string) => Promise<void>;
   rejectBooking: (bookingId: string) => Promise<void>;
+  markOnMyWay: (bookingId: string) => Promise<void>;
   arriveBooking: (bookingId: string) => Promise<void>;
   completeBooking: (bookingId: string) => Promise<void>;
   isAccepting: boolean;
   isRejecting: boolean;
+  isMarkingOnMyWay: boolean;
   isArriving: boolean;
   isCompleting: boolean;
   error: string | null;
@@ -16,7 +17,7 @@ interface UseBookingActionsReturn {
 
 /**
  * Hook to encapsulate booking action mutations for pros.
- * Handles accept, reject, arrive, and complete actions.
+ * Handles accept, reject, mark on my way, arrive, and complete actions.
  */
 export function useBookingActions(
   onSuccess?: () => void
@@ -44,6 +45,18 @@ export function useBookingActions(
     },
     onError: (err) => {
       setError(err.message || "Error al rechazar la reserva");
+    },
+  });
+
+  const markOnMyWayMutation = trpc.booking.onMyWay.useMutation({
+    onSuccess: () => {
+      setError(null);
+      if (onSuccess) {
+        onSuccess();
+      }
+    },
+    onError: (err) => {
+      setError(err.message || "Error al marcar como en camino");
     },
   });
 
@@ -95,6 +108,18 @@ export function useBookingActions(
     }
   };
 
+  const markOnMyWay = async (bookingId: string) => {
+    setError(null);
+    try {
+      await markOnMyWayMutation.mutateAsync({ bookingId });
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Error al marcar como en camino";
+      setError(message);
+      throw err;
+    }
+  };
+
   const arriveBooking = async (bookingId: string) => {
     setError(null);
     try {
@@ -122,10 +147,12 @@ export function useBookingActions(
   return {
     acceptBooking,
     rejectBooking,
+    markOnMyWay,
     arriveBooking,
     completeBooking,
     isAccepting: acceptMutation.isPending,
     isRejecting: rejectMutation.isPending,
+    isMarkingOnMyWay: markOnMyWayMutation.isPending,
     isArriving: arriveMutation.isPending,
     isCompleting: completeMutation.isPending,
     error,

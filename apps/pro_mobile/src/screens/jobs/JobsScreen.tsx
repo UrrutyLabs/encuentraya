@@ -3,40 +3,26 @@ import { View, StyleSheet, ActivityIndicator, ScrollView } from "react-native";
 import { useRouter } from "expo-router";
 import { Text } from "../../components/ui/Text";
 import { BookingCard } from "../../components/presentational/BookingCard";
-import { trpc } from "../../lib/trpc/client";
-import { BookingStatus } from "@repo/domain";
+import { BookingStatus, Booking } from "@repo/domain";
 import { theme } from "../../theme";
-import { useSmartPolling } from "../../hooks/useSmartPolling";
+import { useProJobs } from "../../hooks/useProJobs";
 
 export function JobsScreen() {
   const router = useRouter();
   
-  // Smart polling: pauses when app is in background, resumes in foreground
-  const pollingOptions = useSmartPolling({
-    interval: 10000, // Poll every 10 seconds when in foreground
-    enabled: true,
-    refetchOnForeground: true,
-  });
-  
-  // Fetch pro jobs bookings with smart polling for near real-time updates
-  const { data: bookings = [], isLoading, error } = trpc.booking.proJobs.useQuery(
-    undefined,
-    { 
-      retry: false,
-      ...pollingOptions, // Spread smart polling options
-    }
-  );
+  // Fetch pro jobs bookings via hook
+  const { bookings, isLoading, error } = useProJobs();
 
   // Filter bookings into upcoming (accepted and arrived) and completed
-  const { upcoming, completed } = useMemo(() => {
+  const { upcoming, completed } = useMemo<{ upcoming: Booking[]; completed: Booking[] }>(() => {
     const upcomingBookings = bookings.filter(
-      (booking) =>
+      (booking: Booking) =>
         booking.status === BookingStatus.ACCEPTED ||
         booking.status === BookingStatus.ARRIVED
     );
     
     const completedBookings = bookings.filter(
-      (booking) => booking.status === BookingStatus.COMPLETED
+      (booking: Booking) => booking.status === BookingStatus.COMPLETED
     );
 
     return {
@@ -81,7 +67,7 @@ export function JobsScreen() {
             No hay trabajos próximos
           </Text>
         ) : (
-          upcoming.map((booking) => (
+          upcoming.map((booking: Booking) => (
             <BookingCard
               key={booking.id}
               booking={booking}
@@ -101,7 +87,7 @@ export function JobsScreen() {
             No hay trabajos completados
           </Text>
         ) : (
-          completed.map((booking) => (
+          completed.map((booking: Booking) => (
             <BookingCard
               key={booking.id}
               booking={booking}

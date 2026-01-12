@@ -49,6 +49,16 @@ export const bookingRouter = router({
       }
     }),
 
+  onMyWay: proProcedure
+    .input(z.object({ bookingId: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      try {
+        return await bookingService.markOnMyWay(ctx.actor, input.bookingId);
+      } catch (error) {
+        throw mapDomainErrorToTRPCError(error);
+      }
+    }),
+
   arrive: proProcedure
     .input(z.object({ bookingId: z.string() }))
     .mutation(async ({ input, ctx }) => {
@@ -124,10 +134,11 @@ export const bookingRouter = router({
   proJobs: proProcedure.query(async ({ ctx }) => {
     try {
       const allBookings = await bookingService.getProBookingsByUserId(ctx.actor.id);
-      // Filter to accepted, arrived, and completed bookings
+      // Filter to accepted, on my way, arrived, and completed bookings
       return allBookings.filter(
         (booking) =>
           booking.status === BookingStatus.ACCEPTED ||
+          booking.status === BookingStatus.ON_MY_WAY ||
           booking.status === BookingStatus.ARRIVED ||
           booking.status === BookingStatus.COMPLETED
       );

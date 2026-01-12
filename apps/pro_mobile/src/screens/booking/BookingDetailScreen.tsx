@@ -6,10 +6,9 @@ import { Card } from "../../components/ui/Card";
 import { Badge } from "../../components/ui/Badge";
 import { Button } from "../../components/ui/Button";
 import { useBookingActions } from "../../hooks/useBookingActions";
-import { trpc } from "../../lib/trpc/client";
+import { useBookingDetail } from "../../hooks/useBookingDetail";
 import { BookingStatus, Category } from "@repo/domain";
 import { theme } from "../../theme";
-import { useSmartPolling } from "../../hooks/useSmartPolling";
 
 const categoryLabels: Record<string, string> = {
   [Category.PLUMBING]: "Plomería",
@@ -20,8 +19,10 @@ const categoryLabels: Record<string, string> = {
 };
 
 const statusLabels: Record<BookingStatus, string> = {
+  [BookingStatus.PENDING_PAYMENT]: "Pago pendiente",
   [BookingStatus.PENDING]: "Pendiente",
   [BookingStatus.ACCEPTED]: "Aceptada",
+  [BookingStatus.ON_MY_WAY]: "En camino",
   [BookingStatus.ARRIVED]: "Llegó",
   [BookingStatus.REJECTED]: "Rechazada",
   [BookingStatus.COMPLETED]: "Completada",
@@ -29,8 +30,10 @@ const statusLabels: Record<BookingStatus, string> = {
 };
 
 const statusVariants: Record<BookingStatus, "success" | "warning" | "danger" | "info"> = {
+  [BookingStatus.PENDING_PAYMENT]: "warning",
   [BookingStatus.PENDING]: "info",
   [BookingStatus.ACCEPTED]: "success",
+  [BookingStatus.ON_MY_WAY]: "info",
   [BookingStatus.ARRIVED]: "success",
   [BookingStatus.REJECTED]: "danger",
   [BookingStatus.COMPLETED]: "success",
@@ -41,30 +44,13 @@ export function BookingDetailScreen() {
   const { bookingId } = useLocalSearchParams<{ bookingId: string }>();
   const [localStatus, setLocalStatus] = useState<BookingStatus | null>(null);
 
-  // Smart polling: pauses when app is in background, resumes in foreground
-  const pollingOptions = useSmartPolling({
-    interval: 5000, // Poll every 5 seconds when in foreground (more frequent for detail view)
-    enabled: !!bookingId,
-    refetchOnForeground: true,
-  });
+  // Fetch booking by id via hook
+  const { booking, isLoading, error, refetch } = useBookingDetail(bookingId);
 
-  // Fetch booking by id with smart polling for near real-time updates
-  const { data: booking, isLoading, error, refetch } = trpc.booking.getById.useQuery(
-    { id: bookingId || "" },
-    { 
-      enabled: !!bookingId, 
-      retry: false,
-      ...pollingOptions, // Spread smart polling options
-    }
-  );
-
-  const { acceptBooking, rejectBooking, arriveBooking, completeBooking, isAccepting, isRejecting, isArriving, isCompleting, error: actionError } = useBookingActions(() => {
+  const { acceptBooking, rejectBooking, markOnMyWay, arriveBooking, completeBooking, isAccepting, isRejecting, isMarkingOnMyWay, isArriving, isCompleting, error: actionError } = useBookingActions(() => {
     // Refetch booking data after successful action
     refetch();
   });
-
-  // Use local status if set, otherwise use booking status
-  const displayStatus = localStatus || booking?.status;
 
   if (isLoading) {
     return (
@@ -87,6 +73,9 @@ export function BookingDetailScreen() {
     );
   }
 
+  // Use local status if set, otherwise use booking status
+  const displayStatus: BookingStatus | null = localStatus || (booking?.status as BookingStatus) || null;
+
   const handleAccept = async () => {
     if (!bookingId) return;
     try {
@@ -102,6 +91,16 @@ export function BookingDetailScreen() {
     try {
       await rejectBooking(bookingId);
       setLocalStatus(BookingStatus.REJECTED);
+    } catch (err) {
+      // Error handled by hook
+    }
+  };
+
+  const handleMarkOnMyWay = async () => {
+    if (!bookingId) return;
+    try {
+      await markOnMyWay(bookingId);
+      setLocalStatus(BookingStatus.ON_MY_WAY);
     } catch (err) {
       // Error handled by hook
     }
@@ -127,8 +126,8 @@ export function BookingDetailScreen() {
     }
   };
 
-  const statusLabel = displayStatus ? statusLabels[displayStatus] : "";
-  const statusVariant = displayStatus ? statusVariants[displayStatus] : "info";
+  const statusLabel = displayStatus ? statusLabels[displayStatus as BookingStatus] : "";
+  const statusVariant = displayStatus ? statusVariants[displayStatus as BookingStatus] : "info";
   const categoryLabel = categoryLabels[booking.category] || booking.category;
 
   const formattedDate = new Intl.DateTimeFormat("es-UY", {
@@ -141,7 +140,8 @@ export function BookingDetailScreen() {
 
   const canAccept = displayStatus === BookingStatus.PENDING;
   const canReject = displayStatus === BookingStatus.PENDING;
-  const canArrive = displayStatus === BookingStatus.ACCEPTED;
+  const canMarkOnMyWay = displayStatus === BookingStatus.ACCEPTED;
+  const canArrive = displayStatus === BookingStatus.ON_MY_WAY;
   const canComplete = displayStatus === BookingStatus.ARRIVED;
   const isReadOnly = displayStatus === BookingStatus.COMPLETED || displayStatus === BookingStatus.CANCELLED || displayStatus === BookingStatus.REJECTED;
 
@@ -226,6 +226,17 @@ export function BookingDetailScreen() {
               style={styles.actionButton}
             >
               {isRejecting ? "Rechazando..." : "Rechazar"}
+            </Button>
+          )}
+
+          {canMarkOnMyWay && (
+            <Button
+              variant="primary"
+              onPress={handleMarkOnMyWay}
+              disabled={isMarkingOnMyWay}
+              style={styles.actionButton}
+            >
+              {isMarkingOnMyWay ? "Marcando..." : "Marcar como en camino"}
             </Button>
           )}
 

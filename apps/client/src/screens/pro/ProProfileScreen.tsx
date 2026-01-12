@@ -7,7 +7,8 @@ import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { Navigation } from "@/components/presentational/Navigation";
-import { trpc } from "@/lib/trpc/client";
+import { useProDetail } from "@/hooks/useProDetail";
+import { Category } from "@repo/domain";
 
 const CATEGORY_LABELS: Record<string, string> = {
   plumbing: "Plomería",
@@ -21,12 +22,7 @@ export function ProProfileScreen() {
   const params = useParams();
   const proId = params.proId as string;
 
-  const { data: pro, isLoading, error } = trpc.pro.getById.useQuery(
-    { id: proId },
-    {
-      retry: false,
-    }
-  );
+  const { pro, isLoading, error } = useProDetail(proId);
 
   if (isLoading) {
     return (
@@ -86,7 +82,7 @@ export function ProProfileScreen() {
                   </Text>
                 )}
                 <div className="flex flex-wrap gap-2 mb-3">
-                  {pro.categories.map((category) => (
+                  {pro.categories.map((category: Category | string) => (
                     <Badge key={category} variant="info">
                       {CATEGORY_LABELS[category] || category}
                     </Badge>
@@ -120,7 +116,7 @@ export function ProProfileScreen() {
               <Text variant="body" className="text-muted">
                 Profesional en {pro.serviceArea} con experiencia en{" "}
                 {pro.categories
-                  .map((cat) => CATEGORY_LABELS[cat] || cat)
+                  .map((cat: Category | string) => CATEGORY_LABELS[cat] || cat)
                   .join(", ")}
                 .
               </Text>
@@ -128,7 +124,7 @@ export function ProProfileScreen() {
               <Text variant="body" className="text-muted">
                 Profesional con experiencia en{" "}
                 {pro.categories
-                  .map((cat) => CATEGORY_LABELS[cat] || cat)
+                  .map((cat: Category | string) => CATEGORY_LABELS[cat] || cat)
                   .join(", ")}
                 .
               </Text>

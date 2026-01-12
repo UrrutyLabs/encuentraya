@@ -176,7 +176,55 @@ export class BookingService {
   }
 
   /**
-   * Mark booking as arrived (ACCEPTED -> ARRIVED)
+   * Mark booking as on my way (ACCEPTED -> ON_MY_WAY)
+   * Authorization: Pro assigned to booking or Admin
+   */
+  async markOnMyWay(actor: Actor, bookingId: string): Promise<BookingEntity> {
+    const booking = await this.getBookingOrThrow(bookingId);
+
+    // Validate state transition
+    this.validateStateTransition(booking.status, BookingStatus.ON_MY_WAY);
+
+    // Authorization: Pro must be assigned to booking, or actor must be admin
+    if (actor.role !== Role.ADMIN) {
+      if (actor.role !== Role.PRO) {
+        throw new UnauthorizedBookingActionError(
+          "mark on my way",
+          "Only pros can mark bookings as on my way"
+        );
+      }
+
+      // Get pro profile for actor
+      const proProfile = await this.proRepository.findByUserId(actor.id);
+      if (!proProfile) {
+        throw new UnauthorizedBookingActionError(
+          "mark on my way",
+          "Pro profile not found"
+        );
+      }
+
+      if (booking.proProfileId !== proProfile.id) {
+        throw new UnauthorizedBookingActionError(
+          "mark on my way",
+          "Booking is not assigned to this pro"
+        );
+      }
+    }
+
+    // Update status
+    const updated = await this.bookingRepository.updateStatus(
+      bookingId,
+      BookingStatus.ON_MY_WAY
+    );
+    if (!updated) {
+      throw new Error("Failed to update booking status");
+    }
+
+    return updated;
+  }
+
+  /**
+   * Mark booking as arrived (ON_MY_WAY -> ARRIVED)
    * Authorization: Pro assigned to booking or Admin
    */
   async arriveBooking(actor: Actor, bookingId: string): Promise<BookingEntity> {
@@ -439,6 +487,10 @@ export class BookingService {
         BookingStatus.CANCELLED,
       ],
       [BookingStatus.ACCEPTED]: [
+        BookingStatus.ON_MY_WAY,
+        BookingStatus.CANCELLED,
+      ],
+      [BookingStatus.ON_MY_WAY]: [
         BookingStatus.ARRIVED,
         BookingStatus.CANCELLED,
       ],

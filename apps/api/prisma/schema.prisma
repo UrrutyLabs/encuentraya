@@ -20,6 +20,7 @@ enum BookingStatus {
   pending_payment
   pending
   accepted
+  on_my_way
   arrived
   rejected
   completed
