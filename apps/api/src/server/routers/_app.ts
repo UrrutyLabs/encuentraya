@@ -4,6 +4,8 @@ import { proRouter } from "@modules/pro/pro.router";
 import { authRouter } from "./auth.router";
 import { reviewRouter } from "@modules/review/review.router";
 import { paymentRouter } from "@modules/payment/payment.router";
+import { notificationRouter } from "@modules/notification/notification.router";
+import { pushRouter } from "@modules/push/push.router";
 import { container, TOKENS } from "@/server/container";
 import { ProService } from "@modules/pro/pro.service";
 import { clientSearchProsInputSchema } from "@repo/domain";
@@ -25,6 +27,8 @@ export const appRouter = router({
   pro: proRouter,
   review: reviewRouter,
   payment: paymentRouter,
+  notification: notificationRouter,
+  push: pushRouter,
   client: router({
     searchPros: publicProcedure
       .input(clientSearchProsInputSchema)

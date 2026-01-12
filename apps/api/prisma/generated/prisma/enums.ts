@@ -86,3 +86,36 @@ export const PreferredContactMethod = {
 } as const
 
 export type PreferredContactMethod = (typeof PreferredContactMethod)[keyof typeof PreferredContactMethod]
+
+
+export const NotificationChannel = {
+  EMAIL: 'EMAIL',
+  WHATSAPP: 'WHATSAPP',
+  PUSH: 'PUSH'
+} as const
+
+export type NotificationChannel = (typeof NotificationChannel)[keyof typeof NotificationChannel]
+
+
+export const NotificationDeliveryStatus = {
+  QUEUED: 'QUEUED',
+  SENT: 'SENT',
+  FAILED: 'FAILED'
+} as const
+
+export type NotificationDeliveryStatus = (typeof NotificationDeliveryStatus)[keyof typeof NotificationDeliveryStatus]
+
+
+export const PushProvider = {
+  EXPO: 'EXPO'
+} as const
+
+export type PushProvider = (typeof PushProvider)[keyof typeof PushProvider]
+
+
+export const DevicePlatform = {
+  IOS: 'IOS',
+  ANDROID: 'ANDROID'
+} as const
+
+export type DevicePlatform = (typeof DevicePlatform)[keyof typeof DevicePlatform]

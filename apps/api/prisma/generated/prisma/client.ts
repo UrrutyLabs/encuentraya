@@ -79,3 +79,13 @@ export type Payment = Prisma.PaymentModel
  * 
  */
 export type PaymentEvent = Prisma.PaymentEventModel
+/**
+ * Model NotificationDelivery
+ * 
+ */
+export type NotificationDelivery = Prisma.NotificationDeliveryModel
+/**
+ * Model DevicePushToken
+ * 
+ */
+export type DevicePushToken = Prisma.DevicePushTokenModel

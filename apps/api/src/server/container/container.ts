@@ -5,6 +5,8 @@ import { registerProModule } from "./modules/pro.module";
 import { registerReviewModule } from "./modules/review.module";
 import { registerBookingModule } from "./modules/booking.module";
 import { registerPaymentModule } from "./modules/payment.module";
+import { registerNotificationModule } from "./modules/notification.module";
+import { registerPushModule } from "./modules/push.module";
 
 /**
  * Setup and configure the dependency injection container
@@ -26,6 +28,8 @@ export function setupContainer(): DependencyContainer {
   // Register modules that depend on others
   registerBookingModule(tsyringeContainer);
   registerPaymentModule(tsyringeContainer);
+  registerNotificationModule(tsyringeContainer);
+  registerPushModule(tsyringeContainer);
 
   return tsyringeContainer;
 }

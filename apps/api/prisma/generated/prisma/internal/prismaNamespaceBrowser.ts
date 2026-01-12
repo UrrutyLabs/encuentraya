@@ -58,7 +58,9 @@ export const ModelName = {
   Booking: 'Booking',
   Review: 'Review',
   Payment: 'Payment',
-  PaymentEvent: 'PaymentEvent'
+  PaymentEvent: 'PaymentEvent',
+  NotificationDelivery: 'NotificationDelivery',
+  DevicePushToken: 'DevicePushToken'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -192,6 +194,42 @@ export const PaymentEventScalarFieldEnum = {
 } as const
 
 export type PaymentEventScalarFieldEnum = (typeof PaymentEventScalarFieldEnum)[keyof typeof PaymentEventScalarFieldEnum]
+
+
+export const NotificationDeliveryScalarFieldEnum = {
+  id: 'id',
+  channel: 'channel',
+  recipientRef: 'recipientRef',
+  templateId: 'templateId',
+  payload: 'payload',
+  idempotencyKey: 'idempotencyKey',
+  provider: 'provider',
+  providerMessageId: 'providerMessageId',
+  status: 'status',
+  error: 'error',
+  attemptCount: 'attemptCount',
+  lastAttemptAt: 'lastAttemptAt',
+  createdAt: 'createdAt',
+  sentAt: 'sentAt',
+  failedAt: 'failedAt'
+} as const
+
+export type NotificationDeliveryScalarFieldEnum = (typeof NotificationDeliveryScalarFieldEnum)[keyof typeof NotificationDeliveryScalarFieldEnum]
+
+
+export const DevicePushTokenScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  provider: 'provider',
+  platform: 'platform',
+  token: 'token',
+  isActive: 'isActive',
+  lastSeenAt: 'lastSeenAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type DevicePushTokenScalarFieldEnum = (typeof DevicePushTokenScalarFieldEnum)[keyof typeof DevicePushTokenScalarFieldEnum]
 
 
 export const SortOrder = {

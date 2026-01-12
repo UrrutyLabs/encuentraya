@@ -65,6 +65,27 @@ enum PreferredContactMethod {
   PHONE
 }
 
+enum NotificationChannel {
+  EMAIL
+  WHATSAPP
+  PUSH
+}
+
+enum NotificationDeliveryStatus {
+  QUEUED
+  SENT
+  FAILED
+}
+
+enum PushProvider {
+  EXPO
+}
+
+enum DevicePlatform {
+  IOS
+  ANDROID
+}
+
 model User {
   id        String   @id @default(cuid())
   role      Role     @default(client)
@@ -230,4 +251,43 @@ model PaymentEvent {
   @@index([paymentId])
   @@index([createdAt])
   @@map("payment_events")
+}
+
+model NotificationDelivery {
+  id                String                     @id @default(cuid())
+  channel           NotificationChannel
+  recipientRef      String
+  templateId        String
+  payload           Json
+  idempotencyKey    String                     @unique
+  provider          String?
+  providerMessageId String?
+  status            NotificationDeliveryStatus @default(QUEUED)
+  error             String?
+  attemptCount      Int                        @default(0)
+  lastAttemptAt     DateTime?
+  createdAt         DateTime                   @default(now())
+  sentAt            DateTime?
+  failedAt          DateTime?
+
+  @@index([status])
+  @@index([channel, recipientRef])
+  @@index([createdAt])
+  @@map("notification_deliveries")
+}
+
+model DevicePushToken {
+  id         String         @id @default(cuid())
+  userId     String
+  provider   PushProvider   @default(EXPO)
+  platform   DevicePlatform
+  token      String         @unique
+  isActive   Boolean        @default(true)
+  lastSeenAt DateTime?
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+
+  @@index([userId])
+  @@index([isActive])
+  @@map("device_push_tokens")
 }

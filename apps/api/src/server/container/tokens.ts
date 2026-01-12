@@ -14,6 +14,8 @@ export const TOKENS = {
   UserRepository: "UserRepository",
   ClientProfileRepository: "ClientProfileRepository",
   AvailabilityRepository: "AvailabilityRepository",
+  NotificationDeliveryRepository: "NotificationDeliveryRepository",
+  DevicePushTokenRepository: "DevicePushTokenRepository",
 
   // Services
   BookingService: "BookingService",
@@ -22,6 +24,9 @@ export const TOKENS = {
   ProService: "ProService",
   ReviewService: "ReviewService",
   ClientProfileService: "ClientProfileService",
+  NotificationService: "NotificationService",
+  PushTokenService: "PushTokenService",
+  PushDeliveryResolver: "PushDeliveryResolver",
 
   // Infrastructure
   Logger: "Logger",
