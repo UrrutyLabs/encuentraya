@@ -29,6 +29,7 @@ export interface PayableProSummary {
   totalPayable: number; // minor units
   currency: string;
   earningsCount: number;
+  payoutProfileComplete: boolean;
 }
 
 /**
@@ -296,12 +297,18 @@ export class PayoutService {
         // Get currency from first earning (all should have same currency)
         const currency = payableEarnings[0]?.currency || "UYU";
 
+        // Check payout profile completeness
+        const payoutProfile =
+          await this.proPayoutProfileRepository.findByProProfileId(pro.id);
+        const payoutProfileComplete = payoutProfile?.isComplete ?? false;
+
         summaries.push({
           proProfileId: pro.id,
           displayName: pro.displayName,
           totalPayable,
           currency,
           earningsCount: payableEarnings.length,
+          payoutProfileComplete,
         });
       }
     }
@@ -325,6 +332,11 @@ export class PayoutService {
     providerReference: string | null;
     createdAt: Date;
     sentAt: Date | null;
+    earnings: Array<{
+      earningId: string;
+      bookingId: string;
+      netAmount: number;
+    }>;
   }> {
     // Authorization: Admin only
     if (adminActor.role !== Role.ADMIN) {
@@ -336,6 +348,24 @@ export class PayoutService {
       throw new PayoutError(`Payout not found: ${payoutId}`);
     }
 
+    // Get payout items
+    const payoutItems = await this.payoutItemRepository.findByPayoutId(payoutId);
+
+    // Get earnings for each item
+    const earnings = await Promise.all(
+      payoutItems.map(async (item) => {
+        const earning = await this.earningRepository.findById(item.earningId);
+        if (!earning) {
+          throw new PayoutError(`Earning not found: ${item.earningId}`);
+        }
+        return {
+          earningId: earning.id,
+          bookingId: earning.bookingId,
+          netAmount: earning.netAmount,
+        };
+      })
+    );
+
     return {
       id: payout.id,
       proProfileId: payout.proProfileId,
@@ -346,6 +376,7 @@ export class PayoutService {
       providerReference: payout.providerReference,
       createdAt: payout.createdAt,
       sentAt: payout.sentAt,
+      earnings,
     };
   }
 }

@@ -41,6 +41,29 @@ export class ClientProfileService {
 
   /**
    * Get client profile by user ID
+   * Alias for getProfileByUserId for backward compatibility
+   */
+  async getProfile(userId: string): Promise<{
+    id: string;
+    userId: string;
+    firstName: string | null;
+    lastName: string | null;
+    email: string | null;
+    phone: string | null;
+    preferredContactMethod: "EMAIL" | "WHATSAPP" | "PHONE" | null;
+    createdAt: Date;
+    updatedAt: Date;
+  }> {
+    const profile = await this.clientProfileRepository.findByUserId(userId);
+    if (!profile) {
+      // Ensure profile exists if not found
+      return await this.ensureClientProfileExists(userId);
+    }
+    return profile;
+  }
+
+  /**
+   * Get client profile by user ID
    */
   async getProfileByUserId(userId: string): Promise<{
     id: string;

@@ -46,6 +46,7 @@ export interface EarningStatusUpdateInput {
  */
 export interface EarningRepository {
   createFromBooking(input: EarningCreateInput): Promise<EarningEntity>;
+  findById(id: string): Promise<EarningEntity | null>;
   findByBookingId(bookingId: string): Promise<EarningEntity | null>;
   listPayableByPro(
     proProfileId: string,
@@ -84,6 +85,14 @@ export class EarningRepositoryImpl implements EarningRepository {
     });
 
     return this.mapPrismaToDomain(earning);
+  }
+
+  async findById(id: string): Promise<EarningEntity | null> {
+    const earning = await prisma.earning.findUnique({
+      where: { id },
+    });
+
+    return earning ? this.mapPrismaToDomain(earning) : null;
   }
 
   async findByBookingId(bookingId: string): Promise<EarningEntity | null> {

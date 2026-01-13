@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/Button";
 import { Text } from "@/components/ui/Text";
 import { Badge } from "@/components/ui/Badge";
 import { formatCurrency } from "@repo/domain";
+import { BookingTimeline } from "@/components/admin/BookingTimeline";
 
 interface BookingDetailScreenProps {
   bookingId: string;
@@ -162,6 +163,16 @@ export function BookingDetailScreen({ bookingId }: BookingDetailScreenProps) {
             <Text variant="body">{formatDate(booking.updatedAt)}</Text>
           </div>
         </div>
+      </Card>
+
+      {/* Timeline */}
+      <Card className="p-6">
+        <BookingTimeline
+          createdAt={booking.createdAt}
+          updatedAt={booking.updatedAt}
+          scheduledAt={booking.scheduledAt}
+          status={booking.status}
+        />
       </Card>
 
       {/* Address */}

@@ -4,7 +4,7 @@ import { container, TOKENS } from "@/server/container";
 import type { PaymentServiceFactory } from "@/server/container";
 import type { PaymentRepository } from "./payment.repo";
 import type { BookingRepository } from "@modules/booking/booking.repo";
-import { PaymentProvider } from "@repo/domain";
+import { PaymentProvider, PaymentStatus } from "@repo/domain";
 import { TRPCError } from "@trpc/server";
 
 // Resolve payment service factory from container
@@ -141,6 +141,60 @@ export const paymentRouter = router({
             error instanceof Error
               ? error.message
               : "Failed to sync payment status",
+        });
+      }
+    }),
+
+  /**
+   * Admin: List all payments with filters
+   */
+  adminList: adminProcedure
+    .input(
+      z
+        .object({
+          status: z.nativeEnum(PaymentStatus).optional(),
+          query: z.string().optional(),
+          limit: z.number().int().positive().max(100).optional(),
+          cursor: z.string().optional(),
+        })
+        .optional()
+    )
+    .query(async ({ input }) => {
+      try {
+        // Use service factory with default provider for admin methods
+        const service = await paymentServiceFactory(PaymentProvider.MERCADO_PAGO);
+        return await service.adminListPayments(input);
+      } catch (error) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message:
+            error instanceof Error
+              ? error.message
+              : "Failed to list payments",
+        });
+      }
+    }),
+
+  /**
+   * Admin: Get payment by ID with full details including webhook events
+   */
+  adminById: adminProcedure
+    .input(z.object({ paymentId: z.string() }))
+    .query(async ({ input }) => {
+      try {
+        // Use service factory with default provider for admin methods
+        const service = await paymentServiceFactory(PaymentProvider.MERCADO_PAGO);
+        return await service.adminGetPaymentById(input.paymentId);
+      } catch (error) {
+        if (error instanceof TRPCError) {
+          throw error;
+        }
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message:
+            error instanceof Error
+              ? error.message
+              : "Failed to get payment",
         });
       }
     }),

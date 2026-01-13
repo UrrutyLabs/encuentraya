@@ -23,6 +23,17 @@ export const proSchema = z.object({
 export type Pro = z.infer<typeof proSchema>;
 
 /**
+ * Pro signup input schema (email + password only)
+ * ProProfile is created later during onboarding
+ */
+export const proSignupInputSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(8),
+});
+
+export type ProSignupInput = z.infer<typeof proSignupInputSchema>;
+
+/**
  * Pro onboarding input schema
  */
 export const proOnboardInputSchema = z.object({

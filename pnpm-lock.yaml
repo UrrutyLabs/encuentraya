@@ -26,6 +26,9 @@ importers:
 
   apps/admin:
     dependencies:
+      '@repo/domain':
+        specifier: workspace:*
+        version: link:../../packages/domain
       '@repo/trpc':
         specifier: workspace:*
         version: link:../../packages/trpc

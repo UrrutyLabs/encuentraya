@@ -431,4 +431,89 @@ export class PaymentService {
       );
     }
   }
+
+  /**
+   * Admin: List all payments with filters
+   * Returns payments with booking info
+   */
+  async adminListPayments(filters?: {
+    status?: PaymentStatus;
+    query?: string; // Search by bookingId or providerReference
+    limit?: number;
+    cursor?: string;
+  }): Promise<Array<{
+    id: string;
+    status: PaymentStatus;
+    bookingId: string;
+    provider: PaymentProvider;
+    amountEstimated: number;
+    amountAuthorized: number | null;
+    amountCaptured: number | null;
+    currency: string;
+    updatedAt: Date;
+  }>> {
+    const payments = await this.paymentRepository.findAll(filters);
+
+    return payments.map((p) => ({
+      id: p.id,
+      status: p.status,
+      bookingId: p.bookingId,
+      provider: p.provider,
+      amountEstimated: p.amountEstimated,
+      amountAuthorized: p.amountAuthorized,
+      amountCaptured: p.amountCaptured,
+      currency: p.currency,
+      updatedAt: p.updatedAt,
+    }));
+  }
+
+  /**
+   * Admin: Get payment by ID with full details including webhook events
+   */
+  async adminGetPaymentById(paymentId: string): Promise<{
+    id: string;
+    status: PaymentStatus;
+    bookingId: string;
+    provider: PaymentProvider;
+    providerReference: string | null;
+    amountEstimated: number;
+    amountAuthorized: number | null;
+    amountCaptured: number | null;
+    currency: string;
+    createdAt: Date;
+    updatedAt: Date;
+    events: Array<{
+      id: string;
+      eventType: string;
+      raw: unknown;
+      createdAt: Date;
+    }>;
+  }> {
+    const payment = await this.paymentRepository.findById(paymentId);
+    if (!payment) {
+      throw new Error(`Payment not found: ${paymentId}`);
+    }
+
+    const events = await this.paymentEventRepository.findByPaymentId(paymentId);
+
+    return {
+      id: payment.id,
+      status: payment.status,
+      bookingId: payment.bookingId,
+      provider: payment.provider,
+      providerReference: payment.providerReference,
+      amountEstimated: payment.amountEstimated,
+      amountAuthorized: payment.amountAuthorized,
+      amountCaptured: payment.amountCaptured,
+      currency: payment.currency,
+      createdAt: payment.createdAt,
+      updatedAt: payment.updatedAt,
+      events: events.map((e) => ({
+        id: e.id,
+        eventType: e.eventType,
+        raw: e.raw,
+        createdAt: e.createdAt,
+      })),
+    };
+  }
 }

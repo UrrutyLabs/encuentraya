@@ -62,6 +62,12 @@ export interface PaymentRepository {
     provider: PaymentProvider,
     providerReference: string
   ): Promise<PaymentEntity | null>;
+  findAll(filters?: {
+    status?: PaymentStatus;
+    query?: string; // Search by bookingId or providerReference
+    limit?: number;
+    cursor?: string;
+  }): Promise<PaymentEntity[]>;
   updateStatusAndAmounts(id: string, patch: PaymentUpdateInput): Promise<PaymentEntity>;
   setCheckoutUrl(id: string, url: string): Promise<PaymentEntity>;
   setProviderReference(id: string, reference: string): Promise<PaymentEntity>;
@@ -118,6 +124,40 @@ export class PaymentRepositoryImpl implements PaymentRepository {
     });
 
     return payment ? this.mapPrismaToDomain(payment) : null;
+  }
+
+  async findAll(filters?: {
+    status?: PaymentStatus;
+    query?: string;
+    limit?: number;
+    cursor?: string;
+  }): Promise<PaymentEntity[]> {
+    const where: Prisma.PaymentWhereInput = {};
+
+    if (filters?.status) {
+      where.status = filters.status as $Enums.PaymentStatus;
+    }
+
+    if (filters?.query) {
+      where.OR = [
+        { bookingId: { contains: filters.query } },
+        { providerReference: { contains: filters.query } },
+      ];
+    }
+
+    if (filters?.cursor) {
+      where.id = { gt: filters.cursor };
+    }
+
+    const limit = filters?.limit ?? 100;
+
+    const payments = await prisma.payment.findMany({
+      where,
+      take: limit,
+      orderBy: { updatedAt: "desc" },
+    });
+
+    return payments.map(this.mapPrismaToDomain);
   }
 
   async updateStatusAndAmounts(

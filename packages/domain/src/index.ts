@@ -27,9 +27,11 @@ export {
 // Pro schemas
 export {
   proSchema,
+  proSignupInputSchema,
   proOnboardInputSchema,
   proSetAvailabilityInputSchema,
   type Pro,
+  type ProSignupInput,
   type ProOnboardInput,
   type ProSetAvailabilityInput,
 } from "./schemas/pro.schema";
