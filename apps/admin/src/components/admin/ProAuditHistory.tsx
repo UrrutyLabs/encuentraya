@@ -114,18 +114,19 @@ export function ProAuditHistory({ logs, isLoading }: ProAuditHistoryProps) {
                   <Text variant="small" className="text-gray-500 mb-1">
                     {formatDate(log.createdAt)}
                   </Text>
-                  {log.metadata?.reason && (
+                  {log.metadata?.reason != null && (
                     <Text variant="body" className="text-gray-700 mt-2">
                       <span className="font-medium">Razón:</span>{" "}
                       {String(log.metadata.reason)}
                     </Text>
                   )}
-                  {log.metadata?.previousStatus && log.metadata?.newStatus && (
-                    <Text variant="small" className="text-gray-600 mt-1">
-                      Estado: {String(log.metadata.previousStatus)} →{" "}
-                      {String(log.metadata.newStatus)}
-                    </Text>
-                  )}
+                  {log.metadata?.previousStatus != null &&
+                    log.metadata?.newStatus != null && (
+                      <Text variant="small" className="text-gray-600 mt-1">
+                        Estado: {String(log.metadata.previousStatus)} →{" "}
+                        {String(log.metadata.newStatus)}
+                      </Text>
+                    )}
                 </div>
               </div>
             </div>

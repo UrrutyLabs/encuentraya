@@ -14,6 +14,7 @@ import { PaymentService } from "@modules/payment/payment.service";
 import { PaymentProvider } from "@repo/domain";
 import { getPaymentProviderClient } from "@modules/payment/registry";
 import type { EarningService } from "@modules/payout/earning.service";
+import type { AuditService } from "@modules/audit/audit.service";
 
 /**
  * PaymentServiceFactory type
@@ -54,9 +55,10 @@ export function registerPaymentModule(container: DependencyContainer): void {
     const bookingRepo = container.resolve<BookingRepository>(TOKENS.BookingRepository);
     const proRepo = container.resolve<ProRepository>(TOKENS.ProRepository);
     const earningService = container.resolve<EarningService>(TOKENS.EarningService);
+    const auditService = container.resolve<AuditService>(TOKENS.AuditService);
     // Manually construct PaymentService with all dependencies
     // (providerClient and provider as constructor params, repositories injected)
-    return new PaymentService(providerClient, provider, paymentRepo, paymentEventRepo, bookingRepo, proRepo, earningService);
+    return new PaymentService(providerClient, provider, paymentRepo, paymentEventRepo, bookingRepo, proRepo, earningService, auditService);
   };
   
   // Register the factory function as a value

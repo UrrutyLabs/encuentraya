@@ -25,6 +25,8 @@ import type { ClientProfileService } from "@modules/user/clientProfile.service";
 import type { NotificationService } from "@modules/notification/notification.service";
 import type { NotificationEvent } from "@modules/notification/policy";
 import type { EarningService } from "@modules/payout/earning.service";
+import type { AuditService } from "@modules/audit/audit.service";
+import { AuditEventType } from "@modules/audit/audit.repo";
 
 /**
  * Booking service

@@ -76,7 +76,7 @@ export class AuditLogRepositoryImpl implements AuditLogRepository {
         resourceType: input.resourceType,
         resourceId: input.resourceId,
         action: input.action,
-        metadata: input.metadata ? (input.metadata as object) : null,
+        metadata: input.metadata ? (input.metadata as object) : undefined,
         ipAddress: input.ipAddress ?? null,
         userAgent: input.userAgent ?? null,
       },
