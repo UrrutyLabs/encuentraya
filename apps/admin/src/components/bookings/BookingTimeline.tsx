@@ -1,7 +1,7 @@
 "use client";
 
 import { Text } from "@repo/ui";
-import { BookingStatus } from "@repo/domain";
+import { BookingStatus, getBookingStatusLabel } from "@repo/domain";
 
 interface BookingTimelineProps {
   createdAt: Date;
@@ -26,19 +26,6 @@ export function BookingTimeline({
     });
   };
 
-  const getStatusLabel = (status: BookingStatus): string => {
-    const labels: Record<BookingStatus, string> = {
-      [BookingStatus.PENDING_PAYMENT]: "Pago pendiente",
-      [BookingStatus.PENDING]: "Pendiente",
-      [BookingStatus.ACCEPTED]: "Aceptada",
-      [BookingStatus.ON_MY_WAY]: "En camino",
-      [BookingStatus.ARRIVED]: "Llegó",
-      [BookingStatus.COMPLETED]: "Completada",
-      [BookingStatus.REJECTED]: "Rechazada",
-      [BookingStatus.CANCELLED]: "Cancelada",
-    };
-    return labels[status] || status;
-  };
 
   const timelineItems = [
     {
@@ -52,7 +39,7 @@ export function BookingTimeline({
       isActive: true,
     },
     {
-      label: `Estado actual: ${getStatusLabel(status)}`,
+      label: `Estado actual: ${getBookingStatusLabel(status)}`,
       date: updatedAt,
       isActive: true,
     },

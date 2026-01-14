@@ -49,7 +49,7 @@ export function Navigation({ showLogin = true, showProfile = false }: Navigation
     <nav className="px-4 py-4 border-b border-border bg-surface">
       <div className="max-w-6xl mx-auto flex justify-between items-center">
         <Link href="/">
-          <Text variant="h2" className="text-primary">
+          <Text variant="h2">
             Arreglatodo
           </Text>
         </Link>

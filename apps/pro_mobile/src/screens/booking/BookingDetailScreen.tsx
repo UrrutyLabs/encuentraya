@@ -8,7 +8,7 @@ import { Badge } from "../../components/ui/Badge";
 import { Button } from "../../components/ui/Button";
 import { useBookingActions } from "../../hooks/useBookingActions";
 import { useBookingDetail } from "../../hooks/useBookingDetail";
-import { BookingStatus, Category } from "@repo/domain";
+import { BookingStatus, Category, getBookingStatusLabel, getBookingStatusVariant } from "@repo/domain";
 import { theme } from "../../theme";
 
 const categoryLabels: Record<string, string> = {
@@ -19,27 +19,6 @@ const categoryLabels: Record<string, string> = {
   [Category.PAINTING]: "Pintura",
 };
 
-const statusLabels: Record<BookingStatus, string> = {
-  [BookingStatus.PENDING_PAYMENT]: "Pago pendiente",
-  [BookingStatus.PENDING]: "Pendiente",
-  [BookingStatus.ACCEPTED]: "Aceptada",
-  [BookingStatus.ON_MY_WAY]: "En camino",
-  [BookingStatus.ARRIVED]: "Llegó",
-  [BookingStatus.REJECTED]: "Rechazada",
-  [BookingStatus.COMPLETED]: "Completada",
-  [BookingStatus.CANCELLED]: "Cancelada",
-};
-
-const statusVariants: Record<BookingStatus, "success" | "warning" | "danger" | "info"> = {
-  [BookingStatus.PENDING_PAYMENT]: "warning",
-  [BookingStatus.PENDING]: "info",
-  [BookingStatus.ACCEPTED]: "success",
-  [BookingStatus.ON_MY_WAY]: "info",
-  [BookingStatus.ARRIVED]: "success",
-  [BookingStatus.REJECTED]: "danger",
-  [BookingStatus.COMPLETED]: "success",
-  [BookingStatus.CANCELLED]: "warning",
-};
 
 export function BookingDetailScreen() {
   const { bookingId } = useLocalSearchParams<{ bookingId: string }>();
@@ -128,8 +107,8 @@ export function BookingDetailScreen() {
     }
   };
 
-  const statusLabel = displayStatus ? statusLabels[displayStatus as BookingStatus] : "";
-  const statusVariant = displayStatus ? statusVariants[displayStatus as BookingStatus] : "info";
+  const statusLabel = displayStatus ? getBookingStatusLabel(displayStatus as BookingStatus) : "";
+  const statusVariant = displayStatus ? getBookingStatusVariant(displayStatus as BookingStatus) : "info";
   const categoryLabel = categoryLabels[booking.category] || booking.category;
 
   const formattedDate = new Intl.DateTimeFormat("es-UY", {

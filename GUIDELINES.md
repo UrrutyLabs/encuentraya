@@ -82,7 +82,7 @@ packages/
   domain/  # Shared Zod schemas + domain types (pure TS)
   trpc/    # Shared tRPC client helpers (superjson, links)
   config/  # Shared tsconfig/eslint presets
-  ui/      # Optional minimal tokens (not required for MVP)
+  ui/      # Shared design tokens + web UI components (client/admin)
 
 tooling/
   eslint/
@@ -105,12 +105,27 @@ Everything under `packages/*` must be:
 - DOM globals (window, document)
 - Framework-specific code (Next / Expo)
 
-### 5.2 No shared UI initially
+### 5.2 Shared UI Components (Web Only)
 
-For MVP:
+**Location:** `packages/ui/`
 
-- Share domain logic and API types only
-- Avoid cross-platform UI abstractions until flows are stable
+**Structure:**
+- `tokens/` - Design tokens (colors, typography, spacing, radius, shadows) - universal
+- `web/atoms/` - Atomic components (Button, Card, Text, Badge, Input, Select) - web only
+- `web/molecules/` - Composite components (EmptyState) - web only
+
+**Rationale:**
+- Share common UI components between `client` and `admin` apps (both use Next.js + Tailwind)
+- Reduces duplication and ensures consistency
+- Design tokens remain universal and can be used by mobile app
+- Mobile app has separate component implementations (React Native)
+
+**Rules:**
+- ✅ Web components use Tailwind CSS v4 with CSS variables for colors
+- ✅ Use inline styles for colors when Tailwind class detection is unreliable
+- ✅ Components must work identically in both client and admin apps
+- ✅ Design tokens are universal and can be imported by mobile
+- ❌ Do not share React Native components with web (platform-specific implementations)
 
 ## 6. Local Development Conventions
 
@@ -308,11 +323,13 @@ After changes:
 
 We explicitly do NOT build:
 
-- Shared cross-platform UI system
+- Shared cross-platform UI components (web and mobile use separate implementations)
 - Dynamic pricing
 - Multi-city support
 - Subscriptions / loyalty / referrals
 - Automated dispute resolution
+
+**Note:** We DO share web UI components between client and admin apps via `packages/ui/web/` for consistency and DRY principles.
 
 ## 10. Source of Truth
 

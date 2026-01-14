@@ -2,20 +2,20 @@
 
 import { useMemo } from "react";
 import { Calendar, History } from "lucide-react";
-import { Text } from "@repo/ui";
+import { Text, Card } from "@repo/ui";
 import { Navigation } from "@/components/presentational/Navigation";
 import { BookingCard } from "@/components/presentational/BookingCard";
 import { EmptyState } from "@/components/presentational/EmptyState";
 import { MyBookingsSkeleton } from "@/components/presentational/MyBookingsSkeleton";
 import { useMyBookings } from "@/hooks/useMyBookings";
-import { BookingStatus } from "@repo/domain";
+import { BookingStatus, type Booking } from "@repo/domain";
 
 export function MyBookingsScreen() {
   const { bookings, isLoading, reviewStatusMap } = useMyBookings();
 
-  const { upcoming, past } = useMemo(() => {
+  const { upcoming, past } = useMemo((): { upcoming: Booking[]; past: Booking[] } => {
     const now = new Date();
-    const upcomingBookings = bookings.filter((booking) => {
+    const upcomingBookings = bookings.filter((booking: Booking) => {
       const scheduledDate = new Date(booking.scheduledAt);
       return (
         scheduledDate >= now &&
@@ -25,7 +25,7 @@ export function MyBookingsScreen() {
       );
     });
 
-    const pastBookings = bookings.filter((booking) => {
+    const pastBookings = bookings.filter((booking: Booking) => {
       const scheduledDate = new Date(booking.scheduledAt);
       return (
         scheduledDate < now ||
@@ -76,7 +76,7 @@ export function MyBookingsScreen() {
                   </Card>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {upcoming.map((booking) => (
+                    {upcoming.map((booking: Booking) => (
                       <BookingCard key={booking.id} booking={booking} />
                     ))}
                   </div>
@@ -99,7 +99,7 @@ export function MyBookingsScreen() {
                   </Card>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {past.map((booking) => (
+                    {past.map((booking: Booking) => (
                       <BookingCard
                         key={booking.id}
                         booking={booking}

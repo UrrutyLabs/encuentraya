@@ -5,8 +5,7 @@ import { Text } from "@repo/ui";
 import { Badge } from "@repo/ui";
 import { Calendar, CreditCard, Wallet, ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { formatCurrency } from "@repo/domain";
-import { BookingStatus, PaymentStatus } from "@repo/domain";
+import { formatCurrency, BookingStatus, PaymentStatus, getBookingStatusLabel, getBookingStatusVariant } from "@repo/domain";
 
 interface RecentActivityFeedProps {
   recentBookings: Array<{
@@ -36,7 +35,12 @@ interface RecentActivityFeedProps {
   isLoading?: boolean;
 }
 
-const getStatusBadgeVariant = (status: string): "info" | "success" | "warning" | "danger" => {
+const getStatusBadgeVariant = (status: string | BookingStatus | PaymentStatus): "info" | "success" | "warning" | "danger" => {
+  // Handle booking statuses
+  if (Object.values(BookingStatus).includes(status as BookingStatus)) {
+    return getBookingStatusVariant(status as BookingStatus);
+  }
+  // Handle payment/payout statuses
   if (status.includes("COMPLETED") || status.includes("CAPTURED") || status.includes("SETTLED")) {
     return "success";
   }
@@ -47,6 +51,15 @@ const getStatusBadgeVariant = (status: string): "info" | "success" | "warning" |
     return "danger";
   }
   return "info";
+};
+
+const getStatusLabel = (status: string | BookingStatus | PaymentStatus): string => {
+  // Handle booking statuses
+  if (Object.values(BookingStatus).includes(status as BookingStatus)) {
+    return getBookingStatusLabel(status as BookingStatus);
+  }
+  // For payment/payout statuses, return as-is (they're already translated elsewhere)
+  return status;
 };
 
 const formatDate = (date: Date) => {
@@ -154,8 +167,8 @@ export function RecentActivityFeed({
                   </Text>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Badge variant={getStatusBadgeVariant(activity.status)}>
-                    {activity.status}
+                  <Badge variant={getStatusBadgeVariant(activity.status)} showIcon>
+                    {getStatusLabel(activity.status)}
                   </Badge>
                   <Text variant="xs" className="text-muted whitespace-nowrap">
                     {formatDate(activity.date)}

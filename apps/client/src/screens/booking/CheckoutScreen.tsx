@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import {
   CreditCard,
@@ -23,7 +23,7 @@ import { useClientProfile } from "@/hooks/useClientProfile";
 import { PaymentStatus, formatCurrency } from "@repo/domain";
 import Link from "next/link";
 
-export function CheckoutScreen() {
+function CheckoutContent() {
   const searchParams = useSearchParams();
   const bookingId = searchParams.get("bookingId");
 
@@ -299,5 +299,26 @@ export function CheckoutScreen() {
         </div>
       </div>
     </div>
+  );
+}
+
+export function CheckoutScreen() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-bg">
+        <Navigation showLogin={false} showProfile={true} />
+        <div className="px-4 py-8">
+          <div className="max-w-4xl mx-auto">
+            <Card className="p-8 text-center">
+              <div className="flex items-center justify-center">
+                <Loader2 className="w-6 h-6 text-primary animate-spin" />
+              </div>
+            </Card>
+          </div>
+        </div>
+      </div>
+    }>
+      <CheckoutContent />
+    </Suspense>
   );
 }

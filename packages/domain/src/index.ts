@@ -60,3 +60,6 @@ export {
 
 // Format utilities
 export { formatCurrency } from "./utils/format";
+
+// Booking status utilities
+export { getBookingStatusLabel, getBookingStatusVariant } from "./utils/booking-status";

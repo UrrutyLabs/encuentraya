@@ -8,43 +8,18 @@ import {
   RotateCcw,
   Star,
   ArrowRight,
-  CheckCircle,
-  XCircle,
-  AlertCircle,
-  MapPin,
 } from "lucide-react";
 import { Card } from "@repo/ui";
 import { Text } from "@repo/ui";
 import { Badge } from "@repo/ui";
 import type { Booking } from "@repo/domain";
-import { BookingStatus } from "@repo/domain";
+import { BookingStatus, getBookingStatusLabel, getBookingStatusVariant } from "@repo/domain";
 
 interface BookingCardProps {
   booking: Booking;
   hasReview?: boolean;
 }
 
-const STATUS_LABELS: Record<BookingStatus, string> = {
-  [BookingStatus.PENDING_PAYMENT]: "Pago pendiente",
-  [BookingStatus.PENDING]: "Pendiente",
-  [BookingStatus.ACCEPTED]: "Aceptada",
-  [BookingStatus.ON_MY_WAY]: "En camino",
-  [BookingStatus.ARRIVED]: "Llegó",
-  [BookingStatus.REJECTED]: "Rechazada",
-  [BookingStatus.COMPLETED]: "Completada",
-  [BookingStatus.CANCELLED]: "Cancelada",
-};
-
-const STATUS_VARIANTS: Record<BookingStatus, "info" | "success" | "warning" | "danger"> = {
-  [BookingStatus.PENDING_PAYMENT]: "warning",
-  [BookingStatus.PENDING]: "info",
-  [BookingStatus.ACCEPTED]: "success",
-  [BookingStatus.ON_MY_WAY]: "info",
-  [BookingStatus.ARRIVED]: "success",
-  [BookingStatus.REJECTED]: "danger",
-  [BookingStatus.COMPLETED]: "success",
-  [BookingStatus.CANCELLED]: "warning",
-};
 
 const CATEGORY_LABELS: Record<string, string> = {
   plumbing: "Plomería",
@@ -66,8 +41,8 @@ function formatDate(date: Date): string {
 
 export function BookingCard({ booking, hasReview = false }: BookingCardProps) {
   const router = useRouter();
-  const statusLabel = STATUS_LABELS[booking.status];
-  const statusVariant = STATUS_VARIANTS[booking.status];
+  const statusLabel = getBookingStatusLabel(booking.status);
+  const statusVariant = getBookingStatusVariant(booking.status);
   const categoryLabel = CATEGORY_LABELS[booking.category] || booking.category;
   const showReviewPrompt =
     booking.status === BookingStatus.COMPLETED && !hasReview;

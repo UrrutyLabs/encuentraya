@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useMemo, useRef, useEffect, startTransition } from "react";
+import { useState, useMemo, useRef, useEffect, startTransition, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { Loader2 } from "lucide-react";
 import { Text } from "@repo/ui";
 import { Card } from "@repo/ui";
 import { Button } from "@repo/ui";
@@ -15,7 +16,7 @@ import { useClientProfile } from "@/hooks/useClientProfile";
 import { useRebookTemplate } from "@/hooks/useRebookTemplate";
 import { Category } from "@repo/domain";
 
-export function BookingCreateScreen() {
+function BookingCreateContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const proId = searchParams.get("proId");
@@ -261,5 +262,26 @@ export function BookingCreateScreen() {
         </div>
       </div>
     </div>
+  );
+}
+
+export function BookingCreateScreen() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-bg">
+        <Navigation showLogin={false} showProfile={true} />
+        <div className="px-4 py-8">
+          <div className="max-w-4xl mx-auto">
+            <Card className="p-8 text-center">
+              <div className="flex items-center justify-center">
+                <Loader2 className="w-6 h-6 text-primary animate-spin" />
+              </div>
+            </Card>
+          </div>
+        </div>
+      </div>
+    }>
+      <BookingCreateContent />
+    </Suspense>
   );
 }

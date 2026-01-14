@@ -4,7 +4,7 @@ import { Card } from "../ui/Card";
 import { Text } from "../ui/Text";
 import { Badge } from "../ui/Badge";
 import type { Booking } from "@repo/domain";
-import { BookingStatus, Category } from "@repo/domain";
+import { Category, getBookingStatusLabel, getBookingStatusVariant } from "@repo/domain";
 import { theme } from "../../theme";
 
 interface BookingCardProps {
@@ -20,32 +20,11 @@ const categoryLabels: Record<string, string> = {
   [Category.PAINTING]: "Pintura",
 };
 
-const statusLabels: Record<BookingStatus, string> = {
-  [BookingStatus.PENDING_PAYMENT]: "Pago pendiente",
-  [BookingStatus.PENDING]: "Pendiente",
-  [BookingStatus.ACCEPTED]: "Aceptada",
-  [BookingStatus.ON_MY_WAY]: "En camino",
-  [BookingStatus.ARRIVED]: "Llegó",
-  [BookingStatus.REJECTED]: "Rechazada",
-  [BookingStatus.COMPLETED]: "Completada",
-  [BookingStatus.CANCELLED]: "Cancelada",
-};
-
-const statusVariants: Record<BookingStatus, "success" | "warning" | "danger" | "info"> = {
-  [BookingStatus.PENDING_PAYMENT]: "warning",
-  [BookingStatus.PENDING]: "info",
-  [BookingStatus.ACCEPTED]: "success",
-  [BookingStatus.ON_MY_WAY]: "info",
-  [BookingStatus.ARRIVED]: "success",
-  [BookingStatus.REJECTED]: "danger",
-  [BookingStatus.COMPLETED]: "success",
-  [BookingStatus.CANCELLED]: "warning",
-};
 
 export function BookingCard({ booking, onPress }: BookingCardProps) {
   const categoryLabel = categoryLabels[booking.category] || booking.category;
-  const statusLabel = statusLabels[booking.status];
-  const statusVariant = statusVariants[booking.status];
+  const statusLabel = getBookingStatusLabel(booking.status);
+  const statusVariant = getBookingStatusVariant(booking.status);
 
   const formattedDate = new Intl.DateTimeFormat("es-UY", {
     day: "numeric",

@@ -5,7 +5,7 @@ import { CalendarX } from "lucide-react";
 import { Badge } from "@repo/ui";
 import { TableSkeleton } from "@/components/ui/TableSkeleton";
 import { EmptyState } from "@repo/ui";
-import { formatCurrency } from "@repo/domain";
+import { formatCurrency, BookingStatus, getBookingStatusLabel, getBookingStatusVariant } from "@repo/domain";
 
 interface BookingRow {
   id: string;
@@ -37,19 +37,6 @@ export function BookingsTable({ bookings, isLoading }: BookingsTableProps) {
     });
   };
 
-  const getStatusBadgeVariant = (status: string) => {
-    const statusMap: Record<string, "info" | "success" | "warning" | "danger"> = {
-      pending_payment: "warning",
-      pending: "info",
-      accepted: "info",
-      on_my_way: "info",
-      arrived: "info",
-      completed: "success",
-      rejected: "danger",
-      cancelled: "danger",
-    };
-    return statusMap[status] || "info";
-  };
 
   const getPaymentStatusBadgeVariant = (status: string | null) => {
     if (!status) return "info";
@@ -116,8 +103,8 @@ export function BookingsTable({ bookings, isLoading }: BookingsTableProps) {
                   {formatDate(booking.createdAt)}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <Badge variant={getStatusBadgeVariant(booking.status)}>
-                    {booking.status}
+                  <Badge variant={getBookingStatusVariant(booking.status as BookingStatus)} showIcon>
+                    {getBookingStatusLabel(booking.status as BookingStatus)}
                   </Badge>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">

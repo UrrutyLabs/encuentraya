@@ -3,7 +3,7 @@
 import { Card } from "@repo/ui";
 import { Text } from "@repo/ui";
 import { Badge } from "@repo/ui";
-import { BookingStatus } from "@repo/domain";
+import { BookingStatus, getBookingStatusLabel, getBookingStatusVariant } from "@repo/domain";
 import { useRouter } from "next/navigation";
 
 interface BookingStatusBreakdownProps {
@@ -20,27 +20,6 @@ interface BookingStatusBreakdownProps {
   isLoading?: boolean;
 }
 
-const statusLabels: Record<BookingStatus, string> = {
-  [BookingStatus.PENDING_PAYMENT]: "Pago pendiente",
-  [BookingStatus.PENDING]: "Pendiente",
-  [BookingStatus.ACCEPTED]: "Aceptada",
-  [BookingStatus.ON_MY_WAY]: "En camino",
-  [BookingStatus.ARRIVED]: "Llegó",
-  [BookingStatus.COMPLETED]: "Completada",
-  [BookingStatus.REJECTED]: "Rechazada",
-  [BookingStatus.CANCELLED]: "Cancelada",
-};
-
-const statusVariants: Record<BookingStatus, "info" | "success" | "warning" | "danger"> = {
-  [BookingStatus.PENDING_PAYMENT]: "warning",
-  [BookingStatus.PENDING]: "info",
-  [BookingStatus.ACCEPTED]: "info",
-  [BookingStatus.ON_MY_WAY]: "info",
-  [BookingStatus.ARRIVED]: "info",
-  [BookingStatus.COMPLETED]: "success",
-  [BookingStatus.REJECTED]: "danger",
-  [BookingStatus.CANCELLED]: "danger",
-};
 
 export function BookingStatusBreakdown({
   breakdown,
@@ -92,7 +71,9 @@ export function BookingStatusBreakdown({
               onClick={() => router.push(`/admin/bookings?status=${status}`)}
             >
               <div className="flex items-center gap-3">
-                <Badge variant={statusVariants[status]}>{statusLabels[status]}</Badge>
+                <Badge variant={getBookingStatusVariant(status)} showIcon>
+                  {getBookingStatusLabel(status)}
+                </Badge>
                 <Text variant="small" className="text-muted">
                   {count} reservas
                 </Text>

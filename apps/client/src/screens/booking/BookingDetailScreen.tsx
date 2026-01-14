@@ -24,31 +24,10 @@ import { Button } from "@repo/ui";
 import { Badge } from "@repo/ui";
 import { Navigation } from "@/components/presentational/Navigation";
 import { BookingDetailSkeleton } from "@/components/presentational/BookingDetailSkeleton";
-import { BookingStatus, formatCurrency } from "@repo/domain";
+import { BookingStatus, formatCurrency, getBookingStatusLabel, getBookingStatusVariant } from "@repo/domain";
 import { useBookingDetail } from "@/hooks/useBookingDetail";
 import { useCancelBooking } from "@/hooks/useCancelBooking";
 
-const STATUS_LABELS: Record<BookingStatus, string> = {
-  [BookingStatus.PENDING_PAYMENT]: "Pago pendiente",
-  [BookingStatus.PENDING]: "Pendiente",
-  [BookingStatus.ACCEPTED]: "Aceptada",
-  [BookingStatus.ON_MY_WAY]: "En camino",
-  [BookingStatus.ARRIVED]: "Llegó",
-  [BookingStatus.REJECTED]: "Rechazada",
-  [BookingStatus.COMPLETED]: "Completada",
-  [BookingStatus.CANCELLED]: "Cancelada",
-};
-
-const STATUS_VARIANTS: Record<BookingStatus, "info" | "success" | "warning" | "danger"> = {
-  [BookingStatus.PENDING_PAYMENT]: "warning",
-  [BookingStatus.PENDING]: "info",
-  [BookingStatus.ACCEPTED]: "success",
-  [BookingStatus.ON_MY_WAY]: "info",
-  [BookingStatus.ARRIVED]: "success",
-  [BookingStatus.REJECTED]: "danger",
-  [BookingStatus.COMPLETED]: "success",
-  [BookingStatus.CANCELLED]: "warning",
-};
 
 const CATEGORY_LABELS: Record<string, string> = {
   plumbing: "Plomería",
@@ -146,8 +125,8 @@ export function BookingDetailScreen() {
     );
   }
 
-  const statusLabel = STATUS_LABELS[booking.status as BookingStatus];
-  const statusVariant = STATUS_VARIANTS[booking.status as BookingStatus];
+  const statusLabel = getBookingStatusLabel(booking.status as BookingStatus);
+  const statusVariant = getBookingStatusVariant(booking.status as BookingStatus);
   const categoryLabel = CATEGORY_LABELS[booking.category] || booking.category;
 
   // Extract address from description (assuming format "Servicio en {address}")

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { BookingStatus } from "@repo/domain";
+import { BookingStatus, getBookingStatusLabel, getBookingStatusVariant } from "@repo/domain";
 import { useBooking, useCancelBooking, useForceBookingStatus } from "@/hooks/useBookings";
 import { Card } from "@repo/ui";
 import { Button } from "@repo/ui";
@@ -35,19 +35,6 @@ export function BookingDetailScreen({ bookingId }: BookingDetailScreenProps) {
     });
   };
 
-  const getStatusBadgeVariant = (status: string) => {
-    const statusMap: Record<string, "info" | "success" | "warning" | "danger"> = {
-      pending_payment: "warning",
-      pending: "info",
-      accepted: "info",
-      on_my_way: "info",
-      arrived: "info",
-      completed: "success",
-      rejected: "danger",
-      cancelled: "danger",
-    };
-    return statusMap[status] || "info";
-  };
 
   const handleCancel = () => {
     if (confirm("¿Estás seguro de que querés cancelar esta reserva?")) {
@@ -108,8 +95,8 @@ export function BookingDetailScreen({ bookingId }: BookingDetailScreenProps) {
       <div className="flex items-center justify-between">
         <div>
           <Text variant="h1">Reserva #{booking.id}</Text>
-          <Badge variant={getStatusBadgeVariant(booking.status)} className="mt-2">
-            {booking.status}
+          <Badge variant={getBookingStatusVariant(booking.status)} showIcon className="mt-2">
+            {getBookingStatusLabel(booking.status)}
           </Badge>
         </div>
         <Button variant="ghost" onClick={() => router.back()}>
@@ -331,7 +318,7 @@ export function BookingDetailScreen({ bookingId }: BookingDetailScreenProps) {
                   <option value="">Seleccionar estado</option>
                   {statusOptions.map((status) => (
                     <option key={status} value={status}>
-                      {status}
+                      {getBookingStatusLabel(status)}
                     </option>
                   ))}
                 </select>
