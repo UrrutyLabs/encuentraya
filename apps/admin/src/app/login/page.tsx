@@ -3,9 +3,9 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
-import { Text } from "@/components/ui/Text";
+import { Button } from "@repo/ui";
+import { Input } from "@repo/ui";
+import { Text } from "@repo/ui";
 
 export default function LoginPage() {
   const router = useRouter();

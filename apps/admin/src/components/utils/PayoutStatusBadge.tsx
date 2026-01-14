@@ -1,6 +1,6 @@
 "use client";
 
-import { Badge } from "@/components/ui/Badge";
+import { Badge } from "@repo/ui";
 
 interface PayoutStatusBadgeProps {
   status: string;

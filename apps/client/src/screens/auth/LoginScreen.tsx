@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { LogIn, Loader2 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { AuthForm } from "@/components/forms/AuthForm";
-import { Text } from "@/components/ui/Text";
+import { Text } from "@repo/ui";
 
 export function LoginScreen() {
   const router = useRouter();

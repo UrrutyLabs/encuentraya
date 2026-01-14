@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Wrench } from "lucide-react";
-import { Text } from "@/components/ui/Text";
+import { Text } from "@repo/ui";
 
 export function LandingFooter() {
   return (

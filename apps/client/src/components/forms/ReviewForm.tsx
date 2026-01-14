@@ -1,6 +1,6 @@
 import { Star, MessageSquare, AlertCircle, Send, X, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/Button";
-import { Text } from "@/components/ui/Text";
+import { Button } from "@repo/ui";
+import { Text } from "@repo/ui";
 
 interface ReviewFormProps {
   rating: number;

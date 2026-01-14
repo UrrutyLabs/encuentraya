@@ -1,7 +1,7 @@
 "use client";
 
-import { Input } from "@/components/ui/Input";
-import { Button } from "@/components/ui/Button";
+import { Input } from "@repo/ui";
+import { Button } from "@repo/ui";
 import { BookingStatus } from "@repo/domain";
 
 interface BookingsFiltersProps {

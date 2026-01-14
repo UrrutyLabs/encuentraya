@@ -5,7 +5,7 @@ import { PaymentStatus } from "@repo/domain";
 import { usePayments } from "@/hooks/usePayments";
 import { PaymentsTable } from "@/components/payments/PaymentsTable";
 import { PaymentsFilters } from "@/components/payments/PaymentsFilters";
-import { Text } from "@/components/ui/Text";
+import { Text } from "@repo/ui";
 
 export function PaymentsListScreen() {
   const [statusFilter, setStatusFilter] = useState<PaymentStatus | undefined>();

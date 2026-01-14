@@ -4,12 +4,13 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { BookingStatus } from "@repo/domain";
 import { useBooking, useCancelBooking, useForceBookingStatus } from "@/hooks/useBookings";
-import { Card } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
-import { Text } from "@/components/ui/Text";
-import { Badge } from "@/components/ui/Badge";
+import { Card } from "@repo/ui";
+import { Button } from "@repo/ui";
+import { Text } from "@repo/ui";
+import { Badge } from "@repo/ui";
 import { formatCurrency } from "@repo/domain";
 import { BookingTimeline } from "@/components/bookings/BookingTimeline";
+import { BookingDetailSkeleton } from "@/components/presentational/BookingDetailSkeleton";
 
 interface BookingDetailScreenProps {
   bookingId: string;
@@ -80,11 +81,7 @@ export function BookingDetailScreen({ bookingId }: BookingDetailScreenProps) {
   };
 
   if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <Text variant="h1">Cargando...</Text>
-      </div>
-    );
+    return <BookingDetailSkeleton />;
   }
 
   if (!booking) {

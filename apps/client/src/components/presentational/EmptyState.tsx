@@ -1,6 +1,6 @@
 import { SearchX, Inbox } from "lucide-react";
-import { Card } from "@/components/ui/Card";
-import { Text } from "@/components/ui/Text";
+import { Card } from "@repo/ui";
+import { Text } from "@repo/ui";
 
 interface EmptyStateProps {
   title?: string;

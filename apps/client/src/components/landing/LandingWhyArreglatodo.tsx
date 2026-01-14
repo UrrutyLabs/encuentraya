@@ -1,6 +1,6 @@
 import { Shield, DollarSign, ShieldCheck, Headphones } from "lucide-react";
-import { Card } from "@/components/ui/Card";
-import { Text } from "@/components/ui/Text";
+import { Card } from "@repo/ui";
+import { Text } from "@repo/ui";
 
 export function LandingWhyArreglatodo() {
   return (

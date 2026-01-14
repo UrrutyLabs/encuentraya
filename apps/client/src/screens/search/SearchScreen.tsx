@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import { Filter, Calendar, Clock } from "lucide-react";
-import { Text } from "@/components/ui/Text";
-import { Card } from "@/components/ui/Card";
-import { Input } from "@/components/ui/Input";
+import { Text } from "@repo/ui";
+import { Card } from "@repo/ui";
+import { Input } from "@repo/ui";
 import { Navigation } from "@/components/presentational/Navigation";
 import { ProCard } from "@/components/presentational/ProCard";
 import { EmptyState } from "@/components/presentational/EmptyState";

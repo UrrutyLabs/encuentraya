@@ -1,7 +1,7 @@
 "use client";
 
-import { Card } from "@/components/ui/Card";
-import { Text } from "@/components/ui/Text";
+import { Card } from "@repo/ui";
+import { Text } from "@repo/ui";
 import { formatCurrency } from "@repo/domain";
 import { formatDate } from "@/components/utils/formatDate";
 

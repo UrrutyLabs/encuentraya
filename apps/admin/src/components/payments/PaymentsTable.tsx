@@ -1,8 +1,10 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Text } from "@/components/ui/Text";
-import { Badge } from "@/components/ui/Badge";
+import { CreditCard } from "lucide-react";
+import { Badge } from "@repo/ui";
+import { TableSkeleton } from "@/components/ui/TableSkeleton";
+import { EmptyState } from "@repo/ui";
 import { formatCurrency } from "@repo/domain";
 
 interface PaymentRow {
@@ -49,22 +51,16 @@ export function PaymentsTable({ payments, isLoading }: PaymentsTableProps) {
   };
 
   if (isLoading) {
-    return (
-      <div className="bg-white rounded-lg border border-gray-200 p-8">
-        <Text variant="body" className="text-gray-600">
-          Cargando pagos...
-        </Text>
-      </div>
-    );
+    return <TableSkeleton rows={5} columns={5} />;
   }
 
   if (payments.length === 0) {
     return (
-      <div className="bg-white rounded-lg border border-gray-200 p-8">
-        <Text variant="body" className="text-gray-600">
-          No se encontraron pagos
-        </Text>
-      </div>
+      <EmptyState
+        icon={CreditCard}
+        title="No se encontraron pagos"
+        description="No hay pagos que coincidan con los filtros seleccionados."
+      />
     );
   }
 

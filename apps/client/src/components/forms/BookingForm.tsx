@@ -6,10 +6,10 @@ import {
   Hourglass,
   DollarSign,
 } from "lucide-react";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
-import { Text } from "@/components/ui/Text";
-import { Card } from "@/components/ui/Card";
+import { Button } from "@repo/ui";
+import { Input } from "@repo/ui";
+import { Text } from "@repo/ui";
+import { Card } from "@repo/ui";
 import { Category } from "@repo/domain";
 
 interface BookingFormProps {

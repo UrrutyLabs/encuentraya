@@ -1,8 +1,10 @@
 "use client";
 
-import { Text } from "@/components/ui/Text";
-import { Badge } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
+import { Wallet } from "lucide-react";
+import { Badge } from "@repo/ui";
+import { Button } from "@repo/ui";
+import { TableSkeleton } from "@/components/ui/TableSkeleton";
+import { EmptyState } from "@repo/ui";
 import { formatCurrency } from "@repo/domain";
 
 interface PayablePro {
@@ -26,22 +28,16 @@ export function PayablesTable({
   onCreatePayout,
 }: PayablesTableProps) {
   if (isLoading) {
-    return (
-      <div className="bg-white rounded-lg border border-gray-200 p-8">
-        <Text variant="body" className="text-gray-600">
-          Cargando profesionales...
-        </Text>
-      </div>
-    );
+    return <TableSkeleton rows={5} columns={5} />;
   }
 
   if (pros.length === 0) {
     return (
-      <div className="bg-white rounded-lg border border-gray-200 p-8">
-        <Text variant="body" className="text-gray-600">
-          No hay profesionales con cobros pendientes
-        </Text>
-      </div>
+      <EmptyState
+        icon={Wallet}
+        title="No hay profesionales con cobros pendientes"
+        description="Todos los profesionales tienen sus cobros al día o no hay cobros pendientes."
+      />
     );
   }
 

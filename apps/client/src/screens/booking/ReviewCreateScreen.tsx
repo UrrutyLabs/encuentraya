@@ -9,9 +9,9 @@ import {
   CheckCircle,
   ArrowLeft,
 } from "lucide-react";
-import { Text } from "@/components/ui/Text";
-import { Card } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
+import { Text } from "@repo/ui";
+import { Card } from "@repo/ui";
+import { Button } from "@repo/ui";
 import { Navigation } from "@/components/presentational/Navigation";
 import { ReviewForm } from "@/components/forms/ReviewForm";
 import { useReviewForm } from "@/hooks/useReviewForm";

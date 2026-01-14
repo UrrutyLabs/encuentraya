@@ -1,6 +1,6 @@
 "use client";
 
-import { Text } from "@/components/ui/Text";
+import { Text } from "@repo/ui";
 import { BookingStatus } from "@repo/domain";
 
 interface BookingTimelineProps {

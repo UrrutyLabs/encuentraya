@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Card } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
-import { Text } from "@/components/ui/Text";
-import { Badge } from "@/components/ui/Badge";
+import { Card } from "@repo/ui";
+import { Button } from "@repo/ui";
+import { Text } from "@repo/ui";
+import { Badge } from "@repo/ui";
 import { ProAuditHistory } from "@/components/pros/ProAuditHistory";
+import { ProDetailSkeleton } from "@/components/presentational/ProDetailSkeleton";
 import { useProDetail } from "@/hooks/useProDetail";
 
 interface ProDetailScreenProps {
@@ -87,11 +88,7 @@ export function ProDetailScreen({ proProfileId }: ProDetailScreenProps) {
   };
 
   if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <Text variant="h1">Cargando...</Text>
-      </div>
-    );
+    return <ProDetailSkeleton />;
   }
 
   if (!pro) {

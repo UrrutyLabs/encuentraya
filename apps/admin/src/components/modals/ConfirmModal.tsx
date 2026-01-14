@@ -1,8 +1,8 @@
 "use client";
 
-import { Card } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
-import { Text } from "@/components/ui/Text";
+import { Card } from "@repo/ui";
+import { Button } from "@repo/ui";
+import { Text } from "@repo/ui";
 
 interface ConfirmModalProps {
   title: string;

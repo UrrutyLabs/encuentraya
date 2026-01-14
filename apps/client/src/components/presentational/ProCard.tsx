@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { Star, DollarSign, CheckCircle } from "lucide-react";
-import { Card } from "@/components/ui/Card";
-import { Text } from "@/components/ui/Text";
-import { Badge } from "@/components/ui/Badge";
+import { Card } from "@repo/ui";
+import { Text } from "@repo/ui";
+import { Badge } from "@repo/ui";
 import type { Pro } from "@repo/domain";
 
 interface ProCardProps {

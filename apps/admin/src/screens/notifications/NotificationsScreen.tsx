@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { useFailedNotifications, useRetryFailed, useDrainQueued } from "@/hooks/useNotifications";
 import { NotificationsTable } from "@/components/notifications/NotificationsTable";
-import { Button } from "@/components/ui/Button";
-import { Text } from "@/components/ui/Text";
-import { Card } from "@/components/ui/Card";
+import { Button } from "@repo/ui";
+import { Text } from "@repo/ui";
+import { Card } from "@repo/ui";
 
 export function NotificationsScreen() {
   const [limit] = useState(100);

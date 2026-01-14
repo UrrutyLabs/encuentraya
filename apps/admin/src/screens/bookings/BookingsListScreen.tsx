@@ -5,7 +5,7 @@ import { BookingStatus } from "@repo/domain";
 import { useBookings } from "@/hooks/useBookings";
 import { BookingsTable } from "@/components/bookings/BookingsTable";
 import { BookingsFilters } from "@/components/bookings/BookingsFilters";
-import { Text } from "@/components/ui/Text";
+import { Text } from "@repo/ui";
 
 export function BookingsListScreen() {
   const [statusFilter, setStatusFilter] = useState<BookingStatus | undefined>();

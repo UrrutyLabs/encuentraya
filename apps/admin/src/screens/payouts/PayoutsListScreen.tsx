@@ -2,7 +2,7 @@
 
 import { usePayouts } from "@/hooks/usePayouts";
 import { PayoutsTable } from "@/components/payouts/PayoutsTable";
-import { Text } from "@/components/ui/Text";
+import { Text } from "@repo/ui";
 
 export function PayoutsListScreen() {
   const { data: payouts, isLoading } = usePayouts(100);

@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { Text } from "@/components/ui/Text";
-import { Button } from "@/components/ui/Button";
+import { Text } from "@repo/ui";
+import { Button } from "@repo/ui";
 
 export function AccessDeniedScreen() {
   return (

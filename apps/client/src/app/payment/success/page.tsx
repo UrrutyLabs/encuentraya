@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { Text } from "@/components/ui/Text";
-import { Card } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
+import { Text } from "@repo/ui";
+import { Card } from "@repo/ui";
+import { Button } from "@repo/ui";
 import { Navigation } from "@/components/presentational/Navigation";
 
 export default function PaymentSuccessPage() {

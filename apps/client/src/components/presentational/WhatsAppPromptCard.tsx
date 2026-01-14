@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { MessageCircle } from "lucide-react";
-import { Card } from "@/components/ui/Card";
-import { Text } from "@/components/ui/Text";
-import { Button } from "@/components/ui/Button";
+import { Card } from "@repo/ui";
+import { Text } from "@repo/ui";
+import { Button } from "@repo/ui";
 
 export function WhatsAppPromptCard() {
   return (

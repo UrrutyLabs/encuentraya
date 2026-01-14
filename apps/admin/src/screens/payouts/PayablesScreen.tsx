@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { usePayablePros, useCreatePayout, useSendPayout } from "@/hooks/usePayouts";
 import { PayablesTable } from "@/components/payouts/PayablesTable";
-import { Text } from "@/components/ui/Text";
+import { Text } from "@repo/ui";
 import { ConfirmModal } from "@/components/modals/ConfirmModal";
 
 export function PayablesScreen() {

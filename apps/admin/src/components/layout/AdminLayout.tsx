@@ -12,8 +12,8 @@ import {
   LayoutDashboard,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import { Button } from "@/components/ui/Button";
-import { Text } from "@/components/ui/Text";
+import { Button } from "@repo/ui";
+import { Text } from "@repo/ui";
 
 interface AdminLayoutProps {
   children: React.ReactNode;

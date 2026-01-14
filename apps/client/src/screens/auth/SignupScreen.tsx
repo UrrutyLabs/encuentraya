@@ -4,7 +4,7 @@ import { useState } from "react";
 import { UserPlus } from "lucide-react";
 import { useSignup } from "@/hooks/useSignup";
 import { AuthForm } from "@/components/forms/AuthForm";
-import { Text } from "@/components/ui/Text";
+import { Text } from "@repo/ui";
 
 export function SignupScreen() {
   const { signup, isPending, error } = useSignup();

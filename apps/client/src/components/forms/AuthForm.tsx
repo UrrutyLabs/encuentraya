@@ -8,9 +8,9 @@ import {
   Loader2,
   AlertCircle,
 } from "lucide-react";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
-import { Text } from "@/components/ui/Text";
+import { Button } from "@repo/ui";
+import { Input } from "@repo/ui";
+import { Text } from "@repo/ui";
 
 interface AuthFormProps {
   mode: "login" | "signup";

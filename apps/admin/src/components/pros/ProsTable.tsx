@@ -1,8 +1,11 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Text } from "@/components/ui/Text";
-import { Badge } from "@/components/ui/Badge";
+import { Users } from "lucide-react";
+import { Text } from "@repo/ui";
+import { Badge } from "@repo/ui";
+import { TableSkeleton } from "@/components/ui/TableSkeleton";
+import { EmptyState } from "@repo/ui";
 
 interface ProRow {
   id: string;
@@ -54,22 +57,16 @@ export function ProsTable({ pros, isLoading }: ProsTableProps) {
   };
 
   if (isLoading) {
-    return (
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <Text variant="body" className="text-gray-600">
-          Cargando profesionales...
-        </Text>
-      </div>
-    );
+    return <TableSkeleton rows={5} columns={6} />;
   }
 
   if (pros.length === 0) {
     return (
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <Text variant="body" className="text-gray-600">
-          No se encontraron profesionales.
-        </Text>
-      </div>
+      <EmptyState
+        icon={Users}
+        title="No se encontraron profesionales"
+        description="No hay profesionales que coincidan con los filtros seleccionados."
+      />
     );
   }
 

@@ -13,11 +13,11 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { trpc } from "@/lib/trpc/client";
-import { Text } from "@/components/ui/Text";
-import { Card } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
-import { Select } from "@/components/ui/Select";
+import { Text } from "@repo/ui";
+import { Card } from "@repo/ui";
+import { Button } from "@repo/ui";
+import { Input } from "@repo/ui";
+import { Select } from "@repo/ui";
 import { Navigation } from "@/components/presentational/Navigation";
 import { useClientProfile } from "@/hooks/useClientProfile";
 import type { PreferredContactMethod } from "@repo/domain";

@@ -1,8 +1,10 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Text } from "@/components/ui/Text";
-import { Badge } from "@/components/ui/Badge";
+import { CalendarX } from "lucide-react";
+import { Badge } from "@repo/ui";
+import { TableSkeleton } from "@/components/ui/TableSkeleton";
+import { EmptyState } from "@repo/ui";
 import { formatCurrency } from "@repo/domain";
 
 interface BookingRow {
@@ -64,22 +66,16 @@ export function BookingsTable({ bookings, isLoading }: BookingsTableProps) {
   };
 
   if (isLoading) {
-    return (
-      <div className="bg-white rounded-lg border border-gray-200 p-8">
-        <Text variant="body" className="text-gray-600">
-          Cargando reservas...
-        </Text>
-      </div>
-    );
+    return <TableSkeleton rows={5} columns={6} />;
   }
 
   if (bookings.length === 0) {
     return (
-      <div className="bg-white rounded-lg border border-gray-200 p-8">
-        <Text variant="body" className="text-gray-600">
-          No se encontraron reservas
-        </Text>
-      </div>
+      <EmptyState
+        icon={CalendarX}
+        title="No se encontraron reservas"
+        description="No hay reservas que coincidan con los filtros seleccionados."
+      />
     );
   }
 

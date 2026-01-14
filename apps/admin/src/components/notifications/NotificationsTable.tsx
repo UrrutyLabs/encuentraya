@@ -1,7 +1,9 @@
 "use client";
 
-import { Text } from "@/components/ui/Text";
-import { Badge } from "@/components/ui/Badge";
+import { BellOff } from "lucide-react";
+import { Badge } from "@repo/ui";
+import { TableSkeleton } from "@/components/ui/TableSkeleton";
+import { EmptyState } from "@repo/ui";
 import { formatDateShort } from "@/components/utils/formatDate";
 
 interface FailedNotification {
@@ -34,22 +36,16 @@ export function NotificationsTable({
   };
 
   if (isLoading) {
-    return (
-      <div className="bg-white rounded-lg border border-gray-200 p-8">
-        <Text variant="body" className="text-gray-600">
-          Cargando notificaciones fallidas...
-        </Text>
-      </div>
-    );
+    return <TableSkeleton rows={5} columns={5} />;
   }
 
   if (notifications.length === 0) {
     return (
-      <div className="bg-white rounded-lg border border-gray-200 p-8">
-        <Text variant="body" className="text-gray-600">
-          No hay notificaciones fallidas
-        </Text>
-      </div>
+      <EmptyState
+        icon={BellOff}
+        title="No hay notificaciones fallidas"
+        description="Todas las notificaciones se han enviado correctamente."
+      />
     );
   }
 

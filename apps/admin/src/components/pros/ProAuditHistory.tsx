@@ -1,8 +1,8 @@
 "use client";
 
-import { Text } from "@/components/ui/Text";
-import { Card } from "@/components/ui/Card";
-import { Badge } from "@/components/ui/Badge";
+import { Text } from "@repo/ui";
+import { Card } from "@repo/ui";
+import { Badge } from "@repo/ui";
 
 type AuditEventType =
   | "PRO_SUSPENDED"

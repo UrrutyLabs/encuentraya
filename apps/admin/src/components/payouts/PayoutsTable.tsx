@@ -1,7 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Text } from "@/components/ui/Text";
+import { Wallet } from "lucide-react";
+import { TableSkeleton } from "@/components/ui/TableSkeleton";
+import { EmptyState } from "@repo/ui";
 import { formatCurrency } from "@repo/domain";
 import { PayoutStatusBadge } from "@/components/utils/PayoutStatusBadge";
 import { formatDateShort } from "@/components/utils/formatDate";
@@ -27,22 +29,16 @@ export function PayoutsTable({ payouts, isLoading }: PayoutsTableProps) {
   const router = useRouter();
 
   if (isLoading) {
-    return (
-      <div className="bg-white rounded-lg border border-gray-200 p-8">
-        <Text variant="body" className="text-gray-600">
-          Cargando cobros...
-        </Text>
-      </div>
-    );
+    return <TableSkeleton rows={5} columns={6} />;
   }
 
   if (payouts.length === 0) {
     return (
-      <div className="bg-white rounded-lg border border-gray-200 p-8">
-        <Text variant="body" className="text-gray-600">
-          No se encontraron cobros
-        </Text>
-      </div>
+      <EmptyState
+        icon={Wallet}
+        title="No se encontraron cobros"
+        description="Aún no hay cobros registrados en el sistema."
+      />
     );
   }
 

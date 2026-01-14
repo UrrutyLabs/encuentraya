@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { Calendar, History } from "lucide-react";
-import { Text } from "@/components/ui/Text";
+import { Text } from "@repo/ui";
 import { Navigation } from "@/components/presentational/Navigation";
 import { BookingCard } from "@/components/presentational/BookingCard";
 import { EmptyState } from "@/components/presentational/EmptyState";

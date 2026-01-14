@@ -3,12 +3,13 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { usePayout, useSendPayout } from "@/hooks/usePayouts";
-import { Card } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
-import { Text } from "@/components/ui/Text";
+import { Card } from "@repo/ui";
+import { Button } from "@repo/ui";
+import { Text } from "@repo/ui";
 import { PayoutStatusBadge } from "@/components/utils/PayoutStatusBadge";
 import { PayoutSummary } from "@/components/payouts/PayoutSummary";
 import { PayoutEarningsList } from "@/components/payouts/PayoutEarningsList";
+import { PayoutDetailSkeleton } from "@/components/presentational/PayoutDetailSkeleton";
 import { ConfirmModal } from "@/components/modals/ConfirmModal";
 
 interface PayoutDetailScreenProps {
@@ -43,11 +44,7 @@ export function PayoutDetailScreen({ payoutId }: PayoutDetailScreenProps) {
   };
 
   if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <Text variant="h1">Cargando...</Text>
-      </div>
-    );
+    return <PayoutDetailSkeleton />;
   }
 
   if (!payout) {

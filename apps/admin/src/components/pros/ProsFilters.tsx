@@ -1,8 +1,8 @@
 "use client";
 
-import { Text } from "@/components/ui/Text";
-import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
+import { Text } from "@repo/ui";
+import { Button } from "@repo/ui";
+import { Card } from "@repo/ui";
 
 interface ProsFiltersProps {
   status?: "pending" | "active" | "suspended";

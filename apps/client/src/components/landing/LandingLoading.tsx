@@ -1,5 +1,5 @@
 import { Loader2 } from "lucide-react";
-import { Text } from "@/components/ui/Text";
+import { Text } from "@repo/ui";
 
 export function LandingLoading() {
   return (

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { usePros } from "@/hooks/usePros";
 import { ProsTable } from "@/components/pros/ProsTable";
 import { ProsFilters } from "@/components/pros/ProsFilters";
-import { Text } from "@/components/ui/Text";
+import { Text } from "@repo/ui";
 
 export function ProsListScreen() {
   const [statusFilter, setStatusFilter] = useState<

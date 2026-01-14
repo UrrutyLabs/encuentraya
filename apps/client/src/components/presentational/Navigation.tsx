@@ -4,8 +4,8 @@ import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Search, Calendar, User, Settings, LogOut } from "lucide-react";
-import { Button } from "@/components/ui/Button";
-import { Text } from "@/components/ui/Text";
+import { Button } from "@repo/ui";
+import { Text } from "@repo/ui";
 import { useAuth } from "@/hooks/useAuth";
 
 interface NavigationProps {

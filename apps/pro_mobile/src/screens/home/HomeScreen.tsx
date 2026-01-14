@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { View, StyleSheet, ActivityIndicator, ScrollView } from "react-native";
+import { View, StyleSheet, ScrollView } from "react-native";
 import { useRouter } from "expo-router";
 import { Feather } from "@expo/vector-icons";
 import { Text } from "../../components/ui/Text";

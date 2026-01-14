@@ -2,10 +2,11 @@
 
 import { useRouter } from "next/navigation";
 import { usePayment, useSyncPaymentStatus } from "@/hooks/usePayments";
-import { Card } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
-import { Text } from "@/components/ui/Text";
-import { Badge } from "@/components/ui/Badge";
+import { Card } from "@repo/ui";
+import { Button } from "@repo/ui";
+import { Text } from "@repo/ui";
+import { Badge } from "@repo/ui";
+import { PaymentDetailSkeleton } from "@/components/presentational/PaymentDetailSkeleton";
 import { formatCurrency } from "@repo/domain";
 
 interface PaymentDetailScreenProps {
@@ -55,11 +56,7 @@ export function PaymentDetailScreen({ paymentId }: PaymentDetailScreenProps) {
   };
 
   if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <Text variant="h1">Cargando...</Text>
-      </div>
-    );
+    return <PaymentDetailSkeleton />;
   }
 
   if (!payment) {

@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { Button } from "@/components/ui/Button";
-import { Text } from "@/components/ui/Text";
+import { Button } from "@repo/ui";
+import { Text } from "@repo/ui";
 
 export function LandingHero() {
   return (

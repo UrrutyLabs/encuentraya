@@ -12,10 +12,10 @@ import {
   AlertCircle,
   ArrowLeft,
 } from "lucide-react";
-import { Text } from "@/components/ui/Text";
-import { Card } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
-import { Badge } from "@/components/ui/Badge";
+import { Text } from "@repo/ui";
+import { Card } from "@repo/ui";
+import { Button } from "@repo/ui";
+import { Badge } from "@repo/ui";
 import { Navigation } from "@/components/presentational/Navigation";
 import { ProProfileSkeleton } from "@/components/presentational/ProProfileSkeleton";
 import { useProDetail } from "@/hooks/useProDetail";
