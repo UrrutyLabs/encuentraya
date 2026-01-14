@@ -8,8 +8,7 @@ import { Navigation } from "@/components/presentational/Navigation";
 import { ProCard } from "@/components/presentational/ProCard";
 import { EmptyState } from "@/components/presentational/EmptyState";
 import { useSearchPros } from "@/hooks/useSearchPros";
-import { Category } from "@repo/domain";
-import { trpc } from "@/lib/trpc/client";
+import { Category, type Pro } from "@repo/domain";
 
 const CATEGORY_OPTIONS: { value: Category | ""; label: string }[] = [
   { value: "", label: "Todas las categorías" },
@@ -31,14 +30,6 @@ export function SearchScreen() {
     time: time || undefined,
   });
 
-  // Dev-only: Test API connection
-  const { data: healthData, isLoading: isHealthLoading } = trpc.health.ping.useQuery(
-    undefined,
-    {
-      refetchOnWindowFocus: false,
-    }
-  );
-
   return (
     <div className="min-h-screen bg-bg">
       <Navigation showLogin={false} showProfile={true} />
@@ -47,25 +38,6 @@ export function SearchScreen() {
           <Text variant="h1" className="mb-6 text-primary">
             Buscar profesionales
           </Text>
-
-          {/* Dev-only API status */}
-          {process.env.NODE_ENV === "development" && (
-            <Card className="p-4 mb-4">
-              {isHealthLoading ? (
-                <Text variant="small" className="text-muted">
-                  Verificando conexión...
-                </Text>
-              ) : healthData?.ok ? (
-                <Text variant="small" className="text-success">
-                  API conectada
-                </Text>
-              ) : (
-                <Text variant="small" className="text-danger">
-                  Error de conexión
-                </Text>
-              )}
-            </Card>
-          )}
 
           {/* Filters */}
           <Card className="p-6 mb-6">
@@ -116,7 +88,7 @@ export function SearchScreen() {
             <EmptyState />
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {pros.map((pro) => (
+              {pros.map((pro: Pro) => (
                 <ProCard key={pro.id} pro={pro} />
               ))}
             </div>

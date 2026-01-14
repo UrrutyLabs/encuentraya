@@ -501,6 +501,63 @@ export class BookingService {
   }
 
   /**
+   * Get rebook template from a completed booking
+   * Returns data needed to prefill a new booking form
+   * Authorization: Caller must be the booking's client
+   * Business rules:
+   * - Booking status must be COMPLETED
+   * - Booking must have proProfileId assigned
+   */
+  async getRebookTemplate(
+    actor: Actor,
+    bookingId: string
+  ): Promise<{
+    proProfileId: string;
+    category: Category;
+    addressText: string;
+    estimatedHours: number;
+  }> {
+    const booking = await this.getBookingOrThrow(bookingId);
+
+    // Authorization: Caller must be the booking's client
+    if (actor.role !== Role.ADMIN) {
+      if (actor.role !== Role.CLIENT) {
+        throw new UnauthorizedBookingActionError(
+          "get rebook template",
+          "Only clients can rebook"
+        );
+      }
+
+      if (booking.clientUserId !== actor.id) {
+        throw new UnauthorizedBookingActionError(
+          "get rebook template",
+          "Booking does not belong to this client"
+        );
+      }
+    }
+
+    // Business rules: Booking must be COMPLETED
+    if (booking.status !== BookingStatus.COMPLETED) {
+      throw new InvalidBookingStateError(
+        booking.status,
+        BookingStatus.COMPLETED
+      );
+    }
+
+    // Business rules: Booking must have proProfileId
+    if (!booking.proProfileId) {
+      throw new Error("Booking does not have a pro assigned");
+    }
+
+    return {
+      proProfileId: booking.proProfileId,
+      category: booking.category as Category,
+      addressText: booking.addressText,
+      estimatedHours: booking.hoursEstimate,
+    };
+  }
+
+  /**
    * Get bookings for a client
    */
   async getClientBookings(clientId: string): Promise<Booking[]> {

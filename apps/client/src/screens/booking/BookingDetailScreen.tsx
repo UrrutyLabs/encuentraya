@@ -322,6 +322,19 @@ export function BookingDetailScreen() {
                   </Link>
                 </Card>
               )}
+              {booking.proId && (
+                <Card className="p-6 mb-6 bg-primary/5 border-primary/20">
+                  <Text variant="h2" className="mb-3 text-text">
+                    ¿Querés que vuelva este profesional?
+                  </Text>
+                  <Text variant="body" className="text-muted mb-4">
+                    Creá una nueva solicitud para el mismo profesional.
+                  </Text>
+                  <Link href={`/book?rebookFrom=${bookingId}`}>
+                    <Button variant="primary">Volver a contratar</Button>
+                  </Link>
+                </Card>
+              )}
               <Card className="p-6">
                 <Text variant="body" className="text-muted">
                   Esta reserva fue completada el{" "}

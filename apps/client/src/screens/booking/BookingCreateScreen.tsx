@@ -1,30 +1,81 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo, useRef, useEffect, startTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { Text } from "@/components/ui/Text";
 import { Card } from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
 import { Navigation } from "@/components/presentational/Navigation";
 import { WhatsAppPromptCard } from "@/components/presentational/WhatsAppPromptCard";
 import { BookingForm } from "@/components/forms/BookingForm";
 import { useProDetail } from "@/hooks/useProDetail";
 import { useCreateBooking } from "@/hooks/useCreateBooking";
 import { useClientProfile } from "@/hooks/useClientProfile";
+import { useRebookTemplate } from "@/hooks/useRebookTemplate";
 import { Category } from "@repo/domain";
 
 export function BookingCreateScreen() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const proId = searchParams.get("proId");
+  const rebookFrom = searchParams.get("rebookFrom");
 
+  // Fetch rebook template if rebookFrom is present
+  const {
+    data: rebookTemplate,
+    isLoading: isLoadingRebook,
+    error: rebookError,
+  } = useRebookTemplate(rebookFrom || undefined);
+
+  // Derive initial values from rebook template (memoized to prevent recalculation)
+  const rebookValues = useMemo(() => {
+    if (rebookTemplate) {
+      return {
+        category: rebookTemplate.category,
+        address: rebookTemplate.addressText,
+        hours: rebookTemplate.estimatedHours.toString(),
+      };
+    }
+    return null;
+  }, [rebookTemplate]);
+
+  // Initialize state with values from rebook template if available
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
-  const [address, setAddress] = useState("");
-  const [hours, setHours] = useState("");
-  const [category, setCategory] = useState<Category | "">("");
+  const [address, setAddress] = useState(rebookValues?.address || "");
+  const [hours, setHours] = useState(rebookValues?.hours || "");
+  const [category, setCategory] = useState<Category | "">(rebookValues?.category || "");
+  
+  // Track previous rebookValues to update state only when template first loads
+  const prevRebookValuesRef = useRef(rebookValues);
+
+  // Update form fields when rebook template first becomes available
+  // Using startTransition to mark updates as non-urgent, avoiding cascading renders
+  useEffect(() => {
+    const prevValues = prevRebookValuesRef.current;
+    if (rebookValues && prevValues !== rebookValues) {
+      prevRebookValuesRef.current = rebookValues;
+      // Use startTransition to defer state updates, preventing cascading renders
+      startTransition(() => {
+        if (category !== rebookValues.category) {
+          setCategory(rebookValues.category);
+        }
+        if (address !== rebookValues.address) {
+          setAddress(rebookValues.address);
+        }
+        if (hours !== rebookValues.hours) {
+          setHours(rebookValues.hours);
+        }
+      });
+    }
+  }, [rebookValues, category, address, hours]);
+
+  // Determine proId: from rebook template or query param
+  const effectiveProId = rebookTemplate?.proProfileId || proId;
 
   // Fetch pro details to get hourly rate
-  const { pro, isLoading: isLoadingPro } = useProDetail(proId || undefined);
+  const { pro, isLoading: isLoadingPro } = useProDetail(effectiveProId || undefined);
 
   // Booking creation hook
   const { createBooking, isPending, error: createError } = useCreateBooking();
@@ -39,7 +90,7 @@ export function BookingCreateScreen() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!proId || !category || !date || !time || !address || !hours) {
+    if (!effectiveProId || !category || !date || !time || !address || !hours) {
       return;
     }
 
@@ -48,7 +99,7 @@ export function BookingCreateScreen() {
 
     try {
       await createBooking({
-        proId,
+        proId: effectiveProId,
         category: category as Category,
         description: `Servicio en ${address}`,
         scheduledAt,
@@ -60,7 +111,36 @@ export function BookingCreateScreen() {
     }
   };
 
-  if (!proId) {
+  // Handle rebook error
+  if (rebookFrom && rebookError) {
+    return (
+      <div className="min-h-screen bg-bg">
+        <Navigation showLogin={false} showProfile={true} />
+        <div className="px-4 py-8">
+          <div className="max-w-4xl mx-auto">
+            <Card className="p-8 text-center">
+              <Text variant="h2" className="mb-2 text-text">
+                No se puede volver a contratar desde esta reserva
+              </Text>
+              <Text variant="body" className="text-muted mb-4">
+                La reserva seleccionada no está disponible para volver a contratar.
+              </Text>
+              <div className="flex gap-2 justify-center">
+                <Link href="/search">
+                  <Button variant="primary">Buscar profesionales</Button>
+                </Link>
+                <Link href="/my-bookings">
+                  <Button variant="ghost">Mis reservas</Button>
+                </Link>
+              </div>
+            </Card>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!effectiveProId) {
     return (
       <div className="min-h-screen bg-bg">
         <Navigation showLogin={false} showProfile={true} />
@@ -86,7 +166,7 @@ export function BookingCreateScreen() {
     );
   }
 
-  if (isLoadingPro) {
+  if (isLoadingRebook || isLoadingPro) {
     return (
       <div className="min-h-screen bg-bg">
         <Navigation showLogin={false} showProfile={true} />
@@ -94,7 +174,7 @@ export function BookingCreateScreen() {
           <div className="max-w-4xl mx-auto">
             <Card className="p-8 text-center">
               <Text variant="body" className="text-muted">
-                Cargando información del profesional...
+                Cargando información...
               </Text>
             </Card>
           </div>
@@ -150,6 +230,15 @@ export function BookingCreateScreen() {
           {/* WhatsApp prompt */}
           {shouldShowPrompt && <WhatsAppPromptCard />}
 
+          {/* Rebook info banner */}
+          {rebookFrom && rebookTemplate && (
+            <Card className="p-4 mb-6 bg-primary/5 border-primary/20">
+              <Text variant="body" className="text-text">
+                Esta es una nueva solicitud. El profesional debe aceptarla.
+              </Text>
+            </Card>
+          )}
+
           <Card className="p-6">
             <BookingForm
               date={date}
@@ -166,6 +255,7 @@ export function BookingCreateScreen() {
               loading={isPending}
               error={createError?.message}
               estimatedCost={estimatedCost}
+              availableCategories={pro.categories}
             />
           </Card>
         </div>

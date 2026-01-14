@@ -19,9 +19,10 @@ interface BookingFormProps {
   loading?: boolean;
   error?: string | null;
   estimatedCost?: number;
+  availableCategories?: Category[];
 }
 
-const CATEGORY_OPTIONS: { value: Category; label: string }[] = [
+const ALL_CATEGORY_OPTIONS: { value: Category; label: string }[] = [
   { value: Category.PLUMBING, label: "Plomería" },
   { value: Category.ELECTRICAL, label: "Electricidad" },
   { value: Category.CLEANING, label: "Limpieza" },
@@ -44,7 +45,17 @@ export function BookingForm({
   loading = false,
   error,
   estimatedCost,
+  availableCategories,
 }: BookingFormProps) {
+  // Filter category options based on available categories
+  // If availableCategories is provided, only show those categories
+  // Otherwise, show all categories (for backward compatibility)
+  const categoryOptions = availableCategories
+    ? ALL_CATEGORY_OPTIONS.filter((option) =>
+        availableCategories.includes(option.value)
+      )
+    : ALL_CATEGORY_OPTIONS;
+
   return (
     <form onSubmit={onSubmit} className="space-y-4">
       <div>
@@ -58,7 +69,7 @@ export function BookingForm({
           className="w-full px-3 py-2 border border-border rounded-md bg-surface text-text focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
         >
           <option value="">Seleccionar categoría</option>
-          {CATEGORY_OPTIONS.map((option) => (
+          {categoryOptions.map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}
             </option>

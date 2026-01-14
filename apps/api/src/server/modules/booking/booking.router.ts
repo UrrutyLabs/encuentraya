@@ -118,6 +118,16 @@ export const bookingRouter = router({
     return bookingService.getClientBookings(ctx.actor.id);
   }),
 
+  rebookTemplate: protectedProcedure
+    .input(z.object({ bookingId: z.string() }))
+    .query(async ({ input, ctx }) => {
+      try {
+        return await bookingService.getRebookTemplate(ctx.actor, input.bookingId);
+      } catch (error) {
+        throw mapDomainErrorToTRPCError(error);
+      }
+    }),
+
   proInbox: proProcedure.query(async ({ ctx }) => {
     try {
       const allBookings = await bookingService.getProBookingsByUserId(ctx.actor.id);

@@ -62,6 +62,8 @@ export function BookingCard({ booking, hasReview = false }: BookingCardProps) {
     booking.status === BookingStatus.COMPLETED && !hasReview;
   const showPaymentPrompt =
     booking.status === BookingStatus.PENDING_PAYMENT;
+  const showRebookPrompt =
+    booking.status === BookingStatus.COMPLETED && booking.proId;
 
   const handleCardClick = () => {
     router.push(`/my-bookings/${booking.id}`);
@@ -70,6 +72,11 @@ export function BookingCard({ booking, hasReview = false }: BookingCardProps) {
   const handlePayNow = (e: React.MouseEvent) => {
     e.stopPropagation();
     router.push(`/checkout?bookingId=${booking.id}`);
+  };
+
+  const handleRebook = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    router.push(`/book?rebookFrom=${booking.id}`);
   };
 
   return (
@@ -105,6 +112,14 @@ export function BookingCard({ booking, hasReview = false }: BookingCardProps) {
               className="px-3 py-1 bg-primary text-white text-sm font-medium rounded-md hover:opacity-90 transition-opacity"
             >
               Pagar ahora
+            </button>
+          )}
+          {showRebookPrompt && (
+            <button
+              onClick={handleRebook}
+              className="px-3 py-1 bg-primary text-white text-sm font-medium rounded-md hover:opacity-90 transition-opacity"
+            >
+              Volver a contratar
             </button>
           )}
           {showReviewPrompt && (
