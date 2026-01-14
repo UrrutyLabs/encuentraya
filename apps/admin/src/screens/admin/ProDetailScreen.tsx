@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { trpc } from "@/lib/trpc/client";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Text } from "@/components/ui/Text";
 import { Badge } from "@/components/ui/Badge";
 import { ProAuditHistory } from "@/components/admin/ProAuditHistory";
+import { useProDetail } from "@/hooks/useProDetail";
 
 interface ProDetailScreenProps {
   proProfileId: string;
@@ -19,44 +19,21 @@ export function ProDetailScreen({ proProfileId }: ProDetailScreenProps) {
   const [showUnsuspendModal, setShowUnsuspendModal] = useState(false);
   const [suspendReason, setSuspendReason] = useState("");
 
-  const utils = trpc.useUtils();
-
-  const { data: pro, isLoading, refetch } = trpc.pro.adminById.useQuery({
+  const {
+    pro,
+    isLoading,
+    auditLogs,
+    isLoadingAuditLogs,
+    suspend,
+    unsuspend,
+  } = useProDetail({
     proProfileId,
-  });
-
-  // Fetch audit logs for suspend/unsuspend actions only
-  const { data: auditLogs, isLoading: isLoadingAuditLogs } =
-    trpc.audit.getResourceLogs.useQuery({
-      resourceType: "pro",
-      resourceId: proProfileId,
-      eventTypes: ["PRO_SUSPENDED", "PRO_UNSUSPENDED"],
-    });
-
-  const suspendMutation = trpc.pro.suspend.useMutation({
-    onSuccess: () => {
+    onSuspendSuccess: () => {
       setShowSuspendModal(false);
       setSuspendReason("");
-      refetch();
-      // Refetch audit logs to show the new suspend action
-      void utils.audit.getResourceLogs.invalidate({
-        resourceType: "pro",
-        resourceId: proProfileId,
-        eventTypes: ["PRO_SUSPENDED", "PRO_UNSUSPENDED"],
-      });
     },
-  });
-
-  const unsuspendMutation = trpc.pro.unsuspend.useMutation({
-    onSuccess: () => {
+    onUnsuspendSuccess: () => {
       setShowUnsuspendModal(false);
-      refetch();
-      // Refetch audit logs to show the new unsuspend action
-      void utils.audit.getResourceLogs.invalidate({
-        resourceType: "pro",
-        resourceId: proProfileId,
-        eventTypes: ["PRO_SUSPENDED", "PRO_UNSUSPENDED"],
-      });
     },
   });
 
@@ -102,14 +79,11 @@ export function ProDetailScreen({ proProfileId }: ProDetailScreenProps) {
   };
 
   const confirmSuspend = () => {
-    suspendMutation.mutate({
-      proProfileId,
-      reason: suspendReason || undefined,
-    });
+    suspend.mutate(suspendReason || undefined);
   };
 
   const confirmUnsuspend = () => {
-    unsuspendMutation.mutate({ proProfileId });
+    unsuspend.mutate();
   };
 
   if (isLoading) {
@@ -282,7 +256,7 @@ export function ProDetailScreen({ proProfileId }: ProDetailScreenProps) {
       </Card>
 
       {/* Audit History */}
-      <ProAuditHistory logs={auditLogs || []} isLoading={isLoadingAuditLogs} />
+      <ProAuditHistory logs={auditLogs} isLoading={isLoadingAuditLogs} />
 
       {/* Actions */}
       <Card className="p-6">
@@ -294,7 +268,7 @@ export function ProDetailScreen({ proProfileId }: ProDetailScreenProps) {
             <Button
               variant="danger"
               onClick={handleSuspend}
-              disabled={suspendMutation.isPending}
+              disabled={suspend.isPending}
             >
               Suspender
             </Button>
@@ -303,7 +277,7 @@ export function ProDetailScreen({ proProfileId }: ProDetailScreenProps) {
             <Button
               variant="primary"
               onClick={handleUnsuspend}
-              disabled={unsuspendMutation.isPending}
+              disabled={unsuspend.isPending}
             >
               Reactivar
             </Button>
@@ -337,10 +311,10 @@ export function ProDetailScreen({ proProfileId }: ProDetailScreenProps) {
               <Button
                 variant="danger"
                 onClick={confirmSuspend}
-                disabled={suspendMutation.isPending}
+                disabled={suspend.isPending}
                 className="flex-1"
               >
-                {suspendMutation.isPending ? "Suspendiendo..." : "Confirmar"}
+                {suspend.isPending ? "Suspendiendo..." : "Confirmar"}
               </Button>
               <Button
                 variant="ghost"
@@ -371,10 +345,10 @@ export function ProDetailScreen({ proProfileId }: ProDetailScreenProps) {
               <Button
                 variant="primary"
                 onClick={confirmUnsuspend}
-                disabled={unsuspendMutation.isPending}
+                disabled={unsuspend.isPending}
                 className="flex-1"
               >
-                {unsuspendMutation.isPending ? "Reactivando..." : "Confirmar"}
+                {unsuspend.isPending ? "Reactivando..." : "Confirmar"}
               </Button>
               <Button
                 variant="ghost"
