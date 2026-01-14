@@ -2,8 +2,16 @@
 
 import { useState } from "react";
 import { useParams } from "next/navigation";
+import {
+  Star,
+  Loader2,
+  AlertCircle,
+  CheckCircle,
+  ArrowLeft,
+} from "lucide-react";
 import { Text } from "@/components/ui/Text";
 import { Card } from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
 import { Navigation } from "@/components/presentational/Navigation";
 import { ReviewForm } from "@/components/forms/ReviewForm";
 import { useReviewForm } from "@/hooks/useReviewForm";
@@ -50,9 +58,12 @@ export function ReviewCreateScreen() {
         <div className="px-4 py-8">
           <div className="max-w-4xl mx-auto">
             <Card className="p-8 text-center">
-              <Text variant="body" className="text-muted">
-                Cargando...
-              </Text>
+              <div className="flex flex-col items-center gap-3">
+                <Loader2 className="w-8 h-8 text-primary animate-spin" />
+                <Text variant="body" className="text-muted">
+                  Cargando...
+                </Text>
+              </div>
             </Card>
           </div>
         </div>
@@ -67,18 +78,21 @@ export function ReviewCreateScreen() {
         <div className="px-4 py-8">
           <div className="max-w-4xl mx-auto">
             <Card className="p-8 text-center">
+              <AlertCircle className="w-12 h-12 text-warning mx-auto mb-4" />
               <Text variant="h2" className="mb-2 text-text">
                 Reserva no encontrada
               </Text>
               <Text variant="body" className="text-muted mb-4">
                 La reserva que buscas no existe.
               </Text>
-              <button
+              <Button
                 onClick={() => window.history.back()}
-                className="px-4 py-2 bg-primary text-white rounded-md hover:opacity-90"
+                variant="primary"
+                className="flex items-center gap-2 mx-auto"
               >
+                <ArrowLeft className="w-4 h-4" />
                 Volver a mis reservas
-              </button>
+              </Button>
             </Card>
           </div>
         </div>
@@ -93,10 +107,14 @@ export function ReviewCreateScreen() {
         <Navigation showLogin={false} showProfile={true} />
         <div className="px-4 py-8">
           <div className="max-w-4xl mx-auto">
-            <Text variant="h1" className="mb-6 text-primary">
-              Dejar reseña
-            </Text>
+            <div className="flex items-center gap-2 mb-6">
+              <Star className="w-6 h-6 text-primary" />
+              <Text variant="h1" className="text-primary">
+                Dejar reseña
+              </Text>
+            </div>
             <Card className="p-6 text-center">
+              <AlertCircle className="w-12 h-12 text-muted mx-auto mb-3" />
               <Text variant="body" className="text-muted">
                 La reseña está disponible cuando el trabajo esté completado.
               </Text>
@@ -114,10 +132,14 @@ export function ReviewCreateScreen() {
         <Navigation showLogin={false} showProfile={true} />
         <div className="px-4 py-8">
           <div className="max-w-4xl mx-auto">
-            <Text variant="h1" className="mb-6 text-primary">
-              Dejar reseña
-            </Text>
+            <div className="flex items-center gap-2 mb-6">
+              <Star className="w-6 h-6 text-primary" />
+              <Text variant="h1" className="text-primary">
+                Dejar reseña
+              </Text>
+            </div>
             <Card className="p-6 text-center">
+              <CheckCircle className="w-12 h-12 text-success mx-auto mb-3" />
               <Text variant="body" className="text-muted">
                 Ya dejaste una reseña para este trabajo.
               </Text>
@@ -133,9 +155,12 @@ export function ReviewCreateScreen() {
       <Navigation showLogin={false} showProfile={true} />
       <div className="px-4 py-8">
         <div className="max-w-4xl mx-auto">
-          <Text variant="h1" className="mb-6 text-primary">
-            Dejar reseña
-          </Text>
+          <div className="flex items-center gap-2 mb-6">
+            <Star className="w-6 h-6 text-primary" />
+            <Text variant="h1" className="text-primary">
+              Dejar reseña
+            </Text>
+          </div>
 
           <Card className="p-6">
             <ReviewForm

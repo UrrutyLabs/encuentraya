@@ -1,3 +1,4 @@
+import { Clock, Users, CheckCircle } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { Text } from "@/components/ui/Text";
 
@@ -11,8 +12,8 @@ export function LandingHowItWorks() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Card className="text-center">
             <div className="mb-4">
-              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                <span className="text-primary font-bold text-xl">1</span>
+              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                <Clock className="w-8 h-8 text-primary" />
               </div>
               <Text variant="h2" className="mb-2 text-text">
                 Contanos qué necesitás
@@ -25,8 +26,8 @@ export function LandingHowItWorks() {
 
           <Card className="text-center">
             <div className="mb-4">
-              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                <span className="text-primary font-bold text-xl">2</span>
+              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                <Users className="w-8 h-8 text-primary" />
               </div>
               <Text variant="h2" className="mb-2 text-text">
                 Un profesional acepta
@@ -39,8 +40,8 @@ export function LandingHowItWorks() {
 
           <Card className="text-center">
             <div className="mb-4">
-              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                <span className="text-primary font-bold text-xl">3</span>
+              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                <CheckCircle className="w-8 h-8 text-primary" />
               </div>
               <Text variant="h2" className="mb-2 text-text">
                 Trabajo hecho, pago seguro

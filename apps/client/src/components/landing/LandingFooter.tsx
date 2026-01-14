@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Wrench } from "lucide-react";
 import { Text } from "@/components/ui/Text";
 
 export function LandingFooter() {
@@ -6,9 +7,12 @@ export function LandingFooter() {
     <footer className="px-4 py-8 border-t border-border bg-surface">
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-          <Text variant="small" className="text-muted">
-            © Arreglatodo — Hecho para resolver lo cotidiano.
-          </Text>
+          <div className="flex items-center gap-2">
+            <Wrench className="w-5 h-5 text-muted" />
+            <Text variant="small" className="text-muted">
+              © Arreglatodo — Hecho para resolver lo cotidiano.
+            </Text>
+          </div>
           <div className="flex gap-6">
             <Link href="#" className="text-muted hover:text-text transition-colors">
               <Text variant="small">Términos</Text>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Filter, Calendar, Clock } from "lucide-react";
 import { Text } from "@/components/ui/Text";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
@@ -41,9 +42,16 @@ export function SearchScreen() {
 
           {/* Filters */}
           <Card className="p-6 mb-6">
+            <div className="flex items-center gap-2 mb-4">
+              <Filter className="w-5 h-5 text-primary" />
+              <Text variant="h2" className="text-text">
+                Filtros
+              </Text>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium text-text mb-1">
+                <label className="flex items-center gap-2 text-sm font-medium text-text mb-1">
+                  <Filter className="w-4 h-4 text-muted" />
                   Categoría
                 </label>
                 <select
@@ -59,16 +67,26 @@ export function SearchScreen() {
                 </select>
               </div>
               <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <Calendar className="w-4 h-4 text-muted" />
+                  <label className="block text-sm font-medium text-text">
+                    Fecha
+                  </label>
+                </div>
                 <Input
-                  label="Fecha"
                   type="date"
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
                 />
               </div>
               <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <Clock className="w-4 h-4 text-muted" />
+                  <label className="block text-sm font-medium text-text">
+                    Hora
+                  </label>
+                </div>
                 <Input
-                  label="Hora"
                   type="time"
                   value={time}
                   onChange={(e) => setTime(e.target.value)}

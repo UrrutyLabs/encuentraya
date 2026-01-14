@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Search, Calendar, User, Settings, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Text } from "@/components/ui/Text";
 import { useAuth } from "@/hooks/useAuth";
@@ -54,12 +55,14 @@ export function Navigation({ showLogin = true, showProfile = false }: Navigation
         </Link>
         <div className="flex items-center gap-4">
           <Link href="/search">
-            <Button variant="ghost" className="px-4">
+            <Button variant="ghost" className="px-4 flex items-center gap-2">
+              <Search className="w-4 h-4" />
               Buscar
             </Button>
           </Link>
           <Link href="/my-bookings">
-            <Button variant="ghost" className="px-4">
+            <Button variant="ghost" className="px-4 flex items-center gap-2">
+              <Calendar className="w-4 h-4" />
               Mis reservas
             </Button>
           </Link>
@@ -76,9 +79,7 @@ export function Navigation({ showLogin = true, showProfile = false }: Navigation
                 onClick={() => setShowMenu(!showMenu)}
                 className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors"
               >
-                <Text variant="xs" className="text-primary">
-                  {user?.email?.[0]?.toUpperCase() || "U"}
-                </Text>
+                <User className="w-4 h-4 text-primary" />
               </button>
               {showMenu && (
                 <div className="absolute right-0 mt-2 w-48 bg-surface border border-border rounded-md shadow-lg z-50">
@@ -91,16 +92,18 @@ export function Navigation({ showLogin = true, showProfile = false }: Navigation
                     <Link
                       href="/settings"
                       onClick={() => setShowMenu(false)}
-                      className="block w-full text-left px-4 py-2 hover:bg-surface/80 transition-colors"
+                      className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-surface/80 transition-colors"
                     >
+                      <Settings className="w-4 h-4 text-muted" />
                       <Text variant="body" className="text-text">
                         Configuración
                       </Text>
                     </Link>
                     <button
                       onClick={handleSignOut}
-                      className="w-full text-left px-4 py-2 hover:bg-surface/80 transition-colors"
+                      className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-surface/80 transition-colors"
                     >
+                      <LogOut className="w-4 h-4 text-muted" />
                       <Text variant="body" className="text-text">
                         Cerrar sesión
                       </Text>

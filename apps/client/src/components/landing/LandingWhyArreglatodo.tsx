@@ -1,3 +1,4 @@
+import { Shield, DollarSign, ShieldCheck, Headphones } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { Text } from "@/components/ui/Text";
 
@@ -9,7 +10,10 @@ export function LandingWhyArreglatodo() {
           Por qué Arreglatodo
         </Text>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card>
+          <Card className="text-center hover:shadow-lg transition-shadow">
+            <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
+              <Shield className="w-6 h-6 text-primary" />
+            </div>
             <Text variant="h2" className="mb-2 text-text">
               Profesionales verificados
             </Text>
@@ -18,7 +22,10 @@ export function LandingWhyArreglatodo() {
             </Text>
           </Card>
 
-          <Card>
+          <Card className="text-center hover:shadow-lg transition-shadow">
+            <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
+              <DollarSign className="w-6 h-6 text-primary" />
+            </div>
             <Text variant="h2" className="mb-2 text-text">
               Precios claros
             </Text>
@@ -27,7 +34,10 @@ export function LandingWhyArreglatodo() {
             </Text>
           </Card>
 
-          <Card>
+          <Card className="text-center hover:shadow-lg transition-shadow">
+            <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
+              <ShieldCheck className="w-6 h-6 text-primary" />
+            </div>
             <Text variant="h2" className="mb-2 text-text">
               Pagos seguros
             </Text>
@@ -36,7 +46,10 @@ export function LandingWhyArreglatodo() {
             </Text>
           </Card>
 
-          <Card>
+          <Card className="text-center hover:shadow-lg transition-shadow">
+            <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
+              <Headphones className="w-6 h-6 text-primary" />
+            </div>
             <Text variant="h2" className="mb-2 text-text">
               Soporte local
             </Text>

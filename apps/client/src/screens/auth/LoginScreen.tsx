@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { LogIn, Loader2 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { AuthForm } from "@/components/forms/AuthForm";
 import { Text } from "@/components/ui/Text";
@@ -39,9 +40,12 @@ export function LoginScreen() {
   if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-bg">
-        <Text variant="body" className="text-muted">
-          Cargando...
-        </Text>
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 className="w-8 h-8 text-primary animate-spin" />
+          <Text variant="body" className="text-muted">
+            Cargando...
+          </Text>
+        </div>
       </div>
     );
   }
@@ -49,9 +53,12 @@ export function LoginScreen() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-bg">
       <div className="max-w-md w-full space-y-8 p-8 bg-surface rounded-lg border border-border">
-        <Text variant="h1" className="text-center text-text">
-          Iniciar sesión
-        </Text>
+        <div className="flex items-center justify-center gap-2">
+          <LogIn className="w-6 h-6 text-primary" />
+          <Text variant="h1" className="text-center text-text">
+            Iniciar sesión
+          </Text>
+        </div>
         <AuthForm
           mode="login"
           email={email}

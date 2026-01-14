@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import { Calendar, History, Loader2 } from "lucide-react";
 import { Text } from "@/components/ui/Text";
 import { Card } from "@/components/ui/Card";
 import { Navigation } from "@/components/presentational/Navigation";
@@ -51,22 +52,29 @@ export function MyBookingsScreen() {
 
           {isLoading ? (
             <Card className="p-8 text-center">
-              <Text variant="body" className="text-muted">
-                Cargando reservas...
-              </Text>
+              <div className="flex flex-col items-center gap-3">
+                <Loader2 className="w-8 h-8 text-primary animate-spin" />
+                <Text variant="body" className="text-muted">
+                  Cargando reservas...
+                </Text>
+              </div>
             </Card>
           ) : bookings.length === 0 ? (
             <EmptyState
               title="No tenés reservas"
               description="Cuando hagas una reserva, aparecerá aquí."
+              icon="inbox"
             />
           ) : (
             <div className="space-y-8">
               {/* Upcoming Bookings */}
               <section>
-                <Text variant="h2" className="mb-4 text-text">
-                  Próximas
-                </Text>
+                <div className="flex items-center gap-2 mb-4">
+                  <Calendar className="w-5 h-5 text-primary" />
+                  <Text variant="h2" className="text-text">
+                    Próximas
+                  </Text>
+                </div>
                 {upcoming.length === 0 ? (
                   <Card className="p-6">
                     <Text variant="body" className="text-muted text-center">
@@ -84,9 +92,12 @@ export function MyBookingsScreen() {
 
               {/* Past Bookings */}
               <section>
-                <Text variant="h2" className="mb-4 text-text">
-                  Pasadas
-                </Text>
+                <div className="flex items-center gap-2 mb-4">
+                  <History className="w-5 h-5 text-muted" />
+                  <Text variant="h2" className="text-text">
+                    Pasadas
+                  </Text>
+                </div>
                 {past.length === 0 ? (
                   <Card className="p-6">
                     <Text variant="body" className="text-muted text-center">

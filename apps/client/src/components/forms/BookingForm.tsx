@@ -1,3 +1,11 @@
+import {
+  Filter,
+  Calendar,
+  Clock,
+  MapPin,
+  Hourglass,
+  DollarSign,
+} from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Text } from "@/components/ui/Text";
@@ -59,7 +67,8 @@ export function BookingForm({
   return (
     <form onSubmit={onSubmit} className="space-y-4">
       <div>
-        <label className="block text-sm font-medium text-text mb-1">
+        <label className="flex items-center gap-2 text-sm font-medium text-text mb-1">
+          <Filter className="w-4 h-4 text-muted" />
           Categoría
         </label>
         <select
@@ -78,48 +87,71 @@ export function BookingForm({
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label className="flex items-center gap-2 text-sm font-medium text-text mb-1">
+            <Calendar className="w-4 h-4 text-muted" />
+            Fecha
+          </label>
+          <Input
+            type="date"
+            value={date}
+            onChange={(e) => onDateChange(e.target.value)}
+            required
+          />
+        </div>
+        <div>
+          <label className="flex items-center gap-2 text-sm font-medium text-text mb-1">
+            <Clock className="w-4 h-4 text-muted" />
+            Hora
+          </label>
+          <Input
+            type="time"
+            value={time}
+            onChange={(e) => onTimeChange(e.target.value)}
+            required
+          />
+        </div>
+      </div>
+
+      <div>
+        <label className="flex items-center gap-2 text-sm font-medium text-text mb-1">
+          <MapPin className="w-4 h-4 text-muted" />
+          Dirección
+        </label>
         <Input
-          label="Fecha"
-          type="date"
-          value={date}
-          onChange={(e) => onDateChange(e.target.value)}
-          required
-        />
-        <Input
-          label="Hora"
-          type="time"
-          value={time}
-          onChange={(e) => onTimeChange(e.target.value)}
+          type="text"
+          value={address}
+          onChange={(e) => onAddressChange(e.target.value)}
+          placeholder="Ingresá la dirección donde se realizará el trabajo"
           required
         />
       </div>
 
-      <Input
-        label="Dirección"
-        type="text"
-        value={address}
-        onChange={(e) => onAddressChange(e.target.value)}
-        placeholder="Ingresá la dirección donde se realizará el trabajo"
-        required
-      />
-
-      <Input
-        label="Horas estimadas"
-        type="number"
-        min="0.5"
-        step="0.5"
-        value={hours}
-        onChange={(e) => onHoursChange(e.target.value)}
-        placeholder="Ej: 2.5"
-        required
-      />
+      <div>
+        <label className="flex items-center gap-2 text-sm font-medium text-text mb-1">
+          <Hourglass className="w-4 h-4 text-muted" />
+          Horas estimadas
+        </label>
+        <Input
+          type="number"
+          min="0.5"
+          step="0.5"
+          value={hours}
+          onChange={(e) => onHoursChange(e.target.value)}
+          placeholder="Ej: 2.5"
+          required
+        />
+      </div>
 
       {estimatedCost !== undefined && (
         <Card className="p-4 bg-primary/5 border-primary/20">
           <div className="flex justify-between items-center">
-            <Text variant="body" className="text-text font-medium">
-              Costo estimado:
-            </Text>
+            <div className="flex items-center gap-2">
+              <DollarSign className="w-5 h-5 text-primary" />
+              <Text variant="body" className="text-text font-medium">
+                Costo estimado:
+              </Text>
+            </div>
             <Text variant="h2" className="text-primary">
               ${estimatedCost.toFixed(0)}
             </Text>

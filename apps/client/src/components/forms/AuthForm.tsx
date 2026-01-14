@@ -1,3 +1,13 @@
+import {
+  Mail,
+  Lock,
+  User,
+  Phone,
+  LogIn,
+  UserPlus,
+  Loader2,
+  AlertCircle,
+} from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Text } from "@/components/ui/Text";
@@ -47,54 +57,95 @@ export function AuthForm({
     <form onSubmit={onSubmit} className="space-y-4">
       {!isLogin && (
         <>
-          <Input
-            label="Nombre"
-            type="text"
-            value={firstName}
-            onChange={(e) => onFirstNameChange?.(e.target.value)}
-          />
-          <Input
-            label="Apellido"
-            type="text"
-            value={lastName}
-            onChange={(e) => onLastNameChange?.(e.target.value)}
-          />
-          <Input
-            label="Teléfono"
-            type="tel"
-            placeholder="+598..."
-            value={phone}
-            onChange={(e) => onPhoneChange?.(e.target.value)}
-          />
+          <div>
+            <label className="flex items-center gap-2 text-sm font-medium text-text mb-1">
+              <User className="w-4 h-4 text-muted" />
+              Nombre
+            </label>
+            <Input
+              type="text"
+              value={firstName}
+              onChange={(e) => onFirstNameChange?.(e.target.value)}
+            />
+          </div>
+          <div>
+            <label className="flex items-center gap-2 text-sm font-medium text-text mb-1">
+              <User className="w-4 h-4 text-muted" />
+              Apellido
+            </label>
+            <Input
+              type="text"
+              value={lastName}
+              onChange={(e) => onLastNameChange?.(e.target.value)}
+            />
+          </div>
+          <div>
+            <label className="flex items-center gap-2 text-sm font-medium text-text mb-1">
+              <Phone className="w-4 h-4 text-muted" />
+              Teléfono
+            </label>
+            <Input
+              type="tel"
+              placeholder="+598..."
+              value={phone}
+              onChange={(e) => onPhoneChange?.(e.target.value)}
+            />
+          </div>
         </>
       )}
-      <Input
-        label="Email"
-        type="email"
-        value={email}
-        onChange={(e) => onEmailChange(e.target.value)}
-        required
-      />
-      <Input
-        label="Contraseña"
-        type="password"
-        value={password}
-        onChange={(e) => onPasswordChange(e.target.value)}
-        required
-      />
+      <div>
+        <label className="flex items-center gap-2 text-sm font-medium text-text mb-1">
+          <Mail className="w-4 h-4 text-muted" />
+          Email
+        </label>
+        <Input
+          type="email"
+          value={email}
+          onChange={(e) => onEmailChange(e.target.value)}
+          required
+        />
+      </div>
+      <div>
+        <label className="flex items-center gap-2 text-sm font-medium text-text mb-1">
+          <Lock className="w-4 h-4 text-muted" />
+          Contraseña
+        </label>
+        <Input
+          type="password"
+          value={password}
+          onChange={(e) => onPasswordChange(e.target.value)}
+          required
+        />
+      </div>
       {error && (
-        <Text variant="small" className="text-danger">
-          {error}
-        </Text>
+        <div className="flex items-center gap-2 p-3 bg-danger/10 border border-danger/20 rounded-md">
+          <AlertCircle className="w-4 h-4 text-danger shrink-0" />
+          <Text variant="small" className="text-danger">
+            {error}
+          </Text>
+        </div>
       )}
-      <Button type="submit" variant="primary" className="w-full" disabled={loading}>
-        {loading
-          ? isLogin
-            ? "Iniciando sesión..."
-            : "Registrando..."
-          : isLogin
-            ? "Ingresar"
-            : "Crear cuenta"}
+      <Button
+        type="submit"
+        variant="primary"
+        className="w-full flex items-center gap-2 justify-center"
+        disabled={loading}
+      >
+        {loading ? (
+          <>
+            <Loader2 className="w-4 h-4 animate-spin" />
+            {isLogin ? "Iniciando sesión..." : "Registrando..."}
+          </>
+        ) : (
+          <>
+            {isLogin ? (
+              <LogIn className="w-4 h-4" />
+            ) : (
+              <UserPlus className="w-4 h-4" />
+            )}
+            {isLogin ? "Ingresar" : "Crear cuenta"}
+          </>
+        )}
       </Button>
       {footerLink && (
         <Text variant="small" className="text-center text-muted">

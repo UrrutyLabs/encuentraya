@@ -2,6 +2,18 @@
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import {
+  MapPin,
+  Phone,
+  Star,
+  DollarSign,
+  User,
+  FileText,
+  Calendar,
+  Loader2,
+  AlertCircle,
+  ArrowLeft,
+} from "lucide-react";
 import { Text } from "@/components/ui/Text";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -31,9 +43,12 @@ export function ProProfileScreen() {
         <div className="px-4 py-8">
           <div className="max-w-4xl mx-auto">
             <Card className="p-8 text-center">
-              <Text variant="body" className="text-muted">
-                Cargando perfil...
-              </Text>
+              <div className="flex flex-col items-center gap-3">
+                <Loader2 className="w-8 h-8 text-primary animate-spin" />
+                <Text variant="body" className="text-muted">
+                  Cargando perfil...
+                </Text>
+              </div>
             </Card>
           </div>
         </div>
@@ -48,6 +63,7 @@ export function ProProfileScreen() {
         <div className="px-4 py-8">
           <div className="max-w-4xl mx-auto">
             <Card className="p-8 text-center">
+              <AlertCircle className="w-12 h-12 text-warning mx-auto mb-4" />
               <Text variant="h2" className="mb-2 text-text">
                 Profesional no encontrado
               </Text>
@@ -55,7 +71,10 @@ export function ProProfileScreen() {
                 El profesional que buscas no existe o fue eliminado.
               </Text>
               <Link href="/search">
-                <Button variant="primary">Volver a búsqueda</Button>
+                <Button variant="primary" className="flex items-center gap-2 mx-auto">
+                  <ArrowLeft className="w-4 h-4" />
+                  Volver a búsqueda
+                </Button>
               </Link>
             </Card>
           </div>
@@ -72,14 +91,20 @@ export function ProProfileScreen() {
           {/* Pro Header */}
           <Card className="p-6 mb-6">
             <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-4">
-              <div>
-                <Text variant="h1" className="mb-2 text-primary">
-                  {pro.name}
-                </Text>
-                {pro.serviceArea && (
-                  <Text variant="body" className="text-muted mb-3">
-                    {pro.serviceArea}
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-2">
+                  <User className="w-6 h-6 text-primary" />
+                  <Text variant="h1" className="text-primary">
+                    {pro.name}
                   </Text>
+                </div>
+                {pro.serviceArea && (
+                  <div className="flex items-center gap-2 mb-3">
+                    <MapPin className="w-4 h-4 text-muted" />
+                    <Text variant="body" className="text-muted">
+                      {pro.serviceArea}
+                    </Text>
+                  </div>
                 )}
                 <div className="flex flex-wrap gap-2 mb-3">
                   {pro.categories.map((category: Category | string) => (
@@ -90,18 +115,25 @@ export function ProProfileScreen() {
                 </div>
               </div>
               <div className="text-right">
-                <Text variant="h2" className="text-primary mb-1">
-                  ${pro.hourlyRate.toFixed(0)}/hora
-                </Text>
-                {pro.rating && (
-                  <Text variant="body" className="text-muted">
-                    ⭐ {pro.rating.toFixed(1)} ({pro.reviewCount} reseñas)
+                <div className="flex items-center justify-end gap-2 mb-1">
+                  <DollarSign className="w-5 h-5 text-primary" />
+                  <Text variant="h2" className="text-primary">
+                    ${pro.hourlyRate.toFixed(0)}/hora
                   </Text>
+                </div>
+                {pro.rating && (
+                  <div className="flex items-center justify-end gap-1">
+                    <Star className="w-4 h-4 text-warning fill-warning" />
+                    <Text variant="body" className="text-muted">
+                      {pro.rating.toFixed(1)} ({pro.reviewCount} reseñas)
+                    </Text>
+                  </div>
                 )}
               </div>
             </div>
             <Link href={`/book?proId=${pro.id}`}>
-              <Button variant="primary" className="w-full md:w-auto">
+              <Button variant="primary" className="w-full md:w-auto flex items-center gap-2">
+                <Calendar className="w-4 h-4" />
                 Reservar
               </Button>
             </Link>
@@ -109,9 +141,12 @@ export function ProProfileScreen() {
 
           {/* About Section */}
           <Card className="p-6 mb-6">
-            <Text variant="h2" className="mb-4 text-text">
-              Acerca de
-            </Text>
+            <div className="flex items-center gap-2 mb-4">
+              <FileText className="w-5 h-5 text-primary" />
+              <Text variant="h2" className="text-text">
+                Acerca de
+              </Text>
+            </div>
             {pro.serviceArea ? (
               <Text variant="body" className="text-muted">
                 Profesional en {pro.serviceArea} con experiencia en{" "}
@@ -130,22 +165,38 @@ export function ProProfileScreen() {
               </Text>
             )}
             {pro.phone && (
-              <Text variant="body" className="text-muted mt-2">
-                Teléfono: {pro.phone}
-              </Text>
+              <div className="flex items-center gap-2 mt-3">
+                <Phone className="w-4 h-4 text-muted" />
+                <Text variant="body" className="text-muted">
+                  {pro.phone}
+                </Text>
+              </div>
             )}
           </Card>
 
           {/* Reviews Section */}
           <Card className="p-6">
-            <Text variant="h2" className="mb-4 text-text">
-              Reseñas
-            </Text>
-            {pro.reviewCount > 0 ? (
-              <Text variant="body" className="text-muted">
-                {pro.reviewCount} {pro.reviewCount === 1 ? "reseña" : "reseñas"}
-                {pro.rating && ` - Promedio: ${pro.rating.toFixed(1)} ⭐`}
+            <div className="flex items-center gap-2 mb-4">
+              <Star className="w-5 h-5 text-primary" />
+              <Text variant="h2" className="text-text">
+                Reseñas
               </Text>
+            </div>
+            {pro.reviewCount > 0 ? (
+              <div className="flex items-center gap-2">
+                <Text variant="body" className="text-muted">
+                  {pro.reviewCount} {pro.reviewCount === 1 ? "reseña" : "reseñas"}
+                </Text>
+                {pro.rating && (
+                  <>
+                    <span className="text-muted">-</span>
+                    <Star className="w-4 h-4 text-warning fill-warning" />
+                    <Text variant="body" className="text-muted">
+                      Promedio: {pro.rating.toFixed(1)}
+                    </Text>
+                  </>
+                )}
+              </div>
             ) : (
               <Text variant="body" className="text-muted">
                 Aún no hay reseñas para este profesional.

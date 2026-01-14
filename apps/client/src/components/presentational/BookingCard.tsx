@@ -2,6 +2,17 @@
 
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import {
+  Clock,
+  CreditCard,
+  RotateCcw,
+  Star,
+  ArrowRight,
+  CheckCircle,
+  XCircle,
+  AlertCircle,
+  MapPin,
+} from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { Text } from "@/components/ui/Text";
 import { Badge } from "@/components/ui/Badge";
@@ -90,17 +101,25 @@ export function BookingCard({ booking, hasReview = false }: BookingCardProps) {
         </Text>
         <div className="flex gap-2 items-center">
           {showReviewPrompt && (
-            <Badge variant="warning">Pendiente de reseña</Badge>
+            <Badge variant="warning" className="flex items-center gap-1">
+              <Star className="w-3 h-3" />
+              Pendiente de reseña
+            </Badge>
           )}
-          <Badge variant={statusVariant}>{statusLabel}</Badge>
+          <Badge variant={statusVariant} showIcon>
+            {statusLabel}
+          </Badge>
         </div>
       </div>
       <Text variant="body" className="text-muted mb-2 line-clamp-2">
         {booking.description}
       </Text>
-      <Text variant="small" className="text-muted mb-3">
-        {formatDate(booking.scheduledAt)}
-      </Text>
+      <div className="flex items-center gap-2 mb-3">
+        <Clock className="w-4 h-4 text-muted" />
+        <Text variant="small" className="text-muted">
+          {formatDate(booking.scheduledAt)}
+        </Text>
+      </div>
       <div className="flex justify-between items-center">
         <Text variant="small" className="text-text font-medium">
           ${booking.totalAmount.toFixed(0)}
@@ -109,16 +128,18 @@ export function BookingCard({ booking, hasReview = false }: BookingCardProps) {
           {showPaymentPrompt && (
             <button
               onClick={handlePayNow}
-              className="px-3 py-1 bg-primary text-white text-sm font-medium rounded-md hover:opacity-90 transition-opacity"
+              className="flex items-center gap-1 px-3 py-1 bg-primary text-white text-sm font-medium rounded-md hover:opacity-90 transition-opacity"
             >
+              <CreditCard className="w-4 h-4" />
               Pagar ahora
             </button>
           )}
           {showRebookPrompt && (
             <button
               onClick={handleRebook}
-              className="px-3 py-1 bg-primary text-white text-sm font-medium rounded-md hover:opacity-90 transition-opacity"
+              className="flex items-center gap-1 px-3 py-1 bg-primary text-white text-sm font-medium rounded-md hover:opacity-90 transition-opacity"
             >
+              <RotateCcw className="w-4 h-4" />
               Volver a contratar
             </button>
           )}
@@ -126,13 +147,15 @@ export function BookingCard({ booking, hasReview = false }: BookingCardProps) {
             <Link
               href={`/my-bookings/${booking.id}/review`}
               onClick={(e) => e.stopPropagation()}
-              className="text-primary hover:underline text-sm font-medium"
+              className="flex items-center gap-1 text-primary hover:underline text-sm font-medium"
             >
+              <Star className="w-4 h-4" />
               Calificar
             </Link>
           )}
-          <Text variant="small" className="text-muted">
-            Ver detalles →
+          <Text variant="small" className="text-muted flex items-center gap-1">
+            Ver detalles
+            <ArrowRight className="w-3 h-3" />
           </Text>
         </div>
       </div>

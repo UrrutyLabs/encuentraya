@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Star, DollarSign, CheckCircle } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { Text } from "@/components/ui/Text";
 import { Badge } from "@/components/ui/Badge";
@@ -18,7 +19,11 @@ export function ProCard({ pro }: ProCardProps) {
           <Text variant="h2" className="text-text">
             {pro.name}
           </Text>
-          {isActive && <Badge variant="success">Activo</Badge>}
+          {isActive && (
+            <Badge variant="success" showIcon>
+              Activo
+            </Badge>
+          )}
         </div>
         {pro.serviceArea && (
           <Text variant="body" className="text-muted mb-2">
@@ -35,13 +40,19 @@ export function ProCard({ pro }: ProCardProps) {
           </div>
         )}
         <div className="flex justify-between items-center">
-          <Text variant="small" className="text-text font-medium">
-            ${pro.hourlyRate.toFixed(0)}/hora
-          </Text>
-          {pro.rating && (
-            <Text variant="small" className="text-muted">
-              ⭐ {pro.rating.toFixed(1)} ({pro.reviewCount})
+          <div className="flex items-center gap-1">
+            <DollarSign className="w-4 h-4 text-primary" />
+            <Text variant="small" className="text-text font-medium">
+              ${pro.hourlyRate.toFixed(0)}/hora
             </Text>
+          </div>
+          {pro.rating && (
+            <div className="flex items-center gap-1">
+              <Star className="w-4 h-4 text-warning fill-warning" />
+              <Text variant="small" className="text-muted">
+                {pro.rating.toFixed(1)} ({pro.reviewCount})
+              </Text>
+            </div>
           )}
         </div>
       </Card>

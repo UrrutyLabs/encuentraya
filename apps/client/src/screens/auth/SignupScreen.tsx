@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { UserPlus } from "lucide-react";
 import { useSignup } from "@/hooks/useSignup";
 import { AuthForm } from "@/components/forms/AuthForm";
 import { Text } from "@/components/ui/Text";
@@ -29,9 +30,12 @@ export function SignupScreen() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-bg">
       <div className="max-w-md w-full space-y-8 p-8 bg-surface rounded-lg border border-border">
-        <Text variant="h1" className="text-center text-text">
-          Registrarse
-        </Text>
+        <div className="flex items-center justify-center gap-2">
+          <UserPlus className="w-6 h-6 text-primary" />
+          <Text variant="h1" className="text-center text-text">
+            Registrarse
+          </Text>
+        </div>
         <AuthForm
           mode="signup"
           email={email}

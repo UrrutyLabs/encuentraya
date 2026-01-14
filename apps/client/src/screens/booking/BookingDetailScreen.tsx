@@ -2,6 +2,22 @@
 
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import {
+  ArrowLeft,
+  CreditCard,
+  User,
+  Filter,
+  Calendar,
+  MapPin,
+  Hourglass,
+  FileText,
+  DollarSign,
+  X,
+  Star,
+  RotateCcw,
+  CheckCircle,
+  AlertCircle,
+} from "lucide-react";
 import { Text } from "@/components/ui/Text";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -150,9 +166,14 @@ export function BookingDetailScreen() {
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between mb-6">
             <Link href="/my-bookings">
-              <Button variant="ghost">← Volver</Button>
+              <Button variant="ghost" className="flex items-center gap-2">
+                <ArrowLeft className="w-4 h-4" />
+                Volver
+              </Button>
             </Link>
-            <Badge variant={statusVariant}>{statusLabel}</Badge>
+            <Badge variant={statusVariant} showIcon>
+              {statusLabel}
+            </Badge>
           </div>
 
           <Text variant="h1" className="mb-6 text-primary">
@@ -164,22 +185,35 @@ export function BookingDetailScreen() {
           {booking.status === BookingStatus.PENDING_PAYMENT && (
             <Card className="p-6 mb-6 bg-warning/10 border-warning/20">
               <div className="flex items-start justify-between mb-4">
-                <div>
-                  <Text variant="h2" className="mb-2 text-text">
-                    Pago pendiente
-                  </Text>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <AlertCircle className="w-5 h-5 text-warning" />
+                    <Text variant="h2" className="text-text">
+                      Pago pendiente
+                    </Text>
+                  </div>
                   <Text variant="body" className="text-muted mb-2">
                     Para continuar con tu reserva, necesitás autorizar el pago.
                   </Text>
                   {payment && (
-                    <Text variant="body" className="text-text font-medium">
-                      Monto estimado: {formatCurrency(payment.amountEstimated, payment.currency, true)}
-                    </Text>
+                    <div className="flex items-center gap-2 mt-2">
+                      <DollarSign className="w-4 h-4 text-text" />
+                      <Text variant="body" className="text-text font-medium">
+                        Monto estimado: {formatCurrency(payment.amountEstimated, payment.currency, true)}
+                      </Text>
+                    </div>
                   )}
                 </div>
-                <Badge variant="warning">Pago pendiente</Badge>
+                <Badge variant="warning" showIcon>
+                  Pago pendiente
+                </Badge>
               </div>
-              <Button variant="primary" onClick={handleAuthorizePayment} className="w-full md:w-auto">
+              <Button
+                variant="primary"
+                onClick={handleAuthorizePayment}
+                className="w-full md:w-auto flex items-center gap-2"
+              >
+                <CreditCard className="w-4 h-4" />
                 Autorizar pago
               </Button>
             </Card>
@@ -187,20 +221,28 @@ export function BookingDetailScreen() {
 
           {pro && (
             <Card className="p-6 mb-6">
-              <Text variant="h2" className="mb-4 text-text">
-                Profesional
-              </Text>
+              <div className="flex items-center gap-2 mb-4">
+                <User className="w-5 h-5 text-primary" />
+                <Text variant="h2" className="text-text">
+                  Profesional
+                </Text>
+              </div>
               <div className="flex items-center justify-between">
                 <div>
                   <Text variant="body" className="text-text font-medium mb-1">
                     {pro.name}
                   </Text>
-                  <Text variant="small" className="text-muted">
-                    ${pro.hourlyRate.toFixed(0)}/hora
-                  </Text>
+                  <div className="flex items-center gap-1">
+                    <DollarSign className="w-4 h-4 text-muted" />
+                    <Text variant="small" className="text-muted">
+                      ${pro.hourlyRate.toFixed(0)}/hora
+                    </Text>
+                  </div>
                 </div>
                 <Link href={`/pros/${pro.id}`}>
-                  <Button variant="ghost">Ver perfil</Button>
+                  <Button variant="ghost" className="flex items-center gap-2">
+                    Ver perfil
+                  </Button>
                 </Link>
               </div>
             </Card>
@@ -208,46 +250,64 @@ export function BookingDetailScreen() {
 
           {/* Booking Summary */}
           <Card className="p-6 mb-6">
-            <Text variant="h2" className="mb-4 text-text">
-              Detalles del servicio
-            </Text>
-            <div className="space-y-3">
+            <div className="flex items-center gap-2 mb-4">
+              <FileText className="w-5 h-5 text-primary" />
+              <Text variant="h2" className="text-text">
+                Detalles del servicio
+              </Text>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Text variant="small" className="text-muted mb-1">
-                  Categoría
-                </Text>
+                <div className="flex items-center gap-2 mb-1">
+                  <Filter className="w-4 h-4 text-muted" />
+                  <Text variant="small" className="text-muted">
+                    Categoría
+                  </Text>
+                </div>
                 <Text variant="body" className="text-text">
                   {categoryLabel}
                 </Text>
               </div>
               <div>
-                <Text variant="small" className="text-muted mb-1">
-                  Fecha y hora
-                </Text>
+                <div className="flex items-center gap-2 mb-1">
+                  <Calendar className="w-4 h-4 text-muted" />
+                  <Text variant="small" className="text-muted">
+                    Fecha y hora
+                  </Text>
+                </div>
                 <Text variant="body" className="text-text">
                   {formatDate(booking.scheduledAt)}
                 </Text>
               </div>
-              <div>
-                <Text variant="small" className="text-muted mb-1">
-                  Dirección
-                </Text>
+              <div className="md:col-span-2">
+                <div className="flex items-center gap-2 mb-1">
+                  <MapPin className="w-4 h-4 text-muted" />
+                  <Text variant="small" className="text-muted">
+                    Dirección
+                  </Text>
+                </div>
                 <Text variant="body" className="text-text">
                   {address}
                 </Text>
               </div>
               <div>
-                <Text variant="small" className="text-muted mb-1">
-                  Horas estimadas
-                </Text>
+                <div className="flex items-center gap-2 mb-1">
+                  <Hourglass className="w-4 h-4 text-muted" />
+                  <Text variant="small" className="text-muted">
+                    Horas estimadas
+                  </Text>
+                </div>
                 <Text variant="body" className="text-text">
                   {booking.estimatedHours} {booking.estimatedHours === 1 ? "hora" : "horas"}
                 </Text>
               </div>
-              <div>
-                <Text variant="small" className="text-muted mb-1">
-                  Descripción
-                </Text>
+              <div className="md:col-span-2">
+                <div className="flex items-center gap-2 mb-1">
+                  <FileText className="w-4 h-4 text-muted" />
+                  <Text variant="small" className="text-muted">
+                    Descripción
+                  </Text>
+                </div>
                 <Text variant="body" className="text-text">
                   {booking.description}
                 </Text>
@@ -257,9 +317,12 @@ export function BookingDetailScreen() {
 
           {/* Cost Summary */}
           <Card className="p-6 mb-6">
-            <Text variant="h2" className="mb-4 text-text">
-              Resumen de costo
-            </Text>
+            <div className="flex items-center gap-2 mb-4">
+              <DollarSign className="w-5 h-5 text-primary" />
+              <Text variant="h2" className="text-text">
+                Resumen de costo
+              </Text>
+            </div>
             <div className="space-y-2">
               <div className="flex justify-between">
                 <Text variant="body" className="text-muted">
@@ -300,8 +363,9 @@ export function BookingDetailScreen() {
                 variant="danger"
                 onClick={handleCancel}
                 disabled={isCancelling}
-                className="w-full md:w-auto"
+                className="w-full md:w-auto flex items-center gap-2"
               >
+                <X className="w-4 h-4" />
                 {isCancelling ? "Cancelando..." : "Cancelar reserva"}
               </Button>
             </Card>
@@ -311,38 +375,53 @@ export function BookingDetailScreen() {
             <>
               {!existingReview && (
                 <Card className="p-6 mb-6 bg-primary/5 border-primary/20">
-                  <Text variant="h2" className="mb-3 text-text">
-                    ¿Cómo te fue con este trabajo?
-                  </Text>
+                  <div className="flex items-center gap-2 mb-3">
+                    <Star className="w-5 h-5 text-primary" />
+                    <Text variant="h2" className="text-text">
+                      ¿Cómo te fue con este trabajo?
+                    </Text>
+                  </div>
                   <Text variant="body" className="text-muted mb-4">
                     Compartí tu experiencia y ayudá a otros a encontrar el mejor profesional.
                   </Text>
                   <Link href={`/my-bookings/${bookingId}/review`}>
-                    <Button variant="primary">Dejar reseña</Button>
+                    <Button variant="primary" className="flex items-center gap-2">
+                      <Star className="w-4 h-4" />
+                      Dejar reseña
+                    </Button>
                   </Link>
                 </Card>
               )}
               {booking.proId && (
                 <Card className="p-6 mb-6 bg-primary/5 border-primary/20">
-                  <Text variant="h2" className="mb-3 text-text">
-                    ¿Querés que vuelva este profesional?
-                  </Text>
+                  <div className="flex items-center gap-2 mb-3">
+                    <RotateCcw className="w-5 h-5 text-primary" />
+                    <Text variant="h2" className="text-text">
+                      ¿Querés que vuelva este profesional?
+                    </Text>
+                  </div>
                   <Text variant="body" className="text-muted mb-4">
                     Creá una nueva solicitud para el mismo profesional.
                   </Text>
                   <Link href={`/book?rebookFrom=${bookingId}`}>
-                    <Button variant="primary">Volver a contratar</Button>
+                    <Button variant="primary" className="flex items-center gap-2">
+                      <RotateCcw className="w-4 h-4" />
+                      Volver a contratar
+                    </Button>
                   </Link>
                 </Card>
               )}
               <Card className="p-6">
-                <Text variant="body" className="text-muted">
-                  Esta reserva fue completada el{" "}
-                  {booking.completedAt
-                    ? formatDateShort(booking.completedAt)
-                    : formatDateShort(booking.updatedAt)}
-                  .
-                </Text>
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="w-5 h-5 text-success" />
+                  <Text variant="body" className="text-muted">
+                    Esta reserva fue completada el{" "}
+                    {booking.completedAt
+                      ? formatDateShort(booking.completedAt)
+                      : formatDateShort(booking.updatedAt)}
+                    .
+                  </Text>
+                </div>
               </Card>
             </>
           )}

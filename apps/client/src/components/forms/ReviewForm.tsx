@@ -1,3 +1,4 @@
+import { Star, MessageSquare, AlertCircle, Send, X, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Text } from "@/components/ui/Text";
 
@@ -35,7 +36,8 @@ export function ReviewForm({
   return (
     <form onSubmit={onSubmit} className="space-y-4">
       <div>
-        <label className="block text-sm font-medium text-text mb-2">
+        <label className="flex items-center gap-2 text-sm font-medium text-text mb-2">
+          <Star className="w-4 h-4 text-warning" />
           Calificación <span className="text-danger">*</span>
         </label>
         <div className="flex gap-2">
@@ -44,13 +46,17 @@ export function ReviewForm({
               key={value}
               type="button"
               onClick={() => onRatingChange(value)}
-              className={`w-12 h-12 rounded-md border-2 transition-colors ${
+              className={`w-12 h-12 rounded-md border-2 transition-colors flex items-center justify-center ${
                 rating >= value
                   ? "bg-warning border-warning text-white"
                   : "bg-surface border-border text-muted hover:border-warning/50"
               }`}
             >
-              ⭐
+              <Star
+                className={`w-6 h-6 ${
+                  rating >= value ? "fill-white text-white" : "fill-none"
+                }`}
+              />
             </button>
           ))}
         </div>
@@ -62,7 +68,8 @@ export function ReviewForm({
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-text mb-1">
+        <label className="flex items-center gap-2 text-sm font-medium text-text mb-1">
+          <MessageSquare className="w-4 h-4 text-muted" />
           Comentario (opcional)
         </label>
         <textarea
@@ -94,7 +101,8 @@ export function ReviewForm({
 
           {onWhatHappenedChange && (
             <div>
-              <label className="block text-sm font-medium text-text mb-1">
+              <label className="flex items-center gap-2 text-sm font-medium text-text mb-1">
+                <AlertCircle className="w-4 h-4 text-warning" />
                 ¿Qué pasó? (opcional)
               </label>
               <textarea
@@ -110,9 +118,12 @@ export function ReviewForm({
       )}
 
       {error && (
-        <Text variant="small" className="text-danger">
-          {error}
-        </Text>
+        <div className="flex items-center gap-2 p-3 bg-danger/10 border border-danger/20 rounded-md">
+          <AlertCircle className="w-4 h-4 text-danger shrink-0" />
+          <Text variant="small" className="text-danger">
+            {error}
+          </Text>
+        </div>
       )}
 
       <div className="flex gap-3">
@@ -120,20 +131,31 @@ export function ReviewForm({
           <Button
             type="button"
             variant="ghost"
-            className="flex-1"
+            className="flex-1 flex items-center gap-2"
             onClick={onCancel}
             disabled={loading}
           >
+            <X className="w-4 h-4" />
             Ahora no
           </Button>
         )}
         <Button
           type="submit"
           variant="primary"
-          className={onCancel ? "flex-1" : "w-full"}
+          className={`${onCancel ? "flex-1" : "w-full"} flex items-center gap-2`}
           disabled={loading || rating === 0}
         >
-          {loading ? "Enviando reseña..." : "Enviar reseña"}
+          {loading ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              Enviando reseña...
+            </>
+          ) : (
+            <>
+              <Send className="w-4 h-4" />
+              Enviar reseña
+            </>
+          )}
         </Button>
       </div>
     </form>

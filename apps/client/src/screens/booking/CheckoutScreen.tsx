@@ -2,6 +2,17 @@
 
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
+import {
+  CreditCard,
+  Calendar,
+  MapPin,
+  Hourglass,
+  DollarSign,
+  ArrowLeft,
+  CheckCircle,
+  AlertCircle,
+  Loader2,
+} from "lucide-react";
 import { trpc } from "@/lib/trpc/client";
 import { Text } from "@/components/ui/Text";
 import { Card } from "@/components/ui/Card";
@@ -72,11 +83,13 @@ export function CheckoutScreen() {
         <div className="px-4 py-8">
           <div className="max-w-4xl mx-auto">
             <Card className="p-8 text-center">
+              <AlertCircle className="w-12 h-12 text-warning mx-auto mb-4" />
               <Text variant="h2" className="mb-2 text-text">
                 Falta el identificador de la reserva.
               </Text>
               <Link href="/my-bookings">
-                <Button variant="secondary" className="mt-4">
+                <Button variant="secondary" className="mt-4 flex items-center gap-2 mx-auto">
+                  <ArrowLeft className="w-4 h-4" />
                   Volver a mis reservas
                 </Button>
               </Link>
@@ -96,9 +109,12 @@ export function CheckoutScreen() {
         <div className="px-4 py-8">
           <div className="max-w-4xl mx-auto">
             <Card className="p-8 text-center">
-              <Text variant="body" className="text-muted">
-                Cargando...
-              </Text>
+              <div className="flex flex-col items-center gap-3">
+                <Loader2 className="w-8 h-8 text-primary animate-spin" />
+                <Text variant="body" className="text-muted">
+                  Cargando...
+                </Text>
+              </div>
             </Card>
           </div>
         </div>
@@ -119,9 +135,12 @@ export function CheckoutScreen() {
         <div className="px-4 py-8">
           <div className="max-w-4xl mx-auto">
             <Card className="p-8">
-              <Text variant="h1" className="mb-4 text-primary">
-                Autorizar pago
-              </Text>
+              <div className="flex items-center gap-2 mb-4">
+                <CheckCircle className="w-6 h-6 text-success" />
+                <Text variant="h1" className="text-primary">
+                  Autorizar pago
+                </Text>
+              </div>
               <Text variant="body" className="mb-6 text-text">
                 El pago ya está autorizado.
               </Text>
@@ -169,23 +188,32 @@ export function CheckoutScreen() {
           {/* Booking Summary */}
           {booking && (
             <Card className="p-6 mb-6">
-              <Text variant="h2" className="mb-4 text-text">
-                Resumen de la reserva
-              </Text>
-              <div className="space-y-2">
+              <div className="flex items-center gap-2 mb-4">
+                <Calendar className="w-5 h-5 text-primary" />
+                <Text variant="h2" className="text-text">
+                  Resumen de la reserva
+                </Text>
+              </div>
+              <div className="space-y-3">
                 <div>
-                  <Text variant="small" className="text-muted">
-                    Fecha y hora:
-                  </Text>
+                  <div className="flex items-center gap-2 mb-1">
+                    <Calendar className="w-4 h-4 text-muted" />
+                    <Text variant="small" className="text-muted">
+                      Fecha y hora:
+                    </Text>
+                  </div>
                   <Text variant="body" className="text-text">
                     {formatDate(booking.scheduledAt)} a las {formatTime(booking.scheduledAt)}
                   </Text>
                 </div>
                 {booking.description && (
                   <div>
-                    <Text variant="small" className="text-muted">
-                      Dirección:
-                    </Text>
+                    <div className="flex items-center gap-2 mb-1">
+                      <MapPin className="w-4 h-4 text-muted" />
+                      <Text variant="small" className="text-muted">
+                        Dirección:
+                      </Text>
+                    </div>
                     <Text variant="body" className="text-text">
                       {booking.description.replace(/^Servicio en /, "")}
                     </Text>
@@ -193,9 +221,12 @@ export function CheckoutScreen() {
                 )}
                 {booking.estimatedHours && (
                   <div>
-                    <Text variant="small" className="text-muted">
-                      Horas estimadas:
-                    </Text>
+                    <div className="flex items-center gap-2 mb-1">
+                      <Hourglass className="w-4 h-4 text-muted" />
+                      <Text variant="small" className="text-muted">
+                        Horas estimadas:
+                      </Text>
+                    </div>
                     <Text variant="body" className="text-text">
                       {booking.estimatedHours} {booking.estimatedHours === 1 ? "hora" : "horas"}
                     </Text>
@@ -207,9 +238,12 @@ export function CheckoutScreen() {
 
           {/* Amount Summary */}
           <Card className="p-6 mb-6">
-            <Text variant="h2" className="mb-4 text-text">
-              Monto estimado: {formatCurrency(amountEstimated, currency, isAmountInMinorUnits)}
-            </Text>
+            <div className="flex items-center gap-2 mb-4">
+              <DollarSign className="w-5 h-5 text-primary" />
+              <Text variant="h2" className="text-text">
+                Monto estimado: {formatCurrency(amountEstimated, currency, isAmountInMinorUnits)}
+              </Text>
+            </div>
             <Text variant="small" className="text-muted">
               Este es un monto estimado. El cobro final depende del trabajo realizado. Nunca se
               cobrará más sin aviso.
@@ -226,9 +260,12 @@ export function CheckoutScreen() {
           {/* Error message */}
           {error && (
             <Card className="p-4 mb-6 bg-danger/10 border-danger/20">
-              <Text variant="body" className="text-danger">
-                {error}
-              </Text>
+              <div className="flex items-center gap-2">
+                <AlertCircle className="w-5 h-5 text-danger" />
+                <Text variant="body" className="text-danger">
+                  {error}
+                </Text>
+              </div>
             </Card>
           )}
 
@@ -238,11 +275,25 @@ export function CheckoutScreen() {
               variant="primary"
               onClick={handleAuthorizePayment}
               disabled={createPreauth.isPending || !bookingId}
+              className="flex items-center gap-2"
             >
-              {createPreauth.isPending ? "Cargando..." : "Autorizar pago"}
+              {createPreauth.isPending ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Cargando...
+                </>
+              ) : (
+                <>
+                  <CreditCard className="w-4 h-4" />
+                  Autorizar pago
+                </>
+              )}
             </Button>
             <Link href="/my-bookings">
-              <Button variant="ghost">Volver a mis reservas</Button>
+              <Button variant="ghost" className="flex items-center gap-2">
+                <ArrowLeft className="w-4 h-4" />
+                Volver a mis reservas
+              </Button>
             </Link>
           </div>
         </div>

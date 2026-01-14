@@ -2,6 +2,16 @@
 
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
+import {
+  Settings,
+  Mail,
+  Phone,
+  MessageCircle,
+  Save,
+  X,
+  Loader2,
+  AlertCircle,
+} from "lucide-react";
 import { trpc } from "@/lib/trpc/client";
 import { Text } from "@/components/ui/Text";
 import { Card } from "@/components/ui/Card";
@@ -59,9 +69,12 @@ export function SettingsScreen() {
         <div className="px-4 py-8">
           <div className="max-w-4xl mx-auto">
             <Card className="p-8 text-center">
-              <Text variant="body" className="text-muted">
-                Cargando...
-              </Text>
+              <div className="flex flex-col items-center gap-3">
+                <Loader2 className="w-8 h-8 text-primary animate-spin" />
+                <Text variant="body" className="text-muted">
+                  Cargando...
+                </Text>
+              </div>
             </Card>
           </div>
         </div>
@@ -74,9 +87,12 @@ export function SettingsScreen() {
       <Navigation showLogin={false} showProfile={true} />
       <div className="px-4 py-8">
         <div className="max-w-4xl mx-auto">
-          <Text variant="h1" className="mb-6 text-primary">
-            Notificaciones
-          </Text>
+          <div className="flex items-center gap-2 mb-6">
+            <Settings className="w-6 h-6 text-primary" />
+            <Text variant="h1" className="text-primary">
+              Notificaciones
+            </Text>
+          </div>
 
           <Card className="p-6">
             <form
@@ -86,9 +102,12 @@ export function SettingsScreen() {
             >
               {profile?.email && (
                 <div className="space-y-2">
-                  <Text variant="small" className="text-muted">
-                    Email
-                  </Text>
+                  <div className="flex items-center gap-2">
+                    <Mail className="w-4 h-4 text-muted" />
+                    <Text variant="small" className="text-muted">
+                      Email
+                    </Text>
+                  </div>
                   <Text variant="body" className="text-text">
                     {profile.email}
                   </Text>
@@ -98,35 +117,48 @@ export function SettingsScreen() {
                 </div>
               )}
 
-              <Input
-                label="Teléfono"
-                type="tel"
-                placeholder="+598..."
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-              />
+              <div>
+                <label className="flex items-center gap-2 text-sm font-medium text-text mb-1">
+                  <Phone className="w-4 h-4 text-muted" />
+                  Teléfono
+                </label>
+                <Input
+                  type="tel"
+                  placeholder="+598..."
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                />
+              </div>
 
-              <Select
-                label="Método de contacto preferido"
-                value={preferredContactMethod}
-                onChange={(e) =>
-                  setPreferredContactMethod(
-                    e.target.value as PreferredContactMethod | ""
-                  )
-                }
-              >
-                <option value="">Seleccionar...</option>
-                <option value="EMAIL">Email</option>
-                <option value="WHATSAPP">WhatsApp</option>
-                <option value="PHONE">Teléfono</option>
-              </Select>
+              <div>
+                <label className="flex items-center gap-2 text-sm font-medium text-text mb-1">
+                  <MessageCircle className="w-4 h-4 text-muted" />
+                  Método de contacto preferido
+                </label>
+                <Select
+                  value={preferredContactMethod}
+                  onChange={(e) =>
+                    setPreferredContactMethod(
+                      e.target.value as PreferredContactMethod | ""
+                    )
+                  }
+                >
+                  <option value="">Seleccionar...</option>
+                  <option value="EMAIL">Email</option>
+                  <option value="WHATSAPP">WhatsApp</option>
+                  <option value="PHONE">Teléfono</option>
+                </Select>
+              </div>
 
               {updateMutation.error && (
                 <Card className="p-4 bg-danger/10 border-danger/20">
-                  <Text variant="body" className="text-danger">
-                    {updateMutation.error.message ||
-                      "No se pudo guardar. Probá de nuevo."}
-                  </Text>
+                  <div className="flex items-center gap-2">
+                    <AlertCircle className="w-5 h-5 text-danger shrink-0" />
+                    <Text variant="body" className="text-danger">
+                      {updateMutation.error.message ||
+                        "No se pudo guardar. Probá de nuevo."}
+                    </Text>
+                  </div>
                 </Card>
               )}
 
@@ -135,14 +167,27 @@ export function SettingsScreen() {
                   type="submit"
                   variant="primary"
                   disabled={updateMutation.isPending}
+                  className="flex items-center gap-2"
                 >
-                  {updateMutation.isPending ? "Guardando..." : "Guardar"}
+                  {updateMutation.isPending ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Guardando...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4" />
+                      Guardar
+                    </>
+                  )}
                 </Button>
                 <Button
                   type="button"
                   variant="ghost"
                   onClick={() => router.back()}
+                  className="flex items-center gap-2"
                 >
+                  <X className="w-4 h-4" />
                   Cancelar
                 </Button>
               </div>
