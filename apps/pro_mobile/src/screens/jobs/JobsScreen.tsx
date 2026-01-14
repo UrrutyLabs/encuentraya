@@ -4,6 +4,7 @@ import { useRouter } from "expo-router";
 import { Feather } from "@expo/vector-icons";
 import { Text } from "../../components/ui/Text";
 import { BookingCard } from "../../components/presentational/BookingCard";
+import { JobsSkeleton } from "../../components/presentational/JobsSkeleton";
 import { BookingStatus, Booking } from "@repo/domain";
 import { theme } from "../../theme";
 import { useProJobs } from "../../hooks/useProJobs";
@@ -38,12 +39,9 @@ export function JobsScreen() {
 
   if (isLoading) {
     return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" color={theme.colors.primary} />
-        <Text variant="body" style={styles.loadingText}>
-          Cargando...
-        </Text>
-      </View>
+      <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+        <JobsSkeleton />
+      </ScrollView>
     );
   }
 

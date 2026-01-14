@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/Input";
 import { Navigation } from "@/components/presentational/Navigation";
 import { ProCard } from "@/components/presentational/ProCard";
 import { EmptyState } from "@/components/presentational/EmptyState";
+import { SearchSkeleton } from "@/components/presentational/SearchSkeleton";
 import { useSearchPros } from "@/hooks/useSearchPros";
 import { Category, type Pro } from "@repo/domain";
 
@@ -42,17 +43,12 @@ export function SearchScreen() {
 
           {/* Filters */}
           <Card className="p-6 mb-6">
-            <div className="flex items-center gap-2 mb-4">
-              <Filter className="w-5 h-5 text-primary" />
-              <Text variant="h2" className="text-text">
-                Filtros
-              </Text>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="space-y-4">
+              {/* Category Filter */}
               <div>
-                <label className="flex items-center gap-2 text-sm font-medium text-text mb-1">
-                  <Filter className="w-4 h-4 text-muted" />
-                  Categoría
+                <label className="flex items-center gap-2 text-sm font-medium text-text mb-2">
+                  <Filter className="w-4 h-4 text-primary" />
+                  Categoría de servicio
                 </label>
                 <select
                   value={category}
@@ -66,42 +62,38 @@ export function SearchScreen() {
                   ))}
                 </select>
               </div>
-              <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <Calendar className="w-4 h-4 text-muted" />
-                  <label className="block text-sm font-medium text-text">
+
+              {/* Date and Time Filters */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="flex items-center gap-2 text-sm font-medium text-text mb-2">
+                    <Calendar className="w-4 h-4 text-primary" />
                     Fecha
                   </label>
+                  <Input
+                    type="date"
+                    value={date}
+                    onChange={(e) => setDate(e.target.value)}
+                  />
                 </div>
-                <Input
-                  type="date"
-                  value={date}
-                  onChange={(e) => setDate(e.target.value)}
-                />
-              </div>
-              <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <Clock className="w-4 h-4 text-muted" />
-                  <label className="block text-sm font-medium text-text">
+                <div>
+                  <label className="flex items-center gap-2 text-sm font-medium text-text mb-2">
+                    <Clock className="w-4 h-4 text-primary" />
                     Hora
                   </label>
+                  <Input
+                    type="time"
+                    value={time}
+                    onChange={(e) => setTime(e.target.value)}
+                  />
                 </div>
-                <Input
-                  type="time"
-                  value={time}
-                  onChange={(e) => setTime(e.target.value)}
-                />
               </div>
             </div>
           </Card>
 
           {/* Results */}
           {isLoading ? (
-            <Card className="p-8 text-center">
-              <Text variant="body" className="text-muted">
-                Cargando profesionales...
-              </Text>
-            </Card>
+            <SearchSkeleton />
           ) : pros.length === 0 ? (
             <EmptyState />
           ) : (

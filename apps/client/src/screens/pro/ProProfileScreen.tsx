@@ -4,13 +4,11 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import {
   MapPin,
-  Phone,
   Star,
   DollarSign,
   User,
   FileText,
   Calendar,
-  Loader2,
   AlertCircle,
   ArrowLeft,
 } from "lucide-react";
@@ -19,6 +17,7 @@ import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { Navigation } from "@/components/presentational/Navigation";
+import { ProProfileSkeleton } from "@/components/presentational/ProProfileSkeleton";
 import { useProDetail } from "@/hooks/useProDetail";
 import { Category } from "@repo/domain";
 
@@ -41,16 +40,7 @@ export function ProProfileScreen() {
       <div className="min-h-screen bg-bg">
         <Navigation showLogin={false} showProfile={true} />
         <div className="px-4 py-8">
-          <div className="max-w-4xl mx-auto">
-            <Card className="p-8 text-center">
-              <div className="flex flex-col items-center gap-3">
-                <Loader2 className="w-8 h-8 text-primary animate-spin" />
-                <Text variant="body" className="text-muted">
-                  Cargando perfil...
-                </Text>
-              </div>
-            </Card>
-          </div>
+          <ProProfileSkeleton />
         </div>
       </div>
     );
@@ -163,14 +153,6 @@ export function ProProfileScreen() {
                   .join(", ")}
                 .
               </Text>
-            )}
-            {pro.phone && (
-              <div className="flex items-center gap-2 mt-3">
-                <Phone className="w-4 h-4 text-muted" />
-                <Text variant="body" className="text-muted">
-                  {pro.phone}
-                </Text>
-              </div>
             )}
           </Card>
 

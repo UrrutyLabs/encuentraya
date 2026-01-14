@@ -23,6 +23,7 @@ import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { Navigation } from "@/components/presentational/Navigation";
+import { BookingDetailSkeleton } from "@/components/presentational/BookingDetailSkeleton";
 import { BookingStatus, formatCurrency } from "@repo/domain";
 import { useBookingDetail } from "@/hooks/useBookingDetail";
 import { useCancelBooking } from "@/hooks/useCancelBooking";
@@ -116,13 +117,7 @@ export function BookingDetailScreen() {
       <div className="min-h-screen bg-bg">
         <Navigation showLogin={false} showProfile={true} />
         <div className="px-4 py-8">
-          <div className="max-w-4xl mx-auto">
-            <Card className="p-8 text-center">
-              <Text variant="body" className="text-muted">
-                Cargando reserva...
-              </Text>
-            </Card>
-          </div>
+          <BookingDetailSkeleton />
         </div>
       </div>
     );

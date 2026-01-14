@@ -4,6 +4,7 @@ import { useRouter } from "expo-router";
 import { Feather } from "@expo/vector-icons";
 import { Text } from "../../components/ui/Text";
 import { BookingCard } from "../../components/presentational/BookingCard";
+import { HomeSkeleton } from "../../components/presentational/HomeSkeleton";
 import { Booking, BookingStatus } from "@repo/domain";
 import { theme } from "../../theme";
 import { useProInbox } from "../../hooks/useProInbox";
@@ -36,12 +37,9 @@ export function HomeScreen() {
 
   if (isLoading) {
     return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" color={theme.colors.primary} />
-        <Text variant="body" style={styles.loadingText}>
-          Cargando...
-        </Text>
-      </View>
+      <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+        <HomeSkeleton />
+      </ScrollView>
     );
   }
 

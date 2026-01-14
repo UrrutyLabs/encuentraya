@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import { StyleSheet, ScrollView, Alert, View, ActivityIndicator } from "react-native";
+import { StyleSheet, ScrollView, Alert, View } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { Card } from "../../components/ui/Card";
 import { Button } from "../../components/ui/Button";
 import { Text } from "../../components/ui/Text";
 import { Input } from "../../components/ui/Input";
+import { PayoutInfoSkeleton } from "../../components/presentational/PayoutInfoSkeleton";
 import { trpc } from "../../lib/trpc/client";
 import { theme } from "../../theme";
 
@@ -51,20 +52,7 @@ export function PayoutInfoScreen() {
   if (isLoading) {
     return (
       <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-        <View style={styles.titleRow}>
-          <Feather name="credit-card" size={24} color={theme.colors.primary} />
-          <Text variant="h1" style={styles.title}>
-            Cobros
-          </Text>
-        </View>
-        <Card style={styles.card}>
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color={theme.colors.primary} />
-            <Text variant="body" style={styles.loadingText}>
-              Cargando...
-            </Text>
-          </View>
-        </Card>
+        <PayoutInfoSkeleton />
       </ScrollView>
     );
   }

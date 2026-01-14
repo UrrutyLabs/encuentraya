@@ -1,12 +1,12 @@
 "use client";
 
 import { useMemo } from "react";
-import { Calendar, History, Loader2 } from "lucide-react";
+import { Calendar, History } from "lucide-react";
 import { Text } from "@/components/ui/Text";
-import { Card } from "@/components/ui/Card";
 import { Navigation } from "@/components/presentational/Navigation";
 import { BookingCard } from "@/components/presentational/BookingCard";
 import { EmptyState } from "@/components/presentational/EmptyState";
+import { MyBookingsSkeleton } from "@/components/presentational/MyBookingsSkeleton";
 import { useMyBookings } from "@/hooks/useMyBookings";
 import { BookingStatus } from "@repo/domain";
 
@@ -51,14 +51,7 @@ export function MyBookingsScreen() {
           </Text>
 
           {isLoading ? (
-            <Card className="p-8 text-center">
-              <div className="flex flex-col items-center gap-3">
-                <Loader2 className="w-8 h-8 text-primary animate-spin" />
-                <Text variant="body" className="text-muted">
-                  Cargando reservas...
-                </Text>
-              </div>
-            </Card>
+            <MyBookingsSkeleton />
           ) : bookings.length === 0 ? (
             <EmptyState
               title="No tenés reservas"
