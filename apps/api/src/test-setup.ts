@@ -19,6 +19,16 @@ vi.mock("@infra/db/prisma", () => {
         IOS: "IOS",
         ANDROID: "ANDROID",
       },
+      NotificationChannel: {
+        EMAIL: "EMAIL",
+        WHATSAPP: "WHATSAPP",
+        PUSH: "PUSH",
+      },
+      NotificationDeliveryStatus: {
+        QUEUED: "QUEUED",
+        SENT: "SENT",
+        FAILED: "FAILED",
+      },
       // Add other enums as needed by tests
     },
   };

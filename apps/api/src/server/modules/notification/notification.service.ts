@@ -1,6 +1,6 @@
 import { injectable, inject } from "tsyringe";
 import type { NotificationDeliveryRepository } from "./notificationDelivery.repo";
-import { TOKENS } from "@/server/container";
+import { TOKENS } from "@/server/container/tokens";
 import type { NotificationMessage } from "./provider";
 import { getNotificationProvider } from "./registry";
 import { $Enums } from "../../../../prisma/generated/prisma/client";
