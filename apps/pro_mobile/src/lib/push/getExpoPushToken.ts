@@ -1,5 +1,6 @@
 import * as Notifications from "expo-notifications";
 import { Platform } from "react-native";
+import { logger } from "../logger";
 
 /**
  * Result of getting Expo push token
@@ -43,7 +44,9 @@ export async function getExpoPushToken(): Promise<ExpoPushTokenResult | null> {
     };
   } catch (error) {
     // If any error occurs (e.g., not running on device), return null
-    console.warn("Failed to get Expo push token:", error);
+    logger.warn("Failed to get Expo push token", {
+      error: error instanceof Error ? error.message : String(error),
+    });
     return null;
   }
 }

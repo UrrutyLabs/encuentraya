@@ -1,5 +1,8 @@
 import { trpc } from "../lib/trpc/client";
 import { useState } from "react";
+import { useQueryClient } from "./useQueryClient";
+import { BookingStatus } from "@repo/domain";
+import type { Booking } from "@repo/domain";
 
 interface UseBookingActionsReturn {
   acceptBooking: (bookingId: string) => Promise<void>;
@@ -18,13 +21,69 @@ interface UseBookingActionsReturn {
 /**
  * Hook to encapsulate booking action mutations for pros.
  * Handles accept, reject, mark on my way, arrive, and complete actions.
+ * Uses optimistic updates for instant UI feedback.
  */
 export function useBookingActions(
   onSuccess?: () => void
 ): UseBookingActionsReturn {
   const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
+
+  // Helper to create optimistic update for booking status changes
+  const createBookingOptimisticUpdate = (newStatus: BookingStatus) => {
+    return {
+      onMutate: async (variables: { bookingId: string }) => {
+        // Cancel outgoing refetches
+        const bookingQueryKey: [string[], { id: string }] = [
+          ["booking", "getById"],
+          { id: variables.bookingId },
+        ];
+        await queryClient.cancelQueries({ queryKey: bookingQueryKey });
+        await queryClient.cancelQueries({ queryKey: [["booking", "proInbox"]] });
+        await queryClient.cancelQueries({ queryKey: [["booking", "proJobs"]] });
+
+        // Snapshot previous values
+        const previousBooking = queryClient.getQueryData<Booking>(bookingQueryKey);
+
+        // Optimistically update booking status
+        if (previousBooking) {
+          queryClient.setQueryData<Booking>(bookingQueryKey, {
+            ...previousBooking,
+            status: newStatus,
+          });
+        }
+
+        return { previousBooking };
+      },
+      onError: (
+        err: Error,
+        variables: { bookingId: string },
+        context: { previousBooking?: Booking }
+      ) => {
+        // Rollback on error
+        if (context?.previousBooking) {
+          const bookingQueryKey: [string[], { id: string }] = [
+            ["booking", "getById"],
+            { id: variables.bookingId },
+          ];
+          queryClient.setQueryData<Booking>(bookingQueryKey, context.previousBooking);
+        }
+      },
+      onSettled: (data: unknown, error: unknown, variables: { bookingId: string }) => {
+        // Invalidate related queries after mutation settles
+        const bookingQueryKey: [string[], { id: string }] = [
+          ["booking", "getById"],
+          { id: variables.bookingId },
+        ];
+        queryClient.invalidateQueries({ queryKey: bookingQueryKey });
+        queryClient.invalidateQueries({ queryKey: [["booking", "proInbox"]] });
+        queryClient.invalidateQueries({ queryKey: [["booking", "proJobs"]] });
+      },
+    };
+  };
 
   const acceptMutation = trpc.booking.accept.useMutation({
+    ...createBookingOptimisticUpdate(BookingStatus.ACCEPTED),
     onSuccess: () => {
       setError(null);
       if (onSuccess) {
@@ -37,6 +96,7 @@ export function useBookingActions(
   });
 
   const rejectMutation = trpc.booking.reject.useMutation({
+    ...createBookingOptimisticUpdate(BookingStatus.REJECTED),
     onSuccess: () => {
       setError(null);
       if (onSuccess) {
@@ -49,6 +109,7 @@ export function useBookingActions(
   });
 
   const markOnMyWayMutation = trpc.booking.onMyWay.useMutation({
+    ...createBookingOptimisticUpdate(BookingStatus.ON_MY_WAY),
     onSuccess: () => {
       setError(null);
       if (onSuccess) {
@@ -61,6 +122,7 @@ export function useBookingActions(
   });
 
   const arriveMutation = trpc.booking.arrive.useMutation({
+    ...createBookingOptimisticUpdate(BookingStatus.ARRIVED),
     onSuccess: () => {
       setError(null);
       if (onSuccess) {
@@ -73,6 +135,7 @@ export function useBookingActions(
   });
 
   const completeMutation = trpc.booking.complete.useMutation({
+    ...createBookingOptimisticUpdate(BookingStatus.COMPLETED),
     onSuccess: () => {
       setError(null);
       if (onSuccess) {

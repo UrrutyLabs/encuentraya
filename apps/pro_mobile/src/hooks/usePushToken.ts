@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { Alert } from "react-native";
 import { trpc } from "../lib/trpc/client";
 import { getExpoPushToken } from "../lib/push/getExpoPushToken";
+import { logger } from "../lib/logger";
 
 /**
  * Hook to register push token after authentication
@@ -14,13 +15,17 @@ export function usePushToken(sessionId: string | null) {
 
   const registerTokenMutation = trpc.push.registerToken.useMutation({
     onError: (error) => {
-      console.warn("Failed to register push token:", error);
+      logger.warn("Failed to register push token", {
+        error: error.message,
+      });
     },
   });
 
   const unregisterTokenMutation = trpc.push.unregisterToken.useMutation({
     onError: (error) => {
-      console.warn("Failed to unregister push token:", error);
+      logger.warn("Failed to unregister push token", {
+        error: error.message,
+      });
     },
   });
 
@@ -62,8 +67,13 @@ export function usePushToken(sessionId: string | null) {
           token: tokenData.token,
         });
         lastRegisteredTokenRef.current = tokenData.token;
+        logger.debug("Push token registered successfully", {
+          platform: tokenData.platform,
+        });
       } catch (error) {
-        console.warn("Failed to register push token:", error);
+        logger.warn("Failed to register push token", {
+          error: error instanceof Error ? error.message : String(error),
+        });
       }
     };
 
@@ -76,8 +86,11 @@ export function usePushToken(sessionId: string | null) {
       try {
         await unregisterTokenMutation.mutateAsync({ token });
         lastRegisteredTokenRef.current = null;
+        logger.debug("Push token unregistered successfully");
       } catch (error) {
-        console.warn("Failed to unregister push token:", error);
+        logger.warn("Failed to unregister push token", {
+          error: error instanceof Error ? error.message : String(error),
+        });
       }
     },
   };

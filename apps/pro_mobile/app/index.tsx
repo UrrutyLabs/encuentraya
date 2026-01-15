@@ -1,12 +1,14 @@
+import { useEffect } from "react";
 import { Redirect } from "expo-router";
 import { ActivityIndicator, View } from "react-native";
 import { useAuth } from "../src/hooks/useAuth";
 import { theme } from "../src/theme";
 import { trpc } from "../src/lib/trpc/client";
 import { Role } from "@repo/domain";
+import { setUserContext, clearUserContext } from "../src/lib/crash-reporting";
 
 export default function Index() {
-  const { session, loading } = useAuth();
+  const { session, loading, user } = useAuth();
 
   // Get user info (role) if authenticated
   const { data: userInfo, isLoading: isLoadingUserInfo } =
@@ -14,6 +16,15 @@ export default function Index() {
       enabled: !!session,
       retry: false,
     });
+
+  // Set user context for crash reporting when authenticated
+  useEffect(() => {
+    if (user && userInfo) {
+      setUserContext(user.id, user.email || undefined);
+    } else if (!session) {
+      clearUserContext();
+    }
+  }, [user, userInfo, session]);
 
   // Check if user has pro profile (only if they have PRO role)
   const { data: proProfile, isLoading: isLoadingProfile } =

@@ -7,6 +7,8 @@ import { Text } from "../../components/ui/Text";
 import { Input } from "../../components/ui/Input";
 import { PayoutInfoSkeleton } from "../../components/presentational/PayoutInfoSkeleton";
 import { trpc } from "../../lib/trpc/client";
+import { useQueryClient } from "../../hooks/useQueryClient";
+import { invalidateRelatedQueries } from "../../lib/react-query/utils";
 import { theme } from "../../theme";
 
 export function PayoutInfoScreen() {
@@ -14,6 +16,7 @@ export function PayoutInfoScreen() {
   const [bankAccountNumber, setBankAccountNumber] = useState("");
   const [bankName, setBankName] = useState("");
   const [documentId, setDocumentId] = useState("");
+  const queryClient = useQueryClient();
 
   // Fetch current payout profile
   const { data: profile, isLoading } = trpc.proPayout.getMine.useQuery(undefined, {
@@ -30,8 +33,12 @@ export function PayoutInfoScreen() {
     }
   }, [profile]);
 
-  // Update mutation
+  // Update mutation with query invalidation
   const updateMutation = trpc.proPayout.updateMine.useMutation({
+    ...invalidateRelatedQueries(queryClient, [
+      [["proPayout", "getMine"]],
+      [["pro", "getMyProfile"]], // Profile completeness may depend on payout info
+    ]),
     onSuccess: () => {
       Alert.alert("Guardado", "Tus datos de cobro fueron guardados correctamente.");
     },
