@@ -3,9 +3,9 @@ import { Redirect } from "expo-router";
 import { ActivityIndicator, View } from "react-native";
 import { useAuth } from "@hooks/auth";
 import { theme } from "../src/theme";
-import { trpc } from "../src/lib/trpc/client";
+import { trpc } from "@lib/trpc/client";
 import { Role } from "@repo/domain";
-import { setUserContext, clearUserContext } from "../src/lib/crash-reporting";
+import { setUserContext, clearUserContext } from "@lib/crash-reporting";
 
 export default function Index() {
   const { session, loading, user } = useAuth();

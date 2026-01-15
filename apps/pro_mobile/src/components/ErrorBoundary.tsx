@@ -4,8 +4,8 @@ import { Feather } from "@expo/vector-icons";
 import { Text } from "./ui/Text";
 import { Button } from "./ui/Button";
 import { theme } from "../theme";
-import { logger } from "../lib/logger";
-import { captureException } from "../lib/crash-reporting";
+import { logger } from "@lib/logger";
+import { captureException } from "@lib/crash-reporting";
 
 interface Props {
   children: ReactNode;

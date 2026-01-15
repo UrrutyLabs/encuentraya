@@ -1,4 +1,4 @@
-import { trpc } from "../../lib/trpc/client";
+import { trpc } from "@lib/trpc/client";
 import { useState } from "react";
 import { useQueryClient } from "../shared/useQueryClient";
 import { BookingStatus } from "@repo/domain";

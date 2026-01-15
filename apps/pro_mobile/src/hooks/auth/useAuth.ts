@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Session, User } from "@supabase/supabase-js";
-import { supabase } from "../../lib/supabase/client";
+import { supabase } from "@lib/supabase/client";
 import { usePushToken } from "../shared/usePushToken";
 
 export function useAuth() {

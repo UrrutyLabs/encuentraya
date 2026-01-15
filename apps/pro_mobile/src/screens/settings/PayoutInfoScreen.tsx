@@ -6,9 +6,9 @@ import { Button } from "@components/ui/Button";
 import { Text } from "@components/ui/Text";
 import { Input } from "@components/ui/Input";
 import { PayoutInfoSkeleton } from "@components/presentational/PayoutInfoSkeleton";
-import { trpc } from "../../lib/trpc/client";
+import { trpc } from "@lib/trpc/client";
 import { useQueryClient } from "@hooks/shared";
-import { invalidateRelatedQueries } from "../../lib/react-query/utils";
+import { invalidateRelatedQueries } from "@lib/react-query/utils";
 import { theme } from "../../theme";
 
 export function PayoutInfoScreen() {

@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import { trpc } from "../../lib/trpc/client";
+import { trpc } from "@lib/trpc/client";
 import type { ProSignupInput } from "@repo/domain";
 
 /**

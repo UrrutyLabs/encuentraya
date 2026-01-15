@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useRouter } from "expo-router";
-import { trpc } from "../../lib/trpc/client";
+import { trpc } from "@lib/trpc/client";
 import { useQueryClient } from "../shared/useQueryClient";
-import { invalidateRelatedQueries } from "../../lib/react-query/utils";
+import { invalidateRelatedQueries } from "@lib/react-query/utils";
 import type { ProOnboardInput } from "@repo/domain";
 
 export function useOnboarding() {

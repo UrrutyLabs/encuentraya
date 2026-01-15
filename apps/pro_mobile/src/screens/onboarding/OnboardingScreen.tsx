@@ -9,7 +9,7 @@ import { CategorySelector } from "@components/presentational/CategorySelector";
 import { theme } from "../../theme";
 import { useOnboarding, useAuth } from "@hooks/auth";
 import { Category } from "@repo/domain";
-import { supabase } from "../../lib/supabase/client";
+import { supabase } from "@lib/supabase/client";
 
 export function OnboardingScreen() {
   const { session, loading: sessionLoading } = useAuth();

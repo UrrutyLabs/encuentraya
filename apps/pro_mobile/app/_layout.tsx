@@ -3,10 +3,10 @@ import { Stack } from "expo-router";
 import { useFonts } from "expo-font";
 import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from "@expo-google-fonts/inter";
 import { ActivityIndicator, View } from "react-native";
-import { TRPCProvider } from "../src/lib/trpc/Provider";
+import { TRPCProvider } from "@lib/trpc/Provider";
 import { ErrorBoundary } from "@components/ErrorBoundary";
 import { OfflineIndicator } from "@components/OfflineIndicator";
-import { initCrashReporting } from "../src/lib/crash-reporting";
+import { initCrashReporting } from "@lib/crash-reporting";
 import { theme } from "../src/theme";
 
 export default function RootLayout() {
