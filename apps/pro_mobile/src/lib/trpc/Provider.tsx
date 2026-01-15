@@ -1,10 +1,12 @@
-import { QueryClient, QueryClientProvider, MutationCache, QueryCache } from "@tanstack/react-query";
+import { QueryClient, MutationCache, QueryCache } from "@tanstack/react-query";
+import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import { useState } from "react";
 import { trpc } from "./client";
 import { createTRPCLinks } from "./links";
 import { logger } from "../logger";
 import { captureException } from "../crash-reporting";
 import { isClientError } from "../react-query/utils";
+import { asyncStoragePersister } from "../react-query/persistence";
 
 // Export queryClient instance for use in hooks
 let queryClientInstance: QueryClient | null = null;
@@ -51,12 +53,16 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
             refetchOnMount: true,
             // Refetch on reconnect
             refetchOnReconnect: true,
+            // Use cached data when offline
+            networkMode: "offlineFirst",
           },
           mutations: {
             // Retry mutations once on failure (useful for network errors)
             retry: 1,
             // Retry delay for mutations
             retryDelay: 1000,
+            // Use offline-first mode for mutations (queue when offline)
+            networkMode: "offlineFirst",
           },
         },
       });
@@ -73,7 +79,23 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <trpc.Provider client={trpcClient} queryClient={queryClient}>
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+      <PersistQueryClientProvider
+        client={queryClient}
+        persistOptions={{
+          persister: asyncStoragePersister,
+          // Only persist successful queries
+          dehydrateOptions: {
+            shouldDehydrateQuery: (query: { state: { status: string } }) => {
+              // Don't persist queries that are still loading or have errors
+              return query.state.status === "success";
+            },
+          },
+          // Maximum age for persisted data (7 days)
+          maxAge: 1000 * 60 * 60 * 24 * 7,
+        }}
+      >
+        {children}
+      </PersistQueryClientProvider>
     </trpc.Provider>
   );
 }

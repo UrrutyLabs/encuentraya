@@ -1,11 +1,12 @@
-import { View, StyleSheet, ActivityIndicator, ScrollView } from "react-native";
-import { useState } from "react";
+import { View, StyleSheet, ScrollView } from "react-native";
+import { useState, useCallback, useMemo } from "react";
 import { useLocalSearchParams } from "expo-router";
 import { Feather } from "@expo/vector-icons";
 import { Text } from "../../components/ui/Text";
 import { Card } from "../../components/ui/Card";
 import { Badge } from "../../components/ui/Badge";
 import { Button } from "../../components/ui/Button";
+import { BookingDetailSkeleton } from "../../components/presentational/BookingDetailSkeleton";
 import { useBookingActions } from "../../hooks/useBookingActions";
 import { useBookingDetail } from "../../hooks/useBookingDetail";
 import { BookingStatus, Category, getBookingStatusLabel, getBookingStatusVariant } from "@repo/domain";
@@ -32,15 +33,93 @@ export function BookingDetailScreen() {
     refetch();
   });
 
+  // Use local status if set, otherwise use booking status
+  const displayStatus: BookingStatus | null = localStatus || (booking?.status as BookingStatus) || null;
+
+  // Memoize handlers to prevent unnecessary re-renders
+  // Must be called before early returns (React Rules of Hooks)
+  const handleAccept = useCallback(async () => {
+    if (!bookingId) return;
+    try {
+      await acceptBooking(bookingId);
+      setLocalStatus(BookingStatus.ACCEPTED);
+    } catch {
+      // Error handled by hook
+    }
+  }, [bookingId, acceptBooking]);
+
+  const handleReject = useCallback(async () => {
+    if (!bookingId) return;
+    try {
+      await rejectBooking(bookingId);
+      setLocalStatus(BookingStatus.REJECTED);
+    } catch {
+      // Error handled by hook
+    }
+  }, [bookingId, rejectBooking]);
+
+  const handleMarkOnMyWay = useCallback(async () => {
+    if (!bookingId) return;
+    try {
+      await markOnMyWay(bookingId);
+      setLocalStatus(BookingStatus.ON_MY_WAY);
+    } catch {
+      // Error handled by hook
+    }
+  }, [bookingId, markOnMyWay]);
+
+  const handleArrive = useCallback(async () => {
+    if (!bookingId) return;
+    try {
+      await arriveBooking(bookingId);
+      setLocalStatus(BookingStatus.ARRIVED);
+    } catch {
+      // Error handled by hook
+    }
+  }, [bookingId, arriveBooking]);
+
+  const handleComplete = useCallback(async () => {
+    if (!bookingId) return;
+    try {
+      await completeBooking(bookingId);
+      setLocalStatus(BookingStatus.COMPLETED);
+    } catch {
+      // Error handled by hook
+    }
+  }, [bookingId, completeBooking]);
+
+  // Memoize computed values (must be before early returns)
+  const statusLabel = useMemo(
+    () => (displayStatus ? getBookingStatusLabel(displayStatus as BookingStatus) : ""),
+    [displayStatus]
+  );
+  
+  const statusVariant = useMemo(
+    () => (displayStatus ? getBookingStatusVariant(displayStatus as BookingStatus) : "info"),
+    [displayStatus]
+  );
+  
+  const categoryLabel = useMemo(
+    () => (booking ? categoryLabels[booking.category] || booking.category : ""),
+    [booking]
+  );
+
+  const formattedDate = useMemo(
+    () =>
+      booking
+        ? new Intl.DateTimeFormat("es-UY", {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+          }).format(new Date(booking.scheduledAt))
+        : "",
+    [booking]
+  );
+
   if (isLoading) {
-    return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" color={theme.colors.primary} />
-        <Text variant="body" style={styles.loadingText}>
-          Cargando reserva...
-        </Text>
-      </View>
-    );
+    return <BookingDetailSkeleton />;
   }
 
   if (error || !booking) {
@@ -53,71 +132,6 @@ export function BookingDetailScreen() {
       </View>
     );
   }
-
-  // Use local status if set, otherwise use booking status
-  const displayStatus: BookingStatus | null = localStatus || (booking?.status as BookingStatus) || null;
-
-  const handleAccept = async () => {
-    if (!bookingId) return;
-    try {
-      await acceptBooking(bookingId);
-      setLocalStatus(BookingStatus.ACCEPTED);
-    } catch {
-      // Error handled by hook
-    }
-  };
-
-  const handleReject = async () => {
-    if (!bookingId) return;
-    try {
-      await rejectBooking(bookingId);
-      setLocalStatus(BookingStatus.REJECTED);
-    } catch {
-      // Error handled by hook
-    }
-  };
-
-  const handleMarkOnMyWay = async () => {
-    if (!bookingId) return;
-    try {
-      await markOnMyWay(bookingId);
-      setLocalStatus(BookingStatus.ON_MY_WAY);
-    } catch {
-      // Error handled by hook
-    }
-  };
-
-  const handleArrive = async () => {
-    if (!bookingId) return;
-    try {
-      await arriveBooking(bookingId);
-      setLocalStatus(BookingStatus.ARRIVED);
-    } catch {
-      // Error handled by hook
-    }
-  };
-
-  const handleComplete = async () => {
-    if (!bookingId) return;
-    try {
-      await completeBooking(bookingId);
-      setLocalStatus(BookingStatus.COMPLETED);
-    } catch {
-      // Error handled by hook
-    }
-  };
-
-  const statusLabel = displayStatus ? getBookingStatusLabel(displayStatus as BookingStatus) : "";
-  const statusVariant = displayStatus ? getBookingStatusVariant(displayStatus as BookingStatus) : "info";
-  const categoryLabel = categoryLabels[booking.category] || booking.category;
-
-  const formattedDate = new Intl.DateTimeFormat("es-UY", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(new Date(booking.scheduledAt));
 
   const canAccept = displayStatus === BookingStatus.PENDING;
   const canReject = displayStatus === BookingStatus.PENDING;
@@ -287,10 +301,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: theme.colors.bg,
-  },
-  loadingText: {
-    marginTop: theme.spacing[2],
-    color: theme.colors.muted,
   },
   errorCard: {
     marginBottom: theme.spacing[4],

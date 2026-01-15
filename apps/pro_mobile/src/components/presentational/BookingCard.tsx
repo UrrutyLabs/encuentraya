@@ -1,3 +1,4 @@
+import React, { useMemo } from "react";
 import { TouchableOpacity, StyleSheet, View } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { Card } from "../ui/Card";
@@ -20,21 +21,39 @@ const categoryLabels: Record<string, string> = {
   [Category.PAINTING]: "Pintura",
 };
 
+function BookingCardComponent({ booking, onPress }: BookingCardProps) {
+  // Memoize computed values to avoid recalculation on re-renders
+  const categoryLabel = useMemo(
+    () => categoryLabels[booking.category] || booking.category,
+    [booking.category]
+  );
+  
+  const statusLabel = useMemo(
+    () => getBookingStatusLabel(booking.status),
+    [booking.status]
+  );
+  
+  const statusVariant = useMemo(
+    () => getBookingStatusVariant(booking.status),
+    [booking.status]
+  );
 
-export function BookingCard({ booking, onPress }: BookingCardProps) {
-  const categoryLabel = categoryLabels[booking.category] || booking.category;
-  const statusLabel = getBookingStatusLabel(booking.status);
-  const statusVariant = getBookingStatusVariant(booking.status);
+  const formattedDate = useMemo(
+    () =>
+      new Intl.DateTimeFormat("es-UY", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      }).format(new Date(booking.scheduledAt)),
+    [booking.scheduledAt]
+  );
 
-  const formattedDate = new Intl.DateTimeFormat("es-UY", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(new Date(booking.scheduledAt));
-
-  const descriptionLines = booking.description.split("\n").slice(0, 2).join("\n");
+  const descriptionLines = useMemo(
+    () => booking.description.split("\n").slice(0, 2).join("\n"),
+    [booking.description]
+  );
 
   return (
     <TouchableOpacity onPress={onPress}>
@@ -103,4 +122,14 @@ const styles = StyleSheet.create({
     fontWeight: theme.typography.weights.semibold,
     color: theme.colors.primary,
   },
+});
+
+// Memoize component to prevent unnecessary re-renders
+export const BookingCard = React.memo(BookingCardComponent, (prevProps, nextProps) => {
+  // Only re-render if booking ID or status changes, or onPress reference changes
+  return (
+    prevProps.booking.id === nextProps.booking.id &&
+    prevProps.booking.status === nextProps.booking.status &&
+    prevProps.onPress === nextProps.onPress
+  );
 });

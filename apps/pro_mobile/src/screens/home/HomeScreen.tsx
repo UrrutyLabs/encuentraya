@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useCallback } from "react";
 import { View, StyleSheet, ScrollView } from "react-native";
 import { useRouter } from "expo-router";
 import { Feather } from "@expo/vector-icons";
@@ -31,9 +31,13 @@ export function HomeScreen() {
     };
   }, [bookings]);
 
-  const handleCardPress = (bookingId: string) => {
-    router.push(`/booking/${bookingId}`);
-  };
+  // Memoize card press handler to prevent unnecessary re-renders of BookingCard
+  const handleCardPress = useCallback(
+    (bookingId: string) => {
+      router.push(`/booking/${bookingId}`);
+    },
+    [router]
+  );
 
   if (isLoading) {
     return (

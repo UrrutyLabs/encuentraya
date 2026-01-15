@@ -5,6 +5,7 @@ import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } f
 import { ActivityIndicator, View } from "react-native";
 import { TRPCProvider } from "../src/lib/trpc/Provider";
 import { ErrorBoundary } from "../src/components/ErrorBoundary";
+import { OfflineIndicator } from "../src/components/OfflineIndicator";
 import { initCrashReporting } from "../src/lib/crash-reporting";
 import { theme } from "../src/theme";
 
@@ -32,6 +33,7 @@ export default function RootLayout() {
   return (
     <ErrorBoundary>
       <TRPCProvider>
+        <OfflineIndicator />
         <Stack
           screenOptions={{
             headerStyle: { backgroundColor: theme.colors.surface },
