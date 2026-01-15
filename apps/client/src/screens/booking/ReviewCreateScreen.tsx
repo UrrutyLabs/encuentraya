@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useParams } from "next/navigation";
 import {
   Star,
-  Loader2,
   AlertCircle,
   CheckCircle,
   ArrowLeft,
