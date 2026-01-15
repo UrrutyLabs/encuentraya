@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import type { User, Session, AuthError } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase/client";
-import { setUserContext, clearUserContext } from "@/lib/crash-reporting";
+import { setUserContext, clearUserContext, logger } from "@/lib/crash-reporting";
 
 interface UseAuthReturn {
   user: User | null;
@@ -25,6 +25,8 @@ export function useAuth(): UseAuthReturn {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
+
+      logger.info("useAuth: getSession success", { session });
 
       // Set user context for crash reporting
       if (session?.user) {

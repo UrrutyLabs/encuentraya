@@ -1,6 +1,7 @@
 import { httpBatchLink } from "@trpc/client";
 import superjson from "superjson";
 import { supabase } from "@/lib/supabase/client";
+import { createAuthFetch } from "@/lib/auth/auth-guards";
 
 const getBaseUrl = () => {
   // Always use the full API URL, even in browser
@@ -9,10 +10,14 @@ const getBaseUrl = () => {
 };
 
 export function createTRPCLinks() {
+  // Create custom fetch wrapper that handles 401 errors
+  const authFetch = createAuthFetch(fetch);
+
   return [
     httpBatchLink({
       url: `${getBaseUrl()}/api/trpc`,
       transformer: superjson,
+      fetch: authFetch, // Use custom fetch wrapper for 401 handling
       headers: async () => {
         const {
           data: { session },
