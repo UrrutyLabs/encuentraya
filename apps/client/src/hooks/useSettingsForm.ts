@@ -4,6 +4,8 @@ import { trpc } from "@/lib/trpc/client";
 import { useClientProfile } from "./useClientProfile";
 import type { PreferredContactMethod } from "@repo/domain";
 import { logger } from "@/lib/logger";
+import { useQueryClient } from "./useQueryClient";
+import { invalidateRelatedQueries } from "@/lib/react-query/utils";
 
 /**
  * Hook to handle settings form logic
@@ -11,6 +13,7 @@ import { logger } from "@/lib/logger";
  */
 export function useSettingsForm() {
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   // Fetch current profile
   const { profile, isLoading: isLoadingProfile, error: profileError } =
@@ -40,6 +43,9 @@ export function useSettingsForm() {
 
   // Update mutation
   const updateMutation = trpc.clientProfile.update.useMutation({
+    ...invalidateRelatedQueries(queryClient, [
+      [["clientProfile", "get"]],
+    ]),
     onSuccess: () => {
       // Redirect immediately - profile will refetch when user navigates back
       router.push("/my-bookings");

@@ -11,6 +11,7 @@
   "dependencies": {
     "@repo/domain": "workspace:*",
     "@repo/monitoring": "workspace:*",
+    "@repo/react-query": "workspace:*",
     "@repo/trpc": "workspace:*",
     "@repo/ui": "workspace:*",
     "@sentry/nextjs": "^8.45.0",

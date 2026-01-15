@@ -206,6 +206,9 @@ importers:
       '@repo/monitoring':
         specifier: workspace:*
         version: link:../../packages/monitoring
+      '@repo/react-query':
+        specifier: workspace:*
+        version: link:../../packages/react-query
       '@repo/trpc':
         specifier: workspace:*
         version: link:../../packages/trpc
@@ -297,6 +300,9 @@ importers:
       '@repo/monitoring':
         specifier: workspace:*
         version: link:../../packages/monitoring
+      '@repo/react-query':
+        specifier: workspace:*
+        version: link:../../packages/react-query
       '@repo/trpc':
         specifier: workspace:*
         version: link:../../packages/trpc
@@ -500,6 +506,28 @@ importers:
       '@sentry/react-native':
         specifier: ^7.0.0
         version: 7.8.0(expo@54.0.31(@babel/core@7.28.5)(@expo/metro-runtime@6.1.2)(expo-router@6.0.21)(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.1.17)(react@19.2.3))(react@19.2.3))(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.1.17)(react@19.2.3))(react@19.2.3)
+    devDependencies:
+      '@repo/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      '@types/node':
+        specifier: ^22.15.3
+        version: 22.15.3
+      eslint:
+        specifier: ^9.39.1
+        version: 9.39.1(jiti@2.6.1)
+      typescript:
+        specifier: 5.9.2
+        version: 5.9.2
+
+  packages/react-query:
+    dependencies:
+      '@tanstack/react-query':
+        specifier: ^5.0.0
+        version: 5.90.16(react@19.2.3)
     devDependencies:
       '@repo/eslint-config':
         specifier: workspace:*

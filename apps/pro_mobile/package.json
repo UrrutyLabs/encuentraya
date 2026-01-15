@@ -22,6 +22,7 @@
     "@react-navigation/native": "^7.1.8",
     "@repo/domain": "workspace:*",
     "@repo/monitoring": "workspace:*",
+    "@repo/react-query": "workspace:*",
     "@repo/trpc": "workspace:*",
     "@repo/ui": "workspace:*",
     "@sentry/react-native": "^7.8.0",
