@@ -22,6 +22,7 @@ type MockSupabaseAdminClient = {
 type MockSupabasePublicClient = {
   auth: {
     resetPasswordForEmail: ReturnType<typeof vi.fn>;
+    verifyOtp: ReturnType<typeof vi.fn>;
   };
 };
 
@@ -41,6 +42,7 @@ vi.mock("@supabase/supabase-js", () => {
   const mockSupabasePublicClient: MockSupabasePublicClient = {
     auth: {
       resetPasswordForEmail: vi.fn(),
+      verifyOtp: vi.fn(),
     },
   };
 
@@ -556,6 +558,138 @@ describe("AuthService", () => {
       // Restore
       process.env.SUPABASE_URL = originalUrl;
       process.env.SUPABASE_SERVICE_ROLE_KEY = originalKey;
+    });
+  });
+
+  describe("resetPasswordWithOtp", () => {
+    it("should verify OTP and update password", async () => {
+      // Arrange
+      const email = "user@example.com";
+      const otp = "123456";
+      const newPassword = "newPassword123";
+      const userId = "user-123";
+
+      mockSupabasePublicClient.auth.verifyOtp.mockResolvedValue({
+        data: {
+          user: {
+            id: userId,
+            email: email,
+          },
+        },
+        error: null,
+      });
+
+      mockSupabaseAdminClient.auth.admin.updateUserById.mockResolvedValue({
+        data: {
+          user: {
+            id: userId,
+          },
+        },
+        error: null,
+      });
+
+      // Act
+      await service.resetPasswordWithOtp(email, otp, newPassword);
+
+      // Assert
+      expect(mockSupabasePublicClient.auth.verifyOtp).toHaveBeenCalledWith({
+        email,
+        token: otp,
+        type: "recovery",
+      });
+      expect(mockSupabaseAdminClient.auth.admin.updateUserById).toHaveBeenCalledWith(userId, {
+        password: newPassword,
+      });
+    });
+
+    it("should throw error if OTP is invalid", async () => {
+      // Arrange
+      const email = "user@example.com";
+      const otp = "invalid-otp";
+      const newPassword = "newPassword123";
+
+      mockSupabasePublicClient.auth.verifyOtp.mockResolvedValue({
+        data: {
+          user: null,
+        },
+        error: { message: "Invalid OTP" },
+      });
+
+      // Act & Assert
+      await expect(
+        service.resetPasswordWithOtp(email, otp, newPassword)
+      ).rejects.toThrow("Invalid or expired OTP code");
+
+      expect(mockSupabaseAdminClient.auth.admin.updateUserById).not.toHaveBeenCalled();
+    });
+
+    it("should throw error if OTP is expired", async () => {
+      // Arrange
+      const email = "user@example.com";
+      const otp = "expired-otp";
+      const newPassword = "newPassword123";
+
+      mockSupabasePublicClient.auth.verifyOtp.mockResolvedValue({
+        data: {
+          user: null,
+        },
+        error: { message: "OTP expired" },
+      });
+
+      // Act & Assert
+      await expect(
+        service.resetPasswordWithOtp(email, otp, newPassword)
+      ).rejects.toThrow("Invalid or expired OTP code");
+    });
+
+    it("should throw error if password update fails", async () => {
+      // Arrange
+      const email = "user@example.com";
+      const otp = "123456";
+      const newPassword = "newPassword123";
+      const userId = "user-123";
+
+      mockSupabasePublicClient.auth.verifyOtp.mockResolvedValue({
+        data: {
+          user: {
+            id: userId,
+            email: email,
+          },
+        },
+        error: null,
+      });
+
+      mockSupabaseAdminClient.auth.admin.updateUserById.mockResolvedValue({
+        data: {
+          user: null,
+        },
+        error: { message: "Password update failed" },
+      });
+
+      // Act & Assert
+      await expect(
+        service.resetPasswordWithOtp(email, otp, newPassword)
+      ).rejects.toThrow("Password update failed");
+    });
+
+    it("should throw error if Supabase configuration is missing", async () => {
+      // Arrange
+      const email = "user@example.com";
+      const otp = "123456";
+      const newPassword = "newPassword123";
+      const originalUrl = process.env.SUPABASE_URL;
+      const originalKey = process.env.SUPABASE_ANON_KEY;
+
+      delete process.env.SUPABASE_URL;
+
+      // Act & Assert
+      await expect(
+        service.resetPasswordWithOtp(email, otp, newPassword)
+      ).rejects.toThrow("Missing Supabase configuration");
+
+      // Restore
+      process.env.SUPABASE_URL = originalUrl;
+      process.env.SUPABASE_ANON_KEY = originalKey;
     });
   });
 });

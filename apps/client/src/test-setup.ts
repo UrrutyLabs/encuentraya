@@ -31,6 +31,8 @@ const mockTrpcClientProfileUpdate = vi.fn();
 const mockTrpcAuthSignup = vi.fn();
 const mockTrpcAuthChangePassword = vi.fn();
 const mockTrpcAuthDeleteAccount = vi.fn();
+const mockTrpcAuthRequestPasswordReset = vi.fn();
+const mockTrpcAuthResetPassword = vi.fn();
 const mockTrpcBookingMyBookings = vi.fn();
 const mockTrpcBookingGetById = vi.fn();
 const mockTrpcBookingCreate = vi.fn();
@@ -72,6 +74,12 @@ vi.mock("@/lib/trpc/client", () => {
         },
         deleteAccount: {
           useMutation: (...args: unknown[]) => mockTrpcAuthDeleteAccount(...args),
+        },
+        requestPasswordReset: {
+          useMutation: (...args: unknown[]) => mockTrpcAuthRequestPasswordReset(...args),
+        },
+        resetPassword: {
+          useMutation: (...args: unknown[]) => mockTrpcAuthResetPassword(...args),
         },
       },
       booking: {
@@ -123,6 +131,8 @@ export {
   mockTrpcAuthSignup,
   mockTrpcAuthChangePassword,
   mockTrpcAuthDeleteAccount,
+  mockTrpcAuthRequestPasswordReset,
+  mockTrpcAuthResetPassword,
   mockTrpcBookingMyBookings,
   mockTrpcBookingGetById,
   mockTrpcBookingCreate,
