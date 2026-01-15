@@ -1,7 +1,11 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { renderHook, act, waitFor } from "@testing-library/react";
 import { useResetPassword } from "../useResetPassword";
-import { mockTrpcAuthResetPassword } from "@/test-setup";
+import {
+  mockGetSession,
+  mockUpdateUser,
+} from "@/test-setup";
+import { Role } from "@repo/domain";
 
 // Mock useRouter
 const mockRouter = {
@@ -16,135 +20,218 @@ vi.mock("next/navigation", () => ({
   useRouter: () => mockRouter,
 }));
 
+// Mock useAuth
+const mockUser = { id: "user-1", email: "test@example.com" };
+vi.mock("../useAuth", () => ({
+  useAuth: () => ({
+    user: mockUser,
+    session: { user: mockUser },
+    loading: false,
+  }),
+}));
+
+// Mock useUserRole - will be overridden in specific tests
+const mockUseUserRole = vi.fn(() => ({
+  role: Role.CLIENT,
+  isLoading: false,
+}));
+
+vi.mock("../useUserRole", () => ({
+  useUserRole: () => mockUseUserRole(),
+}));
+
 describe("useResetPassword", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-  });
-
-  it("should return initial state", () => {
-    mockTrpcAuthResetPassword.mockReturnValue({
-      mutateAsync: vi.fn(),
-      isPending: false,
+    // Reset useUserRole mock to default CLIENT role
+    mockUseUserRole.mockReturnValue({
+      role: Role.CLIENT,
+      isLoading: false,
+    });
+    // Default: recovery session exists
+    mockGetSession.mockResolvedValue({
+      data: {
+        session: {
+          user: mockUser,
+          access_token: "recovery-token",
+        },
+      },
       error: null,
     });
+  });
 
+  it("should return initial state", async () => {
     const { result } = renderHook(() => useResetPassword());
 
     expect(typeof result.current.resetPassword).toBe("function");
     expect(result.current.isPending).toBe(false);
     expect(result.current.error).toBeNull();
-  });
-
-  it("should call mutation with correct token and password", async () => {
-    const mockMutateAsync = vi.fn().mockResolvedValue({ success: true });
-
-    let onSuccessCallback: (() => void) | undefined;
-
-    mockTrpcAuthResetPassword.mockImplementation(
-      (options?: { onSuccess?: () => void }) => {
-        onSuccessCallback = options?.onSuccess;
-        return {
-          mutateAsync: async (input: unknown) => {
-            const result = await mockMutateAsync(input);
-            onSuccessCallback?.();
-            return result;
-          },
-          isPending: false,
-          error: null,
-        };
-      }
-    );
-
-    const { result } = renderHook(() => useResetPassword());
-
-    await act(async () => {
-      await result.current.resetPassword("token-123", "newPassword123");
-    });
-
-    expect(mockMutateAsync).toHaveBeenCalledWith({
-      token: "token-123",
-      newPassword: "newPassword123",
+    
+    // Wait for useEffect to complete
+    await waitFor(() => {
+      expect(mockGetSession).toHaveBeenCalled();
     });
   });
 
-  it("should redirect to login on success", async () => {
-    const mockMutateAsync = vi.fn().mockResolvedValue({ success: true });
+  it("should check for recovery session on mount", async () => {
+    renderHook(() => useResetPassword());
 
-    let onSuccessCallback: (() => void) | undefined;
+    await waitFor(() => {
+      expect(mockGetSession).toHaveBeenCalled();
+    });
+  });
 
-    mockTrpcAuthResetPassword.mockImplementation(
-      (options?: { onSuccess?: () => void }) => {
-        onSuccessCallback = options?.onSuccess;
-        return {
-          mutateAsync: async (input: unknown) => {
-            const result = await mockMutateAsync(input);
-            setTimeout(() => onSuccessCallback?.(), 0);
-            return result;
-          },
-          isPending: false,
-          error: null,
-        };
-      }
-    );
+  it("should update password successfully with recovery session", async () => {
+    mockUpdateUser.mockResolvedValue({
+      data: { user: mockUser },
+      error: null,
+    });
 
     const { result } = renderHook(() => useResetPassword());
 
+    await waitFor(() => {
+      expect(result.current.hasRecoverySession).toBe(true);
+    });
+
     await act(async () => {
-      await result.current.resetPassword("token-123", "newPassword123");
+      await result.current.resetPassword("newPassword123");
+    });
+
+    expect(mockUpdateUser).toHaveBeenCalledWith({
+      password: "newPassword123",
+    });
+  });
+
+  it("should redirect to my-bookings for CLIENT role after success", async () => {
+    mockUpdateUser.mockResolvedValue({
+      data: { user: mockUser },
+      error: null,
+    });
+
+    const { result } = renderHook(() => useResetPassword());
+
+    await waitFor(() => {
+      expect(result.current.hasRecoverySession).toBe(true);
+    });
+
+    await act(async () => {
+      await result.current.resetPassword("newPassword123");
     });
 
     await waitFor(
       () => {
-        expect(mockRouter.push).toHaveBeenCalledWith(
-          "/my-bookings"
-        );
+        expect(mockRouter.push).toHaveBeenCalledWith("/my-bookings");
       },
       { timeout: 2000 }
     );
   });
 
-  it("should handle mutation pending state", () => {
-    mockTrpcAuthResetPassword.mockReturnValue({
-      mutateAsync: vi.fn(),
-      isPending: true,
+  it("should redirect to pro/download-app for PRO role after success", async () => {
+    // Override useUserRole mock for this test
+    mockUseUserRole.mockReturnValue({
+      role: Role.PRO,
+      isLoading: false,
+    });
+
+    mockUpdateUser.mockResolvedValue({
+      data: { user: mockUser },
       error: null,
     });
 
     const { result } = renderHook(() => useResetPassword());
 
-    expect(result.current.isPending).toBe(true);
+    await waitFor(() => {
+      expect(result.current.hasRecoverySession).toBe(true);
+    });
+
+    await act(async () => {
+      await result.current.resetPassword("newPassword123");
+    });
+
+    await waitFor(
+      () => {
+        expect(mockRouter.push).toHaveBeenCalledWith("/pro/download-app");
+      },
+      { timeout: 2000 }
+    );
   });
 
-  it("should handle mutation error", () => {
-    const mockError = { message: "Invalid token" };
+  it("should handle error when no recovery session exists", async () => {
+    mockGetSession.mockResolvedValue({
+      data: { session: null },
+      error: null,
+    });
 
-    mockTrpcAuthResetPassword.mockReturnValue({
-      mutateAsync: vi.fn(),
-      isPending: false,
+    const { result } = renderHook(() => useResetPassword());
+
+    await waitFor(() => {
+      expect(result.current.hasRecoverySession).toBe(false);
+    });
+
+    await act(async () => {
+      await expect(
+        result.current.resetPassword("newPassword123")
+      ).rejects.toThrow();
+    });
+
+    expect(mockUpdateUser).not.toHaveBeenCalled();
+  });
+
+  it("should handle updateUser error", async () => {
+    const mockError = {
+      message: "Password update failed",
+      status: 400,
+    };
+
+    mockUpdateUser.mockResolvedValue({
+      data: { user: null },
       error: mockError,
     });
 
     const { result } = renderHook(() => useResetPassword());
 
-    expect(result.current.error).toEqual(mockError);
-  });
-
-  it("should throw error when mutation fails", async () => {
-    const mockError = new Error("Invalid token");
-    const mockMutateAsync = vi.fn().mockRejectedValue(mockError);
-
-    mockTrpcAuthResetPassword.mockReturnValue({
-      mutateAsync: mockMutateAsync,
-      isPending: false,
-      error: null,
+    await waitFor(() => {
+      expect(result.current.hasRecoverySession).toBe(true);
     });
-
-    const { result } = renderHook(() => useResetPassword());
 
     await act(async () => {
       await expect(
-        result.current.resetPassword("invalid-token", "newPassword123")
-      ).rejects.toThrow("Invalid token");
+        result.current.resetPassword("newPassword123")
+      ).rejects.toThrow();
     });
+
+    expect(result.current.error).toBeTruthy();
+    expect(mockRouter.push).not.toHaveBeenCalled();
+  });
+
+  it("should set pending state during password update", async () => {
+    let resolveUpdate: (value: unknown) => void;
+    const updatePromise = new Promise((resolve) => {
+      resolveUpdate = resolve;
+    });
+
+    mockUpdateUser.mockReturnValue(updatePromise);
+
+    const { result } = renderHook(() => useResetPassword());
+
+    await waitFor(() => {
+      expect(result.current.hasRecoverySession).toBe(true);
+    });
+
+    act(() => {
+      result.current.resetPassword("newPassword123");
+    });
+
+    expect(result.current.isPending).toBe(true);
+
+    await act(async () => {
+      resolveUpdate!({
+        data: { user: mockUser },
+        error: null,
+      });
+      await updatePromise;
+    });
+
+    expect(result.current.isPending).toBe(false);
   });
 });

@@ -1,12 +1,30 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { renderHook, waitFor } from "@testing-library/react";
 import { useRequireAuth } from "../useRequireAuth";
+import { Role } from "@repo/domain";
 
 // Mock useAuth
 const mockUseAuth = vi.fn();
 
 vi.mock("../useAuth", () => ({
   useAuth: () => mockUseAuth(),
+}));
+
+// Mock useUserRole
+const mockUseUserRole = vi.fn();
+
+vi.mock("../useUserRole", () => ({
+  useUserRole: () => mockUseUserRole(),
+}));
+
+// Mock logger
+vi.mock("@/lib/logger", () => ({
+  logger: {
+    info: vi.fn(),
+    error: vi.fn(),
+    warn: vi.fn(),
+    debug: vi.fn(),
+  },
 }));
 
 // Mock useRouter
@@ -25,6 +43,12 @@ vi.mock("next/navigation", () => ({
 describe("useRequireAuth", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // Default mock for useUserRole - no role, not loading
+    mockUseUserRole.mockReturnValue({
+      role: null,
+      isLoading: false,
+      error: null,
+    });
   });
 
   describe("when user is authenticated", () => {
@@ -34,6 +58,12 @@ describe("useRequireAuth", () => {
       mockUseAuth.mockReturnValue({
         user: mockUser,
         loading: false,
+      });
+
+      mockUseUserRole.mockReturnValue({
+        role: null,
+        isLoading: false,
+        error: null,
       });
 
       const { result } = renderHook(() => useRequireAuth());
@@ -51,6 +81,12 @@ describe("useRequireAuth", () => {
       mockUseAuth.mockReturnValue({
         user: mockUser,
         loading: false,
+      });
+
+      mockUseUserRole.mockReturnValue({
+        role: null,
+        isLoading: false,
+        error: null,
       });
 
       const { result } = renderHook(() => useRequireAuth());
@@ -71,6 +107,12 @@ describe("useRequireAuth", () => {
         loading: false,
       });
 
+      mockUseUserRole.mockReturnValue({
+        role: null,
+        isLoading: false,
+        error: null,
+      });
+
       renderHook(() => useRequireAuth());
 
       await waitFor(() => {
@@ -84,6 +126,12 @@ describe("useRequireAuth", () => {
         loading: false,
       });
 
+      mockUseUserRole.mockReturnValue({
+        role: null,
+        isLoading: false,
+        error: null,
+      });
+
       renderHook(() => useRequireAuth({ redirectTo: "/custom-login" }));
 
       await waitFor(() => {
@@ -95,6 +143,12 @@ describe("useRequireAuth", () => {
       mockUseAuth.mockReturnValue({
         user: null,
         loading: false,
+      });
+
+      mockUseUserRole.mockReturnValue({
+        role: null,
+        isLoading: false,
+        error: null,
       });
 
       renderHook(() =>
@@ -116,6 +170,12 @@ describe("useRequireAuth", () => {
         loading: false,
       });
 
+      mockUseUserRole.mockReturnValue({
+        role: null,
+        isLoading: false,
+        error: null,
+      });
+
       const { result } = renderHook(() => useRequireAuth());
 
       const wrappedCallback = result.current.requireAuth(mockCallback);
@@ -134,6 +194,12 @@ describe("useRequireAuth", () => {
         loading: true,
       });
 
+      mockUseUserRole.mockReturnValue({
+        role: null,
+        isLoading: false,
+        error: null,
+      });
+
       const { result } = renderHook(() => useRequireAuth());
 
       expect(result.current.isLoading).toBe(true);
@@ -147,6 +213,12 @@ describe("useRequireAuth", () => {
       mockUseAuth.mockReturnValue({
         user: null,
         loading: true,
+      });
+
+      mockUseUserRole.mockReturnValue({
+        role: null,
+        isLoading: false,
+        error: null,
       });
 
       const { result } = renderHook(() => useRequireAuth());
@@ -165,12 +237,24 @@ describe("useRequireAuth", () => {
         loading: true,
       });
 
+      mockUseUserRole.mockReturnValue({
+        role: null,
+        isLoading: false,
+        error: null,
+      });
+
       const { rerender } = renderHook(() => useRequireAuth());
 
       // Simulate loading completing
       mockUseAuth.mockReturnValue({
         user: null,
         loading: false,
+      });
+
+      mockUseUserRole.mockReturnValue({
+        role: null,
+        isLoading: false,
+        error: null,
       });
 
       rerender();
@@ -191,6 +275,12 @@ describe("useRequireAuth", () => {
         loading: false,
       });
 
+      mockUseUserRole.mockReturnValue({
+        role: null,
+        isLoading: false,
+        error: null,
+      });
+
       const { result } = renderHook(() => useRequireAuth());
 
       const wrappedCallback = result.current.requireAuth(mockCallback);
@@ -208,6 +298,12 @@ describe("useRequireAuth", () => {
         loading: false,
       });
 
+      mockUseUserRole.mockReturnValue({
+        role: null,
+        isLoading: false,
+        error: null,
+      });
+
       const { result } = renderHook(() =>
         useRequireAuth({ returnUrl: "/protected" })
       );
@@ -220,6 +316,142 @@ describe("useRequireAuth", () => {
       expect(mockRouter.push).toHaveBeenCalledWith(
         "/login?returnUrl=%2Fprotected"
       );
+    });
+  });
+
+  describe("role-based authentication", () => {
+    it("should return isAuthenticated true when role matches", () => {
+      const mockUser = { id: "user-1", email: "test@example.com" };
+
+      mockUseAuth.mockReturnValue({
+        user: mockUser,
+        loading: false,
+      });
+
+      mockUseUserRole.mockReturnValue({
+        role: Role.CLIENT,
+        isLoading: false,
+        error: null,
+      });
+
+      const { result } = renderHook(() =>
+        useRequireAuth({ requiredRole: Role.CLIENT })
+      );
+
+      expect(result.current.isAuthenticated).toBe(true);
+      expect(mockRouter.push).not.toHaveBeenCalled();
+    });
+
+    it("should redirect when role does not match - PRO accessing CLIENT route", async () => {
+      const mockUser = { id: "user-1", email: "test@example.com" };
+
+      mockUseAuth.mockReturnValue({
+        user: mockUser,
+        loading: false,
+      });
+
+      mockUseUserRole.mockReturnValue({
+        role: Role.PRO,
+        isLoading: false,
+        error: null,
+      });
+
+      renderHook(() => useRequireAuth({ requiredRole: Role.CLIENT }));
+
+      await waitFor(() => {
+        expect(mockRouter.push).toHaveBeenCalledWith("/pro/download-app");
+      });
+    });
+
+    it("should redirect when role does not match - CLIENT accessing PRO route", async () => {
+      const mockUser = { id: "user-1", email: "test@example.com" };
+
+      mockUseAuth.mockReturnValue({
+        user: mockUser,
+        loading: false,
+      });
+
+      mockUseUserRole.mockReturnValue({
+        role: Role.CLIENT,
+        isLoading: false,
+        error: null,
+      });
+
+      renderHook(() => useRequireAuth({ requiredRole: Role.PRO }));
+
+      await waitFor(() => {
+        expect(mockRouter.push).toHaveBeenCalledWith("/my-bookings");
+      });
+    });
+
+    it("should return isAuthenticated false when role does not match", () => {
+      const mockUser = { id: "user-1", email: "test@example.com" };
+
+      mockUseAuth.mockReturnValue({
+        user: mockUser,
+        loading: false,
+      });
+
+      mockUseUserRole.mockReturnValue({
+        role: Role.CLIENT,
+        isLoading: false,
+        error: null,
+      });
+
+      const { result } = renderHook(() =>
+        useRequireAuth({ requiredRole: Role.PRO })
+      );
+
+      expect(result.current.isAuthenticated).toBe(false);
+    });
+
+    it("should not execute callback when role does not match", () => {
+      const mockUser = { id: "user-1", email: "test@example.com" };
+      const mockCallback = vi.fn();
+
+      mockUseAuth.mockReturnValue({
+        user: mockUser,
+        loading: false,
+      });
+
+      mockUseUserRole.mockReturnValue({
+        role: Role.CLIENT,
+        isLoading: false,
+        error: null,
+      });
+
+      const { result } = renderHook(() =>
+        useRequireAuth({ requiredRole: Role.PRO })
+      );
+
+      const wrappedCallback = result.current.requireAuth(mockCallback);
+
+      wrappedCallback("arg1", "arg2");
+
+      expect(mockCallback).not.toHaveBeenCalled();
+      expect(mockRouter.push).toHaveBeenCalled();
+    });
+
+    it("should wait for role to load before redirecting", () => {
+      const mockUser = { id: "user-1", email: "test@example.com" };
+
+      mockUseAuth.mockReturnValue({
+        user: mockUser,
+        loading: false,
+      });
+
+      mockUseUserRole.mockReturnValue({
+        role: null,
+        isLoading: true,
+        error: null,
+      });
+
+      const { result } = renderHook(() =>
+        useRequireAuth({ requiredRole: Role.CLIENT })
+      );
+
+      expect(result.current.isLoading).toBe(true);
+      expect(mockRouter.push).not.toHaveBeenCalled();
     });
   });
 });

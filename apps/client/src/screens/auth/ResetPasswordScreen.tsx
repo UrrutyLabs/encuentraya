@@ -10,52 +10,20 @@ import { Text, Card } from "@repo/ui";
 
 export function ResetPasswordScreen() {
   const router = useRouter();
-  const { resetPassword, isPending, error } = useResetPassword();
+  const { resetPassword, isPending, error, hasRecoverySession, isLoading } = useResetPassword();
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [validationError, setValidationError] = useState<string | null>(null);
 
-  // Get token from URL
-  // Supabase sends the token in the hash fragment (#access_token=...) or as query param
-  // We need to check both URL hash and query params
-  const [token, setToken] = useState<string>("");
-  const [isCheckingToken, setIsCheckingToken] = useState(true);
-
+  // Check if recovery session exists (user clicked reset link)
   useEffect(() => {
-    // Extract token from URL on mount
-    // This is a client component, so window is always available
-    
-    // Check query params first
-    const urlParams = new URLSearchParams(window.location.search);
-    const queryToken = urlParams.get("access_token") || urlParams.get("token");
-    
-    if (queryToken) {
-      setToken(queryToken);
-      setIsCheckingToken(false);
-      return;
+    if (hasRecoverySession === false && !isLoading) {
+      // No recovery session - redirect to forgot password
+      setTimeout(() => {
+        router.push("/forgot-password");
+      }, 0);
     }
-    
-    // Check hash fragment (Supabase typically uses this)
-    const hash = window.location.hash;
-    if (hash) {
-      const hashParams = new URLSearchParams(hash.substring(1)); // Remove #
-      const hashToken = hashParams.get("access_token") || hashParams.get("token");
-      
-      if (hashToken) {
-        setToken(hashToken);
-        // Clean up the hash from URL
-        window.history.replaceState(null, "", window.location.pathname + window.location.search);
-        setIsCheckingToken(false);
-        return;
-      }
-    }
-    
-    // No token found - update state and redirect after render
-    setIsCheckingToken(false);
-    setTimeout(() => {
-      router.push("/forgot-password");
-    }, 0);
-  }, [router]);
+  }, [hasRecoverySession, isLoading, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,15 +42,15 @@ export function ResetPasswordScreen() {
     }
 
     try {
-      await resetPassword(token, newPassword);
-      // Success - mutation's onSuccess will handle redirect
+      await resetPassword(newPassword);
+      // Success - hook will handle redirect
     } catch (err) {
-      // Error is handled by mutation state
+      // Error is handled by hook state
     }
   };
 
-  // Show loading state while checking token
-  if (isCheckingToken) {
+  // Show loading state while checking recovery session
+  if (isLoading || hasRecoverySession === null) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-bg p-4">
         <div className="flex flex-col items-center gap-3">
@@ -95,8 +63,8 @@ export function ResetPasswordScreen() {
     );
   }
 
-  // Show error state if no token found
-  if (!token) {
+  // Show error state if no recovery session found
+  if (hasRecoverySession === false) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-bg p-4">
         <Card className="max-w-md w-full p-8 space-y-6">

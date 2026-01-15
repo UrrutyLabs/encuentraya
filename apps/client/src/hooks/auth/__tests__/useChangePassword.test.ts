@@ -1,40 +1,58 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { useChangePassword } from "../useChangePassword";
-import { mockTrpcAuthChangePassword } from "@/test-setup";
+import { mockTrpcAuthChangePassword, mockSignOut, mockQueryClient } from "@/test-setup";
 
-// Mock useAuth
-const mockSignOut = vi.fn().mockResolvedValue({ error: null });
+// Add resetQueries to the mockQueryClient from test-setup
+const mockResetQueries = vi.fn();
+const mockInvalidateQueries = vi.fn();
 
-vi.mock("../useAuth", () => ({
-  useAuth: () => ({
-    signOut: mockSignOut,
+// Override the mock to include resetQueries
+vi.mock("@/hooks/shared/useQueryClient", () => ({
+  useQueryClient: () => ({
+    ...mockQueryClient,
+    resetQueries: mockResetQueries,
+    invalidateQueries: mockInvalidateQueries,
   }),
-}));
-
-// Mock useRouter
-const mockRouter = {
-  push: vi.fn(),
-  replace: vi.fn(),
-  back: vi.fn(),
-  refresh: vi.fn(),
-  prefetch: vi.fn(),
-};
-
-vi.mock("next/navigation", () => ({
-  useRouter: () => mockRouter,
 }));
 
 // Mock logger
 vi.mock("@/lib/logger", () => ({
   logger: {
     error: vi.fn(),
+    info: vi.fn(),
   },
 }));
+
+// Supabase client is already mocked in test-setup.ts
+// auth-utils will use the mocked supabase, so we don't need to mock it separately
+
+// Mock window.location.href - use getter/setter to track assignments
+let locationHrefValue = "";
+Object.defineProperty(window, "location", {
+  value: {
+    get href() {
+      return locationHrefValue;
+    },
+    set href(value: string) {
+      locationHrefValue = value;
+    },
+  },
+  writable: true,
+  configurable: true,
+});
 
 describe("useChangePassword", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // Reset all mocks
+    mockResetQueries.mockClear();
+    mockInvalidateQueries.mockClear();
+    mockSignOut.mockClear();
+    // Reset window.location.href
+    locationHrefValue = "";
+    // Reset signOut to return success
+    mockSignOut.mockResolvedValue({ error: null });
   });
 
   describe("initial state", () => {
@@ -178,17 +196,17 @@ describe("useChangePassword", () => {
       expect(mockReset).toHaveBeenCalled();
     });
 
-    it("should sign out and redirect on success", async () => {
-      let onSuccessCallback: (() => void) | undefined;
+    it("should clear cache, sign out, and redirect on success", async () => {
+      let onSuccessCallback: (() => Promise<void>) | undefined;
 
-      mockTrpcAuthChangePassword.mockImplementation((options?: { onSuccess?: () => void }) => {
+      mockTrpcAuthChangePassword.mockImplementation((options?: { onSuccess?: () => Promise<void> }) => {
         onSuccessCallback = options?.onSuccess;
         return {
-          mutate: (input: unknown) => {
-            // Call onSuccess synchronously after mutate is called
-            setTimeout(() => {
-              onSuccessCallback?.();
-            }, 0);
+          mutate: async (input: unknown) => {
+            // Call onSuccess asynchronously after mutate is called
+            if (onSuccessCallback) {
+              await onSuccessCallback();
+            }
           },
           isPending: false,
           error: null,
@@ -211,12 +229,24 @@ describe("useChangePassword", () => {
 
       await act(async () => {
         result.current.handleSubmit(mockEvent);
-        // Wait for onSuccess to be called
-        await new Promise((resolve) => setTimeout(resolve, 10));
+        // Wait for async operations to complete
+        await new Promise((resolve) => setTimeout(resolve, 50));
       });
 
-      expect(mockSignOut).toHaveBeenCalled();
-      expect(mockRouter.push).toHaveBeenCalledWith("/login?passwordChanged=true");
+      // Verify cache clearing
+      expect(mockResetQueries).toHaveBeenCalledWith({
+        queryKey: [["auth", "me"]],
+      });
+      expect(mockInvalidateQueries).toHaveBeenCalled();
+
+      // clearSessionStorage is called but we don't verify it
+      // as it just clears localStorage and doesn't need to be mocked
+
+      // Verify sign out
+      expect(mockSignOut).toHaveBeenCalledWith({ scope: "local" });
+
+      // Verify redirect using window.location.href (assignment, not function call)
+      expect(locationHrefValue).toBe("/login?passwordChanged=true");
     });
   });
 

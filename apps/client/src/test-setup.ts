@@ -31,8 +31,6 @@ const mockTrpcClientProfileUpdate = vi.fn();
 const mockTrpcAuthSignup = vi.fn();
 const mockTrpcAuthChangePassword = vi.fn();
 const mockTrpcAuthDeleteAccount = vi.fn();
-const mockTrpcAuthRequestPasswordReset = vi.fn();
-const mockTrpcAuthResetPassword = vi.fn();
 const mockTrpcBookingMyBookings = vi.fn();
 const mockTrpcBookingGetById = vi.fn();
 const mockTrpcBookingCreate = vi.fn();
@@ -74,12 +72,6 @@ vi.mock("@/lib/trpc/client", () => {
         },
         deleteAccount: {
           useMutation: (...args: unknown[]) => mockTrpcAuthDeleteAccount(...args),
-        },
-        requestPasswordReset: {
-          useMutation: (...args: unknown[]) => mockTrpcAuthRequestPasswordReset(...args),
-        },
-        resetPassword: {
-          useMutation: (...args: unknown[]) => mockTrpcAuthResetPassword(...args),
         },
       },
       booking: {
@@ -131,8 +123,6 @@ export {
   mockTrpcAuthSignup,
   mockTrpcAuthChangePassword,
   mockTrpcAuthDeleteAccount,
-  mockTrpcAuthRequestPasswordReset,
-  mockTrpcAuthResetPassword,
   mockTrpcBookingMyBookings,
   mockTrpcBookingGetById,
   mockTrpcBookingCreate,
@@ -232,6 +222,8 @@ const mockSignInWithPassword = vi.fn();
 const mockSignUp = vi.fn();
 const mockSignOut = vi.fn();
 const mockResend = vi.fn();
+const mockResetPasswordForEmail = vi.fn();
+const mockUpdateUser = vi.fn();
 
 vi.mock("@/lib/supabase/client", () => ({
   supabase: {
@@ -242,6 +234,8 @@ vi.mock("@/lib/supabase/client", () => ({
       signUp: mockSignUp,
       signOut: mockSignOut,
       resend: mockResend,
+      resetPasswordForEmail: mockResetPasswordForEmail,
+      updateUser: mockUpdateUser,
     },
   },
 }));
@@ -254,4 +248,6 @@ export {
   mockSignUp,
   mockSignOut,
   mockResend,
+  mockResetPasswordForEmail,
+  mockUpdateUser,
 };
