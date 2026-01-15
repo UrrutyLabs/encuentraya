@@ -41,3 +41,22 @@ export const clientProfileUpdateInputSchema = z.object({
 });
 
 export type ClientProfileUpdateInput = z.infer<typeof clientProfileUpdateInputSchema>;
+
+/**
+ * Change password input schema
+ */
+export const changePasswordInputSchema = z.object({
+  currentPassword: z.string().min(1, "Current password is required"),
+  newPassword: z.string().min(8, "New password must be at least 8 characters"),
+});
+
+export type ChangePasswordInput = z.infer<typeof changePasswordInputSchema>;
+
+/**
+ * Delete account input schema
+ */
+export const deleteAccountInputSchema = z.object({
+  password: z.string().min(1, "Password is required for account deletion"),
+});
+
+export type DeleteAccountInput = z.infer<typeof deleteAccountInputSchema>;

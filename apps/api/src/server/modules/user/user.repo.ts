@@ -8,6 +8,7 @@ import { Role } from "@repo/domain";
 export interface UserEntity {
   id: string;
   role: Role;
+  deletedAt: Date | null;
   createdAt: Date;
 }
 
@@ -20,6 +21,7 @@ export interface UserRepository {
   findById(id: string): Promise<UserEntity | null>;
   findByRole(role: Role): Promise<UserEntity[]>;
   updateRole(id: string, role: Role): Promise<UserEntity>;
+  softDelete(id: string): Promise<UserEntity>;
 }
 
 /**
@@ -44,8 +46,11 @@ export class UserRepositoryImpl implements UserRepository {
   }
 
   async findById(id: string): Promise<UserEntity | null> {
-    const user = await prisma.user.findUnique({
-      where: { id },
+    const user = await prisma.user.findFirst({
+      where: {
+        id,
+        deletedAt: null, // Filter out soft-deleted users
+      },
     });
 
     return user ? this.mapPrismaToDomain(user) : null;
@@ -53,7 +58,10 @@ export class UserRepositoryImpl implements UserRepository {
 
   async findByRole(role: Role): Promise<UserEntity[]> {
     const users = await prisma.user.findMany({
-      where: { role },
+      where: {
+        role,
+        deletedAt: null, // Filter out soft-deleted users
+      },
       orderBy: { createdAt: "desc" },
     });
 
@@ -69,14 +77,25 @@ export class UserRepositoryImpl implements UserRepository {
     return this.mapPrismaToDomain(user);
   }
 
+  async softDelete(id: string): Promise<UserEntity> {
+    const user = await prisma.user.update({
+      where: { id },
+      data: { deletedAt: new Date() },
+    });
+
+    return this.mapPrismaToDomain(user);
+  }
+
   private mapPrismaToDomain(prismaUser: {
     id: string;
     role: string;
+    deletedAt: Date | null;
     createdAt: Date;
   }): UserEntity {
     return {
       id: prismaUser.id,
       role: prismaUser.role as Role,
+      deletedAt: prismaUser.deletedAt,
       createdAt: prismaUser.createdAt,
     };
   }

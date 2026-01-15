@@ -38,10 +38,16 @@ export function Navigation({ showLogin = true, showProfile = false }: Navigation
 
   const handleSignOut = async () => {
     try {
-      await signOut();
+      const { error } = await signOut();
+      if (error) {
+        console.error("Error signing out:", error);
+        // Even if signOut fails, redirect to home (session might already be invalid)
+      }
       router.push("/");
     } catch (error) {
       console.error("Error signing out:", error);
+      // Redirect anyway to ensure user is logged out from UI perspective
+      router.push("/");
     }
   };
 

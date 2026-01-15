@@ -121,9 +121,10 @@ enum AuditEventType {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  role      Role     @default(client)
-  createdAt DateTime @default(now())
+  id        String    @id @default(cuid())
+  role      Role      @default(client)
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
 
   // Relations
   proProfile    ProProfile?
@@ -133,6 +134,7 @@ model User {
   paymentsAsClient Payment[] @relation("ClientPayments")
 
   @@index([role])
+  @@index([deletedAt])
   @@map("users")
 }
 

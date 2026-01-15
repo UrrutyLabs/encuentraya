@@ -1,19 +1,21 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { LogIn, Loader2 } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { LogIn, Loader2, CheckCircle } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { AuthForm } from "@/components/forms/AuthForm";
-import { Text } from "@repo/ui";
+import { Text, Card } from "@repo/ui";
 
 export function LoginScreen() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { user, loading: authLoading, signIn } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const passwordChanged = searchParams.get("passwordChanged") === "true";
 
   // Redirect if already logged in
   useEffect(() => {
@@ -59,6 +61,17 @@ export function LoginScreen() {
             Iniciar sesión
           </Text>
         </div>
+        {passwordChanged && (
+          <Card className="p-4 bg-success/10 border-success/20">
+            <div className="flex items-center gap-2">
+              <CheckCircle className="w-5 h-5 text-success shrink-0" />
+              <Text variant="body" className="text-success">
+                Tu contraseña ha sido cambiada. Por favor, iniciá sesión con tu
+                nueva contraseña.
+              </Text>
+            </div>
+          </Card>
+        )}
         <AuthForm
           mode="login"
           email={email}

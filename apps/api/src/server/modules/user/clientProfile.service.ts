@@ -104,4 +104,28 @@ export class ClientProfileService {
   }> {
     return await this.clientProfileRepository.upsertForUser(userId, data);
   }
+
+  /**
+   * Anonymize client profile (remove PII for GDPR compliance)
+   * Keeps profile record but removes all personally identifiable information
+   */
+  async anonymizeProfile(userId: string): Promise<{
+    id: string;
+    userId: string;
+    firstName: string | null;
+    lastName: string | null;
+    email: string | null;
+    phone: string | null;
+    preferredContactMethod: "EMAIL" | "WHATSAPP" | "PHONE" | null;
+    createdAt: Date;
+    updatedAt: Date;
+  }> {
+    return await this.clientProfileRepository.upsertForUser(userId, {
+      email: null,
+      firstName: null,
+      lastName: null,
+      phone: null,
+      preferredContactMethod: null,
+    });
+  }
 }

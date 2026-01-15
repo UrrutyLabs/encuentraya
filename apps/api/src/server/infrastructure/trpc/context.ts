@@ -76,6 +76,11 @@ export async function createContext(req: Request): Promise<{
     user = await userRepository.create(role, supabaseUserId);
   }
 
+  // Reject authentication if user is soft-deleted
+  if (user.deletedAt) {
+    return { actor: null, requestId };
+  }
+
   return {
     actor: {
       id: user.id,

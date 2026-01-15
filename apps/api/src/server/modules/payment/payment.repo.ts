@@ -71,6 +71,7 @@ export interface PaymentRepository {
   updateStatusAndAmounts(id: string, patch: PaymentUpdateInput): Promise<PaymentEntity>;
   setCheckoutUrl(id: string, url: string): Promise<PaymentEntity>;
   setProviderReference(id: string, reference: string): Promise<PaymentEntity>;
+  findPendingByClientUserId(clientUserId: string): Promise<PaymentEntity[]>;
 }
 
 /**
@@ -200,6 +201,30 @@ export class PaymentRepositoryImpl implements PaymentRepository {
     });
 
     return this.mapPrismaToDomain(payment);
+  }
+
+  /**
+   * Find pending payments for a client
+   * Pending payments are those with status: CREATED, REQUIRES_ACTION, AUTHORIZED
+   * These prevent account deletion
+   */
+  async findPendingByClientUserId(clientUserId: string): Promise<PaymentEntity[]> {
+    const pendingStatuses: PaymentStatus[] = [
+      PaymentStatus.CREATED,
+      PaymentStatus.REQUIRES_ACTION,
+      PaymentStatus.AUTHORIZED,
+    ];
+
+    const payments = await prisma.payment.findMany({
+      where: {
+        clientUserId,
+        status: {
+          in: pendingStatuses as $Enums.PaymentStatus[],
+        },
+      },
+    });
+
+    return payments.map(this.mapPrismaToDomain);
   }
 
   private mapPrismaToDomain(prismaPayment: Prisma.PaymentGetPayload<Record<string, never>>): PaymentEntity {

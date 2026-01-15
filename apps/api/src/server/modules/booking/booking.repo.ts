@@ -56,6 +56,7 @@ export interface BookingRepository {
     proProfileId: string | null
   ): Promise<BookingEntity | null>;
   assignPro(id: string, proProfileId: string): Promise<BookingEntity | null>;
+  findActiveByClientUserId(clientUserId: string): Promise<BookingEntity[]>;
 }
 
 /**
@@ -175,6 +176,26 @@ export class BookingRepositoryImpl implements BookingRepository {
     });
 
     return this.mapPrismaToDomain(booking);
+  }
+
+  async findActiveByClientUserId(clientUserId: string): Promise<BookingEntity[]> {
+    const activeStatuses: BookingStatus[] = [
+      BookingStatus.PENDING,
+      BookingStatus.ACCEPTED,
+      BookingStatus.ON_MY_WAY,
+      BookingStatus.ARRIVED,
+    ];
+
+    const bookings = await prisma.booking.findMany({
+      where: {
+        clientUserId,
+        status: {
+          in: activeStatuses as $Enums.BookingStatus[],
+        },
+      },
+    });
+
+    return bookings.map(this.mapPrismaToDomain);
   }
 
   private mapPrismaToDomain(prismaBooking: {

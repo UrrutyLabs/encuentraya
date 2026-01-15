@@ -52,10 +52,14 @@ export {
   preferredContactMethodSchema,
   clientSignupInputSchema,
   clientProfileUpdateInputSchema,
+  changePasswordInputSchema,
+  deleteAccountInputSchema,
   type ClientSearchProsInput,
   type PreferredContactMethod,
   type ClientSignupInput,
   type ClientProfileUpdateInput,
+  type ChangePasswordInput,
+  type DeleteAccountInput,
 } from "./schemas/client.schema";
 
 // Format utilities

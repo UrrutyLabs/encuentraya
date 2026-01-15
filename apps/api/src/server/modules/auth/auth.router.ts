@@ -1,7 +1,12 @@
 import { router, protectedProcedure, publicProcedure } from "@infra/trpc";
 import { container, TOKENS } from "@/server/container";
 import { AuthService } from "./auth.service";
-import { clientSignupInputSchema, proSignupInputSchema } from "@repo/domain";
+import {
+  clientSignupInputSchema,
+  proSignupInputSchema,
+  changePasswordInputSchema,
+  deleteAccountInputSchema,
+} from "@repo/domain";
 import { TRPCError } from "@trpc/server";
 
 // Resolve service from container
@@ -85,6 +90,68 @@ export const authRouter = router({
             error instanceof Error
               ? error.message
               : "Failed to create user account",
+        });
+      }
+    }),
+
+  changePassword: protectedProcedure
+    .input(changePasswordInputSchema)
+    .mutation(async ({ input, ctx }) => {
+      try {
+        await authService.changePassword(
+          ctx.actor.id,
+          input.currentPassword,
+          input.newPassword
+        );
+        return { success: true };
+      } catch (error) {
+        if (error instanceof Error) {
+          if (
+            error.message.includes("incorrect") ||
+            error.message.includes("password")
+          ) {
+            throw new TRPCError({
+              code: "UNAUTHORIZED",
+              message: error.message,
+            });
+          }
+        }
+
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message:
+            error instanceof Error
+              ? error.message
+              : "Failed to change password",
+        });
+      }
+    }),
+
+  deleteAccount: protectedProcedure
+    .input(deleteAccountInputSchema)
+    .mutation(async ({ input, ctx }) => {
+      try {
+        await authService.deleteAccount(ctx.actor.id, input.password);
+        return { success: true };
+      } catch (error) {
+        if (error instanceof Error) {
+          if (
+            error.message.includes("incorrect") ||
+            error.message.includes("password")
+          ) {
+            throw new TRPCError({
+              code: "UNAUTHORIZED",
+              message: error.message,
+            });
+          }
+        }
+
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message:
+            error instanceof Error
+              ? error.message
+              : "Failed to delete account",
         });
       }
     }),
