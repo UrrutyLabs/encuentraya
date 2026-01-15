@@ -2,6 +2,7 @@ import {
   User,
   Bell,
   Shield,
+  CreditCard,
   HelpCircle,
   type LucideIcon,
 } from "lucide-react";
@@ -11,6 +12,7 @@ import {
   SettingsProfileSection,
   SettingsNotificationsSection,
   SettingsSecuritySection,
+  SettingsPaymentsSection,
   SettingsHelpSection,
 } from "./index";
 
@@ -56,9 +58,11 @@ type AnyComponent = ComponentType<Record<string, unknown>>;
 
 type SettingsSectionConfig = {
   id: string;
+  tabId: string; // Tab identifier for tab-based navigation
   title: string;
   icon: LucideIcon;
   component: AnyComponent;
+  isEditable: boolean; // Whether this section requires form submission
   visible: (data: {
     profile?: ProfileData | null;
   }) => boolean;
@@ -87,9 +91,11 @@ function asSectionComponent(component: any): AnyComponent {
 export const settingsSections: SettingsSectionConfig[] = [
   {
     id: "profile",
+    tabId: "personalData",
     title: "Información Personal",
     icon: User,
     component: asSectionComponent(SettingsProfileSection),
+    isEditable: true,
     visible: ({ profile }) => !!profile,
     getProps: ({ profile, formState, formHandlers }) => ({
       email: profile?.email,
@@ -102,9 +108,11 @@ export const settingsSections: SettingsSectionConfig[] = [
   },
   {
     id: "notifications",
+    tabId: "notifications",
     title: "Preferencias de Notificación",
     icon: Bell,
     component: asSectionComponent(SettingsNotificationsSection),
+    isEditable: true,
     visible: () => true, // Always visible
     getProps: ({ formState, formHandlers }) => ({
       preferredContactMethod: formState.preferredContactMethod,
@@ -113,9 +121,11 @@ export const settingsSections: SettingsSectionConfig[] = [
   },
   {
     id: "security",
+    tabId: "security",
     title: "Seguridad y Privacidad",
     icon: Shield,
     component: asSectionComponent(SettingsSecuritySection),
+    isEditable: false,
     visible: () => true, // Always visible (empty state handles no actions)
     getProps: ({ securityHandlers }) => ({
       onChangePasswordClick: securityHandlers?.onChangePasswordClick,
@@ -123,10 +133,22 @@ export const settingsSections: SettingsSectionConfig[] = [
     }),
   },
   {
+    id: "payments",
+    tabId: "payments",
+    title: "Pagos",
+    icon: CreditCard,
+    component: asSectionComponent(SettingsPaymentsSection),
+    isEditable: false,
+    visible: () => true, // Always visible (placeholder for now)
+    getProps: () => ({}), // No props needed for placeholder
+  },
+  {
     id: "help",
+    tabId: "help",
     title: "Ayuda y Soporte",
     icon: HelpCircle,
     component: asSectionComponent(SettingsHelpSection),
+    isEditable: false,
     visible: () => true, // Always visible (empty state handles no actions)
     getProps: ({ helpHandlers }) => ({
       onHelpCenterClick: helpHandlers?.onHelpCenterClick,
@@ -135,3 +157,33 @@ export const settingsSections: SettingsSectionConfig[] = [
     }),
   },
 ];
+
+/**
+ * Get tabs configuration from sections
+ * Filters visible sections and maps them to tab format
+ */
+export function getSettingsTabs(
+  sections: SettingsSectionConfig[],
+  profile?: ProfileData | null
+): Array<{ id: string; label: string; icon: LucideIcon }> {
+  return sections
+    .filter((section) => section.visible({ profile }))
+    .map((section) => ({
+      id: section.tabId,
+      label: section.title,
+      icon: section.icon,
+    }));
+}
+
+/**
+ * Find section by tabId
+ */
+export function getSectionByTabId(
+  sections: SettingsSectionConfig[],
+  tabId: string,
+  profile?: ProfileData | null
+): SettingsSectionConfig | undefined {
+  return sections.find(
+    (section) => section.tabId === tabId && section.visible({ profile })
+  );
+}

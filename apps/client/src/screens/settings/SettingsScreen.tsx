@@ -1,14 +1,20 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Settings, Save, X, Loader2, AlertCircle } from "lucide-react";
 import { Text } from "@repo/ui";
 import { Card } from "@repo/ui";
 import { Button } from "@repo/ui";
+import { Tabs } from "@repo/ui";
+import { SidebarMenu } from "@repo/ui";
 import { Navigation } from "@/components/presentational/Navigation";
 import { useSettingsForm } from "@/hooks/useSettingsForm";
-import { settingsSections } from "@/components/settings/settingsConfig";
+import {
+  settingsSections,
+  getSettingsTabs,
+  getSectionByTabId,
+} from "@/components/settings/settingsConfig";
 import { SettingsSkeleton } from "@/components/settings/SettingsSkeleton";
 import {
   ChangePasswordModal,
@@ -17,6 +23,7 @@ import {
 
 export function SettingsScreen() {
   const router = useRouter();
+  const [activeTab, setActiveTab] = useState<string>("personalData");
   const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] =
     useState(false);
   const [isDeleteAccountModalOpen, setIsDeleteAccountModalOpen] =
@@ -92,30 +99,37 @@ export function SettingsScreen() {
     []
   );
 
-  // Filter visible sections
-  const visibleSections = useMemo(
-    () =>
-      settingsSections.filter((section) =>
-        section.visible({ profile })
-      ),
+  // Get tabs configuration
+  const tabs = useMemo(
+    () => getSettingsTabs(settingsSections, profile),
     [profile]
   );
 
-  // Separate editable sections (in form) from read-only/action sections
-  const editableSectionIds = ["profile", "notifications"];
-  const editableSections = visibleSections.filter((section) =>
-    editableSectionIds.includes(section.id)
+  // Get active section based on selected tab
+  const activeSection = useMemo(
+    () => getSectionByTabId(settingsSections, activeTab, profile),
+    [activeTab, profile]
   );
-  const readOnlySections = visibleSections.filter(
-    (section) => !editableSectionIds.includes(section.id)
-  );
+
+  // Ensure activeTab is valid, default to first tab if not
+  const validActiveTab = useMemo(() => {
+    if (activeSection) return activeTab;
+    return tabs[0]?.id || "personalData";
+  }, [activeTab, activeSection, tabs]);
+
+  // Update activeTab if current one is invalid
+  useEffect(() => {
+    if (validActiveTab !== activeTab && tabs.length > 0) {
+      setActiveTab(validActiveTab);
+    }
+  }, [validActiveTab, activeTab, tabs]);
 
   if (isLoading) {
     return (
       <div className="min-h-screen bg-bg">
         <Navigation showLogin={false} showProfile={true} />
         <div className="px-4 py-8">
-          <div className="max-w-4xl mx-auto">
+          <div className="max-w-7xl mx-auto">
             <div className="flex items-center gap-2 mb-6">
               <Settings className="w-6 h-6 text-primary" />
               <Text variant="h1" className="text-primary">
@@ -129,11 +143,110 @@ export function SettingsScreen() {
     );
   }
 
+  const currentSection = activeSection || getSectionByTabId(settingsSections, validActiveTab, profile);
+
+  if (!currentSection) {
+    return (
+      <div className="min-h-screen bg-bg">
+        <Navigation showLogin={false} showProfile={true} />
+        <div className="px-4 py-8">
+          <div className="max-w-4xl mx-auto">
+            <Text variant="h1" className="text-primary">
+              Configuración no disponible
+            </Text>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const SectionComponent = currentSection.component;
+  const sectionProps = currentSection.getProps({
+    profile,
+    formState,
+    formHandlers,
+    securityHandlers,
+    helpHandlers,
+  });
+
+  const isEditableTab = currentSection.isEditable;
+
+  // Convert tabs to sidebar menu items (same structure)
+  const sidebarItems = useMemo(
+    () =>
+      tabs.map((tab) => ({
+        id: tab.id,
+        label: tab.label,
+        icon: tab.icon,
+      })),
+    [tabs]
+  );
+
+  const renderContent = () => (
+    <>
+      {isEditableTab ? (
+        <form
+          key={profile?.id || "new"}
+          onSubmit={handleSubmit}
+          className="space-y-6"
+        >
+          <SectionComponent {...sectionProps} />
+
+          {error && (
+            <Card className="p-4 bg-danger/10 border-danger/20">
+              <div className="flex items-center gap-2">
+                <AlertCircle className="w-5 h-5 text-danger shrink-0" />
+                <Text variant="body" className="text-danger">
+                  {error.message || "No se pudo guardar. Probá de nuevo."}
+                </Text>
+              </div>
+            </Card>
+          )}
+
+          <div className="flex gap-4">
+            <Button
+              type="submit"
+              variant="primary"
+              disabled={isPending}
+              className="flex items-center gap-2"
+            >
+              {isPending ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Guardando...
+                </>
+              ) : (
+                <>
+                  <Save className="w-4 h-4" />
+                  Guardar cambios
+                </>
+              )}
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => router.back()}
+              className="flex items-center gap-2"
+            >
+              <X className="w-4 h-4" />
+              Cancelar
+            </Button>
+          </div>
+        </form>
+      ) : (
+        <div className="space-y-6">
+          <SectionComponent {...sectionProps} />
+        </div>
+      )}
+    </>
+  );
+
   return (
     <div className="min-h-screen bg-bg">
       <Navigation showLogin={false} showProfile={true} />
       <div className="px-4 py-8">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-7xl mx-auto">
+          {/* Header */}
           <div className="flex items-center gap-2 mb-6">
             <Settings className="w-6 h-6 text-primary" />
             <Text variant="h1" className="text-primary">
@@ -141,103 +254,30 @@ export function SettingsScreen() {
             </Text>
           </div>
 
-          <div className="space-y-6">
-            {/* Editable sections (in form) */}
-            {editableSections.length > 0 && (
-              <form
-                key={profile?.id || "new"}
-                onSubmit={handleSubmit}
-                className="space-y-6"
-              >
-                {editableSections.map((section) => {
-                  const SectionComponent = section.component;
-                  const sectionProps = section.getProps({
-                    profile,
-                    formState,
-                    formHandlers,
-                    securityHandlers,
-                    helpHandlers,
-                  });
+          {/* Mobile: Tabs at top */}
+          <div className="md:hidden mb-6">
+            <Tabs
+              tabs={tabs}
+              activeTab={validActiveTab}
+              onTabChange={setActiveTab}
+            />
+          </div>
 
-                  return (
-                    <div key={section.id}>
-                      <div className="flex items-center gap-2 mb-4">
-                        <section.icon className="w-5 h-5 text-primary" />
-                        <Text variant="h2" className="text-text">
-                          {section.title}
-                        </Text>
-                      </div>
-                      <SectionComponent {...sectionProps} />
-                    </div>
-                  );
-                })}
+          {/* Desktop: Sidebar + Content Layout */}
+          <div className="md:flex md:gap-8">
+            {/* Sidebar (Desktop only) */}
+            <aside className="hidden md:block md:w-64 md:shrink-0">
+              <SidebarMenu
+                items={sidebarItems}
+                activeItem={validActiveTab}
+                onItemChange={setActiveTab}
+              />
+            </aside>
 
-                {error && (
-                  <Card className="p-4 bg-danger/10 border-danger/20">
-                    <div className="flex items-center gap-2">
-                      <AlertCircle className="w-5 h-5 text-danger shrink-0" />
-                      <Text variant="body" className="text-danger">
-                        {error.message || "No se pudo guardar. Probá de nuevo."}
-                      </Text>
-                    </div>
-                  </Card>
-                )}
-
-                <div className="flex gap-4">
-                  <Button
-                    type="submit"
-                    variant="primary"
-                    disabled={isPending}
-                    className="flex items-center gap-2"
-                  >
-                    {isPending ? (
-                      <>
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        Guardando...
-                      </>
-                    ) : (
-                      <>
-                        <Save className="w-4 h-4" />
-                        Guardar cambios
-                      </>
-                    )}
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    onClick={() => router.back()}
-                    className="flex items-center gap-2"
-                  >
-                    <X className="w-4 h-4" />
-                    Cancelar
-                  </Button>
-                </div>
-              </form>
-            )}
-
-            {/* Read-only/Action sections (outside form) */}
-            {readOnlySections.map((section) => {
-              const SectionComponent = section.component;
-              const sectionProps = section.getProps({
-                profile,
-                formState,
-                formHandlers,
-                securityHandlers,
-                helpHandlers,
-              });
-
-              return (
-                <div key={section.id}>
-                  <div className="flex items-center gap-2 mb-4">
-                    <section.icon className="w-5 h-5 text-primary" />
-                    <Text variant="h2" className="text-text">
-                      {section.title}
-                    </Text>
-                  </div>
-                  <SectionComponent {...sectionProps} />
-                </div>
-              );
-            })}
+            {/* Content Area */}
+            <main className="flex-1 min-w-0">
+              {renderContent()}
+            </main>
           </div>
         </div>
       </div>
