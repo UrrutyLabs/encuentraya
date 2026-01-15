@@ -9,7 +9,7 @@ import { Button } from "@repo/ui";
 import { Tabs } from "@repo/ui";
 import { SidebarMenu } from "@repo/ui";
 import { Navigation } from "@/components/presentational/Navigation";
-import { useSettingsForm } from "@/hooks/useSettingsForm";
+import { useSettingsForm } from "@/hooks/client";
 import {
   settingsSections,
   getSettingsTabs,

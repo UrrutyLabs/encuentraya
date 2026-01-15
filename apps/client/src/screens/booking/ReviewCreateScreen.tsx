@@ -14,7 +14,8 @@ import { Card } from "@repo/ui";
 import { Button } from "@repo/ui";
 import { Navigation } from "@/components/presentational/Navigation";
 import { ReviewForm } from "@/components/forms/ReviewForm";
-import { useReviewForm } from "@/hooks/useReviewForm";
+import { ReviewCreateSkeleton } from "@/components/presentational/ReviewCreateSkeleton";
+import { useReviewForm } from "@/hooks/booking";
 
 export function ReviewCreateScreen() {
   const params = useParams();
@@ -56,16 +57,7 @@ export function ReviewCreateScreen() {
       <div className="min-h-screen bg-bg">
         <Navigation showLogin={false} showProfile={true} />
         <div className="px-4 py-8">
-          <div className="max-w-4xl mx-auto">
-            <Card className="p-8 text-center">
-              <div className="flex flex-col items-center gap-3">
-                <Loader2 className="w-8 h-8 text-primary animate-spin" />
-                <Text variant="body" className="text-muted">
-                  Cargando...
-                </Text>
-              </div>
-            </Card>
-          </div>
+          <ReviewCreateSkeleton />
         </div>
       </div>
     );

@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { Search, Calendar, User, Settings, LogOut } from "lucide-react";
 import { Button } from "@repo/ui";
 import { Text } from "@repo/ui";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/hooks/auth";
 import { logger } from "@/lib/logger";
 
 interface NavigationProps {

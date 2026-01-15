@@ -2,6 +2,8 @@ import { useRouter } from "next/navigation";
 import { trpc } from "@/lib/trpc/client";
 import { BookingStatus, Category } from "@repo/domain";
 import { logger } from "@/lib/logger";
+import { useQueryClient } from "../shared";
+import { invalidateRelatedQueries } from "@/lib/react-query/utils";
 
 export interface CreateBookingInput {
   proId: string;
@@ -17,8 +19,12 @@ export interface CreateBookingInput {
  */
 export function useCreateBooking() {
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const createBooking = trpc.booking.create.useMutation({
+    ...invalidateRelatedQueries(queryClient, [
+      [["booking", "myBookings"]],
+    ]),
     onSuccess: (data) => {
       // Redirect based on booking status
       if (data.status === BookingStatus.PENDING_PAYMENT) {

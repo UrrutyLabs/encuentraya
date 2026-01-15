@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { UserPlus } from "lucide-react";
-import { useSignup } from "@/hooks/useSignup";
+import { useSignup } from "@/hooks/auth";
 import { AuthForm } from "@/components/forms/AuthForm";
 import { Text } from "@repo/ui";
 

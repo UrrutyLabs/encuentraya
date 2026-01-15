@@ -19,7 +19,8 @@ import { Card } from "@repo/ui";
 import { Button } from "@repo/ui";
 import { Navigation } from "@/components/presentational/Navigation";
 import { WhatsAppPromptCard } from "@/components/presentational/WhatsAppPromptCard";
-import { useClientProfile } from "@/hooks/useClientProfile";
+import { CheckoutSkeleton } from "@/components/presentational/CheckoutSkeleton";
+import { useClientProfile } from "@/hooks/client";
 import { PaymentStatus, formatCurrency } from "@repo/domain";
 import Link from "next/link";
 
@@ -107,16 +108,7 @@ function CheckoutContent() {
       <div className="min-h-screen bg-bg">
         <Navigation showLogin={false} showProfile={true} />
         <div className="px-4 py-8">
-          <div className="max-w-4xl mx-auto">
-            <Card className="p-8 text-center">
-              <div className="flex flex-col items-center gap-3">
-                <Loader2 className="w-8 h-8 text-primary animate-spin" />
-                <Text variant="body" className="text-muted">
-                  Cargando...
-                </Text>
-              </div>
-            </Card>
-          </div>
+          <CheckoutSkeleton />
         </div>
       </div>
     );
@@ -304,20 +296,16 @@ function CheckoutContent() {
 
 export function CheckoutScreen() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-bg">
-        <Navigation showLogin={false} showProfile={true} />
-        <div className="px-4 py-8">
-          <div className="max-w-4xl mx-auto">
-            <Card className="p-8 text-center">
-              <div className="flex items-center justify-center">
-                <Loader2 className="w-6 h-6 text-primary animate-spin" />
-              </div>
-            </Card>
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-bg">
+          <Navigation showLogin={false} showProfile={true} />
+          <div className="px-4 py-8">
+            <CheckoutSkeleton />
           </div>
         </div>
-      </div>
-    }>
+      }
+    >
       <CheckoutContent />
     </Suspense>
   );

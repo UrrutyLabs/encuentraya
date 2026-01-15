@@ -1,7 +1,7 @@
 "use client";
 
 import { ReactNode } from "react";
-import { useRequireAuth } from "@/hooks/useRequireAuth";
+import { useRequireAuth } from "@/hooks/auth";
 import { AuthLoadingState } from "./AuthLoadingState";
 
 interface AuthenticatedGuardProps {

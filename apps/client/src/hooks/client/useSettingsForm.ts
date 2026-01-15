@@ -4,7 +4,7 @@ import { trpc } from "@/lib/trpc/client";
 import { useClientProfile } from "./useClientProfile";
 import type { PreferredContactMethod } from "@repo/domain";
 import { logger } from "@/lib/logger";
-import { useQueryClient } from "./useQueryClient";
+import { useQueryClient } from "../shared";
 import { invalidateRelatedQueries } from "@/lib/react-query/utils";
 
 /**

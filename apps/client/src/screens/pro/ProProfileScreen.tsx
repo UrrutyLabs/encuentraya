@@ -20,8 +20,8 @@ import { Badge } from "@repo/ui";
 import { Navigation } from "@/components/presentational/Navigation";
 import { ProProfileSkeleton } from "@/components/presentational/ProProfileSkeleton";
 import { AuthPromptModal } from "@/components/auth/AuthPromptModal";
-import { useProDetail } from "@/hooks/useProDetail";
-import { useAuth } from "@/hooks/useAuth";
+import { useProDetail } from "@/hooks/pro";
+import { useAuth } from "@/hooks/auth";
 import { Category } from "@repo/domain";
 
 const CATEGORY_LABELS: Record<string, string> = {

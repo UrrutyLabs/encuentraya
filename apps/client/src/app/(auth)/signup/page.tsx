@@ -1,9 +1,10 @@
 import { Suspense } from "react";
 import { SignupScreen } from "@/screens/auth/SignupScreen";
+import { AuthPageSkeleton } from "@/components/auth/AuthPageSkeleton";
 
 export default function SignupPage() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<AuthPageSkeleton />}>
       <SignupScreen />
     </Suspense>
   );

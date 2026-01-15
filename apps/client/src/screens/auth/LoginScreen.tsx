@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { LogIn, Loader2, CheckCircle } from "lucide-react";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/hooks/auth";
 import { AuthForm } from "@/components/forms/AuthForm";
 import { Text, Card } from "@repo/ui";
 

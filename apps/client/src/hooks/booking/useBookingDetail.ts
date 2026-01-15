@@ -1,5 +1,5 @@
 import { trpc } from "@/lib/trpc/client";
-import { useSmartPolling } from "./useSmartPolling";
+import { useSmartPolling } from "../shared";
 import { BookingStatus } from "@repo/domain";
 
 export function useBookingDetail(bookingId: string | undefined) {

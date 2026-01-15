@@ -1,17 +1,23 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useCallback } from "react";
 import { Calendar, History } from "lucide-react";
 import { Text, Card } from "@repo/ui";
 import { Navigation } from "@/components/presentational/Navigation";
 import { BookingCard } from "@/components/presentational/BookingCard";
 import { EmptyState } from "@/components/presentational/EmptyState";
 import { MyBookingsSkeleton } from "@/components/presentational/MyBookingsSkeleton";
-import { useMyBookings } from "@/hooks/useMyBookings";
+import { useMyBookings } from "@/hooks/booking";
 import { BookingStatus, type Booking } from "@repo/domain";
 
 export function MyBookingsScreen() {
   const { bookings, isLoading, reviewStatusMap } = useMyBookings();
+  
+  // Memoize review status lookup function
+  const getHasReview = useCallback(
+    (bookingId: string) => reviewStatusMap[bookingId] ?? false,
+    [reviewStatusMap]
+  );
 
   const { upcoming, past } = useMemo((): { upcoming: Booking[]; past: Booking[] } => {
     const now = new Date();
@@ -103,7 +109,7 @@ export function MyBookingsScreen() {
                       <BookingCard
                         key={booking.id}
                         booking={booking}
-                        hasReview={reviewStatusMap[booking.id] ?? false}
+                        hasReview={getHasReview(booking.id)}
                       />
                     ))}
                   </div>

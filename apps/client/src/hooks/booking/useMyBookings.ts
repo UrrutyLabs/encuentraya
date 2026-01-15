@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { trpc } from "@/lib/trpc/client";
-import { useAuth } from "./useAuth";
-import { useSmartPolling } from "./useSmartPolling";
+import { useAuth } from "../auth";
+import { useSmartPolling } from "../shared";
 import { BookingStatus } from "@repo/domain";
 
 export function useMyBookings() {

@@ -3,17 +3,17 @@
 import { useState, useMemo, useRef, useEffect, startTransition, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Loader2 } from "lucide-react";
 import { Text } from "@repo/ui";
 import { Card } from "@repo/ui";
 import { Button } from "@repo/ui";
 import { Navigation } from "@/components/presentational/Navigation";
 import { WhatsAppPromptCard } from "@/components/presentational/WhatsAppPromptCard";
 import { BookingForm } from "@/components/forms/BookingForm";
-import { useProDetail } from "@/hooks/useProDetail";
-import { useCreateBooking } from "@/hooks/useCreateBooking";
-import { useClientProfile } from "@/hooks/useClientProfile";
-import { useRebookTemplate } from "@/hooks/useRebookTemplate";
+import { BookingCreateSkeleton } from "@/components/presentational/BookingCreateSkeleton";
+import { useProDetail } from "@/hooks/pro";
+import { useCreateBooking } from "@/hooks/booking";
+import { useClientProfile } from "@/hooks/client";
+import { useRebookTemplate } from "@/hooks/booking";
 import { Category } from "@repo/domain";
 import { logger } from "@/lib/logger";
 
@@ -177,13 +177,7 @@ function BookingCreateContent() {
       <div className="min-h-screen bg-bg">
         <Navigation showLogin={false} showProfile={true} />
         <div className="px-4 py-8">
-          <div className="max-w-4xl mx-auto">
-            <Card className="p-8 text-center">
-              <Text variant="body" className="text-muted">
-                Cargando información...
-              </Text>
-            </Card>
-          </div>
+          <BookingCreateSkeleton />
         </div>
       </div>
     );
@@ -272,20 +266,16 @@ function BookingCreateContent() {
 
 export function BookingCreateScreen() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-bg">
-        <Navigation showLogin={false} showProfile={true} />
-        <div className="px-4 py-8">
-          <div className="max-w-4xl mx-auto">
-            <Card className="p-8 text-center">
-              <div className="flex items-center justify-center">
-                <Loader2 className="w-6 h-6 text-primary animate-spin" />
-              </div>
-            </Card>
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-bg">
+          <Navigation showLogin={false} showProfile={true} />
+          <div className="px-4 py-8">
+            <BookingCreateSkeleton />
           </div>
         </div>
-      </div>
-    }>
+      }
+    >
       <BookingCreateContent />
     </Suspense>
   );

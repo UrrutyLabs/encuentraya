@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useMyBookings } from "./useMyBookings";
+import { useMyBookings } from "../booking";
 import { BookingStatus, Category } from "@repo/domain";
 
 /**

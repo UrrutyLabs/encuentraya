@@ -1,5 +1,6 @@
+import { memo, useMemo } from "react";
 import Link from "next/link";
-import { Star, DollarSign, CheckCircle } from "lucide-react";
+import { Star, DollarSign } from "lucide-react";
 import { Card } from "@repo/ui";
 import { Text } from "@repo/ui";
 import { Badge } from "@repo/ui";
@@ -9,8 +10,8 @@ interface ProCardProps {
   pro: Pro;
 }
 
-export function ProCard({ pro }: ProCardProps) {
-  const isActive = pro.isApproved && !pro.isSuspended;
+export const ProCard = memo(function ProCard({ pro }: ProCardProps) {
+  const isActive = useMemo(() => pro.isApproved && !pro.isSuspended, [pro.isApproved, pro.isSuspended]);
 
   return (
     <Link href={`/pros/${pro.id}`}>
@@ -58,4 +59,13 @@ export function ProCard({ pro }: ProCardProps) {
       </Card>
     </Link>
   );
-}
+}, (prevProps, nextProps) => {
+  // Custom comparison function for React.memo
+  return (
+    prevProps.pro.id === nextProps.pro.id &&
+    prevProps.pro.isApproved === nextProps.pro.isApproved &&
+    prevProps.pro.isSuspended === nextProps.pro.isSuspended &&
+    prevProps.pro.rating === nextProps.pro.rating &&
+    prevProps.pro.reviewCount === nextProps.pro.reviewCount
+  );
+});

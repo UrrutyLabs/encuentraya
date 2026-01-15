@@ -13,6 +13,7 @@ import {
 import { supabase } from "@/lib/supabase/client";
 import { Button } from "@repo/ui";
 import { Text } from "@repo/ui";
+import { AuthPageSkeleton } from "@/components/auth/AuthPageSkeleton";
 
 function ConfirmEmailContent() {
   const router = useRouter();
@@ -137,15 +138,7 @@ function ConfirmEmailContent() {
 
 export function ConfirmEmailScreen() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-bg">
-        <div className="max-w-md w-full space-y-8 p-8 bg-surface rounded-lg border border-border">
-          <div className="flex items-center justify-center">
-            <Loader2 className="w-6 h-6 text-primary animate-spin" />
-          </div>
-        </div>
-      </div>
-    }>
+    <Suspense fallback={<AuthPageSkeleton />}>
       <ConfirmEmailContent />
     </Suspense>
   );

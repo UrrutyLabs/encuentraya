@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { X, Lock, Eye, EyeOff, Loader2, AlertCircle } from "lucide-react";
 import { Card, Text, Button, Input } from "@repo/ui";
-import { useChangePassword } from "@/hooks/useChangePassword";
+import { useChangePassword } from "@/hooks/auth";
 
 interface ChangePasswordModalProps {
   isOpen: boolean;

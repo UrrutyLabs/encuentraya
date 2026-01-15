@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { Filter, Calendar, Clock } from "lucide-react";
 import { Text } from "@repo/ui";
 import { Card } from "@repo/ui";
@@ -9,7 +9,7 @@ import { Navigation } from "@/components/presentational/Navigation";
 import { ProCard } from "@/components/presentational/ProCard";
 import { EmptyState } from "@/components/presentational/EmptyState";
 import { SearchSkeleton } from "@/components/presentational/SearchSkeleton";
-import { useSearchPros } from "@/hooks/useSearchPros";
+import { useSearchPros } from "@/hooks/pro";
 import { Category, type Pro } from "@repo/domain";
 
 const CATEGORY_OPTIONS: { value: Category | ""; label: string }[] = [
@@ -26,11 +26,30 @@ export function SearchScreen() {
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
 
-  const { pros, isLoading } = useSearchPros({
-    category: category || undefined,
-    date: date || undefined,
-    time: time || undefined,
-  });
+  // Memoize filters to prevent unnecessary re-renders
+  const filters = useMemo(
+    () => ({
+      category: category || undefined,
+      date: date || undefined,
+      time: time || undefined,
+    }),
+    [category, date, time]
+  );
+
+  const { pros, isLoading } = useSearchPros(filters);
+
+  // Memoize event handlers
+  const handleCategoryChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    setCategory(e.target.value as Category | "");
+  }, []);
+
+  const handleDateChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setDate(e.target.value);
+  }, []);
+
+  const handleTimeChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setTime(e.target.value);
+  }, []);
 
   return (
     <div className="min-h-screen bg-bg">
@@ -52,7 +71,7 @@ export function SearchScreen() {
                 </label>
                 <select
                   value={category}
-                  onChange={(e) => setCategory(e.target.value as Category | "")}
+                  onChange={handleCategoryChange}
                   className="w-full px-3 py-2 border border-border rounded-md bg-surface text-text focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                 >
                   {CATEGORY_OPTIONS.map((option) => (
@@ -73,7 +92,7 @@ export function SearchScreen() {
                   <Input
                     type="date"
                     value={date}
-                    onChange={(e) => setDate(e.target.value)}
+                    onChange={handleDateChange}
                   />
                 </div>
                 <div>
@@ -84,7 +103,7 @@ export function SearchScreen() {
                   <Input
                     type="time"
                     value={time}
-                    onChange={(e) => setTime(e.target.value)}
+                    onChange={handleTimeChange}
                   />
                 </div>
               </div>

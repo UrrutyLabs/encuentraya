@@ -1,6 +1,6 @@
 "use client";
 
-import { useClientAuth } from "@/hooks/useClientAuth";
+import { useClientAuth } from "@/hooks/auth";
 import { LandingLoading } from "@/components/landing/LandingLoading";
 import { LandingScreen } from "@/screens/landing/LandingScreen";
 

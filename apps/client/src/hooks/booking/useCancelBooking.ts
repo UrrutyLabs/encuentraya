@@ -1,21 +1,23 @@
 import { useRouter } from "next/navigation";
 import { trpc } from "@/lib/trpc/client";
 import { logger } from "@/lib/logger";
-import { useQueryClient } from "./useQueryClient";
+import { useQueryClient } from "../shared";
 import { invalidateRelatedQueries } from "@/lib/react-query/utils";
 
 /**
  * Hook to cancel a booking
  * Encapsulates the booking.cancel mutation and handles navigation
+ * Invalidates related queries for instant UI updates
  */
-export function useCancelBooking() {
+export function useCancelBooking(bookingId?: string) {
   const router = useRouter();
   const queryClient = useQueryClient();
 
   const cancelBooking = trpc.booking.cancel.useMutation({
+    // Invalidate related queries for instant UI updates
     ...invalidateRelatedQueries(queryClient, [
       [["booking", "myBookings"]],
-      [["booking", "getById"]],
+      ...(bookingId ? [[["booking", "getById"], { id: bookingId }]] : []),
     ]),
     onSuccess: () => {
       router.push("/my-bookings");

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { X, Trash2, Eye, EyeOff, Loader2, AlertCircle } from "lucide-react";
 import { Card, Text, Button, Input } from "@repo/ui";
-import { useDeleteAccount } from "@/hooks/useDeleteAccount";
+import { useDeleteAccount } from "@/hooks/auth";
 
 interface DeleteAccountModalProps {
   isOpen: boolean;

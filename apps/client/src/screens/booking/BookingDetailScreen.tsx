@@ -25,8 +25,8 @@ import { Badge } from "@repo/ui";
 import { Navigation } from "@/components/presentational/Navigation";
 import { BookingDetailSkeleton } from "@/components/presentational/BookingDetailSkeleton";
 import { BookingStatus, formatCurrency, getBookingStatusLabel, getBookingStatusVariant } from "@repo/domain";
-import { useBookingDetail } from "@/hooks/useBookingDetail";
-import { useCancelBooking } from "@/hooks/useCancelBooking";
+import { useBookingDetail } from "@/hooks/booking";
+import { useCancelBooking } from "@/hooks/booking";
 import { logger } from "@/lib/logger";
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -65,7 +65,7 @@ export function BookingDetailScreen() {
     useBookingDetail(bookingId);
 
   // Cancel booking hook
-  const { cancelBooking, isPending: isCancelling } = useCancelBooking();
+  const { cancelBooking, isPending: isCancelling } = useCancelBooking(bookingId);
 
   const canCancel =
     booking &&
