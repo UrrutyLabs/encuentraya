@@ -27,7 +27,7 @@ import { BookingDetailSkeleton } from "@/components/presentational/BookingDetail
 import { BookingStatus, formatCurrency, getBookingStatusLabel, getBookingStatusVariant } from "@repo/domain";
 import { useBookingDetail } from "@/hooks/useBookingDetail";
 import { useCancelBooking } from "@/hooks/useCancelBooking";
-
+import { logger } from "@/lib/logger";
 
 const CATEGORY_LABELS: Record<string, string> = {
   plumbing: "Plomería",
@@ -81,8 +81,10 @@ export function BookingDetailScreen() {
         await cancelBooking(booking.id);
         // Success - hook's onSuccess will handle redirect
       } catch (error) {
-        // Error is handled by hook state
-        console.error("Error cancelling booking:", error);
+        // Error is handled by hook state, just log it
+        logger.error("Error cancelling booking", error instanceof Error ? error : new Error(String(error)), {
+          bookingId: booking.id,
+        });
       }
     }
   };

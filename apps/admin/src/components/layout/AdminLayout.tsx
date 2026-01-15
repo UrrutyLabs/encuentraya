@@ -44,7 +44,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
     <div className="h-screen flex bg-bg overflow-hidden">
       {/* Left Navigation */}
       <aside className="w-64 bg-surface border-r border-border flex flex-col h-full">
-        <div className="p-4 border-b border-border flex-shrink-0">
+        <div className="p-4 border-b border-border shrink-0">
           <Link href="/admin" className="flex items-center gap-2">
             <LayoutDashboard className="w-6 h-6 text-primary" />
             <Text variant="h2" className="text-text">
@@ -72,7 +72,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
             );
           })}
         </nav>
-        <div className="p-4 border-t border-border flex-shrink-0">
+        <div className="p-4 border-t border-border shrink-0">
           <Button
             variant="ghost"
             onClick={handleSignOut}

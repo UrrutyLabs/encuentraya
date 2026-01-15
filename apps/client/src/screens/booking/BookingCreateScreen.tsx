@@ -15,6 +15,7 @@ import { useCreateBooking } from "@/hooks/useCreateBooking";
 import { useClientProfile } from "@/hooks/useClientProfile";
 import { useRebookTemplate } from "@/hooks/useRebookTemplate";
 import { Category } from "@repo/domain";
+import { logger } from "@/lib/logger";
 
 function BookingCreateContent() {
   const router = useRouter();
@@ -108,7 +109,11 @@ function BookingCreateContent() {
       });
       // Success - hook's onSuccess will handle redirect
     } catch (error) {
-      console.error("Error creating booking:", error);
+      // Error is handled by hook state, just log it
+      logger.error("Error creating booking", error instanceof Error ? error : new Error(String(error)), {
+        proId: effectiveProId,
+        category,
+      });
     }
   };
 

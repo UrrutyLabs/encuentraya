@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import type { User, Session, AuthError } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase/client";
+import { setUserContext, clearUserContext } from "@/lib/crash-reporting";
 
 interface UseAuthReturn {
   user: User | null;
@@ -24,6 +25,13 @@ export function useAuth(): UseAuthReturn {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
+
+      // Set user context for crash reporting
+      if (session?.user) {
+        setUserContext(session.user.id, session.user.email);
+      } else {
+        clearUserContext();
+      }
     });
 
     // Listen for auth changes
@@ -33,6 +41,13 @@ export function useAuth(): UseAuthReturn {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
+
+      // Update user context for crash reporting
+      if (session?.user) {
+        setUserContext(session.user.id, session.user.email);
+      } else {
+        clearUserContext();
+      }
     });
 
     return () => subscription.unsubscribe();

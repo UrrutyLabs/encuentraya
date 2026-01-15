@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { TRPCProvider } from "@/lib/trpc/Provider";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { CrashReportingInit } from "@/components/CrashReportingInit";
 
 const inter = Inter({
   variable: "--font-sans",
@@ -22,7 +24,10 @@ export default function RootLayout({
   return (
     <html lang="es" className={inter.variable}>
       <body className="font-sans antialiased">
-        <TRPCProvider>{children}</TRPCProvider>
+        <ErrorBoundary>
+          <CrashReportingInit />
+          <TRPCProvider>{children}</TRPCProvider>
+        </ErrorBoundary>
       </body>
     </html>
   );

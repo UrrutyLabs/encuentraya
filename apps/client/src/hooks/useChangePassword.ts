@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { trpc } from "@/lib/trpc/client";
 import { useAuth } from "./useAuth";
+import { logger } from "@/lib/logger";
 
 export function useChangePassword() {
   const router = useRouter();
@@ -18,7 +19,7 @@ export function useChangePassword() {
       router.push("/login?passwordChanged=true");
     },
     onError: (error) => {
-      console.error("Error changing password:", error);
+      logger.error("Error changing password", error instanceof Error ? error : new Error(String(error)));
     },
   });
 

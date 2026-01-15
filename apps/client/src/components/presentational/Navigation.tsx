@@ -7,6 +7,7 @@ import { Search, Calendar, User, Settings, LogOut } from "lucide-react";
 import { Button } from "@repo/ui";
 import { Text } from "@repo/ui";
 import { useAuth } from "@/hooks/useAuth";
+import { logger } from "@/lib/logger";
 
 interface NavigationProps {
   showLogin?: boolean;
@@ -40,12 +41,12 @@ export function Navigation({ showLogin = true, showProfile = false }: Navigation
     try {
       const { error } = await signOut();
       if (error) {
-        console.error("Error signing out:", error);
+        logger.error("Error signing out", error instanceof Error ? error : new Error(String(error)));
         // Even if signOut fails, redirect to home (session might already be invalid)
       }
       router.push("/");
     } catch (error) {
-      console.error("Error signing out:", error);
+      logger.error("Error signing out", error instanceof Error ? error : new Error(String(error)));
       // Redirect anyway to ensure user is logged out from UI perspective
       router.push("/");
     }

@@ -1,5 +1,6 @@
 import { useRouter } from "next/navigation";
 import { trpc } from "@/lib/trpc/client";
+import { logger } from "@/lib/logger";
 
 /**
  * Hook to cancel a booking
@@ -19,7 +20,9 @@ export function useCancelBooking() {
       await cancelBooking.mutateAsync({ bookingId });
       // Success - mutation's onSuccess will handle redirect
     } catch (error) {
-      console.error("Error cancelling booking:", error);
+      logger.error("Error cancelling booking", error instanceof Error ? error : new Error(String(error)), {
+        bookingId,
+      });
       throw error;
     }
   };

@@ -3,6 +3,7 @@ import { useRouter } from "next/navigation";
 import { trpc } from "@/lib/trpc/client";
 import { useClientProfile } from "./useClientProfile";
 import type { PreferredContactMethod } from "@repo/domain";
+import { logger } from "@/lib/logger";
 
 /**
  * Hook to handle settings form logic
@@ -44,7 +45,7 @@ export function useSettingsForm() {
       router.push("/my-bookings");
     },
     onError: (error) => {
-      console.error("Error updating profile:", error);
+      logger.error("Error updating profile", error instanceof Error ? error : new Error(String(error)));
     },
   });
 

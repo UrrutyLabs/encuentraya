@@ -1,6 +1,7 @@
 import { useRouter } from "next/navigation";
 import { trpc } from "@/lib/trpc/client";
 import { BookingStatus, Category } from "@repo/domain";
+import { logger } from "@/lib/logger";
 
 export interface CreateBookingInput {
   proId: string;
@@ -33,7 +34,9 @@ export function useCreateBooking() {
       await createBooking.mutateAsync(input);
       // Success - mutation's onSuccess will handle redirect
     } catch (error) {
-      console.error("Error creating booking:", error);
+      logger.error("Error creating booking", error instanceof Error ? error : new Error(String(error)), {
+        input,
+      });
       throw error;
     }
   };

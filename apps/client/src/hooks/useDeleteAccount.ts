@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { trpc } from "@/lib/trpc/client";
 import { useAuth } from "./useAuth";
+import { logger } from "@/lib/logger";
 
 export function useDeleteAccount() {
   const router = useRouter();
@@ -15,7 +16,7 @@ export function useDeleteAccount() {
       router.push("/");
     },
     onError: (error) => {
-      console.error("Error deleting account:", error);
+      logger.error("Error deleting account", error instanceof Error ? error : new Error(String(error)));
     },
   });
 
