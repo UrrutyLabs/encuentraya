@@ -11,7 +11,7 @@ export function useResetPassword() {
   const resetPasswordMutation = trpc.auth.resetPassword.useMutation({
     onSuccess: () => {
       // Redirect to login with success message
-      router.push("/login?passwordReset=true");
+      router.push("/my-bookings");
     },
   });
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Lock, Loader2, AlertCircle } from "lucide-react";
 import { useResetPassword } from "@/hooks/auth";
 import { Button } from "@repo/ui";
@@ -10,7 +10,6 @@ import { Text, Card } from "@repo/ui";
 
 export function ResetPasswordScreen() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const { resetPassword, isPending, error } = useResetPassword();
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
