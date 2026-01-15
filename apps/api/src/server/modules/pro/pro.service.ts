@@ -9,6 +9,7 @@ import type { UserRepository } from "@modules/user/user.repo";
 import type { BookingRepository } from "@modules/booking/booking.repo";
 import type { ProPayoutProfileRepository } from "@modules/payout/proPayoutProfile.repo";
 import type { AuditService } from "@modules/audit/audit.service";
+import type { AvailabilityRepository } from "./availability.repo";
 import { AuditEventType } from "@modules/audit/audit.repo";
 import type {
   Pro,
@@ -38,6 +39,8 @@ export class ProService {
     private readonly bookingRepository: BookingRepository,
     @inject(TOKENS.ProPayoutProfileRepository)
     private readonly proPayoutProfileRepository: ProPayoutProfileRepository,
+    @inject(TOKENS.AvailabilityRepository)
+    private readonly availabilityRepository: AvailabilityRepository,
     @inject(TOKENS.AuditService)
     private readonly auditService: AuditService
   ) {}
@@ -146,10 +149,11 @@ export class ProService {
    * Set pro availability
    * Business rules:
    * - Pro must exist
+   * - If isAvailable is true, create default availability slots (Mon-Fri 9-17)
+   * - If isAvailable is false, delete all availability slots
    */
   async setAvailability(
     proId: string,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Parameter required by API contract, implementation pending
     input: ProSetAvailabilityInput
   ): Promise<Pro> {
     const pro = await this.proRepository.findById(proId);
@@ -157,9 +161,43 @@ export class ProService {
       throw new Error("Pro not found");
     }
 
-    // Update pro profile if needed (for now, just return existing)
-    const updated = pro;
+    // Update serviceArea if provided
+    if (input.serviceArea !== undefined) {
+      await this.proRepository.update(proId, {
+        serviceArea: input.serviceArea ?? null,
+      });
+    }
 
+    // Manage availability slots based on isAvailable flag
+    if (input.isAvailable !== undefined) {
+      if (input.isAvailable) {
+        // Create default availability slots: Monday-Friday, 9:00-17:00
+        // First, delete existing slots to avoid duplicates
+        await this.availabilityRepository.deleteByProProfileId(proId);
+        
+        // Create slots for Monday (1) through Friday (5)
+        const defaultSlots = [
+          { dayOfWeek: 1, startTime: "09:00", endTime: "17:00" }, // Monday
+          { dayOfWeek: 2, startTime: "09:00", endTime: "17:00" }, // Tuesday
+          { dayOfWeek: 3, startTime: "09:00", endTime: "17:00" }, // Wednesday
+          { dayOfWeek: 4, startTime: "09:00", endTime: "17:00" }, // Thursday
+          { dayOfWeek: 5, startTime: "09:00", endTime: "17:00" }, // Friday
+        ];
+
+        for (const slot of defaultSlots) {
+          await this.availabilityRepository.create({
+            proProfileId: proId,
+            ...slot,
+          });
+        }
+      } else {
+        // Delete all availability slots
+        await this.availabilityRepository.deleteByProProfileId(proId);
+      }
+    }
+
+    // Refetch the pro profile to get updated data
+    const updated = await this.proRepository.findById(proId);
     if (!updated) {
       throw new Error("Failed to update pro");
     }
@@ -412,6 +450,7 @@ export class ProService {
   /**
    * Map ProProfileEntity to Pro domain type
    * Calculates rating and reviewCount from reviews
+   * Calculates isAvailable from availability slots array
    */
   private async mapToDomain(entity: ProProfileEntity): Promise<Pro> {
     // Get reviews for this pro to calculate rating and reviewCount
@@ -431,6 +470,11 @@ export class ProService {
     const isApproved = entity.status === "active";
     const isSuspended = entity.status === "suspended";
 
+    // Calculate isAvailable from availability slots array
+    // Pro is available if they have at least one availability slot
+    const availabilitySlots = await this.availabilityRepository.findByProProfileId(entity.id);
+    const isAvailable = availabilitySlots.length > 0;
+
     // Map categories from string[] to Category[]
     const categories = entity.categories.map(
       (c) => c as Category
@@ -448,6 +492,7 @@ export class ProService {
       reviewCount,
       isApproved,
       isSuspended,
+      isAvailable,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
     };

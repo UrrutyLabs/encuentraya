@@ -16,6 +16,7 @@ export const proSchema = z.object({
   reviewCount: z.number().int().min(0).default(0),
   isApproved: z.boolean().default(false),
   isSuspended: z.boolean().default(false),
+  isAvailable: z.boolean().default(false),
   createdAt: z.date(),
   updatedAt: z.date(),
 });
