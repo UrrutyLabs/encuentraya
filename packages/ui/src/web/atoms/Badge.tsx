@@ -54,7 +54,7 @@ export function Badge({
 
   return (
     <span
-      className={`inline-flex items-center gap-2.5 px-3 py-1 rounded-full text-xs font-medium border ${className}`}
+      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border ${className}`}
       style={{ 
         lineHeight: '1.2',
         ...variantStyles[variant]
@@ -67,8 +67,7 @@ export function Badge({
           style={{ 
             display: 'inline-block',
             verticalAlign: 'middle',
-            marginTop: '-1px',
-            marginRight: '2px'
+            marginTop: '-1px'
           }} 
         />
       )}

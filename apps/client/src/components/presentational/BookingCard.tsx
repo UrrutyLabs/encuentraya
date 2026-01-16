@@ -85,17 +85,9 @@ export const BookingCard = memo(function BookingCard({ booking, hasReview = fals
         <Text variant="h2" className="text-text">
           {categoryLabel}
         </Text>
-        <div className="flex gap-2 items-center">
-          {showReviewPrompt && (
-            <Badge variant="warning" className="flex items-center gap-1">
-              <Star className="w-3 h-3" />
-              Pendiente de reseña
-            </Badge>
-          )}
-          <Badge variant={statusVariant} showIcon>
-            {statusLabel}
-          </Badge>
-        </div>
+        <Badge variant={statusVariant} showIcon>
+          {statusLabel}
+        </Badge>
       </div>
       <Text variant="body" className="text-muted mb-2 line-clamp-2">
         {booking.description}
@@ -110,7 +102,7 @@ export const BookingCard = memo(function BookingCard({ booking, hasReview = fals
         <Text variant="small" className="text-text font-medium">
           ${booking.totalAmount.toFixed(0)}
         </Text>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap justify-end">
           {showPaymentPrompt && (
             <button
               onClick={handlePayNow}
@@ -120,29 +112,47 @@ export const BookingCard = memo(function BookingCard({ booking, hasReview = fals
               Pagar ahora
             </button>
           )}
-          {showRebookPrompt && (
-            <button
-              onClick={handleRebook}
-              className="flex items-center gap-1 px-3 py-1 bg-primary text-white text-sm font-medium rounded-md hover:opacity-90 transition-opacity"
-            >
-              <RotateCcw className="w-4 h-4" />
-              Volver a contratar
-            </button>
+          {/* Prioritize review action when pending */}
+          {showReviewPrompt ? (
+            <>
+              <Link
+                href={`/my-bookings/${booking.id}/review`}
+                onClick={(e) => e.stopPropagation()}
+                className="flex items-center gap-1 px-3 py-1 bg-primary text-white text-sm font-medium rounded-md hover:opacity-90 transition-opacity"
+              >
+                <Star className="w-4 h-4" />
+                Calificar
+              </Link>
+              {showRebookPrompt && (
+                <button
+                  onClick={handleRebook}
+                  className="flex items-center gap-1 text-primary hover:underline text-sm font-medium"
+                >
+                  <RotateCcw className="w-4 h-4" />
+                  Volver a contratar
+                </button>
+              )}
+            </>
+          ) : (
+            <>
+              {showRebookPrompt && (
+                <button
+                  onClick={handleRebook}
+                  className="flex items-center gap-1 px-3 py-1 bg-primary text-white text-sm font-medium rounded-md hover:opacity-90 transition-opacity"
+                >
+                  <RotateCcw className="w-4 h-4" />
+                  Volver a contratar
+                </button>
+              )}
+              {/* Only show "Ver detalles" when there are no action buttons */}
+              {!showPaymentPrompt && !showRebookPrompt && (
+                <Text variant="small" className="text-muted flex items-center gap-1">
+                  Ver detalles
+                  <ArrowRight className="w-3 h-3" />
+                </Text>
+              )}
+            </>
           )}
-          {showReviewPrompt && (
-            <Link
-              href={`/my-bookings/${booking.id}/review`}
-              onClick={(e) => e.stopPropagation()}
-              className="flex items-center gap-1 text-primary hover:underline text-sm font-medium"
-            >
-              <Star className="w-4 h-4" />
-              Calificar
-            </Link>
-          )}
-          <Text variant="small" className="text-muted flex items-center gap-1">
-            Ver detalles
-            <ArrowRight className="w-3 h-3" />
-          </Text>
         </div>
       </div>
     </Card>
