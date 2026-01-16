@@ -2,7 +2,8 @@ import { injectable, inject } from "tsyringe";
 import type { EarningRepository } from "./earning.repo";
 import type { BookingRepository } from "@modules/booking/booking.repo";
 import type { PaymentRepository } from "@modules/payment/payment.repo";
-import { BookingStatus, PaymentStatus } from "@repo/domain";
+import type { ProRepository } from "@modules/pro/pro.repo";
+import { BookingStatus, PaymentStatus, Role } from "@repo/domain";
 import type { Actor } from "@infra/auth/roles";
 import { TOKENS } from "@/server/container/tokens";
 import { PLATFORM_FEE_RATE, computeAvailableAt } from "./config";
@@ -19,6 +20,22 @@ export class EarningCreationError extends Error {
 }
 
 /**
+ * Pro earning output
+ * Represents an earning as returned to a pro user
+ */
+export interface ProEarning {
+  id: string;
+  bookingId: string;
+  grossAmount: number;
+  platformFeeAmount: number;
+  netAmount: number;
+  status: "PENDING" | "PAYABLE" | "PAID" | "REVERSED";
+  currency: string;
+  availableAt: Date | null;
+  createdAt: Date;
+}
+
+/**
  * Earning service
  * Contains business logic for earning operations
  */
@@ -30,7 +47,9 @@ export class EarningService {
     @inject(TOKENS.BookingRepository)
     private readonly bookingRepository: BookingRepository,
     @inject(TOKENS.PaymentRepository)
-    private readonly paymentRepository: PaymentRepository
+    private readonly paymentRepository: PaymentRepository,
+    @inject(TOKENS.ProRepository)
+    private readonly proRepository: ProRepository
   ) {}
 
   /**
@@ -171,5 +190,50 @@ export class EarningService {
     await this.earningRepository.markManyStatus(ids, "PAYABLE");
 
     return ids.length;
+  }
+
+  /**
+   * Get earnings for a pro
+   * Returns list of earnings with optional filtering
+   */
+  async getEarningsForPro(
+    actor: Actor,
+    options?: {
+      status?: "PENDING" | "PAYABLE" | "PAID" | "REVERSED";
+      limit?: number;
+      offset?: number;
+    }
+  ): Promise<ProEarning[]> {
+    // Authorization: Actor must be a pro
+    if (actor.role !== Role.PRO) {
+      throw new EarningCreationError("Only pros can access earnings");
+    }
+
+    // Get pro profile for actor
+    const proProfile = await this.proRepository.findByUserId(actor.id);
+    if (!proProfile) {
+      throw new EarningCreationError("Pro profile not found");
+    }
+
+    const earnings = await this.earningRepository.listByProProfileId(
+      proProfile.id,
+      {
+        status: options?.status,
+        limit: options?.limit,
+        offset: options?.offset,
+      }
+    );
+
+    return earnings.map((earning) => ({
+      id: earning.id,
+      bookingId: earning.bookingId,
+      grossAmount: earning.grossAmount,
+      platformFeeAmount: earning.platformFeeAmount,
+      netAmount: earning.netAmount,
+      status: earning.status,
+      currency: earning.currency,
+      availableAt: earning.availableAt,
+      createdAt: earning.createdAt,
+    }));
   }
 }

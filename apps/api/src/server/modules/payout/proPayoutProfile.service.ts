@@ -1,6 +1,7 @@
 import { injectable, inject } from "tsyringe";
 import type { ProPayoutProfileRepository } from "./proPayoutProfile.repo";
 import type { ProRepository } from "@modules/pro/pro.repo";
+import type { EarningRepository } from "./earning.repo";
 import type { Actor } from "@infra/auth/roles";
 import { Role } from "@repo/domain";
 import { TOKENS } from "@/server/container/tokens";
@@ -27,6 +28,17 @@ export interface ProPayoutProfileUpdateInput {
 }
 
 /**
+ * Pro financial summary
+ * Represents the financial summary of earnings for a pro user
+ */
+export interface ProFinancialSummary {
+  availableAmount: number;
+  pendingAmount: number;
+  totalPaidAmount: number;
+  currency: string;
+}
+
+/**
  * Pro payout profile service
  * Contains business logic for pro payout profile operations
  */
@@ -36,7 +48,9 @@ export class ProPayoutProfileService {
     @inject(TOKENS.ProPayoutProfileRepository)
     private readonly proPayoutProfileRepository: ProPayoutProfileRepository,
     @inject(TOKENS.ProRepository)
-    private readonly proRepository: ProRepository
+    private readonly proRepository: ProRepository,
+    @inject(TOKENS.EarningRepository)
+    private readonly earningRepository: EarningRepository
   ) {}
 
   /**
@@ -208,6 +222,63 @@ export class ProPayoutProfileService {
       isComplete: updated.isComplete,
       createdAt: updated.createdAt,
       updatedAt: updated.updatedAt,
+    };
+  }
+
+  /**
+   * Get financial summary for a pro
+   * Returns available, pending, and total paid amounts
+   */
+  async getFinancialSummary(actor: Actor): Promise<ProFinancialSummary> {
+    // Authorization: Actor must be a pro
+    if (actor.role !== Role.PRO) {
+      throw new ProPayoutProfileError("Only pros can access financial summary");
+    }
+
+    // Get pro profile for actor
+    const proProfile = await this.proRepository.findByUserId(actor.id);
+    if (!proProfile) {
+      throw new ProPayoutProfileError("Pro profile not found");
+    }
+
+    // Get all earnings for this pro
+    const allEarnings = await this.earningRepository.listByProProfileId(
+      proProfile.id
+    );
+
+    // Calculate totals by status
+    const now = new Date();
+    let availableAmount = 0; // PAYABLE earnings
+    let pendingAmount = 0; // PENDING earnings
+    let totalPaidAmount = 0; // PAID earnings
+    let currency = "UYU"; // Default currency
+
+    for (const earning of allEarnings) {
+      if (earning.currency) {
+        currency = earning.currency;
+      }
+
+      switch (earning.status) {
+        case "PAYABLE":
+          availableAmount += earning.netAmount;
+          break;
+        case "PENDING":
+          // Only count if availableAt is in the past or null
+          if (!earning.availableAt || earning.availableAt <= now) {
+            pendingAmount += earning.netAmount;
+          }
+          break;
+        case "PAID":
+          totalPaidAmount += earning.netAmount;
+          break;
+      }
+    }
+
+    return {
+      availableAmount,
+      pendingAmount,
+      totalPaidAmount,
+      currency,
     };
   }
 }

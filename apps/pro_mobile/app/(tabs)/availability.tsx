@@ -1,4 +1,4 @@
-import { AvailabilityScreen } from "../../src/screens/availability/AvailabilityScreen";
+import { AvailabilityScreen } from "@screens/availability/AvailabilityScreen";
 
 export default function AvailabilityPage() {
   return <AvailabilityScreen />;

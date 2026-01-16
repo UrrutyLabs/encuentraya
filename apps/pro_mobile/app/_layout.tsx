@@ -79,6 +79,20 @@ export default function RootLayout() {
               headerBackTitle: "Atrás",
             }} 
           />
+          <Stack.Screen 
+            name="profile/earnings" 
+            options={{ 
+              title: "Historial de ingresos",
+              headerBackTitle: "Atrás",
+            }} 
+          />
+          <Stack.Screen 
+            name="profile/edit" 
+            options={{ 
+              title: "Editar perfil",
+              headerBackTitle: "Atrás",
+            }} 
+          />
         </Stack>
       </TRPCProvider>
     </ErrorBoundary>

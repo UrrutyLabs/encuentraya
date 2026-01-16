@@ -19,6 +19,10 @@ export const typography = {
       fontSize: 20,
       lineHeight: 28,
     },
+    h3: {
+      fontSize: 18,
+      lineHeight: 24,
+    },
     body: {
       fontSize: 16,
       lineHeight: 24,

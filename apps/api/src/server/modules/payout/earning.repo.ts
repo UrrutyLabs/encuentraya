@@ -53,6 +53,14 @@ export interface EarningRepository {
     now: Date
   ): Promise<EarningEntity[]>;
   listPendingDue(now: Date): Promise<EarningEntity[]>;
+  listByProProfileId(
+    proProfileId: string,
+    options?: {
+      status?: "PENDING" | "PAYABLE" | "PAID" | "REVERSED";
+      limit?: number;
+      offset?: number;
+    }
+  ): Promise<EarningEntity[]>;
   markStatus(
     earningId: string,
     status: "PENDING" | "PAYABLE" | "PAID" | "REVERSED",
@@ -134,6 +142,37 @@ export class EarningRepositoryImpl implements EarningRepository {
       orderBy: {
         availableAt: "asc",
       },
+    });
+
+    return earnings.map(this.mapPrismaToDomain);
+  }
+
+  async listByProProfileId(
+    proProfileId: string,
+    options?: {
+      status?: "PENDING" | "PAYABLE" | "PAID" | "REVERSED";
+      limit?: number;
+      offset?: number;
+    }
+  ): Promise<EarningEntity[]> {
+    const where: {
+      proProfileId: string;
+      status?: $Enums.EarningStatus;
+    } = {
+      proProfileId,
+    };
+
+    if (options?.status) {
+      where.status = options.status as $Enums.EarningStatus;
+    }
+
+    const earnings = await prisma.earning.findMany({
+      where,
+      orderBy: {
+        createdAt: "desc",
+      },
+      take: options?.limit,
+      skip: options?.offset,
     });
 
     return earnings.map(this.mapPrismaToDomain);

@@ -1,4 +1,4 @@
-import { PayoutInfoScreen } from "../../src/screens/settings/PayoutInfoScreen";
+import { PayoutInfoScreen } from "@screens/settings/PayoutInfoScreen";
 
 export default function PayoutPage() {
   return <PayoutInfoScreen />;

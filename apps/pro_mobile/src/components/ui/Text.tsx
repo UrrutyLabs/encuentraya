@@ -3,7 +3,7 @@ import { theme } from "../../theme";
 
 interface TextProps extends RNTextProps {
   children: React.ReactNode;
-  variant?: "body" | "small" | "xs" | "h1" | "h2";
+  variant?: "body" | "small" | "xs" | "h1" | "h2" | "h3";
 }
 
 export function Text({ children, variant = "body", style, ...props }: TextProps) {
@@ -17,6 +17,12 @@ export function Text({ children, variant = "body", style, ...props }: TextProps)
     h2: {
       fontSize: theme.typography.sizes.h2.fontSize,
       lineHeight: theme.typography.sizes.h2.lineHeight,
+      fontWeight: theme.typography.weights.semibold,
+      color: theme.colors.text,
+    },
+    h3: {
+      fontSize: theme.typography.sizes.h3.fontSize,
+      lineHeight: theme.typography.sizes.h3.lineHeight,
       fontWeight: theme.typography.weights.semibold,
       color: theme.colors.text,
     },

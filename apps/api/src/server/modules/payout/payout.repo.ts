@@ -56,6 +56,13 @@ export interface PayoutRepository {
     status: "CREATED" | "SENT" | "FAILED" | "SETTLED",
     limit?: number
   ): Promise<PayoutEntity[]>;
+  listByProProfileId(
+    proProfileId: string,
+    options?: {
+      limit?: number;
+      offset?: number;
+    }
+  ): Promise<PayoutEntity[]>;
 }
 
 /**
@@ -146,6 +153,27 @@ export class PayoutRepositoryImpl implements PayoutRepository {
         createdAt: "asc",
       },
       take: limit,
+    });
+
+    return payouts.map(this.mapPrismaToDomain);
+  }
+
+  async listByProProfileId(
+    proProfileId: string,
+    options?: {
+      limit?: number;
+      offset?: number;
+    }
+  ): Promise<PayoutEntity[]> {
+    const payouts = await prisma.payout.findMany({
+      where: {
+        proProfileId,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      take: options?.limit,
+      skip: options?.offset,
     });
 
     return payouts.map(this.mapPrismaToDomain);
