@@ -3,7 +3,7 @@ import { CheckCircle, AlertCircle, XCircle, Info } from "lucide-react";
 
 interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
   children: ReactNode;
-  variant?: "success" | "warning" | "danger" | "info";
+  variant?: "success" | "warning" | "danger" | "info" | "new";
   showIcon?: boolean;
 }
 
@@ -12,6 +12,7 @@ const variantIcons = {
   warning: AlertCircle,
   danger: XCircle,
   info: Info,
+  new: Info, // Use Info icon for "new" variant
 };
 
 export function Badge({
@@ -41,6 +42,11 @@ export function Badge({
       backgroundColor: "rgba(37, 99, 235, 0.1)",
       color: "#2563eb",
       borderColor: "rgba(37, 99, 235, 0.2)",
+    },
+    new: {
+      backgroundColor: "rgba(44, 177, 188, 0.1)",
+      color: "#2CB1BC",
+      borderColor: "rgba(44, 177, 188, 0.2)",
     },
   };
 
