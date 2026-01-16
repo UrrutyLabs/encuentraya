@@ -4,7 +4,15 @@ import { Star, DollarSign } from "lucide-react";
 import { Card } from "@repo/ui";
 import { Text } from "@repo/ui";
 import { Badge } from "@repo/ui";
-import type { Pro } from "@repo/domain";
+import { Category, type Pro } from "@repo/domain";
+
+const CATEGORY_LABELS: Record<Category, string> = {
+  [Category.PLUMBING]: "Plomería",
+  [Category.ELECTRICAL]: "Electricidad",
+  [Category.CLEANING]: "Limpieza",
+  [Category.HANDYMAN]: "Arreglos generales",
+  [Category.PAINTING]: "Pintura",
+};
 
 interface ProCardProps {
   pro: Pro;
@@ -35,7 +43,7 @@ export const ProCard = memo(function ProCard({ pro }: ProCardProps) {
           <div className="flex flex-wrap gap-2 mb-3">
             {pro.categories.slice(0, 2).map((category) => (
               <Badge key={category} variant="info">
-                {category}
+                {CATEGORY_LABELS[category as Category] || category}
               </Badge>
             ))}
           </div>
