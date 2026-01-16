@@ -18,7 +18,7 @@ export function LandingHero() {
           priority
           quality={90}
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-bg/95 via-bg/90 to-bg/80" />
+        <div className="absolute inset-0 bg-linear-to-r from-bg/95 via-bg/90 to-bg/80" />
       </div>
 
       {/* Content */}
