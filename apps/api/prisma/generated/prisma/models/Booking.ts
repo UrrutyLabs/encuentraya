@@ -36,6 +36,7 @@ export type BookingSumAggregateOutputType = {
 
 export type BookingMinAggregateOutputType = {
   id: string | null
+  displayId: string | null
   clientUserId: string | null
   proProfileId: string | null
   category: $Enums.Category | null
@@ -50,6 +51,7 @@ export type BookingMinAggregateOutputType = {
 
 export type BookingMaxAggregateOutputType = {
   id: string | null
+  displayId: string | null
   clientUserId: string | null
   proProfileId: string | null
   category: $Enums.Category | null
@@ -64,6 +66,7 @@ export type BookingMaxAggregateOutputType = {
 
 export type BookingCountAggregateOutputType = {
   id: number
+  displayId: number
   clientUserId: number
   proProfileId: number
   category: number
@@ -88,6 +91,7 @@ export type BookingSumAggregateInputType = {
 
 export type BookingMinAggregateInputType = {
   id?: true
+  displayId?: true
   clientUserId?: true
   proProfileId?: true
   category?: true
@@ -102,6 +106,7 @@ export type BookingMinAggregateInputType = {
 
 export type BookingMaxAggregateInputType = {
   id?: true
+  displayId?: true
   clientUserId?: true
   proProfileId?: true
   category?: true
@@ -116,6 +121,7 @@ export type BookingMaxAggregateInputType = {
 
 export type BookingCountAggregateInputType = {
   id?: true
+  displayId?: true
   clientUserId?: true
   proProfileId?: true
   category?: true
@@ -217,6 +223,7 @@ export type BookingGroupByArgs<ExtArgs extends runtime.Types.Extensions.Internal
 
 export type BookingGroupByOutputType = {
   id: string
+  displayId: string
   clientUserId: string
   proProfileId: string | null
   category: $Enums.Category
@@ -254,6 +261,7 @@ export type BookingWhereInput = {
   OR?: Prisma.BookingWhereInput[]
   NOT?: Prisma.BookingWhereInput | Prisma.BookingWhereInput[]
   id?: Prisma.StringFilter<"Booking"> | string
+  displayId?: Prisma.StringFilter<"Booking"> | string
   clientUserId?: Prisma.StringFilter<"Booking"> | string
   proProfileId?: Prisma.StringNullableFilter<"Booking"> | string | null
   category?: Prisma.EnumCategoryFilter<"Booking"> | $Enums.Category
@@ -273,6 +281,7 @@ export type BookingWhereInput = {
 
 export type BookingOrderByWithRelationInput = {
   id?: Prisma.SortOrder
+  displayId?: Prisma.SortOrder
   clientUserId?: Prisma.SortOrder
   proProfileId?: Prisma.SortOrderInput | Prisma.SortOrder
   category?: Prisma.SortOrder
@@ -292,6 +301,7 @@ export type BookingOrderByWithRelationInput = {
 
 export type BookingWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  displayId?: string
   AND?: Prisma.BookingWhereInput | Prisma.BookingWhereInput[]
   OR?: Prisma.BookingWhereInput[]
   NOT?: Prisma.BookingWhereInput | Prisma.BookingWhereInput[]
@@ -310,10 +320,11 @@ export type BookingWhereUniqueInput = Prisma.AtLeast<{
   review?: Prisma.XOR<Prisma.ReviewNullableScalarRelationFilter, Prisma.ReviewWhereInput> | null
   payment?: Prisma.XOR<Prisma.PaymentNullableScalarRelationFilter, Prisma.PaymentWhereInput> | null
   earning?: Prisma.XOR<Prisma.EarningNullableScalarRelationFilter, Prisma.EarningWhereInput> | null
-}, "id">
+}, "id" | "displayId">
 
 export type BookingOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
+  displayId?: Prisma.SortOrder
   clientUserId?: Prisma.SortOrder
   proProfileId?: Prisma.SortOrderInput | Prisma.SortOrder
   category?: Prisma.SortOrder
@@ -336,6 +347,7 @@ export type BookingScalarWhereWithAggregatesInput = {
   OR?: Prisma.BookingScalarWhereWithAggregatesInput[]
   NOT?: Prisma.BookingScalarWhereWithAggregatesInput | Prisma.BookingScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Booking"> | string
+  displayId?: Prisma.StringWithAggregatesFilter<"Booking"> | string
   clientUserId?: Prisma.StringWithAggregatesFilter<"Booking"> | string
   proProfileId?: Prisma.StringNullableWithAggregatesFilter<"Booking"> | string | null
   category?: Prisma.EnumCategoryWithAggregatesFilter<"Booking"> | $Enums.Category
@@ -350,6 +362,7 @@ export type BookingScalarWhereWithAggregatesInput = {
 
 export type BookingCreateInput = {
   id?: string
+  displayId: string
   category: $Enums.Category
   status?: $Enums.BookingStatus
   scheduledAt: Date | string
@@ -367,6 +380,7 @@ export type BookingCreateInput = {
 
 export type BookingUncheckedCreateInput = {
   id?: string
+  displayId: string
   clientUserId: string
   proProfileId?: string | null
   category: $Enums.Category
@@ -384,6 +398,7 @@ export type BookingUncheckedCreateInput = {
 
 export type BookingUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  displayId?: Prisma.StringFieldUpdateOperationsInput | string
   category?: Prisma.EnumCategoryFieldUpdateOperationsInput | $Enums.Category
   status?: Prisma.EnumBookingStatusFieldUpdateOperationsInput | $Enums.BookingStatus
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -401,6 +416,7 @@ export type BookingUpdateInput = {
 
 export type BookingUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  displayId?: Prisma.StringFieldUpdateOperationsInput | string
   clientUserId?: Prisma.StringFieldUpdateOperationsInput | string
   proProfileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.EnumCategoryFieldUpdateOperationsInput | $Enums.Category
@@ -418,6 +434,7 @@ export type BookingUncheckedUpdateInput = {
 
 export type BookingCreateManyInput = {
   id?: string
+  displayId: string
   clientUserId: string
   proProfileId?: string | null
   category: $Enums.Category
@@ -432,6 +449,7 @@ export type BookingCreateManyInput = {
 
 export type BookingUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  displayId?: Prisma.StringFieldUpdateOperationsInput | string
   category?: Prisma.EnumCategoryFieldUpdateOperationsInput | $Enums.Category
   status?: Prisma.EnumBookingStatusFieldUpdateOperationsInput | $Enums.BookingStatus
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -444,6 +462,7 @@ export type BookingUpdateManyMutationInput = {
 
 export type BookingUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  displayId?: Prisma.StringFieldUpdateOperationsInput | string
   clientUserId?: Prisma.StringFieldUpdateOperationsInput | string
   proProfileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.EnumCategoryFieldUpdateOperationsInput | $Enums.Category
@@ -468,6 +487,7 @@ export type BookingOrderByRelationAggregateInput = {
 
 export type BookingCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  displayId?: Prisma.SortOrder
   clientUserId?: Prisma.SortOrder
   proProfileId?: Prisma.SortOrder
   category?: Prisma.SortOrder
@@ -486,6 +506,7 @@ export type BookingAvgOrderByAggregateInput = {
 
 export type BookingMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  displayId?: Prisma.SortOrder
   clientUserId?: Prisma.SortOrder
   proProfileId?: Prisma.SortOrder
   category?: Prisma.SortOrder
@@ -500,6 +521,7 @@ export type BookingMaxOrderByAggregateInput = {
 
 export type BookingMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  displayId?: Prisma.SortOrder
   clientUserId?: Prisma.SortOrder
   proProfileId?: Prisma.SortOrder
   category?: Prisma.SortOrder
@@ -661,6 +683,7 @@ export type BookingUpdateOneRequiredWithoutEarningNestedInput = {
 
 export type BookingCreateWithoutClientInput = {
   id?: string
+  displayId: string
   category: $Enums.Category
   status?: $Enums.BookingStatus
   scheduledAt: Date | string
@@ -677,6 +700,7 @@ export type BookingCreateWithoutClientInput = {
 
 export type BookingUncheckedCreateWithoutClientInput = {
   id?: string
+  displayId: string
   proProfileId?: string | null
   category: $Enums.Category
   status?: $Enums.BookingStatus
@@ -722,6 +746,7 @@ export type BookingScalarWhereInput = {
   OR?: Prisma.BookingScalarWhereInput[]
   NOT?: Prisma.BookingScalarWhereInput | Prisma.BookingScalarWhereInput[]
   id?: Prisma.StringFilter<"Booking"> | string
+  displayId?: Prisma.StringFilter<"Booking"> | string
   clientUserId?: Prisma.StringFilter<"Booking"> | string
   proProfileId?: Prisma.StringNullableFilter<"Booking"> | string | null
   category?: Prisma.EnumCategoryFilter<"Booking"> | $Enums.Category
@@ -736,6 +761,7 @@ export type BookingScalarWhereInput = {
 
 export type BookingCreateWithoutProProfileInput = {
   id?: string
+  displayId: string
   category: $Enums.Category
   status?: $Enums.BookingStatus
   scheduledAt: Date | string
@@ -752,6 +778,7 @@ export type BookingCreateWithoutProProfileInput = {
 
 export type BookingUncheckedCreateWithoutProProfileInput = {
   id?: string
+  displayId: string
   clientUserId: string
   category: $Enums.Category
   status?: $Enums.BookingStatus
@@ -794,6 +821,7 @@ export type BookingUpdateManyWithWhereWithoutProProfileInput = {
 
 export type BookingCreateWithoutReviewInput = {
   id?: string
+  displayId: string
   category: $Enums.Category
   status?: $Enums.BookingStatus
   scheduledAt: Date | string
@@ -810,6 +838,7 @@ export type BookingCreateWithoutReviewInput = {
 
 export type BookingUncheckedCreateWithoutReviewInput = {
   id?: string
+  displayId: string
   clientUserId: string
   proProfileId?: string | null
   category: $Enums.Category
@@ -842,6 +871,7 @@ export type BookingUpdateToOneWithWhereWithoutReviewInput = {
 
 export type BookingUpdateWithoutReviewInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  displayId?: Prisma.StringFieldUpdateOperationsInput | string
   category?: Prisma.EnumCategoryFieldUpdateOperationsInput | $Enums.Category
   status?: Prisma.EnumBookingStatusFieldUpdateOperationsInput | $Enums.BookingStatus
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -858,6 +888,7 @@ export type BookingUpdateWithoutReviewInput = {
 
 export type BookingUncheckedUpdateWithoutReviewInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  displayId?: Prisma.StringFieldUpdateOperationsInput | string
   clientUserId?: Prisma.StringFieldUpdateOperationsInput | string
   proProfileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.EnumCategoryFieldUpdateOperationsInput | $Enums.Category
@@ -874,6 +905,7 @@ export type BookingUncheckedUpdateWithoutReviewInput = {
 
 export type BookingCreateWithoutPaymentInput = {
   id?: string
+  displayId: string
   category: $Enums.Category
   status?: $Enums.BookingStatus
   scheduledAt: Date | string
@@ -890,6 +922,7 @@ export type BookingCreateWithoutPaymentInput = {
 
 export type BookingUncheckedCreateWithoutPaymentInput = {
   id?: string
+  displayId: string
   clientUserId: string
   proProfileId?: string | null
   category: $Enums.Category
@@ -922,6 +955,7 @@ export type BookingUpdateToOneWithWhereWithoutPaymentInput = {
 
 export type BookingUpdateWithoutPaymentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  displayId?: Prisma.StringFieldUpdateOperationsInput | string
   category?: Prisma.EnumCategoryFieldUpdateOperationsInput | $Enums.Category
   status?: Prisma.EnumBookingStatusFieldUpdateOperationsInput | $Enums.BookingStatus
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -938,6 +972,7 @@ export type BookingUpdateWithoutPaymentInput = {
 
 export type BookingUncheckedUpdateWithoutPaymentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  displayId?: Prisma.StringFieldUpdateOperationsInput | string
   clientUserId?: Prisma.StringFieldUpdateOperationsInput | string
   proProfileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.EnumCategoryFieldUpdateOperationsInput | $Enums.Category
@@ -954,6 +989,7 @@ export type BookingUncheckedUpdateWithoutPaymentInput = {
 
 export type BookingCreateWithoutEarningInput = {
   id?: string
+  displayId: string
   category: $Enums.Category
   status?: $Enums.BookingStatus
   scheduledAt: Date | string
@@ -970,6 +1006,7 @@ export type BookingCreateWithoutEarningInput = {
 
 export type BookingUncheckedCreateWithoutEarningInput = {
   id?: string
+  displayId: string
   clientUserId: string
   proProfileId?: string | null
   category: $Enums.Category
@@ -1002,6 +1039,7 @@ export type BookingUpdateToOneWithWhereWithoutEarningInput = {
 
 export type BookingUpdateWithoutEarningInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  displayId?: Prisma.StringFieldUpdateOperationsInput | string
   category?: Prisma.EnumCategoryFieldUpdateOperationsInput | $Enums.Category
   status?: Prisma.EnumBookingStatusFieldUpdateOperationsInput | $Enums.BookingStatus
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1018,6 +1056,7 @@ export type BookingUpdateWithoutEarningInput = {
 
 export type BookingUncheckedUpdateWithoutEarningInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  displayId?: Prisma.StringFieldUpdateOperationsInput | string
   clientUserId?: Prisma.StringFieldUpdateOperationsInput | string
   proProfileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.EnumCategoryFieldUpdateOperationsInput | $Enums.Category
@@ -1034,6 +1073,7 @@ export type BookingUncheckedUpdateWithoutEarningInput = {
 
 export type BookingCreateManyClientInput = {
   id?: string
+  displayId: string
   proProfileId?: string | null
   category: $Enums.Category
   status?: $Enums.BookingStatus
@@ -1047,6 +1087,7 @@ export type BookingCreateManyClientInput = {
 
 export type BookingUpdateWithoutClientInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  displayId?: Prisma.StringFieldUpdateOperationsInput | string
   category?: Prisma.EnumCategoryFieldUpdateOperationsInput | $Enums.Category
   status?: Prisma.EnumBookingStatusFieldUpdateOperationsInput | $Enums.BookingStatus
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1063,6 +1104,7 @@ export type BookingUpdateWithoutClientInput = {
 
 export type BookingUncheckedUpdateWithoutClientInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  displayId?: Prisma.StringFieldUpdateOperationsInput | string
   proProfileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.EnumCategoryFieldUpdateOperationsInput | $Enums.Category
   status?: Prisma.EnumBookingStatusFieldUpdateOperationsInput | $Enums.BookingStatus
@@ -1079,6 +1121,7 @@ export type BookingUncheckedUpdateWithoutClientInput = {
 
 export type BookingUncheckedUpdateManyWithoutClientInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  displayId?: Prisma.StringFieldUpdateOperationsInput | string
   proProfileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.EnumCategoryFieldUpdateOperationsInput | $Enums.Category
   status?: Prisma.EnumBookingStatusFieldUpdateOperationsInput | $Enums.BookingStatus
@@ -1092,6 +1135,7 @@ export type BookingUncheckedUpdateManyWithoutClientInput = {
 
 export type BookingCreateManyProProfileInput = {
   id?: string
+  displayId: string
   clientUserId: string
   category: $Enums.Category
   status?: $Enums.BookingStatus
@@ -1105,6 +1149,7 @@ export type BookingCreateManyProProfileInput = {
 
 export type BookingUpdateWithoutProProfileInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  displayId?: Prisma.StringFieldUpdateOperationsInput | string
   category?: Prisma.EnumCategoryFieldUpdateOperationsInput | $Enums.Category
   status?: Prisma.EnumBookingStatusFieldUpdateOperationsInput | $Enums.BookingStatus
   scheduledAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1121,6 +1166,7 @@ export type BookingUpdateWithoutProProfileInput = {
 
 export type BookingUncheckedUpdateWithoutProProfileInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  displayId?: Prisma.StringFieldUpdateOperationsInput | string
   clientUserId?: Prisma.StringFieldUpdateOperationsInput | string
   category?: Prisma.EnumCategoryFieldUpdateOperationsInput | $Enums.Category
   status?: Prisma.EnumBookingStatusFieldUpdateOperationsInput | $Enums.BookingStatus
@@ -1137,6 +1183,7 @@ export type BookingUncheckedUpdateWithoutProProfileInput = {
 
 export type BookingUncheckedUpdateManyWithoutProProfileInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  displayId?: Prisma.StringFieldUpdateOperationsInput | string
   clientUserId?: Prisma.StringFieldUpdateOperationsInput | string
   category?: Prisma.EnumCategoryFieldUpdateOperationsInput | $Enums.Category
   status?: Prisma.EnumBookingStatusFieldUpdateOperationsInput | $Enums.BookingStatus
@@ -1152,6 +1199,7 @@ export type BookingUncheckedUpdateManyWithoutProProfileInput = {
 
 export type BookingSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  displayId?: boolean
   clientUserId?: boolean
   proProfileId?: boolean
   category?: boolean
@@ -1171,6 +1219,7 @@ export type BookingSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
 
 export type BookingSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  displayId?: boolean
   clientUserId?: boolean
   proProfileId?: boolean
   category?: boolean
@@ -1187,6 +1236,7 @@ export type BookingSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
 
 export type BookingSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  displayId?: boolean
   clientUserId?: boolean
   proProfileId?: boolean
   category?: boolean
@@ -1203,6 +1253,7 @@ export type BookingSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
 
 export type BookingSelectScalar = {
   id?: boolean
+  displayId?: boolean
   clientUserId?: boolean
   proProfileId?: boolean
   category?: boolean
@@ -1215,7 +1266,7 @@ export type BookingSelectScalar = {
   updatedAt?: boolean
 }
 
-export type BookingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "clientUserId" | "proProfileId" | "category" | "status" | "scheduledAt" | "hoursEstimate" | "addressText" | "isFirstBooking" | "createdAt" | "updatedAt", ExtArgs["result"]["booking"]>
+export type BookingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "displayId" | "clientUserId" | "proProfileId" | "category" | "status" | "scheduledAt" | "hoursEstimate" | "addressText" | "isFirstBooking" | "createdAt" | "updatedAt", ExtArgs["result"]["booking"]>
 export type BookingInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   client?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   proProfile?: boolean | Prisma.Booking$proProfileArgs<ExtArgs>
@@ -1243,6 +1294,7 @@ export type $BookingPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
+    displayId: string
     clientUserId: string
     proProfileId: string | null
     category: $Enums.Category
@@ -1682,6 +1734,7 @@ export interface Prisma__BookingClient<T, Null = never, ExtArgs extends runtime.
  */
 export interface BookingFieldRefs {
   readonly id: Prisma.FieldRef<"Booking", 'String'>
+  readonly displayId: Prisma.FieldRef<"Booking", 'String'>
   readonly clientUserId: Prisma.FieldRef<"Booking", 'String'>
   readonly proProfileId: Prisma.FieldRef<"Booking", 'String'>
   readonly category: Prisma.FieldRef<"Booking", 'Category'>

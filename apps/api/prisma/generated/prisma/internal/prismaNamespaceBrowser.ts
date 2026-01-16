@@ -142,6 +142,7 @@ export type AvailabilityScalarFieldEnum = (typeof AvailabilityScalarFieldEnum)[k
 
 export const BookingScalarFieldEnum = {
   id: 'id',
+  displayId: 'displayId',
   clientUserId: 'clientUserId',
   proProfileId: 'proProfileId',
   category: 'category',

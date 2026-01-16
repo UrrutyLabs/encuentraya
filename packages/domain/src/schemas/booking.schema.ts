@@ -6,6 +6,7 @@ import { categorySchema, bookingStatusSchema } from "../enums";
  */
 export const bookingSchema = z.object({
   id: z.string(),
+  displayId: z.string(),
   clientId: z.string(),
   proId: z.string(),
   category: categorySchema,

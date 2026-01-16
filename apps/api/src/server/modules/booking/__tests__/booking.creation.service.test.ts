@@ -7,6 +7,7 @@ import type { NotificationService } from "@modules/notification/notification.ser
 import { BookingStatus, Role, Category } from "@repo/domain";
 import type { Actor } from "@infra/auth/roles";
 import * as bookingHelpers from "../booking.helpers";
+import * as displayIdModule from "../booking.display-id";
 
 // Mock the container to prevent initialization errors
 vi.mock("@/server/container", () => ({
@@ -31,9 +32,11 @@ describe("BookingCreationService", () => {
 
   function createMockBookingRepository(): {
     create: ReturnType<typeof vi.fn>;
+    findByClientUserId: ReturnType<typeof vi.fn>;
   } {
     return {
       create: vi.fn(),
+      findByClientUserId: vi.fn().mockResolvedValue([]),
     };
   }
 
@@ -86,6 +89,7 @@ describe("BookingCreationService", () => {
   function createMockBooking(overrides?: Partial<BookingEntity>): BookingEntity {
     return {
       id: "booking-1",
+      displayId: "A0002",
       clientUserId: "client-1",
       proProfileId: "pro-1",
       category: "plumbing",
@@ -93,6 +97,7 @@ describe("BookingCreationService", () => {
       scheduledAt: new Date(),
       hoursEstimate: 2,
       addressText: "123 Main St",
+      isFirstBooking: false,
       createdAt: new Date(),
       updatedAt: new Date(),
       ...overrides,
@@ -124,6 +129,9 @@ describe("BookingCreationService", () => {
       updatedAt: booking.updatedAt,
     }));
 
+    // Mock displayId generation
+    vi.spyOn(displayIdModule, "getNextDisplayId").mockResolvedValue("A0002");
+
     service = new BookingCreationService(
       mockBookingRepository as unknown as BookingRepository,
       mockProRepository as unknown as ProRepository,
@@ -134,6 +142,7 @@ describe("BookingCreationService", () => {
     vi.clearAllMocks();
     mockClientProfileService.ensureClientProfileExists.mockResolvedValue(undefined);
     vi.mocked(bookingHelpers.sendClientNotification).mockResolvedValue(undefined);
+    vi.mocked(displayIdModule.getNextDisplayId).mockResolvedValue("A0002");
   });
 
   describe("createBooking", () => {

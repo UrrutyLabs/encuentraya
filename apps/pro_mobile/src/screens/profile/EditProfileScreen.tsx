@@ -138,20 +138,25 @@ export function EditProfileScreen() {
           </Text>
         </View>
 
+        {/* Email - Read-only display at top */}
+        <View style={styles.emailContainer}>
+          <View style={styles.labelRow}>
+            <Feather name="mail" size={14} color={theme.colors.muted} />
+            <Text variant="small" style={styles.label}>
+              Email
+            </Text>
+          </View>
+          <Text variant="body" style={styles.emailValue}>
+            {pro?.email || ""}
+          </Text>
+        </View>
+
         <Input
           label="Nombre completo *"
           icon="user"
           value={name}
           onChangeText={setName}
           placeholder="Ingresá tu nombre completo"
-          style={styles.input}
-        />
-
-        <Input
-          label="Email"
-          icon="mail"
-          value={pro?.email || ""}
-          editable={false}
           style={styles.input}
         />
 
@@ -315,6 +320,21 @@ const styles = StyleSheet.create({
   bioCounter: {
     color: theme.colors.muted,
     marginLeft: theme.spacing[2],
+  },
+  emailContainer: {
+    marginBottom: theme.spacing[3],
+  },
+  labelRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: theme.spacing[1],
+  },
+  label: {
+    marginLeft: theme.spacing[1],
+    color: theme.colors.muted,
+  },
+  emailValue: {
+    color: theme.colors.text,
   },
   saveButton: {
     width: "100%",

@@ -26,6 +26,7 @@ export class EarningCreationError extends Error {
 export interface ProEarning {
   id: string;
   bookingId: string;
+  bookingDisplayId: string;
   grossAmount: number;
   platformFeeAmount: number;
   netAmount: number;
@@ -227,6 +228,7 @@ export class EarningService {
     return earnings.map((earning) => ({
       id: earning.id,
       bookingId: earning.bookingId,
+      bookingDisplayId: earning.bookingDisplayId || earning.bookingId.slice(-6), // Fallback to last 6 chars if no displayId
       grossAmount: earning.grossAmount,
       platformFeeAmount: earning.platformFeeAmount,
       netAmount: earning.netAmount,

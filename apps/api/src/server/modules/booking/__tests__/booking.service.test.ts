@@ -127,6 +127,7 @@ describe("BookingService", () => {
   function createMockBooking(overrides?: Partial<BookingEntity>): BookingEntity {
     return {
       id: "booking-1",
+      displayId: "A0002",
       clientUserId: "client-1",
       proProfileId: "pro-1",
       category: "PLUMBING",
@@ -134,6 +135,7 @@ describe("BookingService", () => {
       scheduledAt: new Date(),
       hoursEstimate: 2,
       addressText: "123 Main St",
+      isFirstBooking: false,
       createdAt: new Date(),
       updatedAt: new Date(),
       ...overrides,

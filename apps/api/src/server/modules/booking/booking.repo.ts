@@ -2,12 +2,14 @@ import { injectable } from "tsyringe";
 import { $Enums, Prisma } from "@infra/db/prisma";
 import { prisma } from "@infra/db/prisma";
 import { BookingStatus } from "@repo/domain";
+import { getNextDisplayId } from "./booking.display-id";
 
 /**
  * Booking entity (plain object)
  */
 export interface BookingEntity {
   id: string;
+  displayId: string;
   clientUserId: string;
   proProfileId: string | null;
   category: string; // Category enum value
@@ -67,8 +69,12 @@ export interface BookingRepository {
 @injectable()
 export class BookingRepositoryImpl implements BookingRepository {
   async create(input: BookingCreateInput): Promise<BookingEntity> {
+    // Generate displayId before creating
+    const displayId = await getNextDisplayId();
+
     const booking = await prisma.booking.create({
       data: {
+        displayId,
         clientUserId: input.clientUserId,
         proProfileId: input.proProfileId ?? null,
         category: input.category as $Enums.Category, // Prisma expects Category enum, but we pass string
@@ -203,6 +209,7 @@ export class BookingRepositoryImpl implements BookingRepository {
 
   private mapPrismaToDomain(prismaBooking: {
     id: string;
+    displayId: string;
     clientUserId: string;
     proProfileId: string | null;
     category: string;
@@ -216,6 +223,7 @@ export class BookingRepositoryImpl implements BookingRepository {
   }): BookingEntity {
     return {
       id: prismaBooking.id,
+      displayId: prismaBooking.displayId,
       clientUserId: prismaBooking.clientUserId,
       proProfileId: prismaBooking.proProfileId,
       category: prismaBooking.category,

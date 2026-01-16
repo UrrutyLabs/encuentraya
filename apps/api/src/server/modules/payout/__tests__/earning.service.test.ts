@@ -3,6 +3,7 @@ import { EarningService, EarningCreationError } from "../earning.service";
 import type { EarningRepository, EarningEntity } from "../earning.repo";
 import type { BookingRepository, BookingEntity } from "@modules/booking/booking.repo";
 import type { PaymentRepository, PaymentEntity } from "@modules/payment/payment.repo";
+import type { ProRepository } from "@modules/pro/pro.repo";
 import { BookingStatus, PaymentStatus, PaymentProvider, PaymentType } from "@repo/domain";
 import { BookingNotFoundError } from "@modules/booking/booking.errors";
 import type { Actor } from "@infra/auth/roles";
@@ -12,6 +13,7 @@ describe("EarningService", () => {
   let mockEarningRepository: ReturnType<typeof createMockEarningRepository>;
   let mockBookingRepository: ReturnType<typeof createMockBookingRepository>;
   let mockPaymentRepository: ReturnType<typeof createMockPaymentRepository>;
+  let mockProRepository: ReturnType<typeof createMockProRepository>;
 
   function createMockEarningRepository(): {
     findByBookingId: ReturnType<typeof vi.fn>;
@@ -31,7 +33,20 @@ describe("EarningService", () => {
     findById: ReturnType<typeof vi.fn>;
   } {
     return {
-      findById: vi.fn(),
+      findById: vi.fn().mockResolvedValue({
+        id: "booking-1",
+        displayId: "A0002",
+        clientUserId: "client-1",
+        proProfileId: "pro-1",
+        category: "PLUMBING",
+        status: BookingStatus.COMPLETED,
+        scheduledAt: new Date(),
+        hoursEstimate: 2,
+        addressText: "123 Main St",
+        isFirstBooking: false,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }),
     };
   }
 
@@ -40,6 +55,14 @@ describe("EarningService", () => {
   } {
     return {
       findByBookingId: vi.fn(),
+    };
+  }
+
+  function createMockProRepository(): {
+    findByUserId: ReturnType<typeof vi.fn>;
+  } {
+    return {
+      findByUserId: vi.fn(),
     };
   }
 
@@ -53,6 +76,7 @@ describe("EarningService", () => {
   function createMockBooking(overrides?: Partial<BookingEntity>): BookingEntity {
     return {
       id: "booking-1",
+      displayId: "A0002",
       clientUserId: "client-1",
       proProfileId: "pro-1",
       category: "PLUMBING",
@@ -60,6 +84,7 @@ describe("EarningService", () => {
       scheduledAt: new Date(),
       hoursEstimate: 2,
       addressText: "123 Main St",
+      isFirstBooking: false,
       createdAt: new Date(),
       updatedAt: new Date(),
       ...overrides,
@@ -110,11 +135,13 @@ describe("EarningService", () => {
     mockEarningRepository = createMockEarningRepository();
     mockBookingRepository = createMockBookingRepository();
     mockPaymentRepository = createMockPaymentRepository();
+    mockProRepository = createMockProRepository();
 
     service = new EarningService(
       mockEarningRepository as unknown as EarningRepository,
       mockBookingRepository as unknown as BookingRepository,
-      mockPaymentRepository as unknown as PaymentRepository
+      mockPaymentRepository as unknown as PaymentRepository,
+      mockProRepository as unknown as ProRepository
     );
   });
 

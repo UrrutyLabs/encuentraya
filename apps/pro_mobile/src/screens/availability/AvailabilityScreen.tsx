@@ -4,6 +4,7 @@ import { Feather } from "@expo/vector-icons";
 import { Text } from "@components/ui/Text";
 import { Button } from "@components/ui/Button";
 import { Card } from "@components/ui/Card";
+import { AvailabilitySkeleton } from "@components/presentational/AvailabilitySkeleton";
 import { useAvailabilitySlots } from "@hooks/pro/useAvailabilitySlots";
 import type { AvailabilitySlotInput } from "@repo/domain";
 import { theme } from "../../theme";
@@ -123,11 +124,7 @@ export function AvailabilityScreen() {
   }, [editingSlots, slotsByDay]);
 
   if (isLoading) {
-    return (
-      <View style={styles.container}>
-        <Text variant="body">Cargando...</Text>
-      </View>
-    );
+    return <AvailabilitySkeleton />;
   }
 
   return (

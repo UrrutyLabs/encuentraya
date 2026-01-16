@@ -164,6 +164,15 @@ export function BookingDetailScreen() {
         </View>
         <View style={styles.row}>
           <View style={styles.labelRow}>
+            <Feather name="hash" size={14} color={theme.colors.muted} />
+            <Text variant="small" style={styles.label}>
+              ID de reserva:
+            </Text>
+          </View>
+          <Text variant="body">#{booking.displayId}</Text>
+        </View>
+        <View style={styles.row}>
+          <View style={styles.labelRow}>
             <Feather name="tag" size={14} color={theme.colors.muted} />
             <Text variant="small" style={styles.label}>
               Categoría:

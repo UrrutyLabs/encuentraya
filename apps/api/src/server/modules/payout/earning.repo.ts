@@ -7,6 +7,7 @@ import { prisma, $Enums } from "@infra/db/prisma";
 export interface EarningEntity {
   id: string;
   bookingId: string;
+  bookingDisplayId?: string; // Optional, populated when fetched with booking relation
   proProfileId: string;
   clientUserId: string;
   currency: string;
@@ -168,6 +169,13 @@ export class EarningRepositoryImpl implements EarningRepository {
 
     const earnings = await prisma.earning.findMany({
       where,
+      include: {
+        booking: {
+          select: {
+            displayId: true,
+          },
+        },
+      },
       orderBy: {
         createdAt: "desc",
       },
@@ -175,7 +183,14 @@ export class EarningRepositoryImpl implements EarningRepository {
       skip: options?.offset,
     });
 
-    return earnings.map(this.mapPrismaToDomain);
+    return earnings.map((e) => {
+      const entity = this.mapPrismaToDomain(e);
+      // Include bookingDisplayId if booking relation is loaded
+      if (e.booking?.displayId) {
+        entity.bookingDisplayId = e.booking.displayId;
+      }
+      return entity;
+    });
   }
 
   async markStatus(

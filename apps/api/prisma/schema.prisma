@@ -204,6 +204,7 @@ model Availability {
 
 model Booking {
   id             String        @id @default(cuid())
+  displayId      String        @unique
   clientUserId   String
   proProfileId   String?
   category       Category

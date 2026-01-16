@@ -16,6 +16,7 @@ import { theme } from "../../theme";
 interface Earning {
   id: string;
   bookingId: string;
+  bookingDisplayId: string;
   grossAmount: number;
   platformFeeAmount: number;
   netAmount: number;
@@ -194,7 +195,7 @@ export function EarningsListScreen() {
                       {formatAmount(earning.netAmount, earning.currency)}
                     </Text>
                     <Text variant="xs" style={styles.bookingId}>
-                      #{earning.bookingId.slice(-6)}
+                      #{earning.bookingDisplayId}
                     </Text>
                   </View>
                 </Card>

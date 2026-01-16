@@ -68,6 +68,7 @@ export function mapBookingEntityToDomain(
 ): Booking {
   return {
     id: entity.id,
+    displayId: entity.displayId,
     clientId: entity.clientUserId,
     proId: entity.proProfileId || "",
     category: entity.category as Category,
@@ -95,6 +96,7 @@ export function adaptToDomain(
 ): BookingCreateOutput {
   return {
     id: entity.id,
+    displayId: entity.displayId,
     clientId: entity.clientUserId,
     proId: entity.proProfileId || input.proId,
     category: input.category,
