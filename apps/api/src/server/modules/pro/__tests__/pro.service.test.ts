@@ -6,6 +6,7 @@ import type { UserRepository, UserEntity } from "@modules/user/user.repo";
 import type { BookingRepository } from "@modules/booking/booking.repo";
 import type { ProPayoutProfileRepository, ProPayoutProfileEntity } from "@modules/payout/proPayoutProfile.repo";
 import type { AuditService } from "@modules/audit/audit.service";
+import type { AvailabilityRepository } from "../availability.repo";
 import { AuditEventType } from "@modules/audit/audit.repo";
 import type { ProOnboardInput, ProSetAvailabilityInput, Category } from "@repo/domain";
 import { Role, BookingStatus } from "@repo/domain";
@@ -18,6 +19,7 @@ describe("ProService", () => {
   let mockUserRepository: ReturnType<typeof createMockUserRepository>;
   let mockBookingRepository: ReturnType<typeof createMockBookingRepository>;
   let mockProPayoutProfileRepository: ReturnType<typeof createMockProPayoutProfileRepository>;
+  let mockAvailabilityRepository: ReturnType<typeof createMockAvailabilityRepository>;
   let mockAuditService: ReturnType<typeof createMockAuditService>;
 
   function createMockProRepository(): {
@@ -76,6 +78,18 @@ describe("ProService", () => {
     };
   }
 
+  function createMockAvailabilityRepository(): {
+    findByProProfileId: ReturnType<typeof vi.fn>;
+    create: ReturnType<typeof vi.fn>;
+    deleteByProProfileId: ReturnType<typeof vi.fn>;
+  } {
+    return {
+      findByProProfileId: vi.fn(),
+      create: vi.fn(),
+      deleteByProProfileId: vi.fn(),
+    };
+  }
+
   function createMockAuditService(): {
     logEvent: ReturnType<typeof vi.fn>;
   } {
@@ -92,6 +106,7 @@ describe("ProService", () => {
     return {
       id: "user-1",
       role: Role.PRO,
+      deletedAt: null,
       createdAt: new Date(),
       ...overrides,
     };
@@ -174,16 +189,25 @@ describe("ProService", () => {
     mockUserRepository = createMockUserRepository();
     mockBookingRepository = createMockBookingRepository();
     mockProPayoutProfileRepository = createMockProPayoutProfileRepository();
+    mockAvailabilityRepository = createMockAvailabilityRepository();
     mockAuditService = createMockAuditService();
+    
+    // Set default return values for availability repository
+    mockAvailabilityRepository.findByProProfileId.mockResolvedValue([]);
+    
     service = new ProService(
       mockProRepository as unknown as ProRepository,
       mockReviewRepository as unknown as ReviewRepository,
       mockUserRepository as unknown as UserRepository,
       mockBookingRepository as unknown as BookingRepository,
       mockProPayoutProfileRepository as unknown as ProPayoutProfileRepository,
+      mockAvailabilityRepository as unknown as AvailabilityRepository,
       mockAuditService as unknown as AuditService
     );
     vi.clearAllMocks();
+    
+    // Re-set default after clearAllMocks
+    mockAvailabilityRepository.findByProProfileId.mockResolvedValue([]);
   });
 
   describe("onboardPro", () => {
@@ -766,6 +790,101 @@ describe("ProService", () => {
       await expect(service.unsuspendPro(proProfileId, actor)).rejects.toThrow(
         `Pro profile not found: ${proProfileId}`
       );
+    });
+  });
+
+  describe("approvePro", () => {
+    it("should approve pro and log audit event", async () => {
+      // Arrange
+      const proProfileId = "pro-1";
+      const actor = createMockActor(Role.ADMIN);
+      const proProfile = createMockProProfile({ id: proProfileId, status: "pending" });
+      const activePro = createMockProProfile({ id: proProfileId, status: "active" });
+
+      mockProRepository.findById.mockResolvedValue(proProfile);
+      mockProRepository.updateStatus.mockResolvedValue(activePro);
+      mockAuditService.logEvent.mockResolvedValue(undefined);
+
+      // Act
+      const result = await service.approvePro(proProfileId, actor);
+
+      // Assert
+      expect(mockProRepository.findById).toHaveBeenCalledWith(proProfileId);
+      expect(mockProRepository.updateStatus).toHaveBeenCalledWith(proProfileId, "active");
+      expect(mockAuditService.logEvent).toHaveBeenCalledWith({
+        eventType: AuditEventType.PRO_APPROVED,
+        actor,
+        resourceType: "pro",
+        resourceId: proProfileId,
+        action: "approve",
+        metadata: {
+          previousStatus: "pending",
+          newStatus: "active",
+          proDisplayName: proProfile.displayName,
+          proEmail: proProfile.email,
+        },
+      });
+      expect(result).toEqual(activePro);
+    });
+
+    it("should throw error when pro not found", async () => {
+      // Arrange
+      const proProfileId = "non-existent";
+      const actor = createMockActor(Role.ADMIN);
+      mockProRepository.findById.mockResolvedValue(null);
+
+      // Act & Assert
+      await expect(service.approvePro(proProfileId, actor)).rejects.toThrow(
+        `Pro profile not found: ${proProfileId}`
+      );
+    });
+
+    it("should throw error when pro is not pending", async () => {
+      // Arrange
+      const proProfileId = "pro-1";
+      const actor = createMockActor(Role.ADMIN);
+      const proProfile = createMockProProfile({ id: proProfileId, status: "active" });
+
+      mockProRepository.findById.mockResolvedValue(proProfile);
+
+      // Act & Assert
+      await expect(service.approvePro(proProfileId, actor)).rejects.toThrow(
+        `Pro profile is not pending. Current status: active`
+      );
+      expect(mockProRepository.updateStatus).not.toHaveBeenCalled();
+      expect(mockAuditService.logEvent).not.toHaveBeenCalled();
+    });
+
+    it("should throw error when pro is suspended", async () => {
+      // Arrange
+      const proProfileId = "pro-1";
+      const actor = createMockActor(Role.ADMIN);
+      const proProfile = createMockProProfile({ id: proProfileId, status: "suspended" });
+
+      mockProRepository.findById.mockResolvedValue(proProfile);
+
+      // Act & Assert
+      await expect(service.approvePro(proProfileId, actor)).rejects.toThrow(
+        `Pro profile is not pending. Current status: suspended`
+      );
+      expect(mockProRepository.updateStatus).not.toHaveBeenCalled();
+      expect(mockAuditService.logEvent).not.toHaveBeenCalled();
+    });
+
+    it("should throw error when updateStatus fails", async () => {
+      // Arrange
+      const proProfileId = "pro-1";
+      const actor = createMockActor(Role.ADMIN);
+      const proProfile = createMockProProfile({ id: proProfileId, status: "pending" });
+
+      mockProRepository.findById.mockResolvedValue(proProfile);
+      mockProRepository.updateStatus.mockResolvedValue(null);
+
+      // Act & Assert
+      await expect(service.approvePro(proProfileId, actor)).rejects.toThrow(
+        `Failed to approve pro: ${proProfileId}`
+      );
+      expect(mockAuditService.logEvent).not.toHaveBeenCalled();
     });
   });
 });

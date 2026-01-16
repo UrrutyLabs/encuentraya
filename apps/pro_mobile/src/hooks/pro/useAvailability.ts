@@ -33,9 +33,14 @@ export function useAvailability(): UseAvailabilityReturn {
       // Snapshot previous value
       const previousPro = pro;
 
-      // Optimistically update - note: since availability is calculated from isApproved/isSuspended,
-      // we'll just invalidate and let the server response update it properly
-      // The UI will show the new state optimistically via the mutation input
+      // Optimistically update the isAvailable field
+      // The backend computes isAvailable from the Availability array (has slots = available)
+      if (previousPro && variables.isAvailable !== undefined) {
+        queryClient.setQueryData([["pro", "getMyProfile"]], {
+          ...previousPro,
+          isAvailable: variables.isAvailable,
+        });
+      }
       
       return { previousPro };
     },
@@ -48,7 +53,7 @@ export function useAvailability(): UseAvailabilityReturn {
     },
     onSuccess: () => {
       setError(null);
-      // Invalidate to refetch the latest data
+      // Invalidate to refetch the latest data and ensure consistency
       queryClient.invalidateQueries({ queryKey: [["pro", "getMyProfile"]] });
     },
     onSettled: () => {
@@ -57,10 +62,9 @@ export function useAvailability(): UseAvailabilityReturn {
     },
   });
 
-  // Determine availability from pro profile
-  // For now, we'll use a simple approach - if pro exists and is approved, consider available
-  // TODO: Add explicit isAvailable field to Pro schema when availability system is fully implemented
-  const isAvailable = pro ? pro.isApproved && !pro.isSuspended : false;
+  // Get availability from pro profile
+  // The backend computes isAvailable from the Availability array (has slots = available)
+  const isAvailable = pro?.isAvailable ?? false;
 
   const toggleAvailability = async () => {
     const newAvailability = !isAvailable;

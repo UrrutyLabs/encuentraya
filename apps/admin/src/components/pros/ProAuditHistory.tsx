@@ -7,6 +7,7 @@ import { Badge } from "@repo/ui";
 type AuditEventType =
   | "PRO_SUSPENDED"
   | "PRO_UNSUSPENDED"
+  | "PRO_APPROVED"
   | "BOOKING_STATUS_FORCED"
   | "PAYMENT_SYNCED"
   | "PAYOUT_CREATED"
@@ -42,6 +43,7 @@ const getEventLabel = (eventType: AuditEventType): string => {
   const labels: Record<AuditEventType, string> = {
     PRO_SUSPENDED: "Profesional Suspendido",
     PRO_UNSUSPENDED: "Profesional Reactivado",
+    PRO_APPROVED: "Profesional Aprobado",
     BOOKING_STATUS_FORCED: "Estado de Reserva Forzado",
     PAYMENT_SYNCED: "Pago Sincronizado",
     PAYOUT_CREATED: "Cobro Creado",
@@ -57,6 +59,7 @@ const getEventBadgeVariant = (
   const variantMap: Record<AuditEventType, "info" | "success" | "warning" | "danger"> = {
     PRO_SUSPENDED: "danger",
     PRO_UNSUSPENDED: "success",
+    PRO_APPROVED: "success",
     BOOKING_STATUS_FORCED: "warning",
     PAYMENT_SYNCED: "info",
     PAYOUT_CREATED: "info",

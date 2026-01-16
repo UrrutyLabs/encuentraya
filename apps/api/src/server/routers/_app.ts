@@ -46,7 +46,7 @@ export const appRouter = router({
         // Get all pros and filter
         const allPros = await proService.getAllPros();
         
-        // Filter by category if provided
+        // Filter by category if provideda
         const filtered = allPros.filter((pro) => {
           if (!pro.isApproved || pro.isSuspended) return false;
           if (input.category && !pro.categories.includes(input.category)) {

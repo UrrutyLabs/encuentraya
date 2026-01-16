@@ -18,6 +18,7 @@ export function ProDetailScreen({ proProfileId }: ProDetailScreenProps) {
   const router = useRouter();
   const [showSuspendModal, setShowSuspendModal] = useState(false);
   const [showUnsuspendModal, setShowUnsuspendModal] = useState(false);
+  const [showApproveModal, setShowApproveModal] = useState(false);
   const [suspendReason, setSuspendReason] = useState("");
 
   const {
@@ -27,6 +28,7 @@ export function ProDetailScreen({ proProfileId }: ProDetailScreenProps) {
     isLoadingAuditLogs,
     suspend,
     unsuspend,
+    approve,
   } = useProDetail({
     proProfileId,
     onSuspendSuccess: () => {
@@ -35,6 +37,9 @@ export function ProDetailScreen({ proProfileId }: ProDetailScreenProps) {
     },
     onUnsuspendSuccess: () => {
       setShowUnsuspendModal(false);
+    },
+    onApproveSuccess: () => {
+      setShowApproveModal(false);
     },
   });
 
@@ -79,12 +84,20 @@ export function ProDetailScreen({ proProfileId }: ProDetailScreenProps) {
     setShowUnsuspendModal(true);
   };
 
+  const handleApprove = () => {
+    setShowApproveModal(true);
+  };
+
   const confirmSuspend = () => {
     suspend.mutate(suspendReason || undefined);
   };
 
   const confirmUnsuspend = () => {
     unsuspend.mutate();
+  };
+
+  const confirmApprove = () => {
+    approve.mutate();
   };
 
   if (isLoading) {
@@ -101,6 +114,7 @@ export function ProDetailScreen({ proProfileId }: ProDetailScreenProps) {
 
   const canSuspend = pro.status !== "suspended";
   const canUnsuspend = pro.status === "suspended";
+  const canApprove = pro.status === "pending";
 
   return (
     <div className="space-y-6">
@@ -253,7 +267,14 @@ export function ProDetailScreen({ proProfileId }: ProDetailScreenProps) {
       </Card>
 
       {/* Audit History */}
-      <ProAuditHistory logs={auditLogs} isLoading={isLoadingAuditLogs} />
+      <ProAuditHistory 
+        logs={auditLogs.map(log => ({
+          ...log,
+          eventType: log.eventType as "PRO_SUSPENDED" | "PRO_UNSUSPENDED" | "PRO_APPROVED" | "BOOKING_STATUS_FORCED" | "PAYMENT_SYNCED" | "PAYOUT_CREATED" | "PAYOUT_SENT" | "USER_ROLE_CHANGED",
+          actorRole: log.actorRole as string,
+        }))} 
+        isLoading={isLoadingAuditLogs} 
+      />
 
       {/* Actions */}
       <Card className="p-6">
@@ -261,6 +282,15 @@ export function ProDetailScreen({ proProfileId }: ProDetailScreenProps) {
           Acciones
         </Text>
         <div className="flex gap-2">
+          {canApprove && (
+            <Button
+              variant="primary"
+              onClick={handleApprove}
+              disabled={approve.isPending}
+            >
+              Aprobar
+            </Button>
+          )}
           {canSuspend && (
             <Button
               variant="danger"
@@ -350,6 +380,37 @@ export function ProDetailScreen({ proProfileId }: ProDetailScreenProps) {
               <Button
                 variant="ghost"
                 onClick={() => setShowUnsuspendModal(false)}
+                className="flex-1"
+              >
+                Cancelar
+              </Button>
+            </div>
+          </Card>
+        </div>
+      )}
+
+      {/* Approve Confirmation Modal */}
+      {showApproveModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <Card className="p-6 max-w-md w-full m-4">
+            <Text variant="h2" className="mb-4">
+              Confirmar Aprobación
+            </Text>
+            <Text variant="body" className="mb-4">
+              ¿Estás seguro de que querés aprobar a este profesional? Una vez aprobado, podrá recibir solicitudes de clientes.
+            </Text>
+            <div className="flex gap-2">
+              <Button
+                variant="primary"
+                onClick={confirmApprove}
+                disabled={approve.isPending}
+                className="flex-1"
+              >
+                {approve.isPending ? "Aprobando..." : "Confirmar"}
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={() => setShowApproveModal(false)}
                 className="flex-1"
               >
                 Cancelar

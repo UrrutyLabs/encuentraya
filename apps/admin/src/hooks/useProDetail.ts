@@ -4,12 +4,14 @@ interface UseProDetailProps {
   proProfileId: string;
   onSuspendSuccess?: () => void;
   onUnsuspendSuccess?: () => void;
+  onApproveSuccess?: () => void;
 }
 
 export function useProDetail({
   proProfileId,
   onSuspendSuccess,
   onUnsuspendSuccess,
+  onApproveSuccess,
 }: UseProDetailProps) {
   const utils = trpc.useUtils();
 
@@ -51,6 +53,14 @@ export function useProDetail({
     },
   });
 
+  const approveMutation = trpc.pro.approve.useMutation({
+    onSuccess: () => {
+      refetch();
+      invalidateAuditLogs();
+      onApproveSuccess?.();
+    },
+  });
+
   const handleSuspend = (reason?: string) => {
     suspendMutation.mutate({
       proProfileId,
@@ -60,6 +70,10 @@ export function useProDetail({
 
   const handleUnsuspend = () => {
     unsuspendMutation.mutate({ proProfileId });
+  };
+
+  const handleApprove = () => {
+    approveMutation.mutate({ proProfileId });
   };
 
   return {
@@ -74,6 +88,10 @@ export function useProDetail({
     unsuspend: {
       mutate: handleUnsuspend,
       isPending: unsuspendMutation.isPending,
+    },
+    approve: {
+      mutate: handleApprove,
+      isPending: approveMutation.isPending,
     },
   };
 }

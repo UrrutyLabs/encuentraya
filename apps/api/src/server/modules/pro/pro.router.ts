@@ -207,6 +207,36 @@ export const proRouter = router({
     }),
 
   /**
+   * Admin: Approve a pro (set status from pending to active)
+   */
+  approve: adminProcedure
+    .input(z.object({ proProfileId: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      try {
+        await proService.approvePro(input.proProfileId, ctx.actor);
+        return { success: true };
+      } catch (error) {
+        if (error instanceof Error && error.message.includes("not found")) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: error.message,
+          });
+        }
+        if (error instanceof Error && error.message.includes("not pending")) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: error.message,
+          });
+        }
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message:
+            error instanceof Error ? error.message : "Failed to approve pro",
+        });
+      }
+    }),
+
+  /**
    * Admin: Unsuspend a pro (set to active)
    */
   unsuspend: adminProcedure

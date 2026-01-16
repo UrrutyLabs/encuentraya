@@ -408,6 +408,50 @@ export class ProService {
   }
 
   /**
+   * Admin: Approve a pro (set status from pending to active)
+   */
+  async approvePro(
+    proProfileId: string,
+    actor: Actor
+  ): Promise<ProProfileEntity> {
+    const proProfile = await this.proRepository.findById(proProfileId);
+    if (!proProfile) {
+      throw new Error(`Pro profile not found: ${proProfileId}`);
+    }
+
+    if (proProfile.status !== "pending") {
+      throw new Error(`Pro profile is not pending. Current status: ${proProfile.status}`);
+    }
+
+    const previousStatus = proProfile.status;
+
+    const updated = await this.proRepository.updateStatus(
+      proProfileId,
+      "active"
+    );
+    if (!updated) {
+      throw new Error(`Failed to approve pro: ${proProfileId}`);
+    }
+
+    // Log audit event
+    await this.auditService.logEvent({
+      eventType: AuditEventType.PRO_APPROVED,
+      actor,
+      resourceType: "pro",
+      resourceId: proProfileId,
+      action: "approve",
+      metadata: {
+        previousStatus,
+        newStatus: "active",
+        proDisplayName: proProfile.displayName,
+        proEmail: proProfile.email,
+      },
+    });
+
+    return updated;
+  }
+
+  /**
    * Admin: Unsuspend a pro (set to active)
    */
   async unsuspendPro(
