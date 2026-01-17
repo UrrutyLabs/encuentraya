@@ -97,6 +97,32 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
+            # Verificar que las herramientas necesarias estén instaladas
+            if ! command -v node &> /dev/null; then
+              echo "❌ Error: Node.js no está instalado. Ejecuta el script de user data o instálalo manualmente."
+              exit 1
+            fi
+            
+            if ! command -v pnpm &> /dev/null; then
+              echo "❌ Error: pnpm no está instalado. Ejecuta el script de user data o instálalo manualmente."
+              exit 1
+            fi
+            
+            if ! command -v pm2 &> /dev/null; then
+              echo "❌ Error: PM2 no está instalado. Ejecuta el script de user data o instálalo manualmente."
+              exit 1
+            fi
+            
+            # Asegurar que pnpm esté en el PATH
+            export PNPM_HOME="$HOME/.local/share/pnpm"
+            export PATH="$PNPM_HOME:$PATH"
+            
+            echo "✅ Herramientas verificadas:"
+            echo "  - Node.js: $(node --version)"
+            echo "  - pnpm: $(pnpm --version)"
+            echo "  - PM2: $(pm2 --version)"
+            
+            # Ejecutar deployment
             cd ~/arreglatodo
             pnpm install --frozen-lockfile
             cd apps/api
