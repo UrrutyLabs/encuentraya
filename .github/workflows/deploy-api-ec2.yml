@@ -46,19 +46,6 @@ jobs:
           # Copiar .env a apps/api/.env.local para que Next.js lo lea durante el build
           cp .env.tmp apps/api/.env.local
           echo "✅ .env.local creado en apps/api/"
-          
-          # También cargar variables a GITHUB_ENV para pasos posteriores
-          while IFS= read -r line || [ -n "$line" ]; do
-            # Saltar comentarios y líneas vacías
-            if [[ "$line" =~ ^[[:space:]]*# ]] || [[ -z "${line// }" ]]; then
-              continue
-            fi
-            # Escribir variable a GITHUB_ENV (formato KEY=VALUE)
-            printf '%s\n' "$line" >> $GITHUB_ENV
-          done < .env.tmp
-          
-          echo "✅ Variables de entorno cargadas"
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
