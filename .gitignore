@@ -25,6 +25,10 @@ coverage
 # Vercel
 .vercel
 
+# Amplify
+.amplify-hosting
+amplify/
+
 # Build Outputs
 .next/
 out/
@@ -40,3 +44,7 @@ yarn-error.log*
 # Misc
 .DS_Store
 *.pem
+
+# Deployment scripts (keep scripts but ignore sensitive files)
+scripts/*.pem
+scripts/*.key

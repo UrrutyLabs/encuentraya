@@ -1,0 +1,43 @@
+name: Deploy Admin to Amplify
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'apps/admin/**'
+      - 'packages/**'
+      - 'pnpm-workspace.yaml'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 9
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build admin
+        run: pnpm build --filter admin
+
+      - name: Deploy to Amplify
+        uses: aws-amplify/amplify-hosting-github-actions@v1
+        with:
+          amplify_app_id: ${{ secrets.AMPLIFY_ADMIN_APP_ID }}
+          amplify_env_name: main
+          amplify_token: ${{ secrets.AMPLIFY_DEPLOY_TOKEN }}

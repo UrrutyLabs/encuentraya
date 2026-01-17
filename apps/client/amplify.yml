@@ -1,0 +1,24 @@
+version: 1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        # Enable pnpm
+        - corepack enable
+        - corepack prepare pnpm@latest --activate
+        # Install dependencies from root
+        - cd ../..
+        - pnpm install --frozen-lockfile
+    build:
+      commands:
+        # Build client app
+        - pnpm build --filter client
+  artifacts:
+    baseDirectory: apps/client/.next
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - node_modules/**/*
+      - apps/client/.next/cache/**/*
+      - .turbo/**/*
