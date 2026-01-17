@@ -1,21 +1,22 @@
 version: 1
-frontend:
-  phases:
-    preBuild:
-      commands:
-        - corepack enable
-        - corepack prepare pnpm@latest --activate
-        - cd ../..
-        - pnpm install --frozen-lockfile
-    build:
-      commands:
-        - pnpm turbo run build --filter=client
-  artifacts:
-    baseDirectory: apps/client/.next
-    files:
-      - "**/*"
-  cache:
-    paths:
-      - node_modules/**/*
-      - apps/client/.next/cache/**/*
-      - .turbo/**/*
+applications:
+  - appRoot: apps/client
+    frontend:
+    phases:
+      preBuild:
+        commands:
+          - corepack enable
+          - corepack prepare pnpm@latest --activate
+          - cd ../..
+          - pnpm install --frozen-lockfile
+      build:
+        commands:
+          - pnpm turbo run build --filter=client
+    artifacts:
+      baseDirectory: apps/client/.next
+      files:
+        - "**/*"
+    cache:
+      paths:
+        - node_modules/**/*
+        - .turbo/**/*
