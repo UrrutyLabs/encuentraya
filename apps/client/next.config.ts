@@ -19,4 +19,9 @@ export default withSentryConfig(nextConfig, {
   hideSourceMaps: true,
   disableLogger: true,
   automaticVercelMonitors: true,
+
+  // Delete source maps after upload to avoid serving them to users
+  sourcemaps: {
+    deleteSourcemapsAfterUpload: true,
+  },
 });

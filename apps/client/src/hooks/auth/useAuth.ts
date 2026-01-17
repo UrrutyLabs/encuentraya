@@ -26,8 +26,6 @@ export function useAuth(): UseAuthReturn {
       setUser(session?.user ?? null);
       setLoading(false);
 
-      logger.info("useAuth: getSession success", { session });
-
       // Set user context for crash reporting
       if (session?.user) {
         setUserContext(session.user.id, session.user.email);
