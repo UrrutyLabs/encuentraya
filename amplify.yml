@@ -5,47 +5,37 @@ applications:
       phases:
         preBuild:
           commands:
-            # Enable pnpm
             - corepack enable
-            - corepack prepare pnpm@latest --activate
-            # Install dependencies from root
-            - cd ../..
             - pnpm install --frozen-lockfile
         build:
           commands:
-            # Build client app
-            - pnpm build --filter client
+            - pnpm turbo run build --filter=client
       artifacts:
-        baseDirectory: apps/client/.next
+        baseDirectory: .next
         files:
-          - '**/*'
+          - "**/*"
       cache:
         paths:
-          - node_modules/**/*
-          - apps/client/.next/cache/**/*
-          - .turbo/**/*
-  
+          - ../../node_modules/**
+          - ../../.turbo/**
+          - .next/cache/**
+
   - appRoot: apps/admin
     frontend:
       phases:
         preBuild:
           commands:
-            # Enable pnpm
             - corepack enable
-            - corepack prepare pnpm@latest --activate
-            # Install dependencies from root
-            - cd ../..
             - pnpm install --frozen-lockfile
         build:
           commands:
-            # Build admin app
-            - pnpm build --filter admin
+            - pnpm turbo run build --filter=admin
       artifacts:
-        baseDirectory: apps/admin/.next
+        baseDirectory: .next
         files:
-          - '**/*'
+          - "**/*"
       cache:
         paths:
-          - node_modules/**/*
-          - apps/admin/.next/cache/**/*
-          - .turbo/**/*
+          - ../../node_modules/**
+          - ../../.turbo/**
+          - .next/cache/**
