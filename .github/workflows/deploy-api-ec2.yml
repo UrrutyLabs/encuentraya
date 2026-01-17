@@ -27,20 +27,38 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION || 'us-east-1' }}
 
       - name: Download .env from S3
+        env:
+          S3_BUCKET: ${{ secrets.S3_DEPLOYMENT_BUCKET }}
         run: |
           # Descargar .env desde S3
-          aws s3 cp s3://${{ secrets.S3_DEPLOYMENT_BUCKET }}/.env .env.tmp
+          echo "Descargando .env desde s3://${S3_BUCKET}/.env"
+          aws s3 cp "s3://${S3_BUCKET}/.env" .env.tmp
           
-          # Leer variables del .env y exportarlas para el build
-          # Esto carga todas las variables del .env al entorno
-          export $(grep -v '^#' .env.tmp | xargs)
+          # Verificar que el archivo se descargó correctamente
+          if [ ! -f .env.tmp ]; then
+            echo "❌ Error: No se pudo descargar .env desde S3"
+            echo "Verifica que el archivo existe en: s3://${S3_BUCKET}/.env"
+            exit 1
+          fi
+          
+          echo "✅ .env descargado exitosamente"
+          
+          # Leer variables del .env línea por línea
+          while IFS= read -r line || [ -n "$line" ]; do
+            # Saltar comentarios y líneas vacías
+            if [[ "$line" =~ ^[[:space:]]*# ]] || [[ -z "${line// }" ]]; then
+              continue
+            fi
+            # Exportar variable (manejar errores silenciosamente)
+            export "$line" 2>/dev/null || true
+          done < .env.tmp
           
           # Exportar variables específicas necesarias para el build
-          echo "DATABASE_URL=$DATABASE_URL" >> $GITHUB_ENV || true
-          echo "SUPABASE_URL=$SUPABASE_URL" >> $GITHUB_ENV || true
-          echo "SUPABASE_SERVICE_ROLE_KEY=$SUPABASE_SERVICE_ROLE_KEY" >> $GITHUB_ENV || true
-          echo "UPSTASH_REDIS_REST_URL=${UPSTASH_REDIS_REST_URL:-}" >> $GITHUB_ENV || true
-          echo "UPSTASH_REDIS_REST_TOKEN=${UPSTASH_REDIS_REST_TOKEN:-}" >> $GITHUB_ENV || true
+          echo "DATABASE_URL=${DATABASE_URL:-}" >> $GITHUB_ENV
+          echo "SUPABASE_URL=${SUPABASE_URL:-}" >> $GITHUB_ENV
+          echo "SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY:-}" >> $GITHUB_ENV
+          echo "UPSTASH_REDIS_REST_URL=${UPSTASH_REDIS_REST_URL:-}" >> $GITHUB_ENV
+          echo "UPSTASH_REDIS_REST_TOKEN=${UPSTASH_REDIS_REST_TOKEN:-}" >> $GITHUB_ENV
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
