@@ -33,6 +33,17 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build API
+        env:
+          # Database (necesario para build, pero no se conecta realmente)
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          # Supabase (necesario para build)
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          # Node environment
+          NODE_ENV: production
+          # Upstash Redis (opcional, pero evita warnings)
+          UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
+          UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
         run: pnpm build --filter api
 
       - name: Deploy to EC2
@@ -57,4 +68,5 @@ jobs:
             pnpm install --frozen-lockfile
             cd apps/api
             pnpm db:generate
+            # Las variables de entorno ya están configuradas en EC2 (ver API_DEPLOYMENT.md)
             pm2 restart api || pm2 start pnpm --name "api" -- start
