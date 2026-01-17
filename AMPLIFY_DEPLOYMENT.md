@@ -12,69 +12,63 @@ Esta guía explica cómo desplegar tus apps Next.js (client y admin) a AWS Ampli
 
 ## 🚀 Método 1: Amplify Hosting con GitHub (Recomendado - Sin CLI)
 
-### Paso 1: Crear App Client en Amplify
+Hay **dos formas** de configurar un monorepo en Amplify:
+
+### Opción A: Monorepo con `applications` (Recomendado)
+
+Cuando Amplify detecta un monorepo, usa el archivo `amplify.yml` en la raíz con la estructura `applications`.
+
+#### Paso 1: Crear App Client en Amplify
 
 1. Ve a [AWS Amplify Console](https://console.aws.amazon.com/amplify)
 2. Click en **"New app"** → **"Host web app"**
 3. Selecciona **GitHub** como provider
 4. Autoriza AWS Amplify a acceder a tu GitHub
 5. Selecciona tu repositorio y branch (`main`)
-6. App name: `arreglatodo-client`
+6. **IMPORTANTE:** En la sección "Monorepo", marca **"Monorepo"** como **Yes**
+7. **App root:** `apps/client`
+8. App name: `arreglatodo-client`
 
-### Paso 2: Configurar Build Settings para Client
+#### Paso 2: Amplify detectará automáticamente
 
-Amplify detectará automáticamente `apps/client/amplify.yml`. Si no, configura manualmente:
+Amplify usará el archivo `amplify.yml` en la raíz que ya tiene la estructura correcta con `applications`. No necesitas configurar nada más.
 
-**Build settings:**
-```yaml
-version: 1
-frontend:
-  phases:
-    preBuild:
-      commands:
-        - corepack enable
-        - corepack prepare pnpm@latest --activate
-        - cd ../..
-        - pnpm install --frozen-lockfile
-    build:
-      commands:
-        - pnpm build --filter client
-  artifacts:
-    baseDirectory: apps/client/.next
-    files:
-      - '**/*'
-  cache:
-    paths:
-      - node_modules/**/*
-      - apps/client/.next/cache/**/*
-```
-
-**Root directory:** (dejar vacío - raíz del repo)
-
-### Paso 3: Configurar Variables de Entorno para Client
+#### Paso 3: Configurar Variables de Entorno para Client
 
 En Amplify Console → App settings → Environment variables:
 
 ```bash
+AMPLIFY_MONOREPO_APP_ROOT=apps/client  # Amplify lo configura automáticamente
 NEXT_PUBLIC_API_URL=https://tu-api-url.com/api
 NEXT_PUBLIC_SUPABASE_URL=tu_supabase_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=tu_anon_key
 NODE_ENV=production
 ```
 
-### Paso 4: Crear App Admin en Amplify
-
-Repite los pasos 1-3 para Admin:
+#### Paso 4: Crear App Admin en Amplify
 
 1. **New app** → **Host web app** → GitHub
 2. Mismo repositorio, mismo branch
-3. App name: `arreglatodo-admin`
-4. Build settings: usar `apps/admin/amplify.yml`
-5. Variables de entorno similares a Client
+3. **Monorepo:** Yes
+4. **App root:** `apps/admin`
+5. App name: `arreglatodo-admin`
+6. Variables de entorno similares a Client (con `AMPLIFY_MONOREPO_APP_ROOT=apps/admin`)
 
-### Paso 5: Deploy
+#### Paso 5: Deploy
 
 Amplify desplegará automáticamente en cada push a `main`. También puedes hacer deploy manual desde la consola.
+
+---
+
+### Opción B: Apps Separadas (Sin marcar como Monorepo)
+
+Si prefieres NO marcar el repo como monorepo en Amplify:
+
+1. **NO marques** "Monorepo" como Yes
+2. Usa los archivos `apps/client/amplify.yml` y `apps/admin/amplify.yml` individuales
+3. Configura cada app por separado con su propio `amplify.yml`
+
+**Nota:** Esta opción requiere más configuración manual pero te da más control.
 
 ---
 
@@ -173,6 +167,12 @@ Los workflows se activarán automáticamente en cada push a `main` que afecte lo
 ---
 
 ## 🔍 Troubleshooting
+
+### Error: "Monorepo spec provided without 'applications' key"
+
+**Solución:** Si marcaste el repo como monorepo en Amplify Console, necesitas usar el archivo `amplify.yml` en la raíz con la estructura `applications`. El archivo ya está configurado correctamente en la raíz del proyecto.
+
+**Alternativa:** Si prefieres no usar monorepo, desmarca "Monorepo" en Amplify Console y usa los archivos `apps/client/amplify.yml` y `apps/admin/amplify.yml` individuales.
 
 ### Error: "Cannot find module"
 

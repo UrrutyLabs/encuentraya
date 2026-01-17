@@ -1,25 +1,51 @@
 version: 1
-frontend:
-  phases:
-    preBuild:
-      commands:
-        # Enable pnpm
-        - corepack enable
-        - corepack prepare pnpm@latest --activate
-        # Install dependencies
-        - pnpm install --frozen-lockfile
-    build:
-      commands:
-        # Build based on which app is being deployed
-        # This will be overridden by Amplify app-specific settings
-        - echo "Building application..."
-        - pnpm build
-  artifacts:
-    baseDirectory: .next
-    files:
-      - '**/*'
-  cache:
-    paths:
-      - node_modules/**/*
-      - .next/cache/**/*
-      - .turbo/**/*
+applications:
+  - appRoot: apps/client
+    frontend:
+      phases:
+        preBuild:
+          commands:
+            # Enable pnpm
+            - corepack enable
+            - corepack prepare pnpm@latest --activate
+            # Install dependencies from root
+            - cd ../..
+            - pnpm install --frozen-lockfile
+        build:
+          commands:
+            # Build client app
+            - pnpm build --filter client
+      artifacts:
+        baseDirectory: apps/client/.next
+        files:
+          - '**/*'
+      cache:
+        paths:
+          - node_modules/**/*
+          - apps/client/.next/cache/**/*
+          - .turbo/**/*
+  
+  - appRoot: apps/admin
+    frontend:
+      phases:
+        preBuild:
+          commands:
+            # Enable pnpm
+            - corepack enable
+            - corepack prepare pnpm@latest --activate
+            # Install dependencies from root
+            - cd ../..
+            - pnpm install --frozen-lockfile
+        build:
+          commands:
+            # Build admin app
+            - pnpm build --filter admin
+      artifacts:
+        baseDirectory: apps/admin/.next
+        files:
+          - '**/*'
+      cache:
+        paths:
+          - node_modules/**/*
+          - apps/admin/.next/cache/**/*
+          - .turbo/**/*
