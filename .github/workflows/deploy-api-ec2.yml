@@ -128,3 +128,16 @@ jobs:
             cd apps/api
             pnpm db:generate
             pm2 restart api || pm2 start pnpm --name "api" -- start
+            
+            # Verificar que Nginx está corriendo (no reiniciar - solo verificar)
+            if command -v nginx &> /dev/null; then
+              if sudo systemctl is-active --quiet nginx; then
+                echo "✅ Nginx está corriendo"
+              else
+                echo "⚠️  Nginx no está corriendo - iniciando..."
+                sudo systemctl start nginx
+                sudo systemctl enable nginx
+              fi
+            else
+              echo "ℹ️  Nginx no está instalado (opcional para reverse proxy)"
+            fi         
