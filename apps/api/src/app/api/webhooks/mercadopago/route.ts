@@ -6,6 +6,7 @@ import { createChildLogger } from "@/server/infrastructure/utils/logger";
 import { randomUUID } from "crypto";
 import type { PaymentServiceFactory } from "@/server/container";
 import { container, TOKENS } from "@/server/container";
+import { getWebhookCorsHeaders } from "@/server/infrastructure/cors";
 
 /**
  * Mercado Pago webhook endpoint
@@ -140,13 +141,11 @@ export async function POST(req: NextRequest) {
 }
 
 // Handle OPTIONS for CORS preflight
-export async function OPTIONS() {
+export async function OPTIONS(req: NextRequest) {
+  const requestOrigin = req.headers.get("origin");
+  const corsHeaders = getWebhookCorsHeaders(requestOrigin);
   return new NextResponse(null, {
     status: 200,
-    headers: {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type",
-    },
+    headers: corsHeaders,
   });
 }

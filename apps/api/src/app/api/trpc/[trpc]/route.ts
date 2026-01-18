@@ -4,13 +4,7 @@ import { TRPCError } from "@trpc/server";
 import { appRouter } from "@/server/routers/_app";
 import { createContext } from "@/server/infrastructure/trpc/context";
 import { createChildLogger } from "@/server/infrastructure/utils/logger";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-  "Access-Control-Allow-Headers":
-    "Content-Type, Authorization, x-user-id, x-user-role, x-request-id",
-};
+import { getTrpcCorsHeaders } from "@/server/infrastructure/cors";
 
 const handler = async (req: Request) => {
   const context = await createContext(req);
@@ -19,6 +13,10 @@ const handler = async (req: Request) => {
     userId: context.actor?.id,
     userRole: context.actor?.role,
   });
+
+  // Get CORS headers based on request origin
+  const requestOrigin = req.headers.get("origin");
+  const corsHeaders = getTrpcCorsHeaders(requestOrigin);
 
   const response = await fetchRequestHandler({
     endpoint: "/api/trpc",
@@ -84,7 +82,9 @@ const handler = async (req: Request) => {
   return response;
 };
 
-export async function OPTIONS() {
+export async function OPTIONS(req: Request) {
+  const requestOrigin = req.headers.get("origin");
+  const corsHeaders = getTrpcCorsHeaders(requestOrigin);
   return new Response(null, {
     status: 200,
     headers: corsHeaders,
