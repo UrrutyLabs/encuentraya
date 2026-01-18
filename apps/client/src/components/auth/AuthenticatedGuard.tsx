@@ -1,7 +1,7 @@
 "use client";
 
 import { ReactNode } from "react";
-import { useRequireAuth } from "@/hooks/auth";
+import { useRouteGuard } from "@/hooks/auth/useRouteGuard";
 import { AuthLoadingState } from "./AuthLoadingState";
 import type { Role } from "@repo/domain";
 
@@ -17,6 +17,8 @@ interface AuthenticatedGuardProps {
  * Handles authentication check and optional role-based access control
  * Renders children only when user is authenticated and has the required role (if specified)
  * 
+ * Uses the new useRouteGuard hook (refactored architecture)
+ * 
  * @param requiredRole - Optional role requirement (CLIENT, PRO, ADMIN)
  *                       If provided, only users with matching role can access
  */
@@ -26,7 +28,7 @@ export function AuthenticatedGuard({
   maxWidth,
   requiredRole,
 }: AuthenticatedGuardProps) {
-  const { isAuthenticated, isLoading } = useRequireAuth({
+  const { isAuthenticated, isLoading } = useRouteGuard({
     redirectTo: "/login",
     returnUrl,
     requiredRole,
@@ -37,7 +39,7 @@ export function AuthenticatedGuard({
     return <AuthLoadingState maxWidth={maxWidth} />;
   }
 
-  // If not authenticated, useRequireAuth will handle redirect
+  // If not authenticated, useRouteGuard will handle redirect
   // Return null as safety check (redirect should happen in hook)
   if (!isAuthenticated) {
     return null;

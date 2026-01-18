@@ -5,23 +5,15 @@
 
 import { supabase } from "@/lib/supabase/client";
 import { clearSessionStorage } from "@/lib/supabase/auth-utils";
+import { redirectToLoginPage } from "./redirect-helpers";
 
 /**
+ * @deprecated Use redirectToLoginPage() from redirect-helpers instead
  * Redirect to login page if not already there
  * Uses window.location.assign to ensure a full page reload and clear any stale state
  */
 export function redirectToLogin(): void {
-  if (typeof window === "undefined") {
-    return;
-  }
-
-  // Prevent redirect loops - don't redirect if already on login page
-  if (window.location.pathname === "/login") {
-    return;
-  }
-
-  console.warn("[Auth Guard] Redirecting to login page");
-  window.location.assign("/login");
+  redirectToLoginPage();
 }
 
 /**
@@ -102,16 +94,28 @@ async function attemptRefresh(): Promise<{ session: Session | null; error: AuthE
  * - Attempts to refresh the session once
  * - Retries the request with new token
  * - Signs out and redirects if refresh fails or second request still returns 401
+ * - Does NOT sign out for server errors (5xx) or network errors
  */
 export function createAuthFetch(originalFetch: typeof fetch): typeof fetch {
   return async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
-    // Make the initial request
-    const response = await originalFetch(input, init);
+    try {
+      // Make the initial request
+      const response = await originalFetch(input, init);
 
-    // If not a 401, return the response as-is
-    if (response.status !== 401) {
-      return response;
-    }
+      // Handle server errors (5xx) - do NOT sign out, just return the error
+      // These are temporary server issues, not authentication problems
+      if (response.status >= 500 && response.status < 600) {
+        console.warn("[Auth Guard] Server error (5xx), not signing out", {
+          status: response.status,
+          url: typeof input === "string" ? input : input instanceof URL ? input.href : input.url,
+        });
+        return response;
+      }
+
+      // If not a 401, return the response as-is
+      if (response.status !== 401) {
+        return response;
+      }
 
     // Got a 401 - attempt to refresh
     console.warn("[Auth Guard] Received 401, attempting session refresh");
@@ -139,12 +143,22 @@ export function createAuthFetch(originalFetch: typeof fetch): typeof fetch {
 
     const retryResponse = await originalFetch(input, retryInit);
 
-    // If retry still returns 401, sign out and redirect
-    if (retryResponse.status === 401) {
-      console.warn("[Auth Guard] Retry still returned 401, signing out");
-      await signOutAndRedirect();
-    }
+      // If retry still returns 401, sign out and redirect
+      if (retryResponse.status === 401) {
+        console.warn("[Auth Guard] Retry still returned 401, signing out");
+        await signOutAndRedirect();
+      }
 
-    return retryResponse;
+      return retryResponse;
+    } catch (error) {
+      // Network errors (CORS, timeout, etc.) - do NOT sign out
+      // These are connectivity issues, not authentication problems
+      console.warn("[Auth Guard] Network error, not signing out", {
+        error: error instanceof Error ? error.message : String(error),
+        url: typeof input === "string" ? input : input instanceof URL ? input.href : input.url,
+      });
+      // Re-throw to let React Query handle it
+      throw error;
+    }
   };
 }

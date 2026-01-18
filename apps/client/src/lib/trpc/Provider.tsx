@@ -7,6 +7,7 @@ import { createTRPCLinks } from "./links";
 import { logger } from "../logger";
 import { captureException } from "../crash-reporting";
 import { createQueryClientDefaults } from "@repo/react-query/config";
+import { NetworkErrorHandler } from "./NetworkErrorHandler";
 
 // Export queryClient instance for use in hooks
 let queryClientInstance: QueryClient | null = null;
@@ -48,7 +49,10 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <trpc.Provider client={trpcClient} queryClient={queryClient}>
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+      <QueryClientProvider client={queryClient}>
+        <NetworkErrorHandler />
+        {children}
+      </QueryClientProvider>
     </trpc.Provider>
   );
 }
