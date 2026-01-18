@@ -13,7 +13,11 @@ export default function GlobalError({
   reset: () => void;
 }) {
   useEffect(() => {
-    // Log error to Sentry
+    // Log error to Sentry (only in production)
+    if (process.env.NODE_ENV !== "production") {
+      return;
+    }
+    
     Sentry.captureException(error);
   }, [error]);
 

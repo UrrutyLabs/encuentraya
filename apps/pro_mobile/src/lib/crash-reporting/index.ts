@@ -41,12 +41,17 @@ export function initCrashReporting() {
   try {
     Sentry.init({
       dsn,
-      debug: __DEV__, // Enable debug mode in development
+      debug: false, // Disable debug mode to prevent console output
       environment: __DEV__ ? "development" : "production",
       // Set tracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring
       tracesSampleRate: __DEV__ ? 1.0 : 0.1,
       // Attach user context when available
       beforeSend(event, hint) {
+        // Prevent sending events in non-production environments 
+        if (__DEV__) {
+          return null;
+        }
+
         // Filter out known non-critical errors
         if (event.exception) {
           const error = hint.originalException;

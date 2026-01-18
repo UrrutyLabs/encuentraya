@@ -15,11 +15,16 @@ export async function register() {
         dsn,
         // Adjust this value in production, or use tracesSampler for greater control
         tracesSampleRate: process.env.NODE_ENV === "production" ? 0.1 : 1.0,
-        // Setting this option to true will print useful information to the console while you're setting up Sentry.
-        debug: process.env.NODE_ENV === "development",
+        // Disable debug mode to prevent console output in development
+        debug: false,
         environment: process.env.NODE_ENV === "production" ? "production" : "development",
         // Filter out known non-critical errors
         beforeSend(event, hint) {
+          // Prevent sending events in non-production environments
+          if (process.env.NODE_ENV !== "production") {
+            return null;
+          }
+
           if (event.exception) {
             const error = hint.originalException;
             if (error instanceof Error) {
