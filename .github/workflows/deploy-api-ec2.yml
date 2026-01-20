@@ -157,13 +157,19 @@ jobs:
             echo "🚀 Starting application with PM2 using standalone server..."
             # Use standalone server - it's located at .next/standalone/apps/api/server.js
             # The standalone build includes all necessary node_modules
-            # The server needs to run from .next/standalone but needs access to .next/static and .next/server
-            # So we run from apps/api directory and point to the standalone server
+            # The server needs to run from .next/standalone directory for correct path resolution
             cd ~/arreglatodo/apps/api
             
-            # Restart with PM2 using the standalone server
-            # Run from apps/api so paths resolve correctly
-            pm2 restart api || pm2 start --name "api" --cwd "$(pwd)" -- node .next/standalone/apps/api/server.js
+            # Check if PM2 process exists, restart or start accordingly
+            if pm2 list | grep -q "api"; then
+              echo "🔄 Restarting existing PM2 process..."
+              pm2 restart api --update-env
+            else
+              echo "🚀 Starting new PM2 process..."
+              # Run from apps/api directory, but the server.js is in .next/standalone/apps/api/
+              # PM2 needs to run from the directory where the server file is located relative to
+              pm2 start node --name "api" --cwd "$(pwd)" -- .next/standalone/apps/api/server.js
+            fi
             
             # Verify and configure Nginx if not enabled
             if command -v nginx &> /dev/null; then
