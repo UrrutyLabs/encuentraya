@@ -30,45 +30,22 @@ jobs:
         env:
           S3_BUCKET: ${{ secrets.S3_DEPLOYMENT_BUCKET }}
         run: |
-          # Descargar .env desde S3
-          echo "Descargando .env desde s3://${S3_BUCKET}/.env"
+          # Download .env from S3
+          echo "Downloading .env from s3://${S3_BUCKET}/.env"
           aws s3 cp "s3://${S3_BUCKET}/.env" .env.tmp
           
-          # Verificar que el archivo se descargó correctamente
+          # Verify the file was downloaded correctly
           if [ ! -f .env.tmp ]; then
-            echo "❌ Error: No se pudo descargar .env desde S3"
-            echo "Verifica que el archivo existe en: s3://${S3_BUCKET}/.env"
+            echo "❌ Error: Could not download .env from S3"
+            echo "Verify that the file exists at: s3://${S3_BUCKET}/.env"
             exit 1
           fi
           
-          echo "✅ .env descargado exitosamente"
+          echo "✅ .env downloaded successfully"
           
-          # Copiar .env a apps/api/.env.local para que Next.js lo lea durante el build
+          # Copy .env to apps/api/.env.local for Next.js to read during build
           cp .env.tmp apps/api/.env.local
-          echo "✅ .env.local creado en apps/api/"
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 9
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Build API
-        env:
-          DATABASE_URL: ${{ env.DATABASE_URL }}
-          SUPABASE_URL: ${{ env.SUPABASE_URL }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ env.SUPABASE_SERVICE_ROLE_KEY }}
-          NODE_ENV: production
-          UPSTASH_REDIS_REST_URL: ${{ env.UPSTASH_REDIS_REST_URL }}
-          UPSTASH_REDIS_REST_TOKEN: ${{ env.UPSTASH_REDIS_REST_TOKEN }}
-        run: pnpm build --filter api
-
+          echo "✅ .env.local created in apps/api/"
       - name: Deploy code to EC2
         uses: appleboy/scp-action@master
         with:
@@ -76,7 +53,8 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           port: 22
-          source: "apps/api/.next,apps/api/package.json,apps/api/prisma,packages,pnpm-workspace.yaml,package.json,pnpm-lock.yaml"
+          # Copy complete source code for build on EC2
+          source: "apps/api/src,apps/api/public,apps/api/package.json,apps/api/next.config.ts,apps/api/tsconfig.json,apps/api/postcss.config.mjs,apps/api/eslint.config.mjs,apps/api/vitest.config.ts,apps/api/prisma,packages,pnpm-workspace.yaml,package.json,pnpm-lock.yaml"
           target: "/home/${{ secrets.EC2_USER }}/arreglatodo"
           strip_components: 0
 
@@ -107,70 +85,90 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            # Verificar que las herramientas necesarias estén instaladas
+            # Verify required tools are installed
             if ! command -v node &> /dev/null; then
-              echo "❌ Error: Node.js no está instalado. Ejecuta el script de user data o instálalo manualmente."
+              echo "❌ Error: Node.js is not installed. Run the user data script or install it manually."
               exit 1
             fi
             
             if ! command -v pnpm &> /dev/null; then
-              echo "❌ Error: pnpm no está instalado. Ejecuta el script de user data o instálalo manualmente."
+              echo "❌ Error: pnpm is not installed. Run the user data script or install it manually."
               exit 1
             fi
             
             if ! command -v pm2 &> /dev/null; then
-              echo "❌ Error: PM2 no está instalado. Ejecuta el script de user data o instálalo manualmente."
+              echo "❌ Error: PM2 is not installed. Run the user data script or install it manually."
               exit 1
             fi
             
-            # Asegurar que pnpm esté en el PATH
+            # Ensure pnpm is in PATH
             export PNPM_HOME="$HOME/.local/share/pnpm"
             export PATH="$PNPM_HOME:$PATH"
             
-            echo "✅ Herramientas verificadas:"
+            echo "✅ Tools verified:"
             echo "  - Node.js: $(node --version)"
             echo "  - pnpm: $(pnpm --version)"
             echo "  - PM2: $(pm2 --version)"
             
-            # Ejecutar deployment
+            # Run deployment
             cd ~/arreglatodo
+            
+            # Install dependencies
+            echo "📦 Installing dependencies..."
             pnpm install --frozen-lockfile
+            
+            # Build on EC2 (same environment as runtime)
             cd apps/api
+            echo "🔨 Generating Prisma Client..."
             pnpm db:generate
+            
+            echo "🏗️  Building Next.js application..."
+            # Load environment variables from .env if it exists
+            if [ -f .env ]; then
+              set -a
+              source .env
+              set +a
+            fi
+            
+            # Build Next.js in production
+            NODE_ENV=production pnpm build
+            
+            echo "🚀 Restarting application with PM2..."
+            # Restart with PM2
             pm2 restart api || pm2 start pnpm --name "api" -- start
             
-            # Verificar y configurar Nginx si no está habilitado
+            # Verify and configure Nginx if not enabled
             if command -v nginx &> /dev/null; then
-              # Verificar si Nginx está habilitado (enabled) para iniciar al arrancar
+              # Check if Nginx is enabled to start on boot
               if sudo systemctl is-enabled --quiet nginx; then
-                echo "✅ Nginx está habilitado y configurado"
-                # Asegurar que esté corriendo
+                echo "✅ Nginx is enabled and configured"
+                # Ensure it's running
                 if ! sudo systemctl is-active --quiet nginx; then
-                  echo "⚠️  Nginx no está corriendo - iniciando..."
+                  echo "⚠️  Nginx is not running - starting..."
                   sudo systemctl start nginx
                 fi
               else
-                echo "⚠️  Nginx no está habilitado - ejecutando script de configuración..."
-                # Ejecutar script de setup de Nginx y SSL
+                echo "⚠️  Nginx is not enabled - running setup script..."
+                # Run Nginx and SSL setup script
                 if [ -f ~/arreglatodo/scripts/setup-nginx-ssl.sh ]; then
                   chmod +x ~/arreglatodo/scripts/setup-nginx-ssl.sh
-                  # El script requiere sudo y configura todo automáticamente
+                  # Script requires sudo and configures everything automatically
                   sudo ~/arreglatodo/scripts/setup-nginx-ssl.sh
-                  echo "✅ Nginx configurado y habilitado exitosamente"
+                  echo "✅ Nginx configured and enabled successfully"
                 else
-                  echo "❌ Error: Script setup-nginx-ssl.sh no encontrado"
-                  echo "⚠️  Nginx no está configurado. Configúralo manualmente o verifica que el script se subió correctamente."
+                  echo "❌ Error: Script setup-nginx-ssl.sh not found"
+                  echo "⚠️  Nginx is not configured. Configure it manually or verify that the script was uploaded correctly."
                 fi
               fi
             else
-              echo "ℹ️  Nginx no está instalado - ejecutando script de configuración..."
-              # Ejecutar script de setup que instalará Nginx
+              echo "ℹ️  Nginx is not installed - running setup script..."
+              # Run setup script that will install Nginx
               if [ -f ~/arreglatodo/scripts/setup-nginx-ssl.sh ]; then
                 chmod +x ~/arreglatodo/scripts/setup-nginx-ssl.sh
                 sudo ~/arreglatodo/scripts/setup-nginx-ssl.sh
-                echo "✅ Nginx instalado, configurado y habilitado exitosamente"
+                echo "✅ Nginx installed, configured and enabled successfully"
               else
-                echo "❌ Error: Script setup-nginx-ssl.sh no encontrado"
-                echo "⚠️  Nginx no está instalado. Instálalo manualmente o verifica que el script se subió correctamente."
+                echo "❌ Error: Script setup-nginx-ssl.sh not found"
+                echo "⚠️  Nginx is not installed. Install it manually or verify that the script was uploaded correctly."
               fi
             fi         
