@@ -50,7 +50,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '24'
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v2
@@ -68,25 +68,7 @@ jobs:
           NODE_ENV: production
           UPSTASH_REDIS_REST_URL: ${{ env.UPSTASH_REDIS_REST_URL }}
           UPSTASH_REDIS_REST_TOKEN: ${{ env.UPSTASH_REDIS_REST_TOKEN }}
-        run: |
-          echo "🏗️  Building API with standalone output..."
-          pnpm build --filter api
-          
-          # Verify standalone build was created
-          echo "🔍 Verifying standalone build..."
-          if [ ! -d "apps/api/.next/standalone" ]; then
-            echo "❌ Error: Standalone build not found!"
-            echo "Contents of apps/api/.next:"
-            ls -la apps/api/.next/ 2>/dev/null || echo "  .next directory does not exist"
-            echo ""
-            echo "Checking if .next exists:"
-            ls -la apps/api/ | grep -E "\.next|next" || echo "  No .next found"
-            exit 1
-          fi
-          
-          echo "✅ Standalone build verified at apps/api/.next/standalone"
-          echo "Standalone structure:"
-          ls -la apps/api/.next/standalone/ | head -10
+        run: pnpm build --filter api
 
       - name: Deploy code to EC2
         uses: appleboy/scp-action@master
@@ -95,10 +77,10 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           port: 22
-          # Copy standalone build output - strip_components: 1 removes 'apps/api' prefix
-          source: "apps/api/.next/standalone,apps/api/.next/static,apps/api/.next/server,apps/api/package.json,apps/api/prisma"
-          target: "/home/${{ secrets.EC2_USER }}/arreglatodo/apps/api"
-          strip_components: 1
+          # Copy .next build output and necessary files
+          source: "apps/api/.next,apps/api/package.json,apps/api/prisma,packages,pnpm-workspace.yaml,package.json,pnpm-lock.yaml"
+          target: "/home/${{ secrets.EC2_USER }}/arreglatodo"
+          strip_components: 0
 
       - name: Deploy .env to EC2
         uses: appleboy/scp-action@master
@@ -153,7 +135,14 @@ jobs:
             echo "  - PM2: $(pm2 --version)"
             
             # Run deployment
-            cd ~/arreglatodo/apps/api
+            cd ~/arreglatodo
+            
+            # Install dependencies (needed for runtime)
+            echo "📦 Installing dependencies..."
+            pnpm install --frozen-lockfile --prod=false
+            
+            # Build on EC2 (same environment as runtime)
+            cd apps/api
             
             # Load environment variables from .env if it exists
             if [ -f .env ]; then
@@ -164,66 +153,11 @@ jobs:
             
             # Generate Prisma Client (needed for runtime)
             echo "🔨 Generating Prisma Client..."
-            if command -v pnpm &> /dev/null; then
-              export PNPM_HOME="$HOME/.local/share/pnpm"
-              export PATH="$PNPM_HOME:$PATH"
-              pnpm db:generate
-            else
-              # Fallback if pnpm is not available (shouldn't happen)
-              npx prisma generate --schema=./prisma/schema.prisma
-            fi
+            pnpm db:generate
             
-            echo "🚀 Starting application with PM2 using standalone server..."
-            cd ~/arreglatodo/apps/api
-            
-            # Verify standalone structure exists
-            echo "🔍 Verifying standalone build structure..."
-            echo "Current directory: $(pwd)"
-            echo "Contents of current directory:"
-            ls -la | head -20
-            
-            if [ ! -d ".next/standalone" ]; then
-              echo "❌ Error: .next/standalone directory not found!"
-              echo "Checking if .next exists:"
-              if [ -d ".next" ]; then
-                echo "Available directories in .next:"
-                ls -la .next/ 2>/dev/null || echo "  .next directory exists but is empty"
-                echo ""
-                echo "Checking for standalone in parent directories..."
-                if [ -d "../.next/standalone" ]; then
-                  echo "Found standalone in parent directory!"
-                fi
-              else
-                echo "  .next directory does not exist"
-              fi
-              exit 1
-            fi
-            
-            # Find the server.js file in standalone
-            SERVER_PATH=""
-            if [ -f ".next/standalone/apps/api/server.js" ]; then
-              SERVER_PATH=".next/standalone/apps/api/server.js"
-            elif [ -f ".next/standalone/server.js" ]; then
-              SERVER_PATH=".next/standalone/server.js"
-            else
-              echo "❌ Error: server.js not found in standalone build!"
-              echo "Searching for server.js..."
-              find .next/standalone -name "server.js" 2>/dev/null || echo "  No server.js found"
-              exit 1
-            fi
-            
-            echo "✅ Found server at: $SERVER_PATH"
-            
-            # Stop and delete existing PM2 process if it exists
-            if pm2 list | grep -q "api"; then
-              echo "🛑 Stopping existing PM2 process..."
-              pm2 delete api || true
-            fi
-            
-            # Start new PM2 process with standalone server
-            echo "🚀 Starting PM2 process with standalone server..."
-            # Run from apps/api directory so paths resolve correctly
-            pm2 start "$SERVER_PATH" --name "api" --cwd "$(pwd)"
+            echo "🚀 Starting application with PM2..."
+            # Restart with PM2 using normal pnpm start
+            pm2 restart api || pm2 start pnpm --name "api" -- start
             
             # Save PM2 configuration
             pm2 save
