@@ -166,9 +166,9 @@ jobs:
               pm2 restart api --update-env
             else
               echo "🚀 Starting new PM2 process..."
-              # Run from apps/api directory, but the server.js is in .next/standalone/apps/api/
-              # PM2 needs to run from the directory where the server file is located relative to
-              pm2 start node --name "api" --cwd "$(pwd)" -- .next/standalone/apps/api/server.js
+              # Run from apps/api directory, execute the standalone server
+              # The server.js path is relative to apps/api directory
+              pm2 start .next/standalone/apps/api/server.js --name "api" --cwd "$(pwd)"
             fi
             
             # Verify and configure Nginx if not enabled
