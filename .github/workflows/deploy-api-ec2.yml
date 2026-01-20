@@ -156,8 +156,15 @@ jobs:
             pnpm db:generate
             
             echo "🚀 Starting application with PM2..."
-            # Restart with PM2 using normal pnpm start
-            pm2 restart api || pm2 start pnpm --name "api" -- start
+            # Stop and delete existing PM2 process to ensure clean start
+            if pm2 list | grep -q "api"; then
+              echo "🛑 Stopping and deleting existing PM2 process..."
+              pm2 delete api || true
+            fi
+            
+            # Start new PM2 process with pnpm start
+            echo "🚀 Starting new PM2 process..."
+            pm2 start pnpm --name "api" -- start
             
             # Save PM2 configuration
             pm2 save
