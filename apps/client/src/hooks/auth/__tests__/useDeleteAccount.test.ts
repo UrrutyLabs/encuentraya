@@ -105,7 +105,8 @@ describe("useDeleteAccount", () => {
       mockTrpcAuthDeleteAccount.mockImplementation((options?: { onSuccess?: () => void }) => {
         onSuccessCallback = options?.onSuccess;
         return {
-          mutate: (input: unknown) => {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Test mock, input not needed
+          mutate: (_input: unknown) => {
             // Call onSuccess synchronously after mutate is called
             setTimeout(() => {
               onSuccessCallback?.();

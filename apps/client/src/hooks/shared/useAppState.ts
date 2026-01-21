@@ -6,16 +6,19 @@ import { useEffect, useState } from "react";
  * Uses document.visibilityState API for web
  */
 export function useAppState(): boolean {
-  const [isForeground, setIsForeground] = useState(true);
+  // Initialize state with current visibility state
+  const [isForeground, setIsForeground] = useState(() => {
+    if (typeof document !== "undefined") {
+      return !document.hidden;
+    }
+    return true;
+  });
 
   useEffect(() => {
     // Check initial state
     const handleVisibilityChange = () => {
       setIsForeground(!document.hidden);
     };
-
-    // Set initial state
-    setIsForeground(!document.hidden);
 
     // Listen for visibility changes
     document.addEventListener("visibilitychange", handleVisibilityChange);

@@ -1,5 +1,5 @@
 import type { NotificationProvider, NotificationMessage, NotificationSendResult } from "../provider";
-import { PushDeliveryResolver, NoActivePushTokensError } from "../pushResolver";
+import { PushDeliveryResolver } from "../pushResolver";
 
 /**
  * Stub push notification provider for development/testing

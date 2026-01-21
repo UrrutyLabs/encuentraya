@@ -9,7 +9,7 @@ import { Input } from "@components/ui/Input";
 import { CategorySelector } from "@components/presentational/CategorySelector";
 import { trpc } from "@lib/trpc/client";
 import { useQueryClient } from "@hooks/shared";
-import { invalidateRelatedQueries, refetchQueries } from "@lib/react-query/utils";
+import { invalidateRelatedQueries } from "@lib/react-query/utils";
 import { Category } from "@repo/domain";
 import { theme } from "../../theme";
 

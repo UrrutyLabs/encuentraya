@@ -36,7 +36,7 @@ export default function LoginPage() {
       } else {
         router.push("/admin/bookings");
       }
-    } catch (err) {
+    } catch {
       setError("Error al iniciar sesión. Por favor, intentá nuevamente.");
       setLoading(false);
     }

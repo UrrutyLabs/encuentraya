@@ -49,7 +49,7 @@ export function ResetPasswordScreen() {
     try {
       await resetPassword(email, otp, newPassword);
       // Success - hook will handle redirect
-    } catch (err) {
+    } catch {
       // Error is handled by hook state
     }
   };

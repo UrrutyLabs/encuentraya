@@ -67,7 +67,6 @@ export function useAvailableTimeWindows(
         (option) => option.value === selectedTimeWindow
       );
       if (!isAvailable) {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         setSelectedTimeWindow("");
       }
     }

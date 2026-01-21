@@ -44,7 +44,10 @@ export function useNetworkError(): {
 
   // Scan for errors on mount and when cache changes
   useEffect(() => {
-    scanForNetworkErrors();
+    // Initial scan - use setTimeout to avoid synchronous setState in effect
+    const timeoutId = setTimeout(() => {
+      scanForNetworkErrors();
+    }, 0);
 
     // Subscribe to cache changes
     const unsubscribe = queryClient.getQueryCache().subscribe((event) => {
@@ -54,7 +57,10 @@ export function useNetworkError(): {
       }
     });
 
-    return unsubscribe;
+    return () => {
+      clearTimeout(timeoutId);
+      unsubscribe();
+    };
   }, [queryClient, scanForNetworkErrors]);
 
   const clearError = useCallback(() => {

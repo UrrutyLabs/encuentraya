@@ -23,7 +23,7 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
           url: `${getBaseUrl()}/api/trpc`,
           transformer: superjson,
           headers: () => {
-            // Get headers from localStorage if available (for test page)
+            // Get headers from localStorage if available (for development/testing)
             if (typeof window !== "undefined") {
               const userId = localStorage.getItem("test-user-id");
               const userRole = localStorage.getItem("test-user-role");

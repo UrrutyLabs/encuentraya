@@ -8,7 +8,6 @@ import type { Actor } from "@infra/auth/roles";
 import { Role } from "@repo/domain";
 import { TOKENS } from "@/server/container/tokens";
 import { getPayoutProviderClient, type PayoutProvider } from "./registry";
-import type { PayoutProviderClient } from "./provider";
 
 /**
  * Error thrown when payout operation fails

@@ -13,6 +13,7 @@ export function createTRPCClientWithSuperjson<TRouter extends AnyRouter>(
   url: string
 ) {
   return createTRPCProxyClient<TRouter>({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- superjson transformer type compatibility
     transformer: superjson as any,
     links: [
       httpBatchLink({

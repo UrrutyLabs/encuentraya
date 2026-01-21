@@ -23,7 +23,7 @@ const handler = async (req: Request) => {
     req,
     router: appRouter,
     createContext: async () => context,
-    onError: ({ error, path, type, ctx, input }) => {
+    onError: ({ error, path, type, input }) => {
       const errorContext: Record<string, unknown> = {
         path,
         type,

@@ -100,7 +100,8 @@ export class TwilioWhatsAppProvider implements NotificationProvider {
     const entries = Object.entries(payload);
     const contentVars: Record<string, string> = {};
 
-    entries.forEach(([key, value], index) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Key not needed, only using index
+    entries.forEach(([_key, value], index) => {
       // Use 1-based indexing as Twilio expects
       contentVars[String(index + 1)] = String(value);
     });

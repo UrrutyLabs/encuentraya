@@ -22,7 +22,7 @@ export function RequestPasswordResetScreen() {
     try {
       await requestPasswordReset(email);
       setSuccess(true);
-    } catch (err) {
+    } catch {
       // Error is handled by mutation state
     }
   };

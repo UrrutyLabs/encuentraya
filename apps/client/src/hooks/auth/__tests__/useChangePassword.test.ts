@@ -202,7 +202,8 @@ describe("useChangePassword", () => {
       mockTrpcAuthChangePassword.mockImplementation((options?: { onSuccess?: () => Promise<void> }) => {
         onSuccessCallback = options?.onSuccess;
         return {
-          mutate: async (input: unknown) => {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Test mock, input not needed
+          mutate: async (_input: unknown) => {
             // Call onSuccess asynchronously after mutate is called
             if (onSuccessCallback) {
               await onSuccessCallback();

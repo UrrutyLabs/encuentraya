@@ -1,6 +1,5 @@
 import { MessageCircle } from "lucide-react";
 import { Card } from "@repo/ui";
-import { Text } from "@repo/ui";
 import { Select } from "@repo/ui";
 import type { PreferredContactMethod } from "@repo/domain";
 

@@ -16,9 +16,9 @@ interface NavigationProps {
   showProfile?: boolean;
 }
 
-export function Navigation({ showLogin = true, showProfile = false }: NavigationProps) {
+export function Navigation({ showLogin = true }: NavigationProps) {
   const router = useRouter();
-  const { signOut, user, loading: authLoading } = useAuth();
+  const { signOut, user } = useAuth();
   const { role } = useUserRole();
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);

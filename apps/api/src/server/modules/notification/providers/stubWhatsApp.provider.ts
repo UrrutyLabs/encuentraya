@@ -5,7 +5,8 @@ import type { NotificationProvider, NotificationMessage, NotificationSendResult 
  * Pretends to send WhatsApp messages without actually sending them
  */
 export class StubWhatsAppProvider implements NotificationProvider {
-  async send(message: NotificationMessage): Promise<NotificationSendResult> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Stub provider doesn't use message
+  async send(_message: NotificationMessage): Promise<NotificationSendResult> {
     // Simulate network delay
     await new Promise((resolve) => setTimeout(resolve, 50));
 

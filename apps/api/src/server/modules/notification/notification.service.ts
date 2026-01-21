@@ -90,7 +90,7 @@ export class NotificationService {
     }
 
     // Increment attempt
-    const updated = await this.notificationDeliveryRepository.incrementAttempt(
+    await this.notificationDeliveryRepository.incrementAttempt(
       delivery.id,
       new Date()
     );

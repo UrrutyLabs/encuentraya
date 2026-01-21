@@ -166,7 +166,7 @@ export const authRouter = router({
         await authService.requestPasswordReset(input.email);
         // Always return success to prevent email enumeration
         return { success: true };
-      } catch (error) {
+      } catch {
         // Don't reveal if email exists or not (security best practice)
         // Log error but return generic message
         throw new TRPCError({

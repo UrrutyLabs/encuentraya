@@ -44,7 +44,7 @@ export function ResetPasswordScreen() {
     try {
       await resetPassword(newPassword);
       // Success - hook will handle redirect
-    } catch (err) {
+    } catch {
       // Error is handled by hook state
     }
   };

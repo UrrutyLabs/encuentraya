@@ -46,7 +46,7 @@ export function useCheckout(bookingId: string | undefined) {
     setError(null);
     try {
       await createPreauth.mutateAsync({ bookingId });
-    } catch (err) {
+    } catch {
       // Error handled by mutation onError
     }
   };

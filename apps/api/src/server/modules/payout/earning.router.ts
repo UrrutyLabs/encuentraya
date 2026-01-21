@@ -20,7 +20,7 @@ export const earningRouter = router({
         })
         .optional()
     )
-    .mutation(async ({ input }) => {
+    .mutation(async () => {
       try {
         const count = await earningService.markPayableIfDue();
         return {

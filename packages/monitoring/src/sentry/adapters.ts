@@ -11,6 +11,7 @@ export interface SentryAdapter {
     message: string;
     category: string;
     data?: Record<string, unknown>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Sentry level can be string or enum
     level?: string | any;
   }) => void;
 }
@@ -24,6 +25,7 @@ export interface SentryAdapter {
  * const adapter = createReactNativeAdapter(Sentry);
  * ```
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Sentry SDK types vary by platform
 export function createReactNativeAdapter(sentry: any): SentryAdapter {
   return {
     setUser: (user) => sentry.setUser(user),
@@ -33,11 +35,13 @@ export function createReactNativeAdapter(sentry: any): SentryAdapter {
       if (typeof options === "string") {
         sentry.captureMessage(message, options);
       } else if (options && typeof options === "object" && "level" in options) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Sentry level type compatibility
         sentry.captureMessage(message, { level: options.level as any });
       } else {
         sentry.captureMessage(message);
       }
     },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Sentry breadcrumb type compatibility
     addBreadcrumb: (breadcrumb) => sentry.addBreadcrumb(breadcrumb as any),
   };
 }
@@ -52,6 +56,7 @@ export function createReactNativeAdapter(sentry: any): SentryAdapter {
  * const adapter = createNextjsAdapter(Sentry);
  * ```
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Sentry SDK types vary by platform
 export function createNextjsAdapter(sentry: any): SentryAdapter {
   return {
     setUser: (user) => sentry.setUser(user),
@@ -61,11 +66,13 @@ export function createNextjsAdapter(sentry: any): SentryAdapter {
       if (typeof options === "string") {
         sentry.captureMessage(message, options);
       } else if (options && typeof options === "object" && "level" in options) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Sentry level type compatibility
         sentry.captureMessage(message, { level: options.level as any });
       } else {
         sentry.captureMessage(message);
       }
     },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Sentry breadcrumb type compatibility
     addBreadcrumb: (breadcrumb) => sentry.addBreadcrumb(breadcrumb as any),
   };
 }

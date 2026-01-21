@@ -22,7 +22,7 @@ import { ProProfileSkeleton } from "@/components/presentational/ProProfileSkelet
 import { AuthPromptModal } from "@/components/auth/AuthPromptModal";
 import { useProDetail } from "@/hooks/pro";
 import { useAuth } from "@/hooks/auth";
-import { Category, type Pro } from "@repo/domain";
+import { Category } from "@repo/domain";
 import { useTodayDate } from "@/hooks/shared/useTodayDate";
 import { getAvailabilityHint } from "@/utils/proAvailability";
 

@@ -70,7 +70,7 @@ function CheckoutContent() {
     setError(null);
     try {
       await createPreauth.mutateAsync({ bookingId });
-    } catch (err) {
+    } catch {
       // Error handled by mutation onError
     }
   };

@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "ArreglaTodo API",
-  description: "API test interface for ArreglaTodo",
+  description: "ArreglaTodo API Server",
 };
 
 export default function RootLayout({

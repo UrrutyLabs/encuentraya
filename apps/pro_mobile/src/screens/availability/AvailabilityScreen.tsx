@@ -101,7 +101,7 @@ export function AvailabilityScreen() {
 
     try {
       await updateSlots(slotsToSave);
-    } catch (err) {
+    } catch {
       // Error handled by hook
     }
   };

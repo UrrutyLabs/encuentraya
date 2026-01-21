@@ -10,7 +10,8 @@ export function useAuth() {
   const [error, setError] = useState<string | null>(null);
 
   // Register push token when session is available
-  const { unregisterToken } = usePushToken(session?.user?.id ?? null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- unregisterToken reserved for future use
+  const { unregisterToken: _unregisterToken } = usePushToken(session?.user?.id ?? null);
 
   useEffect(() => {
     // Get initial session
