@@ -45,7 +45,7 @@ describe("useAuth", () => {
   });
 
   describe("initial state", () => {
-    it("should start with loading true", () => {
+    it("should start with loading true", async () => {
       mockGetSession.mockResolvedValue({
         data: { session: null },
         error: null,
@@ -53,7 +53,13 @@ describe("useAuth", () => {
 
       const { result } = renderHook(() => useAuth());
 
+      // Check initial loading state
       expect(result.current.loading).toBe(true);
+
+      // Wait for async operations to complete to avoid act() warnings
+      await waitFor(() => {
+        expect(result.current.loading).toBe(false);
+      });
     });
 
     it("should set session and user when getSession succeeds", async () => {
@@ -104,7 +110,7 @@ describe("useAuth", () => {
       expect(result.current.user).toBe(null);
     });
 
-    it("should set up auth state change listener", () => {
+    it("should set up auth state change listener", async () => {
       mockGetSession.mockResolvedValue({
         data: { session: null },
         error: null,
@@ -112,10 +118,13 @@ describe("useAuth", () => {
 
       renderHook(() => useAuth());
 
-      expect(mockOnAuthStateChange).toHaveBeenCalled();
+      // Wait for async operations to complete
+      await waitFor(() => {
+        expect(mockOnAuthStateChange).toHaveBeenCalled();
+      });
     });
 
-    it("should clean up auth state change listener on unmount", () => {
+    it("should clean up auth state change listener on unmount", async () => {
       mockGetSession.mockResolvedValue({
         data: { session: null },
         error: null,
@@ -123,7 +132,14 @@ describe("useAuth", () => {
 
       const { unmount } = renderHook(() => useAuth());
 
-      unmount();
+      // Wait for async operations to complete before unmounting
+      await waitFor(() => {
+        expect(mockOnAuthStateChange).toHaveBeenCalled();
+      });
+
+      await act(async () => {
+        unmount();
+      });
 
       expect(authStateChangeUnsubscribe).toHaveBeenCalled();
     });
@@ -554,7 +570,7 @@ describe("useAuth", () => {
       });
     });
 
-    it("should not register push token when session is null", () => {
+    it("should not register push token when session is null", async () => {
       mockGetSession.mockResolvedValue({
         data: { session: null },
         error: null,
@@ -562,7 +578,10 @@ describe("useAuth", () => {
 
       renderHook(() => useAuth());
 
-      expect(mockUsePushToken).toHaveBeenCalledWith(null);
+      // Wait for async state updates to complete
+      await waitFor(() => {
+        expect(mockUsePushToken).toHaveBeenCalledWith(null);
+      });
     });
   });
 });

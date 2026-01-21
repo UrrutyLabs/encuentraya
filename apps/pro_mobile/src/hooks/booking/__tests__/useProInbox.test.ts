@@ -46,7 +46,7 @@ describe("useProInbox", () => {
     (supabase.auth.onAuthStateChange as jest.Mock) = mockOnAuthStateChange;
   });
 
-  it("should return bookings array when query succeeds", () => {
+  it("should return bookings array when query succeeds", async () => {
     const mockBookings = [
       {
         id: "booking-1",
@@ -86,12 +86,17 @@ describe("useProInbox", () => {
 
     const { result } = renderHook(() => useProInbox());
 
+    // Wait for async auth operations to complete
+    await waitFor(() => {
+      expect(mockUseQuery).toHaveBeenCalled();
+    });
+
     expect(result.current.bookings).toEqual(mockBookings);
     expect(result.current.isLoading).toBe(false);
     expect(result.current.error).toBe(null);
   });
 
-  it("should return empty array as default when data is undefined", () => {
+  it("should return empty array as default when data is undefined", async () => {
     mockUseQuery.mockReturnValue({
       data: undefined,
       isLoading: false,
@@ -100,10 +105,15 @@ describe("useProInbox", () => {
 
     const { result } = renderHook(() => useProInbox());
 
+    // Wait for async auth operations to complete
+    await waitFor(() => {
+      expect(mockUseQuery).toHaveBeenCalled();
+    });
+
     expect(result.current.bookings).toEqual([]);
   });
 
-  it("should return loading state when query is loading", () => {
+  it("should return loading state when query is loading", async () => {
     mockUseQuery.mockReturnValue({
       data: [],
       isLoading: true,
@@ -112,10 +122,15 @@ describe("useProInbox", () => {
 
     const { result } = renderHook(() => useProInbox());
 
+    // Wait for async auth operations to complete
+    await waitFor(() => {
+      expect(mockUseQuery).toHaveBeenCalled();
+    });
+
     expect(result.current.isLoading).toBe(true);
   });
 
-  it("should return error when query fails", () => {
+  it("should return error when query fails", async () => {
     const mockError = { message: "Failed to fetch inbox" };
     mockUseQuery.mockReturnValue({
       data: [],
@@ -124,6 +139,11 @@ describe("useProInbox", () => {
     });
 
     const { result } = renderHook(() => useProInbox());
+
+    // Wait for async auth operations to complete
+    await waitFor(() => {
+      expect(mockUseQuery).toHaveBeenCalled();
+    });
 
     expect(result.current.error).toBe(mockError);
   });
@@ -158,7 +178,7 @@ describe("useProInbox", () => {
     });
   });
 
-  it("should call query with undefined input", () => {
+  it("should call query with undefined input", async () => {
     mockUseQuery.mockReturnValue({
       data: [],
       isLoading: false,
@@ -166,11 +186,16 @@ describe("useProInbox", () => {
     });
 
     renderHook(() => useProInbox());
+
+    // Wait for async auth operations to complete
+    await waitFor(() => {
+      expect(mockUseQuery).toHaveBeenCalled();
+    });
 
     expect(mockUseQuery).toHaveBeenCalledWith(undefined, expect.any(Object));
   });
 
-  it("should configure retry to false", () => {
+  it("should configure retry to false", async () => {
     mockUseQuery.mockReturnValue({
       data: [],
       isLoading: false,
@@ -178,6 +203,11 @@ describe("useProInbox", () => {
     });
 
     renderHook(() => useProInbox());
+
+    // Wait for async auth operations to complete
+    await waitFor(() => {
+      expect(mockUseQuery).toHaveBeenCalled();
+    });
 
     expect(mockUseQuery).toHaveBeenCalledWith(
       undefined,

@@ -36,21 +36,44 @@ describe("useNetworkStatus", () => {
     });
   });
 
-  it("should return isChecking true initially", () => {
-    // Mock addEventListener to not call callback immediately
+  it("should return isChecking true initially", async () => {
+    // Mock both addEventListener and fetch to delay callbacks
     const originalAddEventListener = mockNetInfo.addEventListener;
+    const originalFetch = mockNetInfo.fetch;
+    
+    // Prevent addEventListener from calling callback immediately
     (mockNetInfo.addEventListener as jest.Mock).mockImplementationOnce((callback) => {
-      // Don't call callback immediately - simulate initial null state
+      // Don't call callback immediately
       return () => {};
     });
+    
+    // Mock fetch to delay resolution
+    let resolveFetch: ((value: any) => void) | undefined;
+    const fetchPromise = new Promise((resolve) => {
+      resolveFetch = resolve;
+    });
+    (mockNetInfo.fetch as jest.Mock).mockImplementationOnce(() => fetchPromise);
     
     const { result } = renderHook(() => useNetworkStatus());
 
     // Initially should be checking (before state is set)
     expect(result.current.isChecking).toBe(true);
     
-    // Restore original implementation
+    // Resolve the fetch promise and wait for state update
+    await act(async () => {
+      resolveFetch!({ isConnected: true, isInternetReachable: true } as any);
+      // Wait a tick for state to update
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+    
+    // Wait for async operations to complete to avoid act() warnings
+    await waitFor(() => {
+      expect(result.current.isChecking).toBe(false);
+    });
+    
+    // Restore original implementations
     mockNetInfo.addEventListener = originalAddEventListener;
+    mockNetInfo.fetch = originalFetch;
   });
 
   it("should update when network state changes to online", async () => {
@@ -100,20 +123,30 @@ describe("useNetworkStatus", () => {
     });
   });
 
-  it("should clean up event listener on unmount", () => {
+  it("should clean up event listener on unmount", async () => {
     const unsubscribeSpy = jest.fn();
     (mockNetInfo.addEventListener as jest.Mock).mockReturnValue(unsubscribeSpy);
 
     const { unmount } = renderHook(() => useNetworkStatus());
 
-    unmount();
+    // Wait for async operations to complete before unmounting
+    await waitFor(() => {
+      expect(mockNetInfo.fetch).toHaveBeenCalled();
+    });
+
+    await act(async () => {
+      unmount();
+    });
 
     expect(unsubscribeSpy).toHaveBeenCalled();
   });
 
-  it("should fetch initial state on mount", () => {
+  it("should fetch initial state on mount", async () => {
     renderHook(() => useNetworkStatus());
 
-    expect(mockNetInfo.fetch).toHaveBeenCalled();
+    // Wait for async operations to complete
+    await waitFor(() => {
+      expect(mockNetInfo.fetch).toHaveBeenCalled();
+    });
   });
 });
