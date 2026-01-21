@@ -167,13 +167,22 @@ jobs:
             # In monorepo, standalone build structure is: .next/standalone/apps/api/server.js
             # We need to run it from the standalone/apps/api directory where .env.local is located
             echo "🚀 Starting new PM2 process with standalone server..."
-            # Get the absolute path to the standalone directory
+            # Change to standalone directory and get absolute path
+            cd .next/standalone/apps/api
             STANDALONE_DIR=$(pwd)
-            cd ~/arreglatodo/apps/api
             
-            # Start PM2 from the apps/api directory but with cwd set to standalone directory
+            # Verify server.js exists
+            if [ ! -f server.js ]; then
+              echo "❌ Error: server.js not found in standalone directory"
+              echo "Current directory: $(pwd)"
+              echo "Files in directory:"
+              ls -la
+              exit 1
+            fi
+            
+            # Start PM2 with cwd set to standalone directory
             # This ensures Next.js can find .env.local in the correct location
-            PORT=3000 pm2 start "$STANDALONE_DIR/server.js" --name "api" --cwd "$STANDALONE_DIR" --update-env
+            PORT=3000 pm2 start server.js --name "api" --cwd "$STANDALONE_DIR" --update-env
             
             # Save PM2 configuration
             pm2 save
