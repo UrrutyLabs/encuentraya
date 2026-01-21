@@ -94,10 +94,16 @@ jobs:
             # Ensure the directory exists
             mkdir -p ~/arreglatodo/apps/api
             
-            # Remove existing .env if it exists (file or directory)
+            # Forcefully remove existing .env if it exists (file or directory)
             if [ -e ~/arreglatodo/apps/api/.env ]; then
               echo "⚠️  Removing existing .env (file or directory)..."
               rm -rf ~/arreglatodo/apps/api/.env
+            fi
+            
+            # Verify it's gone
+            if [ -e ~/arreglatodo/apps/api/.env ]; then
+              echo "❌ Error: Failed to remove existing .env"
+              exit 1
             fi
             
       - name: Deploy .env to EC2
@@ -108,7 +114,45 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           port: 22
           source: ".env.tmp"
-          target: "/home/${{ secrets.EC2_USER }}/arreglatodo/apps/api/.env"
+          target: "/home/${{ secrets.EC2_USER }}/arreglatodo/apps/api/env_file.tmp"
+          
+      - name: Rename .env file on EC2
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            # Verify env_file.tmp exists and is a file
+            if [ ! -f ~/arreglatodo/apps/api/env_file.tmp ]; then
+              echo "❌ Error: env_file.tmp file not found"
+              ls -la ~/arreglatodo/apps/api/ | grep env
+              exit 1
+            fi
+            
+            # Remove .env if it still exists (should have been removed in previous step)
+            if [ -e ~/arreglatodo/apps/api/.env ]; then
+              echo "⚠️  Removing existing .env..."
+              rm -rf ~/arreglatodo/apps/api/.env
+            fi
+            
+            # Rename env_file.tmp to .env
+            mv ~/arreglatodo/apps/api/env_file.tmp ~/arreglatodo/apps/api/.env
+            
+            # Verify .env is now a file, not a directory
+            if [ -d ~/arreglatodo/apps/api/.env ]; then
+              echo "❌ Error: .env is still a directory after rename"
+              echo "Contents of apps/api:"
+              ls -la ~/arreglatodo/apps/api/
+              exit 1
+            fi
+            
+            if [ ! -f ~/arreglatodo/apps/api/.env ]; then
+              echo "❌ Error: .env file was not created"
+              exit 1
+            fi
+            
+            echo "✅ .env file created successfully"
           
       - name: Verify .env file
         uses: appleboy/ssh-action@master
