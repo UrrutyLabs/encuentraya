@@ -64,13 +64,14 @@ export async function getNextDisplayId(): Promise<string> {
 
   let nextSequence = 1;
 
-  if (bookingsWithDisplayId.length > 0) {
+  if (bookingsWithDisplayId.length > 0 && bookingsWithDisplayId[0]?.displayId) {
     // Extract sequence number from existing displayId
     const displayId = bookingsWithDisplayId[0].displayId;
     const base32Str = displayId.slice(1); // Remove 'A' prefix
     let num = 0;
     for (let i = 0; i < base32Str.length; i++) {
       const char = base32Str[i];
+      if (!char) continue; // Skip if character is undefined
       const index = BASE32_CHARS.indexOf(char);
       if (index === -1) {
         // Invalid character, start from 1

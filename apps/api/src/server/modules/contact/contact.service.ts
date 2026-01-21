@@ -87,6 +87,6 @@ Este mensaje fue enviado desde el formulario de contacto.
       '"': "&quot;",
       "'": "&#039;",
     };
-    return text.replace(/[&<>"']/g, (m) => map[m]);
+    return text.replace(/[&<>"']/g, (m) => map[m] ?? m);
   }
 }

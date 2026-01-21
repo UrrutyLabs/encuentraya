@@ -42,6 +42,12 @@ export const searchRouter = router({
           // If date is today and a time window is provided, check if the window has already passed
           if (inputDateOnlyUTC.getTime() === todayUTC.getTime() && input.timeWindow) {
             const [windowStart] = input.timeWindow.split("-");
+            if (!windowStart) {
+              throw new TRPCError({
+                code: "BAD_REQUEST",
+                message: "Invalid time window format",
+              });
+            }
             const [windowHour, windowMinute] = windowStart.split(":").map(Number);
             
             // Create a date for today at the window start time (in UTC)
