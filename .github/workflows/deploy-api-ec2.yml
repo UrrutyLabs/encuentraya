@@ -84,6 +84,25 @@ jobs:
           target: "/home/${{ secrets.EC2_USER }}/arreglatodo/apps/api"
           strip_components: 2
 
+      - name: Prepare .env deployment
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            # Ensure the directory exists
+            mkdir -p ~/arreglatodo/apps/api
+            
+            # Remove existing .env if it exists (file or directory)
+            if [ -e ~/arreglatodo/apps/api/.env ]; then
+              echo "⚠️  Removing existing .env (file or directory)..."
+              rm -rf ~/arreglatodo/apps/api/.env
+            fi
+            
+            # Also remove env.tmp if it exists
+            rm -f ~/arreglatodo/apps/api/env.tmp
+            
       - name: Deploy .env to EC2
         uses: appleboy/scp-action@master
         with:
@@ -92,7 +111,7 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           port: 22
           source: ".env.tmp"
-          target: "/home/${{ secrets.EC2_USER }}/arreglatodo/apps/api/env.tmp"
+          target: "/home/${{ secrets.EC2_USER }}/arreglatodo/apps/api"
           
       - name: Rename .env file on EC2
         uses: appleboy/ssh-action@master
@@ -101,14 +120,38 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            # Remove existing .env if it's a directory
-            if [ -d ~/arreglatodo/apps/api/.env ]; then
-              echo "⚠️  Removing existing .env directory..."
+            # Verify env.tmp exists and is a file
+            if [ ! -f ~/arreglatodo/apps/api/env.tmp ]; then
+              echo "❌ Error: env.tmp file not found"
+              ls -la ~/arreglatodo/apps/api/ | grep env
+              exit 1
+            fi
+            
+            # Remove .env if it exists (should have been removed in previous step, but double-check)
+            if [ -e ~/arreglatodo/apps/api/.env ]; then
+              echo "⚠️  Removing existing .env..."
               rm -rf ~/arreglatodo/apps/api/.env
             fi
-            # Rename env.tmp to .env
+            
+            # Rename env.tmp to .env using mv
             mv ~/arreglatodo/apps/api/env.tmp ~/arreglatodo/apps/api/.env
+            
+            # Verify .env is now a file, not a directory
+            if [ -d ~/arreglatodo/apps/api/.env ]; then
+              echo "❌ Error: .env is still a directory after rename"
+              echo "Contents of apps/api:"
+              ls -la ~/arreglatodo/apps/api/
+              exit 1
+            fi
+            
+            if [ ! -f ~/arreglatodo/apps/api/.env ]; then
+              echo "❌ Error: .env file was not created"
+              exit 1
+            fi
+            
             echo "✅ .env file created successfully"
+            echo "File type: $(file ~/arreglatodo/apps/api/.env)"
+            echo "File size: $(stat -f%z ~/arreglatodo/apps/api/.env 2>/dev/null || stat -c%s ~/arreglatodo/apps/api/.env 2>/dev/null || echo 'unknown') bytes"
 
       - name: Deploy Nginx setup script to EC2
         uses: appleboy/scp-action@master
@@ -180,8 +223,17 @@ jobs:
               mkdir -p .next/standalone/apps/api
               cp .env .next/standalone/apps/api/.env.local
               echo "✅ .env copied to standalone directory"
+              
+              # Verify the file was copied correctly
+              if [ -f .next/standalone/apps/api/.env.local ]; then
+                echo "✅ Verified .env.local exists in standalone directory"
+              else
+                echo "❌ Error: .env.local was not copied correctly"
+                exit 1
+              fi
             else
               echo "⚠️  Warning: .env file not found at apps/api/.env"
+              exit 1
             fi
             
             echo "🚀 Starting standalone server with PM2..."
@@ -193,13 +245,28 @@ jobs:
             
             # Start standalone server
             # In monorepo, standalone build structure is: .next/standalone/apps/api/server.js
-            # We need to run it from the standalone/apps/api directory
+            # We need to run it from the standalone/apps/api directory where .env.local is located
             # PORT is set explicitly, and other env vars are inherited from the shell
             echo "🚀 Starting new PM2 process with standalone server..."
             cd .next/standalone/apps/api
-            # PM2 will inherit environment variables from the shell
-            PORT=3000 pm2 start server.js --name "api" --update-env
+            
+            # Verify .env.local exists in the current directory before starting
+            if [ ! -f .env.local ]; then
+              echo "❌ Error: .env.local not found in standalone directory"
+              echo "Current directory: $(pwd)"
+              echo "Files in directory:"
+              ls -la
+              exit 1
+            fi
+            
+            echo "✅ .env.local verified in standalone directory before starting server"
+            # Get the absolute path to the standalone directory
+            STANDALONE_DIR=$(pwd)
             cd ~/arreglatodo/apps/api
+            
+            # Start PM2 from the apps/api directory but with cwd set to standalone directory
+            # This ensures Next.js can find .env.local in the correct location
+            PORT=3000 pm2 start "$STANDALONE_DIR/server.js" --name "api" --cwd "$STANDALONE_DIR" --update-env
             
             # Save PM2 configuration
             pm2 save
