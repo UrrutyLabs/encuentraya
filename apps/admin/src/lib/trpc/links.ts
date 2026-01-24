@@ -1,11 +1,20 @@
 import { httpBatchLink } from "@trpc/client";
 import superjson from "superjson";
 import { supabase } from "@/lib/supabase/client";
+import { getApiUrl } from "@/lib/env";
 
 const getBaseUrl = () => {
-  // Always use the full API URL, even in browser
-  if (process.env.NEXT_PUBLIC_API_URL) return process.env.NEXT_PUBLIC_API_URL;
-  return "http://localhost:3002"; // API server port
+  try {
+    return getApiUrl();
+  } catch (error) {
+    // In development, allow fallback to localhost
+    if (process.env.NODE_ENV === "development") {
+      console.warn("[tRPC] Environment detection failed, using localhost fallback:", error);
+      return "http://localhost:3002";
+    }
+    // In production/preview, re-throw the error
+    throw error;
+  }
 };
 
 export function createTRPCLinks() {

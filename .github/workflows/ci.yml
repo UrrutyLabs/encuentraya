@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - develop
     paths:
       - 'apps/api/**'
       - 'apps/admin/**'
@@ -17,7 +16,6 @@ on:
   pull_request:
     branches:
       - main
-      - develop
     paths:
       - 'apps/api/**'
       - 'apps/admin/**'

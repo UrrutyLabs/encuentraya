@@ -1,35 +1,47 @@
 import { httpBatchLink } from "@trpc/client";
 import superjson from "superjson";
 import { supabase } from "../supabase/client";
+import { getApiUrl, getEnvironment } from "../env";
 
 /**
  * Get the base URL for the API.
  * 
+ * Uses environment detection to automatically select the correct API URL:
+ * - Development: localhost or local IP (from EXPO_PUBLIC_LOCAL_API_URL)
+ * - Preview: Staging API URL
+ * - Production: Production API URL
+ * 
  * For device testing (physical device or emulator):
  * - localhost/127.0.0.1 will NOT work
  * - Use your machine's LAN IP address instead (e.g., http://192.168.1.100:3002)
+ * - Set EXPO_PUBLIC_LOCAL_API_URL in .env for local development
  * - Find your IP: macOS/Linux: `ifconfig | grep inet`, Windows: `ipconfig`
- * 
- * For Expo Go on same machine: localhost may work, but LAN IP is more reliable.
  */
 const getBaseUrl = () => {
-  if (process.env.EXPO_PUBLIC_API_URL) {
-    const url = process.env.EXPO_PUBLIC_API_URL;
+  try {
+    const url = getApiUrl();
+    const env = getEnvironment();
+    
     // Log the URL being used (helpful for debugging)
-    if (__DEV__) {
-      console.log(`[tRPC] Using API URL: ${url}`);
+    if (__DEV__ || env === "development") {
+      console.log(`[tRPC] Environment: ${env}, Using API URL: ${url}`);
     }
+    
     return url;
+  } catch (error) {
+    // In development, allow fallback to localhost with warning
+    if (__DEV__) {
+      const fallbackUrl = process.env.EXPO_PUBLIC_LOCAL_API_URL || "http://localhost:3002";
+      console.warn(
+        `[tRPC] Environment detection failed, using fallback: ${fallbackUrl}\n` +
+        `⚠️  This may not work on physical devices. Set EXPO_PUBLIC_LOCAL_API_URL to your computer's LAN IP (e.g., http://192.168.1.100:3002)`,
+        error
+      );
+      return fallbackUrl;
+    }
+    // In production/preview builds, re-throw the error
+    throw error;
   }
-  // Fallback to localhost (may not work on physical devices)
-  const fallbackUrl = "http://localhost:3002";
-  if (__DEV__) {
-    console.warn(
-      `[tRPC] EXPO_PUBLIC_API_URL not set, using fallback: ${fallbackUrl}\n` +
-      `⚠️  This may not work on physical devices. Set EXPO_PUBLIC_API_URL to your computer's LAN IP (e.g., http://192.168.1.100:3002)`
-    );
-  }
-  return fallbackUrl;
 };
 
 export function createTRPCLinks() {
