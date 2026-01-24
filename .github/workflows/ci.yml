@@ -53,9 +53,10 @@ jobs:
         run: |
           if [ "${{ github.event_name }}" == "pull_request" ]; then
             BASE_BRANCH="${{ github.event.pull_request.base.ref }}"
-            pnpm turbo run lint --filter="[origin/${BASE_BRANCH}...]"
+            pnpm turbo run lint --filter="[origin/${BASE_BRANCH}...]" || pnpm turbo run lint
           else
-            pnpm turbo run lint --filter='[HEAD^1]'
+            # For continuous delivery, run all tasks on main branch pushes
+            pnpm turbo run lint
           fi
 
   type-check:
@@ -84,9 +85,10 @@ jobs:
         run: |
           if [ "${{ github.event_name }}" == "pull_request" ]; then
             BASE_BRANCH="${{ github.event.pull_request.base.ref }}"
-            pnpm turbo run check-types --filter="[origin/${BASE_BRANCH}...]"
+            pnpm turbo run check-types --filter="[origin/${BASE_BRANCH}...]" || pnpm turbo run check-types
           else
-            pnpm turbo run check-types --filter='[HEAD^1]'
+            # For continuous delivery, run all tasks on main branch pushes
+            pnpm turbo run check-types
           fi
 
   test:
@@ -120,9 +122,10 @@ jobs:
         run: |
           if [ "${{ github.event_name }}" == "pull_request" ]; then
             BASE_BRANCH="${{ github.event.pull_request.base.ref }}"
-            pnpm turbo run test --filter="[origin/${BASE_BRANCH}...]"
+            pnpm turbo run test --filter="[origin/${BASE_BRANCH}...]" || pnpm turbo run test
           else
-            pnpm turbo run test --filter='[HEAD^1]'
+            # For continuous delivery, run all tasks on main branch pushes
+            pnpm turbo run test
           fi
 
       - name: Upload coverage
