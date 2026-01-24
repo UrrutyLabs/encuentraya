@@ -152,7 +152,17 @@ export function clearUserContext() {
  */
 export function captureException(error: Error, context?: Record<string, unknown>) {
   if (!adapter || isExpoGo) {
-    logger.error("Exception captured (Sentry disabled)", error, context);
+    // In Expo Go, just log the error (Sentry is disabled)
+    // Don't show "Sentry disabled" for expected errors to reduce noise
+    const isJsonParseError = error.message.includes("JSON Parse error");
+    if (isJsonParseError && context?.apiUrl) {
+      logger.error("API connection error", error, {
+        ...context,
+        message: `Cannot connect to API at ${context.apiUrl}. Make sure API server is running and accessible.`,
+      });
+    } else {
+      logger.error("Exception captured", error, context);
+    }
     return;
   }
   const {

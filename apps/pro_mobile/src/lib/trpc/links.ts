@@ -14,10 +14,22 @@ import { supabase } from "../supabase/client";
  */
 const getBaseUrl = () => {
   if (process.env.EXPO_PUBLIC_API_URL) {
-    return process.env.EXPO_PUBLIC_API_URL;
+    const url = process.env.EXPO_PUBLIC_API_URL;
+    // Log the URL being used (helpful for debugging)
+    if (__DEV__) {
+      console.log(`[tRPC] Using API URL: ${url}`);
+    }
+    return url;
   }
   // Fallback to localhost (may not work on physical devices)
-  return "http://localhost:3002";
+  const fallbackUrl = "http://localhost:3002";
+  if (__DEV__) {
+    console.warn(
+      `[tRPC] EXPO_PUBLIC_API_URL not set, using fallback: ${fallbackUrl}\n` +
+      `⚠️  This may not work on physical devices. Set EXPO_PUBLIC_API_URL to your computer's LAN IP (e.g., http://192.168.1.100:3002)`
+    );
+  }
+  return fallbackUrl;
 };
 
 export function createTRPCLinks() {

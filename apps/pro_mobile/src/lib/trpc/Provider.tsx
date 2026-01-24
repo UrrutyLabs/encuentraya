@@ -17,18 +17,36 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
       const client = new QueryClient({
         queryCache: new QueryCache({
           onError: (error: Error) => {
-            logger.error("React Query error", error, {
+            // Check if it's a JSON parse error (usually means API returned HTML)
+            const isJsonParseError = error.message.includes("JSON Parse error");
+            const errorContext: Record<string, unknown> = {
               type: "query",
-            });
-            captureException(error, { type: "react-query-query" });
+            };
+            
+            if (isJsonParseError) {
+              errorContext.hint = "API may be returning HTML instead of JSON. Check if API server is running and accessible.";
+              errorContext.apiUrl = process.env.EXPO_PUBLIC_API_URL || "http://localhost:3002";
+            }
+            
+            logger.error("React Query error", error, errorContext);
+            captureException(error, errorContext);
           },
         }),
         mutationCache: new MutationCache({
           onError: (error: Error) => {
-            logger.error("React Query mutation error", error, {
+            // Check if it's a JSON parse error (usually means API returned HTML)
+            const isJsonParseError = error.message.includes("JSON Parse error");
+            const errorContext: Record<string, unknown> = {
               type: "mutation",
-            });
-            captureException(error, { type: "react-query-mutation" });
+            };
+            
+            if (isJsonParseError) {
+              errorContext.hint = "API may be returning HTML instead of JSON. Check if API server is running and accessible.";
+              errorContext.apiUrl = process.env.EXPO_PUBLIC_API_URL || "http://localhost:3002";
+            }
+            
+            logger.error("React Query mutation error", error, errorContext);
+            captureException(error, errorContext);
           },
         }),
         defaultOptions: createQueryClientDefaults({
