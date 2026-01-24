@@ -17,7 +17,7 @@ export default function GlobalError({
     if (process.env.NODE_ENV !== "production") {
       return;
     }
-    
+
     Sentry.captureException(error);
   }, [error]);
 
@@ -34,7 +34,10 @@ export default function GlobalError({
             </Text>
             {process.env.NODE_ENV === "development" && (
               <div className="mb-6 p-4 bg-surface rounded-lg text-left">
-                <Text variant="small" className="text-muted font-mono break-all">
+                <Text
+                  variant="small"
+                  className="text-muted font-mono break-all"
+                >
                   {error.message}
                 </Text>
               </div>
@@ -43,7 +46,10 @@ export default function GlobalError({
               <Button variant="primary" onClick={reset}>
                 Intentar de nuevo
               </Button>
-              <Button variant="ghost" onClick={() => (window.location.href = "/")}>
+              <Button
+                variant="ghost"
+                onClick={() => (window.location.href = "/")}
+              >
                 Ir al inicio
               </Button>
             </div>

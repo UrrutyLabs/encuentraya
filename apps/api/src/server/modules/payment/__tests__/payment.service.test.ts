@@ -1,13 +1,25 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { PaymentService } from "../payment.service";
 import type { PaymentRepository, PaymentEntity } from "../payment.repo";
-import type { PaymentEventRepository, PaymentEventEntity } from "../paymentEvent.repo";
-import type { BookingRepository, BookingEntity } from "@modules/booking/booking.repo";
+import type {
+  PaymentEventRepository,
+  PaymentEventEntity,
+} from "../paymentEvent.repo";
+import type {
+  BookingRepository,
+  BookingEntity,
+} from "@modules/booking/booking.repo";
 import type { ProRepository, ProProfileEntity } from "@modules/pro/pro.repo";
 import type { EarningService } from "@modules/payout/earning.service";
 import type { AuditService } from "@modules/audit/audit.service";
 import type { PaymentProviderClient } from "../provider";
-import { PaymentProvider, PaymentType, PaymentStatus, BookingStatus, Role } from "@repo/domain";
+import {
+  PaymentProvider,
+  PaymentType,
+  PaymentStatus,
+  BookingStatus,
+  Role,
+} from "@repo/domain";
 import { BookingNotFoundError } from "@modules/booking/booking.errors";
 import type { Actor } from "@infra/auth/roles";
 import { getPaymentProviderClient } from "../registry";
@@ -19,7 +31,9 @@ vi.mock("../registry", () => ({
 describe("PaymentService", () => {
   let service: PaymentService;
   let mockPaymentRepository: ReturnType<typeof createMockPaymentRepository>;
-  let mockPaymentEventRepository: ReturnType<typeof createMockPaymentEventRepository>;
+  let mockPaymentEventRepository: ReturnType<
+    typeof createMockPaymentEventRepository
+  >;
   let mockBookingRepository: ReturnType<typeof createMockBookingRepository>;
   let mockProRepository: ReturnType<typeof createMockProRepository>;
   let mockEarningService: ReturnType<typeof createMockEarningService>;
@@ -105,7 +119,9 @@ describe("PaymentService", () => {
     return { id, role };
   }
 
-  function createMockBooking(overrides?: Partial<BookingEntity>): BookingEntity {
+  function createMockBooking(
+    overrides?: Partial<BookingEntity>
+  ): BookingEntity {
     return {
       id: "booking-1",
       clientUserId: "client-1",
@@ -121,7 +137,9 @@ describe("PaymentService", () => {
     };
   }
 
-  function createMockProProfile(overrides?: Partial<ProProfileEntity>): ProProfileEntity {
+  function createMockProProfile(
+    overrides?: Partial<ProProfileEntity>
+  ): ProProfileEntity {
     return {
       id: "pro-1",
       userId: "user-1",
@@ -139,7 +157,9 @@ describe("PaymentService", () => {
     };
   }
 
-  function createMockPayment(overrides?: Partial<PaymentEntity>): PaymentEntity {
+  function createMockPayment(
+    overrides?: Partial<PaymentEntity>
+  ): PaymentEntity {
     return {
       id: "payment-1",
       provider: PaymentProvider.MERCADO_PAGO,
@@ -161,7 +181,9 @@ describe("PaymentService", () => {
     };
   }
 
-  function createMockPaymentEvent(overrides?: Partial<PaymentEventEntity>): PaymentEventEntity {
+  function createMockPaymentEvent(
+    overrides?: Partial<PaymentEventEntity>
+  ): PaymentEventEntity {
     return {
       id: "event-1",
       paymentId: "payment-1",
@@ -249,7 +271,9 @@ describe("PaymentService", () => {
       expect(result.paymentId).toBe("payment-1");
       expect(result.checkoutUrl).toBe("https://checkout.example.com");
       expect(mockBookingRepository.findById).toHaveBeenCalledWith("booking-1");
-      expect(mockPaymentRepository.findByBookingId).toHaveBeenCalledWith("booking-1");
+      expect(mockPaymentRepository.findByBookingId).toHaveBeenCalledWith(
+        "booking-1"
+      );
       expect(mockProRepository.findById).toHaveBeenCalledWith("pro-1");
       expect(mockPaymentRepository.create).toHaveBeenCalled();
       expect(mockProviderClient.createPreauth).toHaveBeenCalled();
@@ -398,10 +422,9 @@ describe("PaymentService", () => {
         raw: {},
       });
 
-      expect(mockPaymentRepository.findByProviderReference).toHaveBeenCalledWith(
-        PaymentProvider.MERCADO_PAGO,
-        "mp-ref-123"
-      );
+      expect(
+        mockPaymentRepository.findByProviderReference
+      ).toHaveBeenCalledWith(PaymentProvider.MERCADO_PAGO, "mp-ref-123");
       expect(mockPaymentEventRepository.createEvent).toHaveBeenCalled();
       expect(mockProviderClient.fetchPaymentStatus).toHaveBeenCalledWith(
         "mp-ref-123"
@@ -447,7 +470,9 @@ describe("PaymentService", () => {
         raw: {},
       });
 
-      expect(mockPaymentRepository.updateStatusAndAmounts).not.toHaveBeenCalled();
+      expect(
+        mockPaymentRepository.updateStatusAndAmounts
+      ).not.toHaveBeenCalled();
     });
 
     it("should create earning when payment is captured and booking is completed", async () => {
@@ -472,7 +497,9 @@ describe("PaymentService", () => {
         status: PaymentStatus.CAPTURED,
         amountCaptured: 20000,
       });
-      vi.mocked(mockEarningService.createEarningForCompletedBooking).mockResolvedValue(undefined);
+      vi.mocked(
+        mockEarningService.createEarningForCompletedBooking
+      ).mockResolvedValue(undefined);
 
       await service.handleProviderWebhook({
         provider: PaymentProvider.MERCADO_PAGO,
@@ -481,10 +508,9 @@ describe("PaymentService", () => {
         raw: {},
       });
 
-      expect(mockEarningService.createEarningForCompletedBooking).toHaveBeenCalledWith(
-        { role: "SYSTEM" },
-        "booking-1"
-      );
+      expect(
+        mockEarningService.createEarningForCompletedBooking
+      ).toHaveBeenCalledWith({ role: "SYSTEM" }, "booking-1");
     });
   });
 
@@ -509,7 +535,10 @@ describe("PaymentService", () => {
       const result = await service.capturePayment("payment-1");
 
       expect(result.capturedAmount).toBe(20000);
-      expect(mockProviderClient.capture).toHaveBeenCalledWith("mp-ref-123", 20000);
+      expect(mockProviderClient.capture).toHaveBeenCalledWith(
+        "mp-ref-123",
+        20000
+      );
       expect(mockPaymentRepository.updateStatusAndAmounts).toHaveBeenCalledWith(
         "payment-1",
         {
@@ -572,7 +601,10 @@ describe("PaymentService", () => {
       const result = await service.capturePayment("payment-1", 10000);
 
       expect(result.capturedAmount).toBe(10000);
-      expect(mockProviderClient.capture).toHaveBeenCalledWith("mp-ref-123", 10000);
+      expect(mockProviderClient.capture).toHaveBeenCalledWith(
+        "mp-ref-123",
+        10000
+      );
     });
   });
 
@@ -661,7 +693,9 @@ describe("PaymentService", () => {
     });
 
     it("should filter payments by status", async () => {
-      const payments = [createMockPayment({ status: PaymentStatus.AUTHORIZED })];
+      const payments = [
+        createMockPayment({ status: PaymentStatus.AUTHORIZED }),
+      ];
 
       mockPaymentRepository.findAll.mockResolvedValue(payments);
 

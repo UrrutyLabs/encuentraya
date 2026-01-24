@@ -6,7 +6,7 @@
  * Platform fee rate (as decimal, e.g., 0.10 for 10%)
  * Default: 10%
  */
-export const PLATFORM_FEE_RATE = 0.10;
+export const PLATFORM_FEE_RATE = 0.1;
 
 /**
  * Get cooling-off period in hours from environment variable

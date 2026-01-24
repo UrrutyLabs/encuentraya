@@ -5,7 +5,13 @@ import { Text } from "@repo/ui";
 import { Badge } from "@repo/ui";
 import { Calendar, CreditCard, Wallet, ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { formatCurrency, BookingStatus, PaymentStatus, getBookingStatusLabel, getBookingStatusVariant } from "@repo/domain";
+import {
+  formatCurrency,
+  BookingStatus,
+  PaymentStatus,
+  getBookingStatusLabel,
+  getBookingStatusVariant,
+} from "@repo/domain";
 
 interface RecentActivityFeedProps {
   recentBookings: Array<{
@@ -35,25 +41,41 @@ interface RecentActivityFeedProps {
   isLoading?: boolean;
 }
 
-const getStatusBadgeVariant = (status: string | BookingStatus | PaymentStatus): "info" | "success" | "warning" | "danger" => {
+const getStatusBadgeVariant = (
+  status: string | BookingStatus | PaymentStatus
+): "info" | "success" | "warning" | "danger" => {
   // Handle booking statuses
   if (Object.values(BookingStatus).includes(status as BookingStatus)) {
     return getBookingStatusVariant(status as BookingStatus);
   }
   // Handle payment/payout statuses
-  if (status.includes("COMPLETED") || status.includes("CAPTURED") || status.includes("SETTLED")) {
+  if (
+    status.includes("COMPLETED") ||
+    status.includes("CAPTURED") ||
+    status.includes("SETTLED")
+  ) {
     return "success";
   }
-  if (status.includes("PENDING") || status.includes("CREATED") || status.includes("AUTHORIZED")) {
+  if (
+    status.includes("PENDING") ||
+    status.includes("CREATED") ||
+    status.includes("AUTHORIZED")
+  ) {
     return "warning";
   }
-  if (status.includes("FAILED") || status.includes("CANCELLED") || status.includes("REJECTED")) {
+  if (
+    status.includes("FAILED") ||
+    status.includes("CANCELLED") ||
+    status.includes("REJECTED")
+  ) {
     return "danger";
   }
   return "info";
 };
 
-const getStatusLabel = (status: string | BookingStatus | PaymentStatus): string => {
+const getStatusLabel = (
+  status: string | BookingStatus | PaymentStatus
+): string => {
   // Handle booking statuses
   if (Object.values(BookingStatus).includes(status as BookingStatus)) {
     return getBookingStatusLabel(status as BookingStatus);
@@ -167,7 +189,10 @@ export function RecentActivityFeed({
                   </Text>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Badge variant={getStatusBadgeVariant(activity.status)} showIcon>
+                  <Badge
+                    variant={getStatusBadgeVariant(activity.status)}
+                    showIcon
+                  >
                     {getStatusLabel(activity.status)}
                   </Badge>
                   <Text variant="xs" className="text-muted whitespace-nowrap">

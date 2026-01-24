@@ -11,7 +11,8 @@ import { Button } from "@repo/ui";
 
 export function ContactScreen() {
   const router = useRouter();
-  const { submitContact, isPending, error, data, isSuccess } = useSubmitContact();
+  const { submitContact, isPending, error, data, isSuccess } =
+    useSubmitContact();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -51,7 +52,7 @@ export function ContactScreen() {
 
   // Show success state - check both data.success and isSuccess to ensure state is updated
   const showSuccess = (data?.success || isSuccess) && !isPending;
-  
+
   if (showSuccess) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-bg p-4 animate-[fadeIn_0.5s_ease-in-out]">
@@ -65,7 +66,8 @@ export function ContactScreen() {
                 ¡Mensaje enviado!
               </Text>
               <Text variant="body" className="text-muted">
-                {data?.message ?? "Tu mensaje ha sido enviado exitosamente. Te responderemos pronto."}
+                {data?.message ??
+                  "Tu mensaje ha sido enviado exitosamente. Te responderemos pronto."}
               </Text>
             </div>
             <Button
@@ -82,13 +84,15 @@ export function ContactScreen() {
   }
 
   // Extract error message
-  const errorMessage = error?.message || (error?.data?.code === "TOO_MANY_REQUESTS" 
-    ? "Has enviado demasiados mensajes. Por favor espera unos minutos antes de intentar nuevamente."
-    : error?.data?.code === "BAD_REQUEST"
-    ? "Por favor verifica que todos los campos estén completos correctamente."
-    : error
-    ? "Ocurrió un error al enviar tu mensaje. Por favor intenta nuevamente."
-    : null);
+  const errorMessage =
+    error?.message ||
+    (error?.data?.code === "TOO_MANY_REQUESTS"
+      ? "Has enviado demasiados mensajes. Por favor espera unos minutos antes de intentar nuevamente."
+      : error?.data?.code === "BAD_REQUEST"
+        ? "Por favor verifica que todos los campos estén completos correctamente."
+        : error
+          ? "Ocurrió un error al enviar tu mensaje. Por favor intenta nuevamente."
+          : null);
 
   return (
     <div className="min-h-screen bg-bg py-12 px-4 animate-[fadeIn_0.5s_ease-in-out]">
@@ -101,8 +105,12 @@ export function ContactScreen() {
               Contacto
             </Text>
           </div>
-          <Text variant="body" className="text-muted max-w-lg mx-auto animate-[fadeIn_0.5s_ease-in-out_0.2s_both]">
-            ¿Tenés alguna pregunta o necesitás ayuda? Envíanos un mensaje y te responderemos lo antes posible.
+          <Text
+            variant="body"
+            className="text-muted max-w-lg mx-auto animate-[fadeIn_0.5s_ease-in-out_0.2s_both]"
+          >
+            ¿Tenés alguna pregunta o necesitás ayuda? Envíanos un mensaje y te
+            responderemos lo antes posible.
           </Text>
         </div>
 
@@ -127,8 +135,8 @@ export function ContactScreen() {
         <div className="text-center animate-[fadeIn_0.5s_ease-in-out_0.5s_both]">
           <Text variant="small" className="text-muted">
             También podés contactarnos por email en{" "}
-            <a 
-              href="mailto:support@arreglatodo.com" 
+            <a
+              href="mailto:support@arreglatodo.com"
               className="text-primary hover:underline transition-colors hover:text-secondary"
             >
               support@arreglatodo.com

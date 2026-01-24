@@ -5,6 +5,7 @@ A local services marketplace connecting clients with trusted professionals for s
 ## 🎯 Overview
 
 Arreglatodo is a TaskRabbit-style marketplace that enables:
+
 - **Clients** to find, book, and pay professionals for services
 - **Professionals** to manage availability, accept jobs, and get paid
 - **Admins** to oversee operations, approve professionals, and handle disputes
@@ -14,6 +15,7 @@ This is a production-oriented MVP built with modern web and mobile technologies.
 ## ✨ Features
 
 ### For Clients
+
 - 🔍 Search professionals by category, location, and availability
 - 👤 View professional profiles with ratings and reviews
 - 📅 Create and manage bookings
@@ -21,6 +23,7 @@ This is a production-oriented MVP built with modern web and mobile technologies.
 - ⭐ Leave reviews after service completion
 
 ### For Professionals
+
 - 📱 Mobile app for managing jobs on the go
 - ⏰ Set availability and service areas
 - 📋 Receive and manage job requests
@@ -28,6 +31,7 @@ This is a production-oriented MVP built with modern web and mobile technologies.
 - 📊 View booking history and statistics
 
 ### For Admins
+
 - ✅ Approve/suspend professionals
 - 📊 Monitor platform metrics
 - 🔧 Handle disputes and refunds
@@ -36,12 +40,14 @@ This is a production-oriented MVP built with modern web and mobile technologies.
 ## 🛠️ Tech Stack
 
 ### Frontend
+
 - **Web Apps**: Next.js 16 (App Router), TypeScript, React 19
 - **Mobile App**: Expo (React Native), Expo Router
 - **State Management**: TanStack Query (React Query)
 - **API Client**: tRPC for type-safe API calls
 
 ### Backend
+
 - **API**: Next.js API routes with tRPC
 - **Database**: PostgreSQL with Prisma ORM
 - **Authentication**: Supabase Auth
@@ -49,6 +55,7 @@ This is a production-oriented MVP built with modern web and mobile technologies.
 - **Notifications**: SendGrid (email), Twilio (WhatsApp), Expo Push Notifications
 
 ### Infrastructure
+
 - **Monorepo**: Turborepo + pnpm workspaces
 - **Deployment**: Railway (API), Vercel (Web), EAS (Mobile)
 - **CI/CD**: GitHub Actions
@@ -100,6 +107,7 @@ pnpm install
 ### Environment Setup
 
 Each app requires its own `.env` file. See:
+
 - `apps/api/.env.example`
 - `apps/client/.env.example`
 - `apps/admin/.env.example`
@@ -212,16 +220,19 @@ pnpm db:studio
 ## 🏗️ Architecture
 
 ### Monorepo Strategy
+
 - **Shared packages**: Domain types, tRPC helpers, UI components
 - **App-specific**: Each app has its own dependencies and config
 - **Turborepo**: Handles task orchestration and caching
 
 ### API Architecture
+
 - **tRPC**: Type-safe API with automatic type inference
 - **Prisma**: Database ORM with migrations
 - **Domain-driven**: Shared domain types in `packages/domain`
 
 ### Frontend Architecture
+
 - **Component-based**: Reusable UI components in `packages/ui`
 - **Server Components**: Next.js App Router with React Server Components
 - **Client State**: TanStack Query for server state management
@@ -253,16 +264,19 @@ See [Mobile App Documentation](./apps/pro_mobile/docs/EAS_BUILD_AND_DEPLOYMENT.m
 ## 🚢 Deployment
 
 ### API (Railway)
+
 - Automatic deployments on push to `main`
 - Environment variables configured in Railway dashboard
 - Database migrations run automatically
 
 ### Web Apps (Vercel)
+
 - Automatic deployments on push to `main`
 - Preview deployments for pull requests
 - Environment variables configured in Vercel dashboard
 
 ### Mobile App (EAS)
+
 - Production builds via GitHub Actions
 - Preview builds on pull requests
 - OTA updates published automatically

@@ -4,7 +4,11 @@ import { Role } from "@repo/domain";
 
 export default function SettingsPage() {
   return (
-    <AuthenticatedGuard returnUrl="/settings" maxWidth="max-w-7xl" requiredRole={Role.CLIENT}>
+    <AuthenticatedGuard
+      returnUrl="/settings"
+      maxWidth="max-w-7xl"
+      requiredRole={Role.CLIENT}
+    >
       <SettingsScreen />
     </AuthenticatedGuard>
   );

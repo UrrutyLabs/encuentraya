@@ -30,8 +30,11 @@ export class PushDeliveryResolver {
    * @throws NoActivePushTokensError if no active tokens found
    */
   async resolvePushTokens(recipientUserId: string): Promise<string[]> {
-    const tokens = await this.devicePushTokenRepository.listActiveTokensByUserId(recipientUserId);
-    
+    const tokens =
+      await this.devicePushTokenRepository.listActiveTokensByUserId(
+        recipientUserId
+      );
+
     if (tokens.length === 0) {
       throw new NoActivePushTokensError(recipientUserId);
     }

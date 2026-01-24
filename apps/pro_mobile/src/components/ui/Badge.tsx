@@ -74,7 +74,9 @@ export function Badge({
           style={styles.icon}
         />
       )}
-      <Text style={[styles.badgeText, { color: variantStyle.color }]}>{children}</Text>
+      <Text style={[styles.badgeText, { color: variantStyle.color }]}>
+        {children}
+      </Text>
     </View>
   );
 }

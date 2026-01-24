@@ -30,7 +30,10 @@ const statusLabels: Record<string, string> = {
   FAILED: "Fallido",
 };
 
-const statusVariants: Record<string, "info" | "success" | "warning" | "danger"> = {
+const statusVariants: Record<
+  string,
+  "info" | "success" | "warning" | "danger"
+> = {
   CREATED: "warning",
   SENT: "info",
   SETTLED: "success",
@@ -60,7 +63,10 @@ export function PayoutStatusSummary({
   }
 
   const total = Object.values(breakdown).reduce((sum, count) => sum + count, 0);
-  const totalAmount = Object.values(amounts).reduce((sum, amount) => sum + amount, 0);
+  const totalAmount = Object.values(amounts).reduce(
+    (sum, amount) => sum + amount,
+    0
+  );
 
   return (
     <Card className="p-6">
@@ -83,7 +89,9 @@ export function PayoutStatusSummary({
               onClick={() => router.push(`/admin/payouts`)}
             >
               <div className="flex items-center gap-3 flex-1 min-w-0">
-                <Badge variant={statusVariants[status]}>{statusLabels[status]}</Badge>
+                <Badge variant={statusVariants[status]}>
+                  {statusLabels[status]}
+                </Badge>
                 <Text variant="small" className="text-muted">
                   {count} cobros
                 </Text>

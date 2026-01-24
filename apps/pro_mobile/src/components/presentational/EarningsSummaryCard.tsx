@@ -34,7 +34,10 @@ export function EarningsSummaryCard({
               Este mes
             </Text>
           </View>
-          <Text variant="h2" style={[styles.summaryAmount, styles.primaryAmount]}>
+          <Text
+            variant="h2"
+            style={[styles.summaryAmount, styles.primaryAmount]}
+          >
             {formatAmount(thisMonthTotal, currency)}
           </Text>
         </View>

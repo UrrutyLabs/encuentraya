@@ -40,7 +40,11 @@ logger.error("Failed to fetch data", error, { endpoint: "/api/data" });
 ### Sentry Utilities
 
 ```typescript
-import { createReactNativeAdapter, setUserContext, captureException } from "@repo/monitoring/sentry";
+import {
+  createReactNativeAdapter,
+  setUserContext,
+  captureException,
+} from "@repo/monitoring/sentry";
 import * as Sentry from "@sentry/react-native";
 
 const adapter = createReactNativeAdapter(Sentry);
@@ -55,6 +59,7 @@ captureException(adapter, error, { context: "booking" });
 ## Platform-Specific Setup
 
 Each app should:
+
 1. Install the appropriate Sentry SDK (`@sentry/react-native` or `@sentry/nextjs`)
 2. Initialize Sentry with platform-specific config
 3. Create an adapter and pass it to the shared utilities

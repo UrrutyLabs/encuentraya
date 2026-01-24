@@ -4,7 +4,10 @@ import { theme } from "../../theme";
 
 export function AvailabilitySkeleton() {
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.contentContainer}
+    >
       {/* Title Row */}
       <View style={styles.titleRow}>
         <View style={styles.iconPlaceholder} />
@@ -17,7 +20,10 @@ export function AvailabilitySkeleton() {
       {/* Card with Days */}
       <Card style={styles.card}>
         {[...Array(7)].map((_, index) => (
-          <View key={index} style={[styles.dayRow, index === 6 && styles.lastDayRow]}>
+          <View
+            key={index}
+            style={[styles.dayRow, index === 6 && styles.lastDayRow]}
+          >
             {/* Day Header with Switch */}
             <View style={styles.dayHeader}>
               <View style={styles.dayToggleRow}>

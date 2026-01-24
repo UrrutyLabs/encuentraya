@@ -6,7 +6,12 @@ interface TextProps extends RNTextProps {
   variant?: "body" | "small" | "xs" | "h1" | "h2" | "h3";
 }
 
-export function Text({ children, variant = "body", style, ...props }: TextProps) {
+export function Text({
+  children,
+  variant = "body",
+  style,
+  ...props
+}: TextProps) {
   const variantStyles = {
     h1: {
       fontSize: theme.typography.sizes.h1.fontSize,
@@ -46,5 +51,9 @@ export function Text({ children, variant = "body", style, ...props }: TextProps)
     },
   };
 
-  return <RNText style={[variantStyles[variant], style]} {...props}>{children}</RNText>;
+  return (
+    <RNText style={[variantStyles[variant], style]} {...props}>
+      {children}
+    </RNText>
+  );
 }

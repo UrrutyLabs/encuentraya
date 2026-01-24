@@ -152,7 +152,7 @@ describe("useProInbox", () => {
     // Mock a user session
     const mockUser = { id: "user-1", email: "test@example.com" } as any;
     const mockSession = { user: mockUser } as any;
-    
+
     mockGetSession.mockResolvedValue({
       data: { session: mockSession },
       error: null,

@@ -39,10 +39,15 @@ export default function SignupPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-lg shadow">
-        <Text variant="h1" className="text-center text-gray-900">Admin Sign Up</Text>
+        <Text variant="h1" className="text-center text-gray-900">
+          Admin Sign Up
+        </Text>
         <form onSubmit={handleSignup} className="space-y-4">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-900 mb-1">
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-900 mb-1"
+            >
               Email
             </label>
             <input
@@ -55,7 +60,10 @@ export default function SignupPage() {
             />
           </div>
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-900 mb-1">
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-900 mb-1"
+            >
               Password
             </label>
             <input

@@ -14,7 +14,12 @@ interface TabsProps {
   className?: string;
 }
 
-export function Tabs({ tabs, activeTab, onTabChange, className = "" }: TabsProps) {
+export function Tabs({
+  tabs,
+  activeTab,
+  onTabChange,
+  className = "",
+}: TabsProps) {
   return (
     <div className={`border-b border-border ${className}`}>
       <div className="flex gap-1 overflow-x-auto scrollbar-hide">
@@ -39,7 +44,10 @@ export function Tabs({ tabs, activeTab, onTabChange, className = "" }: TabsProps
               role="tab"
             >
               {Icon && <Icon className="w-4 h-4 shrink-0" />}
-              <Text variant="small" className={isActive ? "font-semibold" : "font-medium"}>
+              <Text
+                variant="small"
+                className={isActive ? "font-semibold" : "font-medium"}
+              >
                 {tab.label}
               </Text>
             </button>

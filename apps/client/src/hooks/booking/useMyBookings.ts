@@ -14,14 +14,15 @@ export function useMyBookings() {
     refetchOnForeground: true,
   });
 
-  const { data: bookings, isLoading, error } = trpc.booking.myBookings.useQuery(
-    undefined,
-    {
-      enabled: !!user,
-      retry: false,
-      ...pollingOptions, // Spread smart polling options
-    }
-  );
+  const {
+    data: bookings,
+    isLoading,
+    error,
+  } = trpc.booking.myBookings.useQuery(undefined, {
+    enabled: !!user,
+    retry: false,
+    ...pollingOptions, // Spread smart polling options
+  });
 
   // Get booking IDs for completed bookings
   const completedBookingIds = useMemo(() => {
@@ -32,13 +33,14 @@ export function useMyBookings() {
   }, [bookings]);
 
   // Fetch review status for completed bookings
-  const { data: reviewStatusMap = {} } = trpc.review.statusByBookingIds.useQuery(
-    { bookingIds: completedBookingIds },
-    {
-      enabled: completedBookingIds.length > 0 && !!user,
-      retry: false,
-    }
-  );
+  const { data: reviewStatusMap = {} } =
+    trpc.review.statusByBookingIds.useQuery(
+      { bookingIds: completedBookingIds },
+      {
+        enabled: completedBookingIds.length > 0 && !!user,
+        retry: false,
+      }
+    );
 
   return {
     bookings: bookings ?? [],

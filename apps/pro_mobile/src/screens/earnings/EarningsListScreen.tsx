@@ -10,7 +10,13 @@ import { EarningsSummaryCard } from "@components/presentational/EarningsSummaryC
 import { EarningsSummaryCardSkeleton } from "@components/presentational/EarningsSummaryCardSkeleton";
 import { EarningsCardSkeleton } from "@components/presentational/EarningsCardSkeleton";
 import { useEarnings } from "@hooks/payout";
-import { formatAmount, formatDateShort, getMonthKey, isCurrentMonth, isLastMonth } from "../../utils/format";
+import {
+  formatAmount,
+  formatDateShort,
+  getMonthKey,
+  isCurrentMonth,
+  isLastMonth,
+} from "../../utils/format";
 import { theme } from "../../theme";
 
 interface Earning {
@@ -25,7 +31,6 @@ interface Earning {
   availableAt: string | Date | null;
   createdAt: string | Date;
 }
-
 
 export function EarningsListScreen() {
   const limit = 50; // Load up to 50 earnings at once
@@ -93,10 +98,12 @@ export function EarningsListScreen() {
     refetch();
   }, [refetch]);
 
-
   if (isLoading && earnings.length === 0) {
     return (
-      <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={styles.content}
+      >
         {/* Summary Card Skeleton */}
         <EarningsSummaryCardSkeleton />
 
@@ -114,14 +121,18 @@ export function EarningsListScreen() {
 
   if (error) {
     return (
-      <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={styles.content}
+      >
         <View style={styles.errorContainer}>
           <Feather name="alert-circle" size={48} color={theme.colors.danger} />
           <Text variant="h2" style={styles.errorTitle}>
             Error al cargar ingresos
           </Text>
           <Text variant="body" style={styles.errorText}>
-            {error.message || "No se pudieron cargar los ingresos. Intentá nuevamente."}
+            {error.message ||
+              "No se pudieron cargar los ingresos. Intentá nuevamente."}
           </Text>
           <Button onPress={handleRetry} style={styles.retryButton}>
             Reintentar
@@ -136,7 +147,9 @@ export function EarningsListScreen() {
       <ScrollView
         style={styles.container}
         contentContainerStyle={styles.content}
-        refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={handleRefresh} />}
+        refreshControl={
+          <RefreshControl refreshing={isRefetching} onRefresh={handleRefresh} />
+        }
       >
         <View style={styles.emptyContainer}>
           <Feather name="inbox" size={48} color={theme.colors.muted} />
@@ -155,7 +168,9 @@ export function EarningsListScreen() {
     <ScrollView
       style={styles.container}
       contentContainerStyle={styles.content}
-      refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={handleRefresh} />}
+      refreshControl={
+        <RefreshControl refreshing={isRefetching} onRefresh={handleRefresh} />
+      }
     >
       {/* Summary Card - Only show if there are earnings */}
       {earnings.length > 0 && (
@@ -169,7 +184,10 @@ export function EarningsListScreen() {
       {/* Grouped Earnings */}
       {sortedMonthKeys.map((monthKey) => {
         const monthEarnings = groupedEarnings[monthKey];
-        const monthTotal = monthEarnings.reduce((sum, e) => sum + e.netAmount, 0);
+        const monthTotal = monthEarnings.reduce(
+          (sum, e) => sum + e.netAmount,
+          0
+        );
         const firstEarning = monthEarnings[0];
 
         return (
@@ -182,24 +200,27 @@ export function EarningsListScreen() {
             />
             <View style={styles.earningsList}>
               {monthEarnings.map((earning) => {
-              const displayDateRaw = earning.createdAt;
-              const displayDate = displayDateRaw instanceof Date ? displayDateRaw : new Date(displayDateRaw);
+                const displayDateRaw = earning.createdAt;
+                const displayDate =
+                  displayDateRaw instanceof Date
+                    ? displayDateRaw
+                    : new Date(displayDateRaw);
 
-              return (
-                <Card key={earning.id} style={styles.earningCard}>
-                  <View style={styles.earningRow}>
-                    <Text variant="small" style={styles.date}>
-                      {formatDateShort(displayDate)}
-                    </Text>
-                    <Text variant="body" style={styles.netAmount}>
-                      {formatAmount(earning.netAmount, earning.currency)}
-                    </Text>
-                    <Text variant="xs" style={styles.bookingId}>
-                      #{earning.bookingDisplayId}
-                    </Text>
-                  </View>
-                </Card>
-              );
+                return (
+                  <Card key={earning.id} style={styles.earningCard}>
+                    <View style={styles.earningRow}>
+                      <Text variant="small" style={styles.date}>
+                        {formatDateShort(displayDate)}
+                      </Text>
+                      <Text variant="body" style={styles.netAmount}>
+                        {formatAmount(earning.netAmount, earning.currency)}
+                      </Text>
+                      <Text variant="xs" style={styles.bookingId}>
+                        #{earning.bookingDisplayId}
+                      </Text>
+                    </View>
+                  </Card>
+                );
               })}
             </View>
           </View>

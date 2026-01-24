@@ -16,26 +16,26 @@ export function LandingFooter() {
             </Text>
           </div>
           <div className="flex gap-6">
-            <Link 
-              href="#" 
+            <Link
+              href="#"
               className="text-muted hover:text-text transition-all duration-200 hover:scale-105 active:scale-95"
             >
               <Text variant="small">Términos</Text>
             </Link>
-            <Link 
-              href="/faqs" 
+            <Link
+              href="/faqs"
               className="text-muted hover:text-text transition-all duration-200 hover:scale-105 active:scale-95"
             >
               <Text variant="small">Preguntas frecuentes</Text>
             </Link>
-            <Link 
-              href="#" 
+            <Link
+              href="#"
               className="text-muted hover:text-text transition-all duration-200 hover:scale-105 active:scale-95"
             >
               <Text variant="small">Privacidad</Text>
             </Link>
-            <Link 
-              href="/contact" 
+            <Link
+              href="/contact"
               className="text-muted hover:text-text transition-all duration-200 hover:scale-105 active:scale-95"
             >
               <Text variant="small">Contacto</Text>

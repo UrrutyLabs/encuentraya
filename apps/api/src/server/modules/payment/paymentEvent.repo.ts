@@ -39,7 +39,9 @@ export interface PaymentEventRepository {
  */
 @injectable()
 export class PaymentEventRepositoryImpl implements PaymentEventRepository {
-  async createEvent(input: PaymentEventCreateInput): Promise<PaymentEventEntity> {
+  async createEvent(
+    input: PaymentEventCreateInput
+  ): Promise<PaymentEventEntity> {
     const event = await prisma.paymentEvent.create({
       data: {
         paymentId: input.paymentId,
@@ -61,7 +63,9 @@ export class PaymentEventRepositoryImpl implements PaymentEventRepository {
     return events.map(this.mapPrismaToDomain);
   }
 
-  private mapPrismaToDomain(prismaEvent: Prisma.PaymentEventGetPayload<Record<string, never>>): PaymentEventEntity {
+  private mapPrismaToDomain(
+    prismaEvent: Prisma.PaymentEventGetPayload<Record<string, never>>
+  ): PaymentEventEntity {
     return {
       id: prismaEvent.id,
       paymentId: prismaEvent.paymentId,

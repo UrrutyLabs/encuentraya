@@ -1,6 +1,6 @@
 /**
  * DisplayId generation utilities for bookings
- * 
+ *
  * Generates user-friendly displayIds using base32 encoding
  * Format: A + base32(number) padded to 4 characters
  * Examples: A0002, A0009, A000A, A000H, A000J, A000Z, A0020
@@ -17,7 +17,7 @@ const BASE32_CHARS = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ";
  * Generate displayId from a sequence number using base32 encoding
  * Format: A + base32(number) padded to 4 characters
  * Examples: A0002, A0009, A000A, A000H, A000J, A000Z, A0020
- * 
+ *
  * @param sequenceNumber - The sequential number (starting from 1)
  * @returns DisplayId in format AXXXX
  */
@@ -42,7 +42,7 @@ export function generateDisplayId(sequenceNumber: number): string {
 /**
  * Get the next displayId for a booking
  * Finds the highest existing sequence number and generates the next one
- * 
+ *
  * @returns Promise<string> - The next displayId to use
  */
 export async function getNextDisplayId(): Promise<string> {

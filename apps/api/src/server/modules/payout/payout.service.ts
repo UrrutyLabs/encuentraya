@@ -321,17 +321,19 @@ export class PayoutService {
   async listPayouts(
     adminActor: Actor,
     limit?: number
-  ): Promise<Array<{
-    id: string;
-    proProfileId: string;
-    provider: string;
-    status: string;
-    currency: string;
-    amount: number;
-    providerReference: string | null;
-    createdAt: Date;
-    sentAt: Date | null;
-  }>> {
+  ): Promise<
+    Array<{
+      id: string;
+      proProfileId: string;
+      provider: string;
+      status: string;
+      currency: string;
+      amount: number;
+      providerReference: string | null;
+      createdAt: Date;
+      sentAt: Date | null;
+    }>
+  > {
     // Authorization: Admin only
     if (adminActor.role !== Role.ADMIN) {
       throw new PayoutError("Only admins can list payouts");
@@ -385,7 +387,8 @@ export class PayoutService {
     }
 
     // Get payout items
-    const payoutItems = await this.payoutItemRepository.findByPayoutId(payoutId);
+    const payoutItems =
+      await this.payoutItemRepository.findByPayoutId(payoutId);
 
     // Get earnings for each item
     const earnings = await Promise.all(

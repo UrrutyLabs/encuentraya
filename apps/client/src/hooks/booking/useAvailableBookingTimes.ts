@@ -73,7 +73,10 @@ export function useAvailableBookingTimes(
           return daySlots.some((slot) => {
             // Check if time falls within the slot's time range
             // Time format is "HH:MM" (e.g., "09:00", "13:30")
-            return timeOption.value >= slot.startTime && timeOption.value < slot.endTime;
+            return (
+              timeOption.value >= slot.startTime &&
+              timeOption.value < slot.endTime
+            );
           });
         });
       } else {
@@ -132,7 +135,6 @@ export function useAvailableBookingTimes(
         (option) => option.value === selectedTime
       );
       if (!isAvailable) {
-         
         setSelectedTime("");
       }
     }

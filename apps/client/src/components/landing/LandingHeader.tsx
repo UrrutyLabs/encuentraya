@@ -9,8 +9,8 @@ export function LandingHeader() {
   return (
     <header className="px-4 py-4 border-b border-border bg-surface animate-[fadeIn_0.4s_ease-out]">
       <div className="max-w-6xl mx-auto flex justify-between items-center">
-        <Link 
-          href="/" 
+        <Link
+          href="/"
           className="flex items-center gap-2 transition-all duration-200 hover:scale-105 group"
         >
           <Wrench className="w-8 h-8 text-primary transition-transform duration-300" />
@@ -19,10 +19,7 @@ export function LandingHeader() {
           </Text>
         </Link>
         <Link href="/login">
-          <Button 
-            variant="ghost" 
-            className="px-6"
-          >
+          <Button variant="ghost" className="px-6">
             Iniciar sesión
           </Button>
         </Link>

@@ -14,7 +14,8 @@ export function SettingsPaymentsSection() {
             Métodos de pago
           </Text>
           <Text variant="body" className="text-muted max-w-md">
-            Los métodos de pago estarán disponibles próximamente. Podrás agregar tarjetas y gestionar tus pagos desde aquí.
+            Los métodos de pago estarán disponibles próximamente. Podrás agregar
+            tarjetas y gestionar tus pagos desde aquí.
           </Text>
         </div>
       </div>

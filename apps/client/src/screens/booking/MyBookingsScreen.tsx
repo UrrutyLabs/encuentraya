@@ -12,14 +12,17 @@ import { BookingStatus, type Booking } from "@repo/domain";
 
 export function MyBookingsScreen() {
   const { bookings, isLoading, reviewStatusMap } = useMyBookings();
-  
+
   // Memoize review status lookup function
   const getHasReview = useCallback(
     (bookingId: string) => reviewStatusMap[bookingId] ?? false,
     [reviewStatusMap]
   );
 
-  const { upcoming, past } = useMemo((): { upcoming: Booking[]; past: Booking[] } => {
+  const { upcoming, past } = useMemo((): {
+    upcoming: Booking[];
+    past: Booking[];
+  } => {
     const now = new Date();
     const upcomingBookings = bookings.filter((booking: Booking) => {
       const scheduledDate = new Date(booking.scheduledAt);

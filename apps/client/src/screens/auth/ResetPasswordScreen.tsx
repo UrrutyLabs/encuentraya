@@ -10,7 +10,8 @@ import { Text, Card } from "@repo/ui";
 
 export function ResetPasswordScreen() {
   const router = useRouter();
-  const { resetPassword, isPending, error, hasRecoverySession, isLoading } = useResetPassword();
+  const { resetPassword, isPending, error, hasRecoverySession, isLoading } =
+    useResetPassword();
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [validationError, setValidationError] = useState<string | null>(null);

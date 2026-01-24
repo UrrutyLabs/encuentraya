@@ -1,39 +1,18 @@
 import { PrismaClient } from "../../../../prisma/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
+import { initializeEnvValidation } from "../env-validation";
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
-/**
- * Validate DATABASE_URL is set and has correct format
- */
-function validateDatabaseUrl(): void {
-  const databaseUrl = process.env.DATABASE_URL;
-
-  if (!databaseUrl) {
-    throw new Error(
-      "DATABASE_URL environment variable is not set. " +
-        "Please ensure .env.local exists in apps/api/ with DATABASE_URL configured."
-    );
-  }
-
-  // Basic format validation
-  if (!databaseUrl.startsWith("postgresql://") && !databaseUrl.startsWith("postgres://")) {
-    throw new Error(
-      `DATABASE_URL must start with 'postgresql://' or 'postgres://'. ` +
-        `Current format: ${databaseUrl.substring(0, 20)}...`
-    );
-  }
-}
+initializeEnvValidation();
 
 /**
  * Create and configure database connection pool
  */
 function createDatabasePool(): Pool {
-  validateDatabaseUrl();
-
   const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
     // Connection pool configuration
@@ -87,8 +66,7 @@ function createPrismaClient(): PrismaClient {
   }
 }
 
-export const prisma =
-  globalForPrisma.prisma ?? createPrismaClient();
+export const prisma = globalForPrisma.prisma ?? createPrismaClient();
 
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 

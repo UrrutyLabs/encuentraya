@@ -14,7 +14,14 @@ export function Text({
   ...props
 }: TextProps) {
   const Component =
-    as || (variant === "h1" ? "h1" : variant === "h2" ? "h2" : variant === "h3" ? "h3" : "p");
+    as ||
+    (variant === "h1"
+      ? "h1"
+      : variant === "h2"
+        ? "h2"
+        : variant === "h3"
+          ? "h3"
+          : "p");
 
   const variantClasses = {
     h1: "text-2xl font-bold leading-8 text-text",

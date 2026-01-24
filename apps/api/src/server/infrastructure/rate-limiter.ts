@@ -22,12 +22,20 @@ class InMemoryRateLimiter {
     private readonly windowMs: number
   ) {
     // Cleanup expired entries every 5 minutes
-    this.cleanupInterval = setInterval(() => {
-      this.cleanup();
-    }, 5 * 60 * 1000);
+    this.cleanupInterval = setInterval(
+      () => {
+        this.cleanup();
+      },
+      5 * 60 * 1000
+    );
   }
 
-  async limit(key: string): Promise<{ success: boolean; limit: number; remaining: number; reset: number }> {
+  async limit(key: string): Promise<{
+    success: boolean;
+    limit: number;
+    remaining: number;
+    reset: number;
+  }> {
     const now = Date.now();
     const entry = this.store.get(key);
 
@@ -87,7 +95,10 @@ class InMemoryRateLimiter {
  * Create rate limiter instance
  * Uses Upstash Redis if credentials are available, otherwise falls back to in-memory
  */
-function createRateLimiter(maxRequests: number, windowMs: number): Ratelimit | InMemoryRateLimiter {
+function createRateLimiter(
+  maxRequests: number,
+  windowMs: number
+): Ratelimit | InMemoryRateLimiter {
   const upstashUrl = process.env.UPSTASH_REDIS_REST_URL;
   const upstashToken = process.env.UPSTASH_REDIS_REST_TOKEN;
 
@@ -100,7 +111,10 @@ function createRateLimiter(maxRequests: number, windowMs: number): Ratelimit | I
 
     return new Ratelimit({
       redis,
-      limiter: Ratelimit.slidingWindow(maxRequests, `${Math.floor(windowMs / 1000)}s`),
+      limiter: Ratelimit.slidingWindow(
+        maxRequests,
+        `${Math.floor(windowMs / 1000)}s`
+      ),
       analytics: true,
     });
   }

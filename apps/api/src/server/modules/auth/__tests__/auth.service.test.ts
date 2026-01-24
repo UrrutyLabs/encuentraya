@@ -56,18 +56,22 @@ vi.mock("@supabase/supabase-js", () => {
       return usePublicClient
         ? (mockSupabasePublicClient as unknown as MockSupabaseAdminClient)
         : mockSupabaseAdminClient;
-    }) as (url: string, key: string) => MockSupabaseAdminClient | MockSupabasePublicClient,
+    }) as (
+      url: string,
+      key: string
+    ) => MockSupabaseAdminClient | MockSupabasePublicClient,
   };
 });
 
 // Import after mock to get the mocked version
 import { createClient } from "@supabase/supabase-js";
 
-
 describe("AuthService", () => {
   let service: AuthService;
   let mockUserRepository: ReturnType<typeof createMockUserRepository>;
-  let mockClientProfileService: ReturnType<typeof createMockClientProfileService>;
+  let mockClientProfileService: ReturnType<
+    typeof createMockClientProfileService
+  >;
   let mockBookingRepository: ReturnType<typeof createMockBookingRepository>;
   let mockPaymentRepository: ReturnType<typeof createMockPaymentRepository>;
   let mockSupabaseAdminClient: MockSupabaseAdminClient;
@@ -154,7 +158,11 @@ describe("AuthService", () => {
         phone: "+1234567890",
       };
       const supabaseUserId = "supabase-user-1";
-      const dbUser = { id: supabaseUserId, role: Role.CLIENT, createdAt: new Date() };
+      const dbUser = {
+        id: supabaseUserId,
+        role: Role.CLIENT,
+        createdAt: new Date(),
+      };
 
       mockSupabaseAdminClient.auth.admin.createUser.mockResolvedValue({
         data: { user: { id: supabaseUserId } },
@@ -177,18 +185,26 @@ describe("AuthService", () => {
       const result = await service.signupClient(input);
 
       // Assert
-      expect(mockSupabaseAdminClient.auth.admin.createUser).toHaveBeenCalledWith({
+      expect(
+        mockSupabaseAdminClient.auth.admin.createUser
+      ).toHaveBeenCalledWith({
         email: input.email,
         password: input.password,
         email_confirm: false,
       });
-      expect(mockUserRepository.create).toHaveBeenCalledWith(Role.CLIENT, supabaseUserId);
-      expect(mockClientProfileService.updateProfile).toHaveBeenCalledWith(supabaseUserId, {
-        email: input.email,
-        firstName: input.firstName,
-        lastName: input.lastName,
-        phone: input.phone,
-      });
+      expect(mockUserRepository.create).toHaveBeenCalledWith(
+        Role.CLIENT,
+        supabaseUserId
+      );
+      expect(mockClientProfileService.updateProfile).toHaveBeenCalledWith(
+        supabaseUserId,
+        {
+          email: input.email,
+          firstName: input.firstName,
+          lastName: input.lastName,
+          phone: input.phone,
+        }
+      );
       expect(result).toEqual({
         userId: supabaseUserId,
         email: input.email,
@@ -209,13 +225,20 @@ describe("AuthService", () => {
         error: null,
       });
       mockUserRepository.create.mockRejectedValue(dbError);
-      mockSupabaseAdminClient.auth.admin.deleteUser.mockResolvedValue({ data: {}, error: null });
+      mockSupabaseAdminClient.auth.admin.deleteUser.mockResolvedValue({
+        data: {},
+        error: null,
+      });
 
       // Act & Assert
-      await expect(service.signupClient(input)).rejects.toThrow("Database error");
+      await expect(service.signupClient(input)).rejects.toThrow(
+        "Database error"
+      );
 
       // Should attempt to delete Supabase user
-      expect(mockSupabaseAdminClient.auth.admin.deleteUser).toHaveBeenCalledWith(supabaseUserId);
+      expect(
+        mockSupabaseAdminClient.auth.admin.deleteUser
+      ).toHaveBeenCalledWith(supabaseUserId);
     });
 
     it("should throw error when Supabase user creation fails", async () => {
@@ -232,7 +255,9 @@ describe("AuthService", () => {
       });
 
       // Act & Assert
-      await expect(service.signupClient(input)).rejects.toThrow("Email already exists");
+      await expect(service.signupClient(input)).rejects.toThrow(
+        "Email already exists"
+      );
       expect(mockUserRepository.create).not.toHaveBeenCalled();
     });
 
@@ -244,7 +269,11 @@ describe("AuthService", () => {
         // No firstName, lastName, phone
       };
       const supabaseUserId = "supabase-user-1";
-      const dbUser = { id: supabaseUserId, role: Role.CLIENT, createdAt: new Date() };
+      const dbUser = {
+        id: supabaseUserId,
+        role: Role.CLIENT,
+        createdAt: new Date(),
+      };
 
       mockSupabaseAdminClient.auth.admin.createUser.mockResolvedValue({
         data: { user: { id: supabaseUserId } },
@@ -267,12 +296,15 @@ describe("AuthService", () => {
       const result = await service.signupClient(input);
 
       // Assert
-      expect(mockClientProfileService.updateProfile).toHaveBeenCalledWith(supabaseUserId, {
-        email: input.email,
-        firstName: null,
-        lastName: null,
-        phone: null,
-      });
+      expect(mockClientProfileService.updateProfile).toHaveBeenCalledWith(
+        supabaseUserId,
+        {
+          email: input.email,
+          firstName: null,
+          lastName: null,
+          phone: null,
+        }
+      );
       expect(result).toEqual({
         userId: supabaseUserId,
         email: input.email,
@@ -288,7 +320,11 @@ describe("AuthService", () => {
         password: "password123",
       };
       const supabaseUserId = "supabase-pro-1";
-      const dbUser = { id: supabaseUserId, role: Role.PRO, createdAt: new Date() };
+      const dbUser = {
+        id: supabaseUserId,
+        role: Role.PRO,
+        createdAt: new Date(),
+      };
 
       mockSupabaseAdminClient.auth.admin.createUser.mockResolvedValue({
         data: { user: { id: supabaseUserId } },
@@ -300,12 +336,17 @@ describe("AuthService", () => {
       const result = await service.signupPro(input);
 
       // Assert
-      expect(mockSupabaseAdminClient.auth.admin.createUser).toHaveBeenCalledWith({
+      expect(
+        mockSupabaseAdminClient.auth.admin.createUser
+      ).toHaveBeenCalledWith({
         email: input.email,
         password: input.password,
         email_confirm: false,
       });
-      expect(mockUserRepository.create).toHaveBeenCalledWith(Role.PRO, supabaseUserId);
+      expect(mockUserRepository.create).toHaveBeenCalledWith(
+        Role.PRO,
+        supabaseUserId
+      );
       expect(mockClientProfileService.updateProfile).not.toHaveBeenCalled();
       expect(result).toEqual({
         userId: supabaseUserId,
@@ -327,13 +368,18 @@ describe("AuthService", () => {
         error: null,
       });
       mockUserRepository.create.mockRejectedValue(dbError);
-      mockSupabaseAdminClient.auth.admin.deleteUser.mockResolvedValue({ data: {}, error: null });
+      mockSupabaseAdminClient.auth.admin.deleteUser.mockResolvedValue({
+        data: {},
+        error: null,
+      });
 
       // Act & Assert
       await expect(service.signupPro(input)).rejects.toThrow("Database error");
 
       // Should attempt to delete Supabase user
-      expect(mockSupabaseAdminClient.auth.admin.deleteUser).toHaveBeenCalledWith(supabaseUserId);
+      expect(
+        mockSupabaseAdminClient.auth.admin.deleteUser
+      ).toHaveBeenCalledWith(supabaseUserId);
     });
 
     it("should not create ProProfile during signup", async () => {
@@ -343,7 +389,11 @@ describe("AuthService", () => {
         password: "password123",
       };
       const supabaseUserId = "supabase-pro-1";
-      const dbUser = { id: supabaseUserId, role: Role.PRO, createdAt: new Date() };
+      const dbUser = {
+        id: supabaseUserId,
+        role: Role.PRO,
+        createdAt: new Date(),
+      };
 
       mockSupabaseAdminClient.auth.admin.createUser.mockResolvedValue({
         data: { user: { id: supabaseUserId } },
@@ -373,12 +423,11 @@ describe("AuthService", () => {
       await service.requestPasswordReset(email);
 
       // Assert
-      expect(mockSupabasePublicClient.auth.resetPasswordForEmail).toHaveBeenCalledWith(
-        email,
-        {
-          redirectTo: "http://localhost:3000/reset-password",
-        }
-      );
+      expect(
+        mockSupabasePublicClient.auth.resetPasswordForEmail
+      ).toHaveBeenCalledWith(email, {
+        redirectTo: "http://localhost:3000/reset-password",
+      });
     });
 
     it("should not throw error even if email doesn't exist (security)", async () => {
@@ -408,12 +457,11 @@ describe("AuthService", () => {
       await service.requestPasswordReset(email);
 
       // Assert
-      expect(mockSupabasePublicClient.auth.resetPasswordForEmail).toHaveBeenCalledWith(
-        email,
-        {
-          redirectTo: "https://myapp.com/reset-password",
-        }
-      );
+      expect(
+        mockSupabasePublicClient.auth.resetPasswordForEmail
+      ).toHaveBeenCalledWith(email, {
+        redirectTo: "https://myapp.com/reset-password",
+      });
 
       // Cleanup
       process.env.CLIENT_APP_URL = "http://localhost:3000";
@@ -468,8 +516,12 @@ describe("AuthService", () => {
       await service.resetPassword(accessToken, newPassword);
 
       // Assert
-      expect(mockSupabaseAdminClient.auth.getUser).toHaveBeenCalledWith(accessToken);
-      expect(mockSupabaseAdminClient.auth.admin.updateUserById).toHaveBeenCalledWith(userId, {
+      expect(mockSupabaseAdminClient.auth.getUser).toHaveBeenCalledWith(
+        accessToken
+      );
+      expect(
+        mockSupabaseAdminClient.auth.admin.updateUserById
+      ).toHaveBeenCalledWith(userId, {
         password: newPassword,
       });
     });
@@ -487,11 +539,13 @@ describe("AuthService", () => {
       });
 
       // Act & Assert
-      await expect(service.resetPassword(accessToken, newPassword)).rejects.toThrow(
-        "Invalid or expired reset token"
-      );
+      await expect(
+        service.resetPassword(accessToken, newPassword)
+      ).rejects.toThrow("Invalid or expired reset token");
 
-      expect(mockSupabaseAdminClient.auth.admin.updateUserById).not.toHaveBeenCalled();
+      expect(
+        mockSupabaseAdminClient.auth.admin.updateUserById
+      ).not.toHaveBeenCalled();
     });
 
     it("should throw error if token is expired", async () => {
@@ -507,9 +561,9 @@ describe("AuthService", () => {
       });
 
       // Act & Assert
-      await expect(service.resetPassword(accessToken, newPassword)).rejects.toThrow(
-        "Invalid or expired reset token"
-      );
+      await expect(
+        service.resetPassword(accessToken, newPassword)
+      ).rejects.toThrow("Invalid or expired reset token");
     });
 
     it("should throw error if password update fails", async () => {
@@ -536,9 +590,9 @@ describe("AuthService", () => {
       });
 
       // Act & Assert
-      await expect(service.resetPassword(accessToken, newPassword)).rejects.toThrow(
-        "Password update failed"
-      );
+      await expect(
+        service.resetPassword(accessToken, newPassword)
+      ).rejects.toThrow("Password update failed");
     });
 
     it("should throw error if Supabase configuration is missing", async () => {
@@ -551,9 +605,9 @@ describe("AuthService", () => {
       delete process.env.SUPABASE_URL;
 
       // Act & Assert
-      await expect(service.resetPassword(accessToken, newPassword)).rejects.toThrow(
-        "Missing Supabase configuration"
-      );
+      await expect(
+        service.resetPassword(accessToken, newPassword)
+      ).rejects.toThrow("Missing Supabase configuration");
 
       // Restore
       process.env.SUPABASE_URL = originalUrl;
@@ -597,7 +651,9 @@ describe("AuthService", () => {
         token: otp,
         type: "recovery",
       });
-      expect(mockSupabaseAdminClient.auth.admin.updateUserById).toHaveBeenCalledWith(userId, {
+      expect(
+        mockSupabaseAdminClient.auth.admin.updateUserById
+      ).toHaveBeenCalledWith(userId, {
         password: newPassword,
       });
     });
@@ -620,7 +676,9 @@ describe("AuthService", () => {
         service.resetPasswordWithOtp(email, otp, newPassword)
       ).rejects.toThrow("Invalid or expired OTP code");
 
-      expect(mockSupabaseAdminClient.auth.admin.updateUserById).not.toHaveBeenCalled();
+      expect(
+        mockSupabaseAdminClient.auth.admin.updateUserById
+      ).not.toHaveBeenCalled();
     });
 
     it("should throw error if OTP is expired", async () => {

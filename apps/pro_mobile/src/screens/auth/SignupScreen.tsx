@@ -68,7 +68,11 @@ export function SignupScreen() {
         />
         {displayError && (
           <View style={styles.errorContainer}>
-            <Feather name="alert-circle" size={16} color={theme.colors.danger} />
+            <Feather
+              name="alert-circle"
+              size={16}
+              color={theme.colors.danger}
+            />
             <Text variant="small" style={styles.error}>
               {displayError}
             </Text>

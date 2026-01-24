@@ -1,10 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { renderHook, act, waitFor } from "@testing-library/react";
 import { useResetPassword } from "../useResetPassword";
-import {
-  mockGetSession,
-  mockUpdateUser,
-} from "@/test-setup";
+import { mockGetSession, mockUpdateUser } from "@/test-setup";
 import { Role } from "@repo/domain";
 
 // Mock useRouter
@@ -66,7 +63,7 @@ describe("useResetPassword", () => {
     expect(typeof result.current.resetPassword).toBe("function");
     expect(result.current.isPending).toBe(false);
     expect(result.current.error).toBeNull();
-    
+
     // Wait for useEffect to complete
     await waitFor(() => {
       expect(mockGetSession).toHaveBeenCalled();

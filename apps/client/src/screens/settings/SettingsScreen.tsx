@@ -16,10 +16,7 @@ import {
   getSectionByTabId,
 } from "@/components/settings/settingsConfig";
 import { SettingsSkeleton } from "@/components/settings/SettingsSkeleton";
-import {
-  ChangePasswordModal,
-  DeleteAccountModal,
-} from "@/components/settings";
+import { ChangePasswordModal, DeleteAccountModal } from "@/components/settings";
 
 export function SettingsScreen() {
   const router = useRouter();
@@ -147,7 +144,9 @@ export function SettingsScreen() {
     );
   }
 
-  const currentSection = activeSection || getSectionByTabId(settingsSections, validActiveTab, profile);
+  const currentSection =
+    activeSection ||
+    getSectionByTabId(settingsSections, validActiveTab, profile);
 
   if (!currentSection) {
     return (
@@ -268,9 +267,7 @@ export function SettingsScreen() {
             </aside>
 
             {/* Content Area */}
-            <main className="flex-1 min-w-0">
-              {renderContent()}
-            </main>
+            <main className="flex-1 min-w-0">{renderContent()}</main>
           </div>
         </div>
       </div>

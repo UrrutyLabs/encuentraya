@@ -1,4 +1,12 @@
-import { Mail, User, MessageSquare, FileText, Send, Loader2, AlertCircle } from "lucide-react";
+import {
+  Mail,
+  User,
+  MessageSquare,
+  FileText,
+  Send,
+  Loader2,
+  AlertCircle,
+} from "lucide-react";
 import { Button } from "@repo/ui";
 import { Input } from "@repo/ui";
 import { Text } from "@repo/ui";

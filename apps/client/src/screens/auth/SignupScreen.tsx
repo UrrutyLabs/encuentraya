@@ -57,7 +57,9 @@ export function SignupScreen() {
           footerLink={{
             text: "¿Ya tenés cuenta?",
             linkText: "Iniciar sesión",
-            href: returnUrl ? `/login?returnUrl=${encodeURIComponent(returnUrl)}` : "/login",
+            href: returnUrl
+              ? `/login?returnUrl=${encodeURIComponent(returnUrl)}`
+              : "/login",
           }}
         />
       </div>

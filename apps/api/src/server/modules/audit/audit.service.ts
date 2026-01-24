@@ -75,15 +75,17 @@ export class AuditService {
   async getResourceLogs(
     resourceType: string,
     resourceId: string
-  ): Promise<Array<{
-    id: string;
-    eventType: AuditEventType;
-    actorId: string;
-    actorRole: Role;
-    action: string;
-    metadata: Record<string, unknown> | null;
-    createdAt: Date;
-  }>> {
+  ): Promise<
+    Array<{
+      id: string;
+      eventType: AuditEventType;
+      actorId: string;
+      actorRole: Role;
+      action: string;
+      metadata: Record<string, unknown> | null;
+      createdAt: Date;
+    }>
+  > {
     const logs = await this.auditLogRepository.findByResource(
       resourceType,
       resourceId
@@ -103,15 +105,17 @@ export class AuditService {
   /**
    * Get audit logs for a specific actor (admin user)
    */
-  async getActorLogs(actorId: string): Promise<Array<{
-    id: string;
-    eventType: AuditEventType;
-    resourceType: string;
-    resourceId: string;
-    action: string;
-    metadata: Record<string, unknown> | null;
-    createdAt: Date;
-  }>> {
+  async getActorLogs(actorId: string): Promise<
+    Array<{
+      id: string;
+      eventType: AuditEventType;
+      resourceType: string;
+      resourceId: string;
+      action: string;
+      metadata: Record<string, unknown> | null;
+      createdAt: Date;
+    }>
+  > {
     const logs = await this.auditLogRepository.findByActor(actorId);
 
     return logs.map((log) => ({

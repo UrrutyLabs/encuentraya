@@ -5,6 +5,7 @@ The customer-facing web application for the Arreglatodo marketplace.
 ## Overview
 
 A Next.js web application that enables customers to:
+
 - Search for professionals by category, location, and availability
 - View professional profiles with ratings and reviews
 - Create and manage service bookings
@@ -54,6 +55,7 @@ pnpm install
 ### Environment Setup
 
 1. Copy `.env.example` to `.env.local`:
+
    ```bash
    cp .env.example .env.local
    ```
@@ -150,29 +152,34 @@ See [Frontend Best Practices](../../docs/FE_BEST_PRACTICES.md) for detailed arch
 ## Key Features
 
 ### Authentication
+
 - Login/Signup with email
 - Email confirmation
 - Password reset
 - Protected routes with route guards
 
 ### Professional Search
+
 - Filter by category (plumbing, electrical, cleaning, etc.)
 - Filter by date and time availability
 - View professional profiles with ratings
 
 ### Booking Management
+
 - Create bookings with date/time selection
 - View upcoming and past bookings
 - Cancel bookings
 - Rebook from previous bookings
 
 ### Payment Flow
+
 - Secure checkout process
 - MercadoPago integration
 - Payment status tracking
 - Success/failure handling
 
 ### Reviews
+
 - Create reviews after service completion
 - Rate professionals (1-5 stars)
 - View review history
@@ -198,6 +205,7 @@ The app is deployed on **Vercel** with automatic deployments:
 ### Preview Deployments
 
 Preview deployments automatically:
+
 - Use staging API URL (`NEXT_PUBLIC_STAGING_API_URL`)
 - Set `VERCEL_ENV=preview`
 - Allow testing before production merge

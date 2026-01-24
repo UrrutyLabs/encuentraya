@@ -11,18 +11,21 @@ import { useProJobs } from "@hooks/booking";
 
 export function JobsScreen() {
   const router = useRouter();
-  
+
   // Fetch pro jobs bookings via hook
   const { bookings, isLoading, error } = useProJobs();
 
   // Filter bookings into upcoming (accepted and arrived) and completed
-  const { upcoming, completed } = useMemo<{ upcoming: Booking[]; completed: Booking[] }>(() => {
+  const { upcoming, completed } = useMemo<{
+    upcoming: Booking[];
+    completed: Booking[];
+  }>(() => {
     const upcomingBookings = bookings.filter(
       (booking: Booking) =>
         booking.status === BookingStatus.ACCEPTED ||
         booking.status === BookingStatus.ARRIVED
     );
-    
+
     const completedBookings = bookings.filter(
       (booking: Booking) => booking.status === BookingStatus.COMPLETED
     );
@@ -43,7 +46,10 @@ export function JobsScreen() {
 
   if (isLoading) {
     return (
-      <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={styles.content}
+      >
         <JobsSkeleton />
       </ScrollView>
     );

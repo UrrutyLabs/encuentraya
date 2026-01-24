@@ -1,6 +1,7 @@
 Task: Add a root-level THEME.md documenting the Calm Trust palette and Inter typography usage.
 
 Requirements:
+
 - Include the exact hex tokens
 - Include typography scale (display/h1/h2/body/small/xs)
 - Include “rules”:

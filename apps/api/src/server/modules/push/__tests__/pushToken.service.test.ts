@@ -25,14 +25,16 @@ describe("PushTokenService", () => {
     return { id, role };
   }
 
-  function createMockTokenEntity(overrides?: Partial<{
-    id: string;
-    userId: string;
-    provider: $Enums.PushProvider;
-    platform: $Enums.DevicePlatform;
-    token: string;
-    isActive: boolean;
-  }>) {
+  function createMockTokenEntity(
+    overrides?: Partial<{
+      id: string;
+      userId: string;
+      provider: $Enums.PushProvider;
+      platform: $Enums.DevicePlatform;
+      token: string;
+      isActive: boolean;
+    }>
+  ) {
     return {
       id: "token-1",
       userId: "user-1",
@@ -49,7 +51,9 @@ describe("PushTokenService", () => {
 
   beforeEach(() => {
     mockRepository = createMockRepository();
-    service = new PushTokenService(mockRepository as unknown as DevicePushTokenRepository);
+    service = new PushTokenService(
+      mockRepository as unknown as DevicePushTokenRepository
+    );
   });
 
   describe("registerToken", () => {
@@ -155,7 +159,9 @@ describe("PushTokenService", () => {
       mockRepository.deactivateToken.mockResolvedValue(null);
 
       // Act & Assert - should not throw
-      await expect(service.unregisterToken(actor, input)).resolves.not.toThrow();
+      await expect(
+        service.unregisterToken(actor, input)
+      ).resolves.not.toThrow();
       expect(mockRepository.deactivateToken).toHaveBeenCalledWith(input.token);
     });
   });

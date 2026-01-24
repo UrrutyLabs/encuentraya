@@ -8,11 +8,13 @@ import type { PushDeliveryResolver } from "./pushResolver";
 /**
  * Notification provider registry
  * Returns the appropriate provider based on channel
- * 
+ *
  * This keeps provider-specific implementations isolated and allows
  * easy addition of new providers without changing service/router code.
  */
-export function getNotificationProvider(channel: "EMAIL" | "WHATSAPP" | "PUSH"): NotificationProvider {
+export function getNotificationProvider(
+  channel: "EMAIL" | "WHATSAPP" | "PUSH"
+): NotificationProvider {
   switch (channel) {
     case "EMAIL":
       return new SendGridEmailProvider();
@@ -20,7 +22,9 @@ export function getNotificationProvider(channel: "EMAIL" | "WHATSAPP" | "PUSH"):
       return new TwilioWhatsAppProvider();
     case "PUSH": {
       // PUSH provider needs PushDeliveryResolver to resolve userId to tokens
-      const pushResolver = container.resolve<PushDeliveryResolver>(TOKENS.PushDeliveryResolver);
+      const pushResolver = container.resolve<PushDeliveryResolver>(
+        TOKENS.PushDeliveryResolver
+      );
       return new StubPushProvider(pushResolver);
     }
     default:

@@ -152,9 +152,7 @@ export const authRouter = router({
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message:
-            error instanceof Error
-              ? error.message
-              : "Failed to delete account",
+            error instanceof Error ? error.message : "Failed to delete account",
         });
       }
     }),
@@ -171,7 +169,8 @@ export const authRouter = router({
         // Log error but return generic message
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
-          message: "If an account exists with this email, a password reset link has been sent.",
+          message:
+            "If an account exists with this email, a password reset link has been sent.",
         });
       }
     }),
@@ -206,9 +205,7 @@ export const authRouter = router({
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message:
-            error instanceof Error
-              ? error.message
-              : "Failed to reset password",
+            error instanceof Error ? error.message : "Failed to reset password",
         });
       }
     }),
@@ -247,9 +244,7 @@ export const authRouter = router({
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message:
-            error instanceof Error
-              ? error.message
-              : "Failed to reset password",
+            error instanceof Error ? error.message : "Failed to reset password",
         });
       }
     }),

@@ -20,11 +20,21 @@ import {
 import { mapDomainErrorToTRPCError } from "@shared/errors/error-mapper";
 
 // Resolve services from container
-const bookingCreationService = container.resolve<BookingCreationService>(TOKENS.BookingCreationService);
-const bookingLifecycleService = container.resolve<BookingLifecycleService>(TOKENS.BookingLifecycleService);
-const bookingCompletionService = container.resolve<BookingCompletionService>(TOKENS.BookingCompletionService);
-const bookingQueryService = container.resolve<BookingQueryService>(TOKENS.BookingQueryService);
-const bookingAdminService = container.resolve<BookingAdminService>(TOKENS.BookingAdminService);
+const bookingCreationService = container.resolve<BookingCreationService>(
+  TOKENS.BookingCreationService
+);
+const bookingLifecycleService = container.resolve<BookingLifecycleService>(
+  TOKENS.BookingLifecycleService
+);
+const bookingCompletionService = container.resolve<BookingCompletionService>(
+  TOKENS.BookingCompletionService
+);
+const bookingQueryService = container.resolve<BookingQueryService>(
+  TOKENS.BookingQueryService
+);
+const bookingAdminService = container.resolve<BookingAdminService>(
+  TOKENS.BookingAdminService
+);
 
 export const bookingRouter = router({
   create: protectedProcedure
@@ -42,7 +52,10 @@ export const bookingRouter = router({
     .input(z.object({ bookingId: z.string() }))
     .mutation(async ({ input, ctx }) => {
       try {
-        return await bookingLifecycleService.acceptBooking(ctx.actor, input.bookingId);
+        return await bookingLifecycleService.acceptBooking(
+          ctx.actor,
+          input.bookingId
+        );
       } catch (error) {
         throw mapDomainErrorToTRPCError(error);
       }
@@ -52,7 +65,10 @@ export const bookingRouter = router({
     .input(z.object({ bookingId: z.string() }))
     .mutation(async ({ input, ctx }) => {
       try {
-        return await bookingLifecycleService.rejectBooking(ctx.actor, input.bookingId);
+        return await bookingLifecycleService.rejectBooking(
+          ctx.actor,
+          input.bookingId
+        );
       } catch (error) {
         throw mapDomainErrorToTRPCError(error);
       }
@@ -62,7 +78,10 @@ export const bookingRouter = router({
     .input(z.object({ bookingId: z.string() }))
     .mutation(async ({ input, ctx }) => {
       try {
-        return await bookingLifecycleService.markOnMyWay(ctx.actor, input.bookingId);
+        return await bookingLifecycleService.markOnMyWay(
+          ctx.actor,
+          input.bookingId
+        );
       } catch (error) {
         throw mapDomainErrorToTRPCError(error);
       }
@@ -72,7 +91,10 @@ export const bookingRouter = router({
     .input(z.object({ bookingId: z.string() }))
     .mutation(async ({ input, ctx }) => {
       try {
-        return await bookingLifecycleService.arriveBooking(ctx.actor, input.bookingId);
+        return await bookingLifecycleService.arriveBooking(
+          ctx.actor,
+          input.bookingId
+        );
       } catch (error) {
         throw mapDomainErrorToTRPCError(error);
       }
@@ -82,7 +104,10 @@ export const bookingRouter = router({
     .input(z.object({ bookingId: z.string() }))
     .mutation(async ({ input, ctx }) => {
       try {
-        return await bookingLifecycleService.cancelBooking(ctx.actor, input.bookingId);
+        return await bookingLifecycleService.cancelBooking(
+          ctx.actor,
+          input.bookingId
+        );
       } catch (error) {
         throw mapDomainErrorToTRPCError(error);
       }
@@ -92,7 +117,10 @@ export const bookingRouter = router({
     .input(z.object({ bookingId: z.string() }))
     .mutation(async ({ input, ctx }) => {
       try {
-        return await bookingCompletionService.completeBooking(ctx.actor, input.bookingId);
+        return await bookingCompletionService.completeBooking(
+          ctx.actor,
+          input.bookingId
+        );
       } catch (error) {
         throw mapDomainErrorToTRPCError(error);
       }
@@ -130,7 +158,10 @@ export const bookingRouter = router({
     .input(z.object({ bookingId: z.string() }))
     .query(async ({ input, ctx }) => {
       try {
-        return await bookingQueryService.getRebookTemplate(ctx.actor, input.bookingId);
+        return await bookingQueryService.getRebookTemplate(
+          ctx.actor,
+          input.bookingId
+        );
       } catch (error) {
         throw mapDomainErrorToTRPCError(error);
       }
@@ -138,7 +169,9 @@ export const bookingRouter = router({
 
   proInbox: proProcedure.query(async ({ ctx }) => {
     try {
-      const allBookings = await bookingQueryService.getProBookingsByUserId(ctx.actor.id);
+      const allBookings = await bookingQueryService.getProBookingsByUserId(
+        ctx.actor.id
+      );
       // Filter to pending and accepted bookings
       return allBookings.filter(
         (booking) =>
@@ -152,7 +185,9 @@ export const bookingRouter = router({
 
   proJobs: proProcedure.query(async ({ ctx }) => {
     try {
-      const allBookings = await bookingQueryService.getProBookingsByUserId(ctx.actor.id);
+      const allBookings = await bookingQueryService.getProBookingsByUserId(
+        ctx.actor.id
+      );
       // Filter to accepted, on my way, arrived, and completed bookings
       return allBookings.filter(
         (booking) =>

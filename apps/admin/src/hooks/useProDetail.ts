@@ -15,7 +15,11 @@ export function useProDetail({
 }: UseProDetailProps) {
   const utils = trpc.useUtils();
 
-  const { data: pro, isLoading, refetch } = trpc.pro.adminById.useQuery({
+  const {
+    data: pro,
+    isLoading,
+    refetch,
+  } = trpc.pro.adminById.useQuery({
     proProfileId,
   });
 
@@ -28,9 +32,18 @@ export function useProDetail({
 
   // Helper to invalidate audit logs (type assertion needed due to 'client' router name collision)
   const invalidateAuditLogs = () => {
-    const auditUtils = (utils as unknown as {
-      audit: { getResourceLogs: { invalidate: (input: { resourceType: string; resourceId: string }) => void } };
-    }).audit;
+    const auditUtils = (
+      utils as unknown as {
+        audit: {
+          getResourceLogs: {
+            invalidate: (input: {
+              resourceType: string;
+              resourceId: string;
+            }) => void;
+          };
+        };
+      }
+    ).audit;
     void auditUtils.getResourceLogs.invalidate({
       resourceType: "pro",
       resourceId: proProfileId,

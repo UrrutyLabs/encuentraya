@@ -4,21 +4,20 @@ import {
   DevicePushTokenRepositoryImpl,
   type DevicePushTokenRepository,
 } from "@modules/push/devicePushToken.repo";
-import {
-  PushTokenService,
-} from "@modules/push/pushToken.service";
-import {
-  PushDeliveryResolver,
-} from "@modules/notification/pushResolver";
+import { PushTokenService } from "@modules/push/pushToken.service";
+import { PushDeliveryResolver } from "@modules/notification/pushResolver";
 
 /**
  * Register push module dependencies
  */
 export function registerPushModule(container: DependencyContainer): void {
   // Register repository
-  container.register<DevicePushTokenRepository>(TOKENS.DevicePushTokenRepository, {
-    useClass: DevicePushTokenRepositoryImpl,
-  });
+  container.register<DevicePushTokenRepository>(
+    TOKENS.DevicePushTokenRepository,
+    {
+      useClass: DevicePushTokenRepositoryImpl,
+    }
+  );
 
   // Register service
   container.register(TOKENS.PushTokenService, {

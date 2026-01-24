@@ -22,9 +22,7 @@ export function useCreateBooking() {
   const queryClient = useQueryClient();
 
   const createBooking = trpc.booking.create.useMutation({
-    ...invalidateRelatedQueries(queryClient, [
-      [["booking", "myBookings"]],
-    ]),
+    ...invalidateRelatedQueries(queryClient, [[["booking", "myBookings"]]]),
     onSuccess: (data) => {
       // Redirect based on booking status
       if (data.status === BookingStatus.PENDING_PAYMENT) {
@@ -40,9 +38,13 @@ export function useCreateBooking() {
       await createBooking.mutateAsync(input);
       // Success - mutation's onSuccess will handle redirect
     } catch (error) {
-      logger.error("Error creating booking", error instanceof Error ? error : new Error(String(error)), {
-        input,
-      });
+      logger.error(
+        "Error creating booking",
+        error instanceof Error ? error : new Error(String(error)),
+        {
+          input,
+        }
+      );
       throw error;
     }
   };

@@ -76,7 +76,11 @@ export function ConfirmEmailScreen() {
 
         {resendSuccess && (
           <View style={styles.successContainer}>
-            <Feather name="check-circle" size={16} color={theme.colors.success} />
+            <Feather
+              name="check-circle"
+              size={16}
+              color={theme.colors.success}
+            />
             <Text variant="small" style={styles.success}>
               Email reenviado. Revisá tu bandeja de entrada.
             </Text>
@@ -85,7 +89,11 @@ export function ConfirmEmailScreen() {
 
         {error && (
           <View style={styles.errorContainer}>
-            <Feather name="alert-circle" size={16} color={theme.colors.danger} />
+            <Feather
+              name="alert-circle"
+              size={16}
+              color={theme.colors.danger}
+            />
             <Text variant="small" style={styles.error}>
               {error}
             </Text>

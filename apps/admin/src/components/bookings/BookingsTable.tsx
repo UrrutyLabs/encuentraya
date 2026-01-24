@@ -5,7 +5,12 @@ import { CalendarX } from "lucide-react";
 import { Badge } from "@repo/ui";
 import { TableSkeleton } from "@/components/ui/TableSkeleton";
 import { EmptyState } from "@repo/ui";
-import { formatCurrency, BookingStatus, getBookingStatusLabel, getBookingStatusVariant } from "@repo/domain";
+import {
+  formatCurrency,
+  BookingStatus,
+  getBookingStatusLabel,
+  getBookingStatusVariant,
+} from "@repo/domain";
 
 interface BookingRow {
   id: string;
@@ -37,18 +42,18 @@ export function BookingsTable({ bookings, isLoading }: BookingsTableProps) {
     });
   };
 
-
   const getPaymentStatusBadgeVariant = (status: string | null) => {
     if (!status) return "info";
-    const statusMap: Record<string, "info" | "success" | "warning" | "danger"> = {
-      CREATED: "info",
-      REQUIRES_ACTION: "warning",
-      AUTHORIZED: "info",
-      CAPTURED: "success",
-      FAILED: "danger",
-      CANCELLED: "danger",
-      REFUNDED: "warning",
-    };
+    const statusMap: Record<string, "info" | "success" | "warning" | "danger"> =
+      {
+        CREATED: "info",
+        REQUIRES_ACTION: "warning",
+        AUTHORIZED: "info",
+        CAPTURED: "success",
+        FAILED: "danger",
+        CANCELLED: "danger",
+        REFUNDED: "warning",
+      };
     return statusMap[status] || "info";
   };
 
@@ -103,7 +108,12 @@ export function BookingsTable({ bookings, isLoading }: BookingsTableProps) {
                   {formatDate(booking.createdAt)}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <Badge variant={getBookingStatusVariant(booking.status as BookingStatus)} showIcon>
+                  <Badge
+                    variant={getBookingStatusVariant(
+                      booking.status as BookingStatus
+                    )}
+                    showIcon
+                  >
                     {getBookingStatusLabel(booking.status as BookingStatus)}
                   </Badge>
                 </td>
@@ -118,7 +128,11 @@ export function BookingsTable({ bookings, isLoading }: BookingsTableProps) {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   {booking.paymentStatus ? (
-                    <Badge variant={getPaymentStatusBadgeVariant(booking.paymentStatus)}>
+                    <Badge
+                      variant={getPaymentStatusBadgeVariant(
+                        booking.paymentStatus
+                      )}
+                    >
                       {booking.paymentStatus}
                     </Badge>
                   ) : (

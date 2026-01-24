@@ -78,7 +78,11 @@ export class ErrorBoundary extends Component<Props, State> {
         <View style={styles.container}>
           <ScrollView contentContainerStyle={styles.content}>
             <View style={styles.iconContainer}>
-              <Feather name="alert-circle" size={64} color={theme.colors.danger} />
+              <Feather
+                name="alert-circle"
+                size={64}
+                color={theme.colors.danger}
+              />
             </View>
             <Text variant="h1" style={styles.title}>
               Algo salió mal
@@ -98,7 +102,11 @@ export class ErrorBoundary extends Component<Props, State> {
                 )}
               </View>
             )}
-            <Button variant="primary" onPress={this.handleReset} style={styles.button}>
+            <Button
+              variant="primary"
+              onPress={this.handleReset}
+              style={styles.button}
+            >
               Reintentar
             </Button>
           </ScrollView>

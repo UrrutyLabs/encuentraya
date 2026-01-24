@@ -41,13 +41,8 @@ export function validateStateTransition(
       BookingStatus.ON_MY_WAY,
       BookingStatus.CANCELLED,
     ],
-    [BookingStatus.ON_MY_WAY]: [
-      BookingStatus.ARRIVED,
-      BookingStatus.CANCELLED,
-    ],
-    [BookingStatus.ARRIVED]: [
-      BookingStatus.COMPLETED,
-    ],
+    [BookingStatus.ON_MY_WAY]: [BookingStatus.ARRIVED, BookingStatus.CANCELLED],
+    [BookingStatus.ARRIVED]: [BookingStatus.COMPLETED],
     [BookingStatus.REJECTED]: [], // Terminal state
     [BookingStatus.COMPLETED]: [], // Terminal state
     [BookingStatus.CANCELLED]: [], // Terminal state
@@ -138,10 +133,7 @@ export async function authorizeProAction(
   // Get pro profile for actor
   const proProfile = await proRepository.findByUserId(actor.id);
   if (!proProfile) {
-    throw new UnauthorizedBookingActionError(
-      action,
-      "Pro profile not found"
-    );
+    throw new UnauthorizedBookingActionError(action, "Pro profile not found");
   }
 
   if (booking.proProfileId !== proProfile.id) {
@@ -261,14 +253,12 @@ export async function sendClientNotification(
         payload,
         idempotencyKey: `${event}:${booking.id}:${clientProfile.phone}:WHATSAPP`,
       };
-      await notificationService
-        .deliverNow(whatsappMessage)
-        .catch((error) => {
-          console.error(
-            `Failed to send WHATSAPP notification for booking ${booking.id}:`,
-            error
-          );
-        });
+      await notificationService.deliverNow(whatsappMessage).catch((error) => {
+        console.error(
+          `Failed to send WHATSAPP notification for booking ${booking.id}:`,
+          error
+        );
+      });
     }
   } catch (error) {
     // Log but don't fail booking operation if notification fails

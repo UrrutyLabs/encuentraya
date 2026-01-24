@@ -50,25 +50,29 @@ export function FAQ({
       <div className="px-4 py-16">
         <div className="max-w-4xl mx-auto">
           <div ref={headerRef} className="text-center mb-12">
-            <Text 
-              variant="h1" 
+            <Text
+              variant="h1"
               className={`mb-4 text-primary transition-all duration-600 ${
-                headerVisible ? "animate-[fadeInDown_0.6s_ease-out]" : "opacity-0"
+                headerVisible
+                  ? "animate-[fadeInDown_0.6s_ease-out]"
+                  : "opacity-0"
               }`}
             >
               {title}
             </Text>
-            <Text 
-              variant="body" 
+            <Text
+              variant="body"
               className={`text-muted transition-all duration-600 ${
-                headerVisible ? "animate-[fadeIn_0.6s_ease-out_0.15s_both]" : "opacity-0"
+                headerVisible
+                  ? "animate-[fadeIn_0.6s_ease-out_0.15s_both]"
+                  : "opacity-0"
               }`}
             >
               {description}
             </Text>
           </div>
 
-          <div 
+          <div
             ref={itemsRef}
             className={`space-y-4 mb-8 transition-all duration-600 ${
               itemsVisible ? "opacity-100" : "opacity-0"
@@ -78,12 +82,19 @@ export function FAQ({
               const isOpen = openItems.has(index);
               const delay = index * 0.1;
               return (
-                <Card 
-                  key={index} 
+                <Card
+                  key={index}
                   className={`overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 ${
                     itemsVisible ? "animate-[slideUp_0.5s_ease-out]" : ""
                   }`}
-                  style={itemsVisible ? { animationDelay: `${delay}s`, animationFillMode: "both" } : undefined}
+                  style={
+                    itemsVisible
+                      ? {
+                          animationDelay: `${delay}s`,
+                          animationFillMode: "both",
+                        }
+                      : undefined
+                  }
                 >
                   <button
                     onClick={() => toggleItem(index)}
@@ -109,7 +120,10 @@ export function FAQ({
                     aria-hidden={!isOpen}
                   >
                     <div className="px-4 pb-4">
-                      <Text variant="body" className="text-muted leading-relaxed">
+                      <Text
+                        variant="body"
+                        className="text-muted leading-relaxed"
+                      >
                         {item.answer}
                       </Text>
                     </div>
@@ -120,24 +134,32 @@ export function FAQ({
           </div>
 
           {showContactCTA && (
-            <div 
+            <div
               ref={ctaRef}
               className={`text-center transition-all duration-600 ${
                 ctaVisible ? "opacity-100" : "opacity-0"
               }`}
             >
-              <div className={`inline-flex items-center gap-2 mb-4 ${
-                ctaVisible ? "animate-[fadeIn_0.6s_ease-out_0.1s_both]" : ""
-              }`}>
+              <div
+                className={`inline-flex items-center gap-2 mb-4 ${
+                  ctaVisible ? "animate-[fadeIn_0.6s_ease-out_0.1s_both]" : ""
+                }`}
+              >
                 <HelpCircle className="w-5 h-5 text-muted transition-transform duration-300 hover:scale-110" />
                 <Text variant="body" className="text-muted">
                   ¿Tenés otra duda?
                 </Text>
               </div>
-              <div className={ctaVisible ? "animate-[fadeInUp_0.6s_ease-out_0.25s_both]" : ""}>
+              <div
+                className={
+                  ctaVisible
+                    ? "animate-[fadeInUp_0.6s_ease-out_0.25s_both]"
+                    : ""
+                }
+              >
                 <Link href={ctaHref}>
-                  <Button 
-                    variant="ghost" 
+                  <Button
+                    variant="ghost"
                     className="text-primary transition-all duration-200 hover:scale-105 active:scale-95"
                   >
                     {ctaText}

@@ -53,7 +53,7 @@ export class BookingCompletionService {
   /**
    * Complete a booking (ARRIVED -> COMPLETED)
    * Authorization: Pro assigned to booking or Admin
-   * 
+   *
    * Business rules:
    * - Captures payment if authorized
    * - Creates earning record after successful payment capture
@@ -88,35 +88,40 @@ export class BookingCompletionService {
     // This ensures funds are charged when work is completed
     try {
       const payment = await this.paymentRepository.findByBookingId(bookingId);
-      
+
       if (payment && payment.status === PaymentStatus.AUTHORIZED) {
         // Get payment service using factory
-        const paymentService = await this.paymentServiceFactory(payment.provider);
-        
+        const paymentService = await this.paymentServiceFactory(
+          payment.provider
+        );
+
         // Attempt to capture payment (non-blocking - if it fails, booking still completes)
         // Payment can be captured manually later if needed
-        await paymentService.capturePayment(payment.id).then(async () => {
-          // After successful capture, create earning record
-          // Use system actor since this is an automated process
-          try {
-            await this.earningService.createEarningForCompletedBooking(
-              { role: "SYSTEM" },
-              bookingId
-            );
-          } catch (error) {
-            // Log but don't fail booking completion if earning creation fails
+        await paymentService
+          .capturePayment(payment.id)
+          .then(async () => {
+            // After successful capture, create earning record
+            // Use system actor since this is an automated process
+            try {
+              await this.earningService.createEarningForCompletedBooking(
+                { role: "SYSTEM" },
+                bookingId
+              );
+            } catch (error) {
+              // Log but don't fail booking completion if earning creation fails
+              console.error(
+                `Failed to create earning for booking ${bookingId}:`,
+                error
+              );
+            }
+          })
+          .catch((error) => {
             console.error(
-              `Failed to create earning for booking ${bookingId}:`,
+              `Failed to capture payment ${payment.id} for booking ${bookingId}:`,
               error
             );
-          }
-        }).catch((error) => {
-          console.error(
-            `Failed to capture payment ${payment.id} for booking ${bookingId}:`,
-            error
-          );
-          // Don't throw - booking completion should succeed even if capture fails
-        });
+            // Don't throw - booking completion should succeed even if capture fails
+          });
       } else if (payment && payment.status === PaymentStatus.CAPTURED) {
         // Payment already captured, create earning record
         try {
@@ -134,7 +139,10 @@ export class BookingCompletionService {
       }
     } catch (error) {
       // Log but don't fail booking completion if payment capture fails
-      console.error(`Error attempting to capture payment for booking ${bookingId}:`, error);
+      console.error(
+        `Error attempting to capture payment for booking ${bookingId}:`,
+        error
+      );
     }
 
     // Send notification to client

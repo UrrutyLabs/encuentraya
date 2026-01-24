@@ -32,7 +32,9 @@ export interface DevicePushTokenUpsertInput {
  * Handles all data access for device push tokens
  */
 export interface DevicePushTokenRepository {
-  upsertToken(input: DevicePushTokenUpsertInput): Promise<DevicePushTokenEntity>;
+  upsertToken(
+    input: DevicePushTokenUpsertInput
+  ): Promise<DevicePushTokenEntity>;
   deactivateToken(token: string): Promise<DevicePushTokenEntity | null>;
   listActiveTokensByUserId(userId: string): Promise<string[]>;
 }
@@ -42,7 +44,9 @@ export interface DevicePushTokenRepository {
  */
 @injectable()
 export class DevicePushTokenRepositoryImpl implements DevicePushTokenRepository {
-  async upsertToken(input: DevicePushTokenUpsertInput): Promise<DevicePushTokenEntity> {
+  async upsertToken(
+    input: DevicePushTokenUpsertInput
+  ): Promise<DevicePushTokenEntity> {
     const now = new Date();
     const token = await prisma.devicePushToken.upsert({
       where: { token: input.token },

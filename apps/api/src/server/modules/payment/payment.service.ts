@@ -86,7 +86,9 @@ export class PaymentService {
     }
 
     // Check if payment already exists
-    const existingPayment = await this.paymentRepository.findByBookingId(input.bookingId);
+    const existingPayment = await this.paymentRepository.findByBookingId(
+      input.bookingId
+    );
     if (existingPayment) {
       // Return existing payment if it's still in a valid state
       if (
@@ -170,10 +172,10 @@ export class PaymentService {
    * - Map provider status to PaymentStatus using safe transitions
    * - If payment becomes AUTHORIZED -> set booking status from PENDING_PAYMENT -> PENDING
    * - If payment fails/cancelled -> keep booking in PENDING_PAYMENT (client can retry)
-   * 
+   *
    * Idempotency: Events are stored in PaymentEvent table. If the same event arrives twice,
    * it's safe to process again as status transitions are validated.
-   * 
+   *
    * Booking Status Behavior:
    * - Payment AUTHORIZED: Booking PENDING_PAYMENT -> PENDING (ready for pro acceptance)
    * - Payment FAILED/CANCELLED: Booking stays in PENDING_PAYMENT (client can retry or cancel)
@@ -229,7 +231,8 @@ export class PaymentService {
     if (newStatus !== payment.status) {
       await this.paymentRepository.updateStatusAndAmounts(payment.id, {
         status: newStatus,
-        amountAuthorized: providerStatus.authorizedAmount ?? payment.amountAuthorized,
+        amountAuthorized:
+          providerStatus.authorizedAmount ?? payment.amountAuthorized,
         amountCaptured: providerStatus.capturedAmount ?? payment.amountCaptured,
       });
 
@@ -242,7 +245,10 @@ export class PaymentService {
       if (newStatus === PaymentStatus.AUTHORIZED) {
         // Payment authorized -> booking can proceed to PENDING (awaiting pro acceptance)
         if (booking.status === BookingStatus.PENDING_PAYMENT) {
-          await this.bookingRepository.updateStatus(payment.bookingId, BookingStatus.PENDING);
+          await this.bookingRepository.updateStatus(
+            payment.bookingId,
+            BookingStatus.PENDING
+          );
         }
       } else if (newStatus === PaymentStatus.CAPTURED) {
         // Payment captured -> create earning if booking is completed
@@ -275,8 +281,10 @@ export class PaymentService {
         providerStatus.capturedAmount !== payment.amountCaptured
       ) {
         await this.paymentRepository.updateStatusAndAmounts(payment.id, {
-          amountAuthorized: providerStatus.authorizedAmount ?? payment.amountAuthorized,
-          amountCaptured: providerStatus.capturedAmount ?? payment.amountCaptured,
+          amountAuthorized:
+            providerStatus.authorizedAmount ?? payment.amountAuthorized,
+          amountCaptured:
+            providerStatus.capturedAmount ?? payment.amountCaptured,
         });
       }
     }
@@ -420,15 +428,21 @@ export class PaymentService {
     if (this.isValidStatusTransition(payment.status, providerStatus.status)) {
       await this.paymentRepository.updateStatusAndAmounts(payment.id, {
         status: providerStatus.status,
-        amountAuthorized: providerStatus.authorizedAmount ?? payment.amountAuthorized,
+        amountAuthorized:
+          providerStatus.authorizedAmount ?? payment.amountAuthorized,
         amountCaptured: providerStatus.capturedAmount ?? payment.amountCaptured,
       });
 
       // Update booking status if payment becomes AUTHORIZED
       if (providerStatus.status === PaymentStatus.AUTHORIZED) {
-        const booking = await this.bookingRepository.findById(payment.bookingId);
+        const booking = await this.bookingRepository.findById(
+          payment.bookingId
+        );
         if (booking && booking.status === BookingStatus.PENDING_PAYMENT) {
-          await this.bookingRepository.updateStatus(payment.bookingId, BookingStatus.PENDING);
+          await this.bookingRepository.updateStatus(
+            payment.bookingId,
+            BookingStatus.PENDING
+          );
         }
       }
 
@@ -463,17 +477,19 @@ export class PaymentService {
     query?: string; // Search by bookingId or providerReference
     limit?: number;
     cursor?: string;
-  }): Promise<Array<{
-    id: string;
-    status: PaymentStatus;
-    bookingId: string;
-    provider: PaymentProvider;
-    amountEstimated: number;
-    amountAuthorized: number | null;
-    amountCaptured: number | null;
-    currency: string;
-    updatedAt: Date;
-  }>> {
+  }): Promise<
+    Array<{
+      id: string;
+      status: PaymentStatus;
+      bookingId: string;
+      provider: PaymentProvider;
+      amountEstimated: number;
+      amountAuthorized: number | null;
+      amountCaptured: number | null;
+      currency: string;
+      updatedAt: Date;
+    }>
+  > {
     const payments = await this.paymentRepository.findAll(filters);
 
     return payments.map((p) => ({

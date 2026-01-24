@@ -40,7 +40,9 @@ describe("useProSignup", () => {
   });
 
   it("should call mutation with correct input", async () => {
-    const mockMutateAsync = jest.fn().mockResolvedValue({ email: "test@example.com" });
+    const mockMutateAsync = jest
+      .fn()
+      .mockResolvedValue({ email: "test@example.com" });
     mockUseMutation.mockReturnValue({
       mutateAsync: mockMutateAsync,
       isPending: false,
@@ -62,7 +64,9 @@ describe("useProSignup", () => {
   });
 
   it("should navigate to confirm-email screen on success", async () => {
-    const mockMutateAsync = jest.fn().mockResolvedValue({ email: "test@example.com" });
+    const mockMutateAsync = jest
+      .fn()
+      .mockResolvedValue({ email: "test@example.com" });
     let onSuccessCallback: (data: { email: string }) => void;
 
     mockUseMutation.mockImplementation((options) => {
@@ -139,7 +143,9 @@ describe("useProSignup", () => {
     };
 
     await act(async () => {
-      await expect(result.current.signup(input)).rejects.toThrow("Signup failed");
+      await expect(result.current.signup(input)).rejects.toThrow(
+        "Signup failed"
+      );
     });
   });
 });

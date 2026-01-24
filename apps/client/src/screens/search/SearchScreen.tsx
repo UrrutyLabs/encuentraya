@@ -57,13 +57,19 @@ export function SearchScreen() {
   const { pros, isLoading } = useSearchPros(filters);
 
   // Memoize event handlers
-  const handleCategoryChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
-    setCategory(e.target.value as Category | "");
-  }, []);
+  const handleCategoryChange = useCallback(
+    (e: React.ChangeEvent<HTMLSelectElement>) => {
+      setCategory(e.target.value as Category | "");
+    },
+    []
+  );
 
-  const handleTimeWindowChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
-    setTimeWindow(e.target.value as TimeWindow | "");
-  }, []);
+  const handleTimeWindowChange = useCallback(
+    (e: React.ChangeEvent<HTMLSelectElement>) => {
+      setTimeWindow(e.target.value as TimeWindow | "");
+    },
+    []
+  );
 
   return (
     <div className="min-h-screen bg-bg">

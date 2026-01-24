@@ -2,12 +2,7 @@
 
 import { useState } from "react";
 import { useParams } from "next/navigation";
-import {
-  Star,
-  AlertCircle,
-  CheckCircle,
-  ArrowLeft,
-} from "lucide-react";
+import { Star, AlertCircle, CheckCircle, ArrowLeft } from "lucide-react";
 import { Text } from "@repo/ui";
 import { Card } from "@repo/ui";
 import { Button } from "@repo/ui";

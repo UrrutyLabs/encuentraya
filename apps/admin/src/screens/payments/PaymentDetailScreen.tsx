@@ -30,20 +30,25 @@ export function PaymentDetailScreen({ paymentId }: PaymentDetailScreenProps) {
   };
 
   const getStatusBadgeVariant = (status: string) => {
-    const statusMap: Record<string, "info" | "success" | "warning" | "danger"> = {
-      CREATED: "info",
-      REQUIRES_ACTION: "warning",
-      AUTHORIZED: "info",
-      CAPTURED: "success",
-      FAILED: "danger",
-      CANCELLED: "danger",
-      REFUNDED: "warning",
-    };
+    const statusMap: Record<string, "info" | "success" | "warning" | "danger"> =
+      {
+        CREATED: "info",
+        REQUIRES_ACTION: "warning",
+        AUTHORIZED: "info",
+        CAPTURED: "success",
+        FAILED: "danger",
+        CANCELLED: "danger",
+        REFUNDED: "warning",
+      };
     return statusMap[status] || "info";
   };
 
   const handleSyncStatus = () => {
-    if (confirm("¿Estás seguro de sincronizar el estado del pago con el proveedor?")) {
+    if (
+      confirm(
+        "¿Estás seguro de sincronizar el estado del pago con el proveedor?"
+      )
+    ) {
       syncStatusMutation.mutate(
         { paymentId },
         {
@@ -72,7 +77,10 @@ export function PaymentDetailScreen({ paymentId }: PaymentDetailScreenProps) {
       <div className="flex items-center justify-between">
         <div>
           <Text variant="h1">Pago #{payment.id}</Text>
-          <Badge variant={getStatusBadgeVariant(payment.status)} className="mt-2">
+          <Badge
+            variant={getStatusBadgeVariant(payment.status)}
+            className="mt-2"
+          >
             {payment.status}
           </Badge>
         </div>
@@ -168,28 +176,35 @@ export function PaymentDetailScreen({ paymentId }: PaymentDetailScreenProps) {
           </Text>
         ) : (
           <div className="space-y-4">
-            {payment.events.map((event: { id: string; eventType: string; raw: unknown; createdAt: Date }) => (
-              <div
-                key={event.id}
-                className="border border-gray-200 rounded-md p-4 space-y-2"
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Text variant="body" className="font-medium">
-                      {event.eventType}
-                    </Text>
-                    <Text variant="small" className="text-gray-600">
-                      {formatDate(event.createdAt)}
-                    </Text>
+            {payment.events.map(
+              (event: {
+                id: string;
+                eventType: string;
+                raw: unknown;
+                createdAt: Date;
+              }) => (
+                <div
+                  key={event.id}
+                  className="border border-gray-200 rounded-md p-4 space-y-2"
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Text variant="body" className="font-medium">
+                        {event.eventType}
+                      </Text>
+                      <Text variant="small" className="text-gray-600">
+                        {formatDate(event.createdAt)}
+                      </Text>
+                    </div>
+                  </div>
+                  <div className="bg-gray-50 rounded p-3">
+                    <pre className="text-xs overflow-x-auto">
+                      {JSON.stringify(event.raw, null, 2)}
+                    </pre>
                   </div>
                 </div>
-                <div className="bg-gray-50 rounded p-3">
-                  <pre className="text-xs overflow-x-auto">
-                    {JSON.stringify(event.raw, null, 2)}
-                  </pre>
-                </div>
-              </div>
-            ))}
+              )
+            )}
           </div>
         )}
       </Card>
@@ -205,7 +220,9 @@ export function PaymentDetailScreen({ paymentId }: PaymentDetailScreenProps) {
             onClick={handleSyncStatus}
             disabled={syncStatusMutation.isPending}
           >
-            {syncStatusMutation.isPending ? "Sincronizando..." : "Sincronizar estado"}
+            {syncStatusMutation.isPending
+              ? "Sincronizando..."
+              : "Sincronizar estado"}
           </Button>
         </div>
       </Card>

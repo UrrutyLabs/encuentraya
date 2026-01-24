@@ -25,7 +25,9 @@ export const contactRouter = router({
         throw new TRPCError({
           code: "TOO_MANY_REQUESTS",
           message: `Too many requests from this email. Please try again later.`,
-          cause: { retryAfter: Math.ceil((emailResult.reset - Date.now()) / 1000) },
+          cause: {
+            retryAfter: Math.ceil((emailResult.reset - Date.now()) / 1000),
+          },
         });
       }
 
@@ -41,7 +43,8 @@ export const contactRouter = router({
 
         return {
           success: true,
-          message: "Your message has been sent successfully. We'll get back to you soon!",
+          message:
+            "Your message has been sent successfully. We'll get back to you soon!",
         };
       } catch (error) {
         // Re-throw TRPCErrors as-is

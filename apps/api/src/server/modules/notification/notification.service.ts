@@ -30,7 +30,10 @@ export class NotificationService {
     status: $Enums.NotificationDeliveryStatus;
   }> {
     // Check for existing delivery by idempotencyKey
-    const existing = await this.notificationDeliveryRepository.findByIdempotencyKey(message.idempotencyKey);
+    const existing =
+      await this.notificationDeliveryRepository.findByIdempotencyKey(
+        message.idempotencyKey
+      );
     if (existing) {
       return {
         id: existing.id,
@@ -80,7 +83,10 @@ export class NotificationService {
 
     // If already sent, return existing
     if (delivery.status === $Enums.NotificationDeliveryStatus.SENT) {
-      const existing = await this.notificationDeliveryRepository.findByIdempotencyKey(message.idempotencyKey);
+      const existing =
+        await this.notificationDeliveryRepository.findByIdempotencyKey(
+          message.idempotencyKey
+        );
       return {
         id: existing!.id,
         status: existing!.status,
@@ -101,11 +107,14 @@ export class NotificationService {
       const result = await provider.send(message);
 
       // Mark as sent
-      const sent = await this.notificationDeliveryRepository.markSent(delivery.id, {
-        provider: result.provider,
-        providerMessageId: result.providerMessageId,
-        sentAt: new Date(),
-      });
+      const sent = await this.notificationDeliveryRepository.markSent(
+        delivery.id,
+        {
+          provider: result.provider,
+          providerMessageId: result.providerMessageId,
+          sentAt: new Date(),
+        }
+      );
 
       return {
         id: sent.id,
@@ -115,11 +124,15 @@ export class NotificationService {
       };
     } catch (error) {
       // Mark as failed
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      const failed = await this.notificationDeliveryRepository.markFailed(delivery.id, {
-        error: errorMessage,
-        failedAt: new Date(),
-      });
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      const failed = await this.notificationDeliveryRepository.markFailed(
+        delivery.id,
+        {
+          error: errorMessage,
+          failedAt: new Date(),
+        }
+      );
 
       return {
         id: failed.id,

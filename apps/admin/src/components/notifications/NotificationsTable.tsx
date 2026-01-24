@@ -27,7 +27,10 @@ export function NotificationsTable({
   const getChannelBadgeVariant = (
     channel: string
   ): "info" | "success" | "warning" | "danger" => {
-    const channelMap: Record<string, "info" | "success" | "warning" | "danger"> = {
+    const channelMap: Record<
+      string,
+      "info" | "success" | "warning" | "danger"
+    > = {
       EMAIL: "info",
       WHATSAPP: "success",
       PUSH: "warning",

@@ -12,7 +12,8 @@ export function AccessDeniedScreen() {
           Acceso denegado
         </Text>
         <Text variant="body" className="text-gray-600">
-          No tenés permisos para acceder a esta sección. Solo los administradores pueden acceder.
+          No tenés permisos para acceder a esta sección. Solo los
+          administradores pueden acceder.
         </Text>
         <Link href="/login">
           <Button variant="primary" className="w-full">

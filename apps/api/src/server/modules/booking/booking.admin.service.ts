@@ -52,17 +52,19 @@ export class BookingAdminService {
     dateTo?: Date;
     limit?: number;
     cursor?: string;
-  }): Promise<Array<{
-    id: string;
-    createdAt: Date;
-    status: BookingStatus;
-    clientEmail: string | null;
-    clientName: string | null;
-    proName: string | null;
-    estimatedAmount: number;
-    paymentStatus: string | null;
-    currency: string;
-  }>> {
+  }): Promise<
+    Array<{
+      id: string;
+      createdAt: Date;
+      status: BookingStatus;
+      clientEmail: string | null;
+      clientName: string | null;
+      proName: string | null;
+      estimatedAmount: number;
+      paymentStatus: string | null;
+      currency: string;
+    }>
+  > {
     // Get bookings with filters
     const bookings = await this.bookingRepository.findAll({
       status: filters?.status,
@@ -95,7 +97,9 @@ export class BookingAdminService {
       proIds.map((id) => this.proRepository.findById(id))
     );
     const proMap = new Map(
-      pros.filter((p): p is NonNullable<typeof p> => p !== null).map((p) => [p.id, p])
+      pros
+        .filter((p): p is NonNullable<typeof p> => p !== null)
+        .map((p) => [p.id, p])
     );
 
     // Get payments for bookings
@@ -113,7 +117,9 @@ export class BookingAdminService {
     // Combine and filter by query if provided
     let results = bookings.map((booking) => {
       const clientProfile = clientMap.get(booking.clientUserId);
-      const pro = booking.proProfileId ? proMap.get(booking.proProfileId) : null;
+      const pro = booking.proProfileId
+        ? proMap.get(booking.proProfileId)
+        : null;
       const payment = paymentMap.get(booking.id);
       const hourlyRate = pro?.hourlyRate ?? 0;
       const estimatedAmount = hourlyRate * booking.hoursEstimate;
@@ -124,7 +130,8 @@ export class BookingAdminService {
         status: booking.status,
         clientEmail: clientProfile?.email ?? null,
         clientName: clientProfile
-          ? `${clientProfile.firstName || ""} ${clientProfile.lastName || ""}`.trim() || null
+          ? `${clientProfile.firstName || ""} ${clientProfile.lastName || ""}`.trim() ||
+            null
           : null,
         proName: pro?.displayName ?? null,
         estimatedAmount,

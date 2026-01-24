@@ -54,7 +54,9 @@ export function AdminLayout({ children }: AdminLayoutProps) {
         </div>
         <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
           {navItems.map((item) => {
-            const isActive = pathname === item.href || (item.href === "/admin" && pathname === "/admin");
+            const isActive =
+              pathname === item.href ||
+              (item.href === "/admin" && pathname === "/admin");
             const Icon = item.icon;
             return (
               <Link
@@ -66,7 +68,9 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                     : "text-text hover:bg-surface/80"
                 }`}
               >
-                <Icon className={`w-5 h-5 ${isActive ? "text-primary" : "text-muted"}`} />
+                <Icon
+                  className={`w-5 h-5 ${isActive ? "text-primary" : "text-muted"}`}
+                />
                 {item.label}
               </Link>
             );

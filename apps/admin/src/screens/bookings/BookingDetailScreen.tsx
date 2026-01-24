@@ -2,8 +2,16 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { BookingStatus, getBookingStatusLabel, getBookingStatusVariant } from "@repo/domain";
-import { useBooking, useCancelBooking, useForceBookingStatus } from "@/hooks/useBookings";
+import {
+  BookingStatus,
+  getBookingStatusLabel,
+  getBookingStatusVariant,
+} from "@repo/domain";
+import {
+  useBooking,
+  useCancelBooking,
+  useForceBookingStatus,
+} from "@/hooks/useBookings";
 import { Card } from "@repo/ui";
 import { Button } from "@repo/ui";
 import { Text } from "@repo/ui";
@@ -19,7 +27,9 @@ interface BookingDetailScreenProps {
 export function BookingDetailScreen({ bookingId }: BookingDetailScreenProps) {
   const router = useRouter();
   const [showForceStatusModal, setShowForceStatusModal] = useState(false);
-  const [selectedStatus, setSelectedStatus] = useState<BookingStatus | null>(null);
+  const [selectedStatus, setSelectedStatus] = useState<BookingStatus | null>(
+    null
+  );
 
   const { data: booking, isLoading, refetch } = useBooking(bookingId);
   const cancelMutation = useCancelBooking();
@@ -35,7 +45,6 @@ export function BookingDetailScreen({ bookingId }: BookingDetailScreenProps) {
     });
   };
 
-
   const handleCancel = () => {
     if (confirm("¿Estás seguro de que querés cancelar esta reserva?")) {
       cancelMutation.mutate(
@@ -50,7 +59,10 @@ export function BookingDetailScreen({ bookingId }: BookingDetailScreenProps) {
   };
 
   const handleForceStatus = () => {
-    if (selectedStatus && confirm(`¿Estás seguro de cambiar el estado a ${selectedStatus}?`)) {
+    if (
+      selectedStatus &&
+      confirm(`¿Estás seguro de cambiar el estado a ${selectedStatus}?`)
+    ) {
       forceStatusMutation.mutate(
         {
           bookingId,
@@ -95,7 +107,11 @@ export function BookingDetailScreen({ bookingId }: BookingDetailScreenProps) {
       <div className="flex items-center justify-between">
         <div>
           <Text variant="h1">Reserva #{booking.id}</Text>
-          <Badge variant={getBookingStatusVariant(booking.status)} showIcon className="mt-2">
+          <Badge
+            variant={getBookingStatusVariant(booking.status)}
+            showIcon
+            className="mt-2"
+          >
             {getBookingStatusLabel(booking.status)}
           </Badge>
         </div>
@@ -133,7 +149,10 @@ export function BookingDetailScreen({ bookingId }: BookingDetailScreenProps) {
               Monto estimado
             </Text>
             <Text variant="body">
-              {formatCurrency(booking.estimatedAmount, booking.payment?.currency || "UYU")}
+              {formatCurrency(
+                booking.estimatedAmount,
+                booking.payment?.currency || "UYU"
+              )}
             </Text>
           </div>
           <div>
@@ -247,7 +266,11 @@ export function BookingDetailScreen({ bookingId }: BookingDetailScreenProps) {
                 Monto estimado
               </Text>
               <Text variant="body">
-                {formatCurrency(booking.payment.amountEstimated, booking.payment.currency, true)}
+                {formatCurrency(
+                  booking.payment.amountEstimated,
+                  booking.payment.currency,
+                  true
+                )}
               </Text>
             </div>
             {booking.payment.amountAuthorized && (
@@ -256,7 +279,11 @@ export function BookingDetailScreen({ bookingId }: BookingDetailScreenProps) {
                   Monto autorizado
                 </Text>
                 <Text variant="body">
-                  {formatCurrency(booking.payment.amountAuthorized, booking.payment.currency, true)}
+                  {formatCurrency(
+                    booking.payment.amountAuthorized,
+                    booking.payment.currency,
+                    true
+                  )}
                 </Text>
               </div>
             )}
@@ -266,7 +293,11 @@ export function BookingDetailScreen({ bookingId }: BookingDetailScreenProps) {
                   Monto capturado
                 </Text>
                 <Text variant="body">
-                  {formatCurrency(booking.payment.amountCaptured, booking.payment.currency, true)}
+                  {formatCurrency(
+                    booking.payment.amountCaptured,
+                    booking.payment.currency,
+                    true
+                  )}
                 </Text>
               </div>
             )}
@@ -283,7 +314,10 @@ export function BookingDetailScreen({ bookingId }: BookingDetailScreenProps) {
           <Button
             variant="danger"
             onClick={handleCancel}
-            disabled={cancelMutation.isPending || booking.status === BookingStatus.CANCELLED}
+            disabled={
+              cancelMutation.isPending ||
+              booking.status === BookingStatus.CANCELLED
+            }
           >
             {cancelMutation.isPending ? "Cancelando..." : "Cancelar reserva"}
           </Button>
@@ -311,7 +345,9 @@ export function BookingDetailScreen({ bookingId }: BookingDetailScreenProps) {
                 <select
                   value={selectedStatus || ""}
                   onChange={(e) =>
-                    setSelectedStatus(e.target.value ? (e.target.value as BookingStatus) : null)
+                    setSelectedStatus(
+                      e.target.value ? (e.target.value as BookingStatus) : null
+                    )
                   }
                   className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                 >
@@ -330,7 +366,9 @@ export function BookingDetailScreen({ bookingId }: BookingDetailScreenProps) {
                   disabled={!selectedStatus || forceStatusMutation.isPending}
                   className="flex-1"
                 >
-                  {forceStatusMutation.isPending ? "Actualizando..." : "Confirmar"}
+                  {forceStatusMutation.isPending
+                    ? "Actualizando..."
+                    : "Confirmar"}
                 </Button>
                 <Button
                   variant="ghost"

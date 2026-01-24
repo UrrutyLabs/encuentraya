@@ -1,4 +1,11 @@
-import { Star, MessageSquare, AlertCircle, Send, X, Loader2 } from "lucide-react";
+import {
+  Star,
+  MessageSquare,
+  AlertCircle,
+  Send,
+  X,
+  Loader2,
+} from "lucide-react";
 import { Button } from "@repo/ui";
 import { Text } from "@repo/ui";
 

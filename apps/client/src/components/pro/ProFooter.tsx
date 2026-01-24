@@ -14,16 +14,28 @@ export function ProFooter() {
             </Text>
           </div>
           <div className="flex gap-6">
-            <Link href="#" className="text-muted hover:text-text transition-colors">
+            <Link
+              href="#"
+              className="text-muted hover:text-text transition-colors"
+            >
               <Text variant="small">Términos</Text>
             </Link>
-            <Link href="/pro/faqs" className="text-muted hover:text-text transition-colors">
+            <Link
+              href="/pro/faqs"
+              className="text-muted hover:text-text transition-colors"
+            >
               <Text variant="small">Preguntas frecuentes</Text>
             </Link>
-            <Link href="#" className="text-muted hover:text-text transition-colors">
+            <Link
+              href="#"
+              className="text-muted hover:text-text transition-colors"
+            >
               <Text variant="small">Privacidad</Text>
             </Link>
-            <Link href="/contact" className="text-muted hover:text-text transition-colors">
+            <Link
+              href="/contact"
+              className="text-muted hover:text-text transition-colors"
+            >
               <Text variant="small">Contacto</Text>
             </Link>
           </div>

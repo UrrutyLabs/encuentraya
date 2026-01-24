@@ -62,86 +62,89 @@ function ProConfirmEmailContent() {
     <div className="min-h-screen bg-bg">
       <ProHeader />
       <div className="flex items-center justify-center p-4 min-h-[calc(100vh-73px)]">
-      <div className="max-w-md w-full space-y-8">
-        <div className="text-center space-y-2">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <Mail className="w-6 h-6 text-primary" />
-            <Text variant="h1" className="text-text">
-              Confirmá tu email
-            </Text>
+        <div className="max-w-md w-full space-y-8">
+          <div className="text-center space-y-2">
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <Mail className="w-6 h-6 text-primary" />
+              <Text variant="h1" className="text-text">
+                Confirmá tu email
+              </Text>
+            </div>
           </div>
-        </div>
 
-        <Card className="p-8 space-y-6">
-          <div className="space-y-4">
-            <Text variant="body" className="text-text text-center">
-              Te enviamos un link de confirmación a:
-            </Text>
+          <Card className="p-8 space-y-6">
+            <div className="space-y-4">
+              <Text variant="body" className="text-text text-center">
+                Te enviamos un link de confirmación a:
+              </Text>
 
-            {email && (
-              <div className="flex items-center justify-center gap-2">
-                <Mail className="w-4 h-4 text-primary" />
-                <Text variant="body" className="text-primary text-center font-medium">
-                  {email}
-                </Text>
-              </div>
-            )}
-
-            <Text variant="body" className="text-muted text-center">
-              Hacé click en el link del email para confirmar tu cuenta. 
-              Luego podrás descargar la app móvil y completar tu perfil profesional.
-            </Text>
-
-            {resendSuccess && (
-              <div className="flex items-center gap-2 p-3 bg-success/10 border border-success/20 rounded-md">
-                <CheckCircle className="w-4 h-4 text-success shrink-0" />
-                <Text variant="small" className="text-success text-center">
-                  Email reenviado. Revisá tu bandeja de entrada.
-                </Text>
-              </div>
-            )}
-
-            {error && (
-              <div className="flex items-center gap-2 p-3 bg-danger/10 border border-danger/20 rounded-md">
-                <AlertCircle className="w-4 h-4 text-danger shrink-0" />
-                <Text variant="small" className="text-danger text-center">
-                  {error}
-                </Text>
-              </div>
-            )}
-
-            <Button
-              variant="primary"
-              onClick={handleResendEmail}
-              disabled={resending || !email}
-              className="w-full flex items-center gap-2 justify-center"
-            >
-              {resending ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Reenviando...
-                </>
-              ) : (
-                <>
-                  <Send className="w-4 h-4" />
-                  Reenviar email
-                </>
+              {email && (
+                <div className="flex items-center justify-center gap-2">
+                  <Mail className="w-4 h-4 text-primary" />
+                  <Text
+                    variant="body"
+                    className="text-primary text-center font-medium"
+                  >
+                    {email}
+                  </Text>
+                </div>
               )}
-            </Button>
-          </div>
 
-          <div className="pt-4 border-t border-border">
-            <Button
-              variant="ghost"
-              onClick={() => router.push("/pro")}
-              className="w-full flex items-center gap-2 justify-center"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Volver al inicio
-            </Button>
-          </div>
-        </Card>
-      </div>
+              <Text variant="body" className="text-muted text-center">
+                Hacé click en el link del email para confirmar tu cuenta. Luego
+                podrás descargar la app móvil y completar tu perfil profesional.
+              </Text>
+
+              {resendSuccess && (
+                <div className="flex items-center gap-2 p-3 bg-success/10 border border-success/20 rounded-md">
+                  <CheckCircle className="w-4 h-4 text-success shrink-0" />
+                  <Text variant="small" className="text-success text-center">
+                    Email reenviado. Revisá tu bandeja de entrada.
+                  </Text>
+                </div>
+              )}
+
+              {error && (
+                <div className="flex items-center gap-2 p-3 bg-danger/10 border border-danger/20 rounded-md">
+                  <AlertCircle className="w-4 h-4 text-danger shrink-0" />
+                  <Text variant="small" className="text-danger text-center">
+                    {error}
+                  </Text>
+                </div>
+              )}
+
+              <Button
+                variant="primary"
+                onClick={handleResendEmail}
+                disabled={resending || !email}
+                className="w-full flex items-center gap-2 justify-center"
+              >
+                {resending ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Reenviando...
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-4 h-4" />
+                    Reenviar email
+                  </>
+                )}
+              </Button>
+            </div>
+
+            <div className="pt-4 border-t border-border">
+              <Button
+                variant="ghost"
+                onClick={() => router.push("/pro")}
+                className="w-full flex items-center gap-2 justify-center"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Volver al inicio
+              </Button>
+            </div>
+          </Card>
+        </div>
       </div>
     </div>
   );

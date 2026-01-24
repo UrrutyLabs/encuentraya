@@ -11,7 +11,9 @@ export function useAuth() {
 
   // Register push token when session is available
   // eslint-disable-next-line @typescript-eslint/no-unused-vars -- unregisterToken reserved for future use
-  const { unregisterToken: _unregisterToken } = usePushToken(session?.user?.id ?? null);
+  const { unregisterToken: _unregisterToken } = usePushToken(
+    session?.user?.id ?? null
+  );
 
   useEffect(() => {
     // Get initial session
@@ -82,14 +84,14 @@ export function useAuth() {
   const signOut = async () => {
     try {
       setError(null);
-      
+
       // TODO: Unregister push token on logout
       // For MVP, token stays active but should be unregistered later
       // const currentToken = await getExpoPushToken();
       // if (currentToken) {
       //   await unregisterToken(currentToken.token);
       // }
-      
+
       const { error } = await supabase.auth.signOut();
       if (error) {
         setError(error.message);

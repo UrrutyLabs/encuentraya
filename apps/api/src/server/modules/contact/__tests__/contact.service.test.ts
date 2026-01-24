@@ -23,19 +23,24 @@ describe("ContactService", () => {
     };
   }
 
-  function createContactFormInput(overrides?: Partial<ContactFormInput>): ContactFormInput {
+  function createContactFormInput(
+    overrides?: Partial<ContactFormInput>
+  ): ContactFormInput {
     return {
       name: "John Doe",
       email: "john@example.com",
       subject: "Test Subject",
-      message: "This is a test message with enough characters to pass validation.",
+      message:
+        "This is a test message with enough characters to pass validation.",
       ...overrides,
     };
   }
 
   beforeEach(() => {
     mockNotificationService = createMockNotificationService();
-    service = new ContactService(mockNotificationService as unknown as NotificationService);
+    service = new ContactService(
+      mockNotificationService as unknown as NotificationService
+    );
     vi.clearAllMocks();
   });
 
@@ -45,7 +50,8 @@ describe("ContactService", () => {
       const input = createContactFormInput();
       const mockDeliveryResult = {
         id: "delivery-123",
-        status: NotificationDeliveryStatus.SENT as $Enums.NotificationDeliveryStatus,
+        status:
+          NotificationDeliveryStatus.SENT as $Enums.NotificationDeliveryStatus,
         provider: "sendgrid",
         providerMessageId: "msg-123",
       };
@@ -81,7 +87,8 @@ describe("ContactService", () => {
       const input = createContactFormInput();
       mockNotificationService.deliverNow.mockResolvedValue({
         id: "delivery-123",
-        status: NotificationDeliveryStatus.SENT as $Enums.NotificationDeliveryStatus,
+        status:
+          NotificationDeliveryStatus.SENT as $Enums.NotificationDeliveryStatus,
       });
 
       // Act
@@ -109,7 +116,8 @@ describe("ContactService", () => {
       const input = createContactFormInput();
       mockNotificationService.deliverNow.mockResolvedValue({
         id: "delivery-123",
-        status: NotificationDeliveryStatus.SENT as $Enums.NotificationDeliveryStatus,
+        status:
+          NotificationDeliveryStatus.SENT as $Enums.NotificationDeliveryStatus,
       });
 
       // Act
@@ -140,7 +148,8 @@ describe("ContactService", () => {
       const input = createContactFormInput();
       mockNotificationService.deliverNow.mockResolvedValue({
         id: "delivery-123",
-        status: NotificationDeliveryStatus.SENT as $Enums.NotificationDeliveryStatus,
+        status:
+          NotificationDeliveryStatus.SENT as $Enums.NotificationDeliveryStatus,
       });
 
       // Act
@@ -165,12 +174,14 @@ describe("ContactService", () => {
         name: "<script>alert('xss')</script>",
         email: "test@example.com",
         subject: "Test <b>Subject</b>",
-        message: "Message with <script>alert('xss')</script> and & special chars",
+        message:
+          "Message with <script>alert('xss')</script> and & special chars",
       });
 
       mockNotificationService.deliverNow.mockResolvedValue({
         id: "delivery-123",
-        status: NotificationDeliveryStatus.SENT as $Enums.NotificationDeliveryStatus,
+        status:
+          NotificationDeliveryStatus.SENT as $Enums.NotificationDeliveryStatus,
       });
 
       // Act
@@ -199,7 +210,8 @@ describe("ContactService", () => {
 
       mockNotificationService.deliverNow.mockResolvedValue({
         id: "delivery-123",
-        status: NotificationDeliveryStatus.SENT as $Enums.NotificationDeliveryStatus,
+        status:
+          NotificationDeliveryStatus.SENT as $Enums.NotificationDeliveryStatus,
       });
 
       // Act
@@ -224,7 +236,8 @@ describe("ContactService", () => {
 
       mockNotificationService.deliverNow.mockResolvedValue({
         id: "delivery-123",
-        status: NotificationDeliveryStatus.SENT as $Enums.NotificationDeliveryStatus,
+        status:
+          NotificationDeliveryStatus.SENT as $Enums.NotificationDeliveryStatus,
       });
 
       // Act
@@ -237,7 +250,9 @@ describe("ContactService", () => {
       // Check that the message content has newlines converted to <br>
       expect(html).toContain("Line 1<br>Line 2<br><br>Line 3");
       // The message part should not contain raw newlines (only template formatting)
-      const messagePart = html.match(/<p><strong>Mensaje:<\/strong><\/p>\s*<p>(.*?)<\/p>/)?.[1];
+      const messagePart = html.match(
+        /<p><strong>Mensaje:<\/strong><\/p>\s*<p>(.*?)<\/p>/
+      )?.[1];
       expect(messagePart).toBeDefined();
       if (messagePart) {
         expect(messagePart).toContain("<br>");
@@ -251,7 +266,8 @@ describe("ContactService", () => {
       const input = createContactFormInput();
       mockNotificationService.deliverNow.mockResolvedValue({
         id: "delivery-123",
-        status: NotificationDeliveryStatus.FAILED as $Enums.NotificationDeliveryStatus,
+        status:
+          NotificationDeliveryStatus.FAILED as $Enums.NotificationDeliveryStatus,
         error: "Failed to send email",
       });
 
@@ -268,7 +284,8 @@ describe("ContactService", () => {
       const input = createContactFormInput();
       mockNotificationService.deliverNow.mockResolvedValue({
         id: "delivery-123",
-        status: NotificationDeliveryStatus.QUEUED as $Enums.NotificationDeliveryStatus,
+        status:
+          NotificationDeliveryStatus.QUEUED as $Enums.NotificationDeliveryStatus,
       });
 
       // Act
@@ -287,7 +304,8 @@ describe("ContactService", () => {
 
       mockNotificationService.deliverNow.mockResolvedValue({
         id: "delivery-123",
-        status: NotificationDeliveryStatus.SENT as $Enums.NotificationDeliveryStatus,
+        status:
+          NotificationDeliveryStatus.SENT as $Enums.NotificationDeliveryStatus,
       });
 
       // Act
@@ -296,7 +314,9 @@ describe("ContactService", () => {
       // Assert
       const callArgs = mockNotificationService.deliverNow.mock.calls[0][0];
       expect(callArgs.idempotencyKey).toContain("contact:unique@example.com");
-      expect(callArgs.idempotencyKey).toMatch(/^contact:unique@example\.com:\d+$/);
+      expect(callArgs.idempotencyKey).toMatch(
+        /^contact:unique@example\.com:\d+$/
+      );
     });
 
     it("should include all input fields in notification payload", async () => {
@@ -310,7 +330,8 @@ describe("ContactService", () => {
 
       mockNotificationService.deliverNow.mockResolvedValue({
         id: "delivery-123",
-        status: NotificationDeliveryStatus.SENT as $Enums.NotificationDeliveryStatus,
+        status:
+          NotificationDeliveryStatus.SENT as $Enums.NotificationDeliveryStatus,
       });
 
       // Act

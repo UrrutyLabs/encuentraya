@@ -9,22 +9,24 @@ export function useCheckout(bookingId: string | undefined) {
   const [error, setError] = useState<string | null>(null);
 
   // Fetch booking details
-  const { data: booking, isLoading: isLoadingBooking } = trpc.booking.getById.useQuery(
-    { id: bookingId! },
-    {
-      enabled: !!bookingId,
-      retry: false,
-    }
-  );
+  const { data: booking, isLoading: isLoadingBooking } =
+    trpc.booking.getById.useQuery(
+      { id: bookingId! },
+      {
+        enabled: !!bookingId,
+        retry: false,
+      }
+    );
 
   // Fetch payment summary
-  const { data: payment, isLoading: isLoadingPayment } = trpc.payment.getByBooking.useQuery(
-    { bookingId: bookingId! },
-    {
-      enabled: !!bookingId,
-      retry: false,
-    }
-  );
+  const { data: payment, isLoading: isLoadingPayment } =
+    trpc.payment.getByBooking.useQuery(
+      { bookingId: bookingId! },
+      {
+        enabled: !!bookingId,
+        retry: false,
+      }
+    );
 
   // Create preauth mutation
   const createPreauth = trpc.payment.createPreauthForBooking.useMutation({

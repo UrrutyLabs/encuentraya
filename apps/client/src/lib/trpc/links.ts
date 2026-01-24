@@ -10,7 +10,10 @@ const getBaseUrl = () => {
   } catch (error) {
     // In development, allow fallback to localhost
     if (process.env.NODE_ENV === "development") {
-      console.warn("[tRPC] Environment detection failed, using localhost fallback:", error);
+      console.warn(
+        "[tRPC] Environment detection failed, using localhost fallback:",
+        error
+      );
       return "http://localhost:3002";
     }
     // In production/preview, re-throw the error

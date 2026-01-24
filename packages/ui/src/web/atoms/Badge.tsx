@@ -55,23 +55,23 @@ export function Badge({
   return (
     <span
       className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border ${className}`}
-      style={{ 
-        lineHeight: '1.2',
-        ...variantStyles[variant]
+      style={{
+        lineHeight: "1.2",
+        ...variantStyles[variant],
       }}
       {...props}
     >
       {Icon && (
-        <Icon 
-          className="w-3 h-3 shrink-0" 
-          style={{ 
-            display: 'inline-block',
-            verticalAlign: 'middle',
-            marginTop: '-1px'
-          }} 
+        <Icon
+          className="w-3 h-3 shrink-0"
+          style={{
+            display: "inline-block",
+            verticalAlign: "middle",
+            marginTop: "-1px",
+          }}
         />
       )}
-      <span style={{ display: 'inline-block', verticalAlign: 'middle' }}>
+      <span style={{ display: "inline-block", verticalAlign: "middle" }}>
         {children}
       </span>
     </span>

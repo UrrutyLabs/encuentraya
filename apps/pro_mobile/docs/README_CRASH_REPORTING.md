@@ -11,6 +11,7 @@ pnpm install
 ```
 
 The following packages are required for full Sentry integration:
+
 - `@sentry/react-native` - Sentry SDK for React Native
 - `expo-application` - App information for Sentry context
 - `expo-device` - Device information for Sentry context
@@ -47,7 +48,6 @@ eas secret:create --scope project --name EXPO_PUBLIC_SENTRY_DSN --value https://
 ```
 
 2. **Get Sentry Auth Token:**
-
    - Go to Sentry Settings → Auth Tokens
    - Create a new token with scopes: `project:releases`, `org:read`, `project:read`, `project:write`
    - Use this token for `SENTRY_AUTH_TOKEN`
@@ -91,7 +91,11 @@ logger.error("Failed to save data", error, { userId: "123" });
 #### Crash Reporting
 
 ```typescript
-import { captureException, setUserContext, clearUserContext } from "@/lib/crash-reporting";
+import {
+  captureException,
+  setUserContext,
+  clearUserContext,
+} from "@/lib/crash-reporting";
 
 // Manually capture an exception
 captureException(error, { additionalContext: "value" });
@@ -125,6 +129,7 @@ clearUserContext();
 ## Error Boundary
 
 The app includes a global Error Boundary that:
+
 - Catches React component errors
 - Shows a user-friendly error screen
 - Logs errors with context
@@ -134,6 +139,7 @@ The app includes a global Error Boundary that:
 ## React Query Error Handling
 
 React Query errors are automatically:
+
 - Logged with context
 - Reported to Sentry
 - Retried up to 2 times (except for 4xx errors)

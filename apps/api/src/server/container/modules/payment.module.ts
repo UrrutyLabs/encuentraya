@@ -34,12 +34,9 @@ export function registerPaymentModule(container: DependencyContainer): void {
     useClass: PaymentRepositoryImpl,
   });
 
-  container.register<PaymentEventRepository>(
-    TOKENS.PaymentEventRepository,
-    {
-      useClass: PaymentEventRepositoryImpl,
-    }
-  );
+  container.register<PaymentEventRepository>(TOKENS.PaymentEventRepository, {
+    useClass: PaymentEventRepositoryImpl,
+  });
 
   // Register PaymentServiceFactory
   // This factory creates PaymentService instances with provider-specific clients
@@ -47,20 +44,39 @@ export function registerPaymentModule(container: DependencyContainer): void {
   // then repositories are injected via @inject decorators. Since we're creating instances
   // manually (not via container.resolve), we need to manually resolve repositories.
   // Use useValue since PaymentServiceFactory is a function type, not a class
-  const factory: PaymentServiceFactory = async (provider: PaymentProvider): Promise<PaymentService> => {
+  const factory: PaymentServiceFactory = async (
+    provider: PaymentProvider
+  ): Promise<PaymentService> => {
     const providerClient = await getPaymentProviderClient(provider);
     // Resolve repositories and services from container
-    const paymentRepo = container.resolve<PaymentRepository>(TOKENS.PaymentRepository);
-    const paymentEventRepo = container.resolve<PaymentEventRepository>(TOKENS.PaymentEventRepository);
-    const bookingRepo = container.resolve<BookingRepository>(TOKENS.BookingRepository);
+    const paymentRepo = container.resolve<PaymentRepository>(
+      TOKENS.PaymentRepository
+    );
+    const paymentEventRepo = container.resolve<PaymentEventRepository>(
+      TOKENS.PaymentEventRepository
+    );
+    const bookingRepo = container.resolve<BookingRepository>(
+      TOKENS.BookingRepository
+    );
     const proRepo = container.resolve<ProRepository>(TOKENS.ProRepository);
-    const earningService = container.resolve<EarningService>(TOKENS.EarningService);
+    const earningService = container.resolve<EarningService>(
+      TOKENS.EarningService
+    );
     const auditService = container.resolve<AuditService>(TOKENS.AuditService);
     // Manually construct PaymentService with all dependencies
     // (providerClient and provider as constructor params, repositories injected)
-    return new PaymentService(providerClient, provider, paymentRepo, paymentEventRepo, bookingRepo, proRepo, earningService, auditService);
+    return new PaymentService(
+      providerClient,
+      provider,
+      paymentRepo,
+      paymentEventRepo,
+      bookingRepo,
+      proRepo,
+      earningService,
+      auditService
+    );
   };
-  
+
   // Register the factory function as a value
   // Note: TSyringe's type system has issues with function types, so we use a workaround
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

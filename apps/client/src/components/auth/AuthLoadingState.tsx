@@ -11,7 +11,9 @@ interface AuthLoadingStateProps {
  * Presentational component for authentication loading state
  * Pure UI component - no logic, just renders loading state
  */
-export function AuthLoadingState({ maxWidth = "max-w-4xl" }: AuthLoadingStateProps) {
+export function AuthLoadingState({
+  maxWidth = "max-w-4xl",
+}: AuthLoadingStateProps) {
   return (
     <div className="min-h-screen bg-bg">
       <Navigation showLogin={false} showProfile={true} />

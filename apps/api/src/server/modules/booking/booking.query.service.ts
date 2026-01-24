@@ -42,13 +42,13 @@ export class BookingQueryService {
   async getBookingById(id: string): Promise<Booking | null> {
     const booking = await this.bookingRepository.findById(id);
     if (!booking) return null;
-    
+
     // Get pro to get hourly rate
     const pro = booking.proProfileId
       ? await this.proRepository.findById(booking.proProfileId)
       : null;
     const hourlyRate = pro?.hourlyRate ?? 0;
-    
+
     return mapBookingEntityToDomain(booking, hourlyRate);
   }
 
@@ -114,7 +114,7 @@ export class BookingQueryService {
    */
   async getClientBookings(clientId: string): Promise<Booking[]> {
     const bookings = await this.bookingRepository.findByClientUserId(clientId);
-    
+
     // Get pros for all bookings to get hourly rates
     const proIds = bookings
       .map((b) => b.proProfileId)
@@ -123,12 +123,14 @@ export class BookingQueryService {
       proIds.map((id) => this.proRepository.findById(id))
     );
     const proMap = new Map(
-      pros.filter((p): p is NonNullable<typeof p> => p !== null).map((p) => [p.id, p.hourlyRate])
+      pros
+        .filter((p): p is NonNullable<typeof p> => p !== null)
+        .map((p) => [p.id, p.hourlyRate])
     );
-    
+
     return bookings.map((booking) => {
       const hourlyRate = booking.proProfileId
-        ? proMap.get(booking.proProfileId) ?? 0
+        ? (proMap.get(booking.proProfileId) ?? 0)
         : 0;
       return mapBookingEntityToDomain(booking, hourlyRate);
     });
@@ -139,11 +141,11 @@ export class BookingQueryService {
    */
   async getProBookings(proId: string): Promise<Booking[]> {
     const bookings = await this.bookingRepository.findByProProfileId(proId);
-    
+
     // Get pro to get hourly rate
     const pro = await this.proRepository.findById(proId);
     const hourlyRate = pro?.hourlyRate ?? 0;
-    
+
     return bookings.map((booking) =>
       mapBookingEntityToDomain(booking, hourlyRate)
     );

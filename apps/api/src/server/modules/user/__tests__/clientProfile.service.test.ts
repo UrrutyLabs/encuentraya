@@ -37,14 +37,19 @@ describe("ClientProfileService", () => {
 
   beforeEach(() => {
     mockRepository = createMockRepository();
-    service = new ClientProfileService(mockRepository as unknown as import("../clientProfile.repo").ClientProfileRepository);
+    service = new ClientProfileService(
+      mockRepository as unknown as import("../clientProfile.repo").ClientProfileRepository
+    );
   });
 
   describe("ensureClientProfileExists", () => {
     it("should return existing profile when profile exists", async () => {
       // Arrange
       const userId = "user-1";
-      const existingProfile = createMockProfile({ userId, email: "test@example.com" });
+      const existingProfile = createMockProfile({
+        userId,
+        email: "test@example.com",
+      });
       mockRepository.findByUserId.mockResolvedValue(existingProfile);
 
       // Act
@@ -211,7 +216,10 @@ describe("ClientProfileService", () => {
       const result = await service.updateProfile(userId, updateData);
 
       // Assert
-      expect(mockRepository.upsertForUser).toHaveBeenCalledWith(userId, updateData);
+      expect(mockRepository.upsertForUser).toHaveBeenCalledWith(
+        userId,
+        updateData
+      );
       expect(result).toEqual(updatedProfile);
     });
 
@@ -232,7 +240,10 @@ describe("ClientProfileService", () => {
       const result = await service.updateProfile(userId, updateData);
 
       // Assert
-      expect(mockRepository.upsertForUser).toHaveBeenCalledWith(userId, updateData);
+      expect(mockRepository.upsertForUser).toHaveBeenCalledWith(
+        userId,
+        updateData
+      );
       expect(result.email).toBe("newemail@example.com");
     });
 
@@ -256,7 +267,10 @@ describe("ClientProfileService", () => {
       const result = await service.updateProfile(userId, updateData);
 
       // Assert
-      expect(mockRepository.upsertForUser).toHaveBeenCalledWith(userId, updateData);
+      expect(mockRepository.upsertForUser).toHaveBeenCalledWith(
+        userId,
+        updateData
+      );
       expect(result.firstName).toBeNull();
       expect(result.lastName).toBeNull();
       expect(result.phone).toBeNull();
@@ -278,7 +292,10 @@ describe("ClientProfileService", () => {
       const result = await service.updateProfile(userId, updateData);
 
       // Assert
-      expect(mockRepository.upsertForUser).toHaveBeenCalledWith(userId, updateData);
+      expect(mockRepository.upsertForUser).toHaveBeenCalledWith(
+        userId,
+        updateData
+      );
       expect(result.preferredContactMethod).toBe("WHATSAPP");
     });
   });

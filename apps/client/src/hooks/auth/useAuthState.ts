@@ -33,7 +33,7 @@ export interface UseAuthStateReturn {
 /**
  * Hook that combines useAuth and useUserRole into a single state
  * Automatically fetches role when user is authenticated
- * 
+ *
  * @returns Combined auth state
  */
 export function useAuthState(): UseAuthStateReturn {

@@ -29,18 +29,20 @@ describe("useSignup", () => {
 
       let onSuccessCallback: ((data: { email: string }) => void) | undefined;
 
-      mockTrpcAuthSignup.mockImplementation((options?: { onSuccess?: (data: { email: string }) => void }) => {
-        onSuccessCallback = options?.onSuccess;
-        return {
-          mutateAsync: async (input: unknown) => {
-            const result = await mockMutateAsync(input);
-            onSuccessCallback?.(result);
-            return result;
-          },
-          isPending: false,
-          error: null,
-        };
-      });
+      mockTrpcAuthSignup.mockImplementation(
+        (options?: { onSuccess?: (data: { email: string }) => void }) => {
+          onSuccessCallback = options?.onSuccess;
+          return {
+            mutateAsync: async (input: unknown) => {
+              const result = await mockMutateAsync(input);
+              onSuccessCallback?.(result);
+              return result;
+            },
+            isPending: false,
+            error: null,
+          };
+        }
+      );
 
       const { result } = renderHook(() => useSignup());
 
@@ -73,18 +75,20 @@ describe("useSignup", () => {
 
       let onSuccessCallback: ((data: { email: string }) => void) | undefined;
 
-      mockTrpcAuthSignup.mockImplementation((options?: { onSuccess?: (data: { email: string }) => void }) => {
-        onSuccessCallback = options?.onSuccess;
-        return {
-          mutateAsync: async (input: unknown) => {
-            const result = await mockMutateAsync(input);
-            onSuccessCallback?.(result);
-            return result;
-          },
-          isPending: false,
-          error: null,
-        };
-      });
+      mockTrpcAuthSignup.mockImplementation(
+        (options?: { onSuccess?: (data: { email: string }) => void }) => {
+          onSuccessCallback = options?.onSuccess;
+          return {
+            mutateAsync: async (input: unknown) => {
+              const result = await mockMutateAsync(input);
+              onSuccessCallback?.(result);
+              return result;
+            },
+            isPending: false,
+            error: null,
+          };
+        }
+      );
 
       const { result } = renderHook(() => useSignup("/my-bookings"));
 
@@ -112,18 +116,20 @@ describe("useSignup", () => {
 
       let onSuccessCallback: ((data: { email: string }) => void) | undefined;
 
-      mockTrpcAuthSignup.mockImplementation((options?: { onSuccess?: (data: { email: string }) => void }) => {
-        onSuccessCallback = options?.onSuccess;
-        return {
-          mutateAsync: async (input: unknown) => {
-            const result = await mockMutateAsync(input);
-            onSuccessCallback?.(result);
-            return result;
-          },
-          isPending: false,
-          error: null,
-        };
-      });
+      mockTrpcAuthSignup.mockImplementation(
+        (options?: { onSuccess?: (data: { email: string }) => void }) => {
+          onSuccessCallback = options?.onSuccess;
+          return {
+            mutateAsync: async (input: unknown) => {
+              const result = await mockMutateAsync(input);
+              onSuccessCallback?.(result);
+              return result;
+            },
+            isPending: false,
+            error: null,
+          };
+        }
+      );
 
       const { result } = renderHook(() => useSignup(null));
 

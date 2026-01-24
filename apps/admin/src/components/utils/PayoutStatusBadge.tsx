@@ -10,12 +10,13 @@ export function PayoutStatusBadge({ status }: PayoutStatusBadgeProps) {
   const getStatusBadgeVariant = (
     status: string
   ): "info" | "success" | "warning" | "danger" => {
-    const statusMap: Record<string, "info" | "success" | "warning" | "danger"> = {
-      CREATED: "info",
-      SENT: "info",
-      SETTLED: "success",
-      FAILED: "danger",
-    };
+    const statusMap: Record<string, "info" | "success" | "warning" | "danger"> =
+      {
+        CREATED: "info",
+        SENT: "info",
+        SETTLED: "success",
+        FAILED: "danger",
+      };
     return statusMap[status] || "info";
   };
 

@@ -92,17 +92,27 @@ export class ErrorBoundary extends Component<Props, State> {
               </div>
               {isDevelopment && this.state.error && (
                 <div className="w-full p-4 bg-surface rounded-lg text-left">
-                  <Text variant="small" className="font-mono text-danger text-xs break-all">
+                  <Text
+                    variant="small"
+                    className="font-mono text-danger text-xs break-all"
+                  >
                     {this.state.error.toString()}
                   </Text>
                   {this.state.errorInfo && (
-                    <Text variant="small" className="font-mono text-danger text-xs mt-2 break-all whitespace-pre-wrap">
+                    <Text
+                      variant="small"
+                      className="font-mono text-danger text-xs mt-2 break-all whitespace-pre-wrap"
+                    >
                       {this.state.errorInfo.componentStack}
                     </Text>
                   )}
                 </div>
               )}
-              <Button variant="primary" onClick={this.handleReset} className="w-full">
+              <Button
+                variant="primary"
+                onClick={this.handleReset}
+                className="w-full"
+              >
                 <RefreshCw className="w-4 h-4 mr-2" />
                 Reintentar
               </Button>

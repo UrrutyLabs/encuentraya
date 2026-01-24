@@ -5,6 +5,7 @@ The admin dashboard for managing the Arreglatodo marketplace platform.
 ## Overview
 
 A Next.js web application that provides administrators with tools to:
+
 - Monitor platform metrics and analytics
 - Manage professional profiles (approve/suspend)
 - View and manage bookings
@@ -54,6 +55,7 @@ pnpm install
 ### Environment Setup
 
 1. Copy `.env.example` to `.env.local`:
+
    ```bash
    cp .env.example .env.local
    ```
@@ -151,6 +153,7 @@ See [Frontend Best Practices](../../docs/FE_BEST_PRACTICES.md) for detailed arch
 ## Key Features
 
 ### Dashboard
+
 - Platform overview metrics
 - Revenue trends and charts
 - Booking status breakdown
@@ -158,30 +161,35 @@ See [Frontend Best Practices](../../docs/FE_BEST_PRACTICES.md) for detailed arch
 - Recent activity feed
 
 ### Professional Management
+
 - View all professional profiles
 - Approve/suspend professionals
 - View professional details and audit history
 - Filter and search professionals
 
 ### Booking Management
+
 - View all bookings across the platform
 - Filter by status, date, category
 - Force booking status changes (admin override)
 - View booking timeline and details
 
 ### Payment Management
+
 - View all payment records
 - Monitor payment status
 - View payment details and history
 - Track payment synchronization
 
 ### Payout Management
+
 - View payables (earnings ready for payout)
 - Process payouts
 - View payout history and status
 - Track payout failures and retries
 
 ### Notifications
+
 - View notification delivery status
 - Monitor notification failures
 - Track notification channels (email, WhatsApp, push)
@@ -189,6 +197,7 @@ See [Frontend Best Practices](../../docs/FE_BEST_PRACTICES.md) for detailed arch
 ## Authentication
 
 The admin app requires:
+
 - User must be authenticated
 - User must have `admin` role
 - Protected routes automatically redirect non-admin users

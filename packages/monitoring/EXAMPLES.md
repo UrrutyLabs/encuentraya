@@ -40,7 +40,10 @@ export function initCrashReporting() {
       if (event.exception) {
         const error = hint.originalException;
         if (error instanceof Error) {
-          if (error.message.includes("permission") || error.message.includes("notification")) {
+          if (
+            error.message.includes("permission") ||
+            error.message.includes("notification")
+          ) {
             return null;
           }
         }
@@ -69,17 +72,27 @@ export function clearUserContext() {
   logger.debug("User context cleared");
 }
 
-export function captureException(error: Error, context?: Record<string, unknown>) {
+export function captureException(
+  error: Error,
+  context?: Record<string, unknown>
+) {
   captureExceptionShared(adapter, error, context);
   logger.error("Exception captured", error, context);
 }
 
-export function captureMessage(message: string, level: "info" | "warning" | "error" = "info") {
+export function captureMessage(
+  message: string,
+  level: "info" | "warning" | "error" = "info"
+) {
   captureMessageShared(adapter, message, level);
   logger.info(`Message captured: ${message}`, { level });
 }
 
-export function addBreadcrumb(message: string, category: string, data?: Record<string, unknown>) {
+export function addBreadcrumb(
+  message: string,
+  category: string,
+  data?: Record<string, unknown>
+) {
   addBreadcrumbShared(adapter, message, category, data);
 }
 
@@ -131,17 +144,27 @@ export function clearUserContext() {
   logger.debug("User context cleared");
 }
 
-export function captureException(error: Error, context?: Record<string, unknown>) {
+export function captureException(
+  error: Error,
+  context?: Record<string, unknown>
+) {
   captureExceptionShared(adapter, error, context);
   logger.error("Exception captured", error, context);
 }
 
-export function captureMessage(message: string, level: "info" | "warning" | "error" = "info") {
+export function captureMessage(
+  message: string,
+  level: "info" | "warning" | "error" = "info"
+) {
   captureMessageShared(adapter, message, level);
   logger.info(`Message captured: ${message}`, { level });
 }
 
-export function addBreadcrumb(message: string, category: string, data?: Record<string, unknown>) {
+export function addBreadcrumb(
+  message: string,
+  category: string,
+  data?: Record<string, unknown>
+) {
   addBreadcrumbShared(adapter, message, category, data);
 }
 

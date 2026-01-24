@@ -16,7 +16,9 @@ export const pushRouter = router({
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const pushTokenService = container.resolve<PushTokenService>(TOKENS.PushTokenService);
+      const pushTokenService = container.resolve<PushTokenService>(
+        TOKENS.PushTokenService
+      );
       await pushTokenService.registerToken(ctx.actor, input);
       return { success: true };
     }),
@@ -32,7 +34,9 @@ export const pushRouter = router({
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const pushTokenService = container.resolve<PushTokenService>(TOKENS.PushTokenService);
+      const pushTokenService = container.resolve<PushTokenService>(
+        TOKENS.PushTokenService
+      );
       await pushTokenService.unregisterToken(ctx.actor, input);
       return { success: true };
     }),

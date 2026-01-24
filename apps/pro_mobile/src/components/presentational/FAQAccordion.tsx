@@ -11,9 +11,17 @@ interface FAQAccordionProps {
   defaultExpandedCount?: number;
 }
 
-export function FAQAccordion({ items, defaultExpandedCount = 4 }: FAQAccordionProps) {
+export function FAQAccordion({
+  items,
+  defaultExpandedCount = 4,
+}: FAQAccordionProps) {
   const [openItems, setOpenItems] = useState<Set<number>>(
-    new Set(Array.from({ length: Math.min(defaultExpandedCount, items.length) }, (_, i) => i))
+    new Set(
+      Array.from(
+        { length: Math.min(defaultExpandedCount, items.length) },
+        (_, i) => i
+      )
+    )
   );
 
   const toggleItem = (index: number) => {
@@ -37,7 +45,11 @@ export function FAQAccordion({ items, defaultExpandedCount = 4 }: FAQAccordionPr
               style={styles.questionRow}
               activeOpacity={0.7}
             >
-              <Text variant="h2" style={styles.question} numberOfLines={isOpen ? undefined : 2}>
+              <Text
+                variant="h2"
+                style={styles.question}
+                numberOfLines={isOpen ? undefined : 2}
+              >
                 {item.question}
               </Text>
               <Feather

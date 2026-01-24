@@ -6,7 +6,7 @@ This app uses React Query (TanStack Query) with enhanced configuration and optim
 
 ### Enhanced QueryClient Configuration
 
-- **Smart Retry Logic**: 
+- **Smart Retry Logic**:
   - No retries for client errors (4xx)
   - Up to 2 retries for server errors (5xx) with exponential backoff
   - Mutations retry once on failure
@@ -88,9 +88,7 @@ const mutation = trpc.booking.complete.useMutation({
 import { refetchQueries } from "@/lib/react-query/utils";
 
 const mutation = trpc.pro.updateProfile.useMutation({
-  ...refetchQueries(queryClient, [
-    [["pro", "getMyProfile"]],
-  ]),
+  ...refetchQueries(queryClient, [[["pro", "getMyProfile"]]]),
 });
 ```
 

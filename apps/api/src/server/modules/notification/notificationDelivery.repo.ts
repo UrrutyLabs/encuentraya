@@ -40,13 +40,18 @@ export interface NotificationDeliveryCreateInput {
  */
 export interface NotificationDeliveryRepository {
   findByIdempotencyKey(key: string): Promise<NotificationDeliveryEntity | null>;
-  createQueued(input: NotificationDeliveryCreateInput): Promise<NotificationDeliveryEntity>;
+  createQueued(
+    input: NotificationDeliveryCreateInput
+  ): Promise<NotificationDeliveryEntity>;
   incrementAttempt(id: string, at: Date): Promise<NotificationDeliveryEntity>;
   markSent(
     id: string,
     data: { provider: string; providerMessageId?: string; sentAt: Date }
   ): Promise<NotificationDeliveryEntity>;
-  markFailed(id: string, data: { error: string; failedAt: Date }): Promise<NotificationDeliveryEntity>;
+  markFailed(
+    id: string,
+    data: { error: string; failedAt: Date }
+  ): Promise<NotificationDeliveryEntity>;
   listQueued(limit: number): Promise<NotificationDeliveryEntity[]>;
   listFailed(limit: number): Promise<NotificationDeliveryEntity[]>;
 }
@@ -56,7 +61,9 @@ export interface NotificationDeliveryRepository {
  */
 @injectable()
 export class NotificationDeliveryRepositoryImpl implements NotificationDeliveryRepository {
-  async findByIdempotencyKey(key: string): Promise<NotificationDeliveryEntity | null> {
+  async findByIdempotencyKey(
+    key: string
+  ): Promise<NotificationDeliveryEntity | null> {
     const delivery = await prisma.notificationDelivery.findUnique({
       where: { idempotencyKey: key },
     });
@@ -64,7 +71,9 @@ export class NotificationDeliveryRepositoryImpl implements NotificationDeliveryR
     return delivery ? this.mapPrismaToDomain(delivery) : null;
   }
 
-  async createQueued(input: NotificationDeliveryCreateInput): Promise<NotificationDeliveryEntity> {
+  async createQueued(
+    input: NotificationDeliveryCreateInput
+  ): Promise<NotificationDeliveryEntity> {
     const delivery = await prisma.notificationDelivery.create({
       data: {
         channel: input.channel,
@@ -79,7 +88,10 @@ export class NotificationDeliveryRepositoryImpl implements NotificationDeliveryR
     return this.mapPrismaToDomain(delivery);
   }
 
-  async incrementAttempt(id: string, at: Date): Promise<NotificationDeliveryEntity> {
+  async incrementAttempt(
+    id: string,
+    at: Date
+  ): Promise<NotificationDeliveryEntity> {
     const delivery = await prisma.notificationDelivery.update({
       where: { id },
       data: {
@@ -108,7 +120,10 @@ export class NotificationDeliveryRepositoryImpl implements NotificationDeliveryR
     return this.mapPrismaToDomain(delivery);
   }
 
-  async markFailed(id: string, data: { error: string; failedAt: Date }): Promise<NotificationDeliveryEntity> {
+  async markFailed(
+    id: string,
+    data: { error: string; failedAt: Date }
+  ): Promise<NotificationDeliveryEntity> {
     const delivery = await prisma.notificationDelivery.update({
       where: { id },
       data: {

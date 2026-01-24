@@ -49,10 +49,7 @@ export interface EarningRepository {
   createFromBooking(input: EarningCreateInput): Promise<EarningEntity>;
   findById(id: string): Promise<EarningEntity | null>;
   findByBookingId(bookingId: string): Promise<EarningEntity | null>;
-  listPayableByPro(
-    proProfileId: string,
-    now: Date
-  ): Promise<EarningEntity[]>;
+  listPayableByPro(proProfileId: string, now: Date): Promise<EarningEntity[]>;
   listPendingDue(now: Date): Promise<EarningEntity[]>;
   listByProProfileId(
     proProfileId: string,
@@ -202,7 +199,8 @@ export class EarningRepositoryImpl implements EarningRepository {
       where: { id: earningId },
       data: {
         status: status as $Enums.EarningStatus,
-        availableAt: patch?.availableAt !== undefined ? patch.availableAt : undefined,
+        availableAt:
+          patch?.availableAt !== undefined ? patch.availableAt : undefined,
       },
     });
 

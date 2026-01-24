@@ -20,11 +20,15 @@ const DAYS_OF_WEEK = [
 ];
 
 export function AvailabilityScreen() {
-  const { slots, isLoading, error, updateSlots, isSaving } = useAvailabilitySlots();
+  const { slots, isLoading, error, updateSlots, isSaving } =
+    useAvailabilitySlots();
 
   // Create a map of dayOfWeek -> slot for easy lookup
   const slotsByDay = useMemo(() => {
-    const map = new Map<number, { id: string; startTime: string; endTime: string }>();
+    const map = new Map<
+      number,
+      { id: string; startTime: string; endTime: string }
+    >();
     slots.forEach((slot) => {
       map.set(slot.dayOfWeek, {
         id: slot.id,
@@ -36,7 +40,9 @@ export function AvailabilityScreen() {
   }, [slots]);
 
   // Local state for editing
-  const [editingSlots, setEditingSlots] = useState<Map<number, { enabled: boolean; startTime: string; endTime: string }>>(() => {
+  const [editingSlots, setEditingSlots] = useState<
+    Map<number, { enabled: boolean; startTime: string; endTime: string }>
+  >(() => {
     const map = new Map();
     DAYS_OF_WEEK.forEach(({ day }) => {
       const existing = slotsByDay.get(day);
@@ -75,7 +81,11 @@ export function AvailabilityScreen() {
     }
   };
 
-  const handleTimeChange = (day: number, field: "startTime" | "endTime", value: string) => {
+  const handleTimeChange = (
+    day: number,
+    field: "startTime" | "endTime",
+    value: string
+  ) => {
     const current = editingSlots.get(day);
     if (current) {
       const newMap = new Map(editingSlots);
@@ -115,7 +125,10 @@ export function AvailabilityScreen() {
         return true;
       }
       if (editing?.enabled && existing) {
-        if (editing.startTime !== existing.startTime || editing.endTime !== existing.endTime) {
+        if (
+          editing.startTime !== existing.startTime ||
+          editing.endTime !== existing.endTime
+        ) {
           return true;
         }
       }
@@ -128,7 +141,10 @@ export function AvailabilityScreen() {
   }
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.contentContainer}
+    >
       <View style={styles.titleRow}>
         <Feather name="calendar" size={24} color={theme.colors.primary} />
         <Text variant="h1" style={styles.title}>
@@ -137,7 +153,8 @@ export function AvailabilityScreen() {
       </View>
 
       <Text variant="small" style={styles.helperText}>
-        Configurá tus horarios de disponibilidad. Los clientes podrán solicitar servicios durante estos horarios.
+        Configurá tus horarios de disponibilidad. Los clientes podrán solicitar
+        servicios durante estos horarios.
       </Text>
 
       <Card style={styles.card}>
@@ -146,7 +163,13 @@ export function AvailabilityScreen() {
           if (!slot) return null;
 
           return (
-            <View key={day} style={[styles.dayRow, index === DAYS_OF_WEEK.length - 1 && styles.lastDayRow]}>
+            <View
+              key={day}
+              style={[
+                styles.dayRow,
+                index === DAYS_OF_WEEK.length - 1 && styles.lastDayRow,
+              ]}
+            >
               <View style={styles.dayHeader}>
                 <View style={styles.dayToggleRow}>
                   <Switch
@@ -174,7 +197,9 @@ export function AvailabilityScreen() {
                     <TextInput
                       style={styles.timeInput}
                       value={slot.startTime}
-                      onChangeText={(value) => handleTimeChange(day, "startTime", value)}
+                      onChangeText={(value) =>
+                        handleTimeChange(day, "startTime", value)
+                      }
                       placeholder="09:00"
                       placeholderTextColor={theme.colors.muted}
                       editable={!isSaving}
@@ -188,7 +213,9 @@ export function AvailabilityScreen() {
                     <TextInput
                       style={styles.timeInput}
                       value={slot.endTime}
-                      onChangeText={(value) => handleTimeChange(day, "endTime", value)}
+                      onChangeText={(value) =>
+                        handleTimeChange(day, "endTime", value)
+                      }
                       placeholder="17:00"
                       placeholderTextColor={theme.colors.muted}
                       editable={!isSaving}

@@ -7,12 +7,14 @@ This document describes the offline support and performance optimizations implem
 ### React.memo for Presentational Components
 
 **BookingCard** component is now memoized to prevent unnecessary re-renders:
+
 - Only re-renders when booking ID, status, or onPress handler changes
 - Reduces render cycles in lists with many items
 
 ### useCallback for Event Handlers
 
 Event handlers are memoized using `useCallback`:
+
 - `handleCardPress` in HomeScreen and JobsScreen
 - All action handlers in BookingDetailScreen (accept, reject, markOnMyWay, etc.)
 - Prevents child components from re-rendering unnecessarily
@@ -20,12 +22,14 @@ Event handlers are memoized using `useCallback`:
 ### useMemo for Computed Values
 
 Expensive computations are memoized:
+
 - Date formatting
 - Status labels and variants
 - Category labels
 - Filtered booking lists
 
 **Benefits**:
+
 - Smoother scrolling in lists
 - Reduced CPU usage
 - Better battery life
@@ -36,12 +40,14 @@ Expensive computations are memoized:
 ### React Query Persistence
 
 Query cache is persisted to AsyncStorage:
+
 - **Storage**: `@react-native-async-storage/async-storage`
 - **Key**: `REACT_QUERY_OFFLINE_CACHE`
 - **Max Age**: 7 days
 - **Throttle**: 1 second (prevents excessive writes)
 
 **How it works**:
+
 - Successful queries are automatically persisted
 - On app restart, cache is restored from storage
 - Users can view cached data even when offline
@@ -49,17 +55,19 @@ Query cache is persisted to AsyncStorage:
 ### Network Status Detection
 
 Real-time network connectivity monitoring:
+
 - **Hook**: `useNetworkStatus()`
 - **Package**: `@react-native-community/netinfo`
 - **Returns**: `{ isOnline, isOffline, isChecking }`
 
 **Usage**:
+
 ```typescript
 import { useNetworkStatus } from "@/hooks/useNetworkStatus";
 
 function MyComponent() {
   const { isOnline, isOffline } = useNetworkStatus();
-  
+
   if (isOffline) {
     // Show offline UI
   }
@@ -69,6 +77,7 @@ function MyComponent() {
 ### Offline Indicator
 
 Visual indicator when device is offline:
+
 - Shows banner at top of screen
 - Displays "Sin conexión" message
 - Automatically hides when connection is restored
@@ -76,11 +85,13 @@ Visual indicator when device is offline:
 ### Offline-First Mode
 
 React Query configured for offline-first behavior:
+
 - **Queries**: Use cached data when offline, refetch when online
 - **Mutations**: Queue when offline, execute when online
 - **Network Mode**: `offlineFirst` for both queries and mutations
 
 **Benefits**:
+
 - App works offline with cached data
 - Mutations are queued and executed automatically when online
 - Seamless transition between online/offline states
@@ -128,7 +139,7 @@ import { useNetworkStatus } from "@/hooks/useNetworkStatus";
 
 function MyScreen() {
   const { isOnline, isOffline } = useNetworkStatus();
-  
+
   return (
     <View>
       {isOffline && <Text>You're offline</Text>}
@@ -158,12 +169,14 @@ mutation.mutate({ bookingId: "123" }); // Works offline!
 ## Benefits
 
 ### Performance
+
 - ✅ Faster UI interactions
 - ✅ Smoother scrolling
 - ✅ Reduced re-renders
 - ✅ Better battery life
 
 ### Offline Support
+
 - ✅ View cached data offline
 - ✅ Queue mutations for later
 - ✅ Automatic sync when online

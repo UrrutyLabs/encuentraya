@@ -43,34 +43,51 @@ import type { AuthError } from "@supabase/supabase-js";
  * Mutex to ensure only one refresh attempt runs at a time
  * Prevents parallel requests from spamming refresh calls
  */
-let refreshPromise: Promise<{ session: Session | null; error: AuthError | Error | null }> | null = null;
+let refreshPromise: Promise<{
+  session: Session | null;
+  error: AuthError | Error | null;
+}> | null = null;
 
 /**
  * Attempt to refresh the session
  * Returns the refreshed session or null if refresh failed
  * Uses a mutex to prevent concurrent refresh attempts
  */
-async function attemptRefresh(): Promise<{ session: Session | null; error: AuthError | Error | null }> {
+async function attemptRefresh(): Promise<{
+  session: Session | null;
+  error: AuthError | Error | null;
+}> {
   // If a refresh is already in progress, wait for it
   if (refreshPromise) {
     return refreshPromise;
   }
 
   // Start a new refresh attempt
-  const promise = (async (): Promise<{ session: Session | null; error: AuthError | Error | null }> => {
+  const promise = (async (): Promise<{
+    session: Session | null;
+    error: AuthError | Error | null;
+  }> => {
     try {
       // Get current session to trigger refresh if needed
-      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      const { data: sessionData, error: sessionError } =
+        await supabase.auth.getSession();
 
       if (sessionError || !sessionData.session) {
-        return { session: null, error: sessionError || new Error("No session") };
+        return {
+          session: null,
+          error: sessionError || new Error("No session"),
+        };
       }
 
       // Try to refresh the session
-      const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
+      const { data: refreshData, error: refreshError } =
+        await supabase.auth.refreshSession();
 
       if (refreshError || !refreshData.session) {
-        return { session: null, error: refreshError || new Error("Refresh failed") };
+        return {
+          session: null,
+          error: refreshError || new Error("Refresh failed"),
+        };
       }
 
       return { session: refreshData.session, error: null };
@@ -97,7 +114,10 @@ async function attemptRefresh(): Promise<{ session: Session | null; error: AuthE
  * - Does NOT sign out for server errors (5xx) or network errors
  */
 export function createAuthFetch(originalFetch: typeof fetch): typeof fetch {
-  return async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+  return async (
+    input: RequestInfo | URL,
+    init?: RequestInit
+  ): Promise<Response> => {
     try {
       // Make the initial request
       const response = await originalFetch(input, init);
@@ -107,7 +127,12 @@ export function createAuthFetch(originalFetch: typeof fetch): typeof fetch {
       if (response.status >= 500 && response.status < 600) {
         console.warn("[Auth Guard] Server error (5xx), not signing out", {
           status: response.status,
-          url: typeof input === "string" ? input : input instanceof URL ? input.href : input.url,
+          url:
+            typeof input === "string"
+              ? input
+              : input instanceof URL
+                ? input.href
+                : input.url,
         });
         return response;
       }
@@ -117,31 +142,34 @@ export function createAuthFetch(originalFetch: typeof fetch): typeof fetch {
         return response;
       }
 
-    // Got a 401 - attempt to refresh
-    console.warn("[Auth Guard] Received 401, attempting session refresh");
+      // Got a 401 - attempt to refresh
+      console.warn("[Auth Guard] Received 401, attempting session refresh");
 
-    const refreshResult = await attemptRefresh();
+      const refreshResult = await attemptRefresh();
 
-    if (!refreshResult || refreshResult.error || !refreshResult.session) {
-      // Refresh failed - sign out and redirect
-      console.warn("[Auth Guard] Session refresh failed, signing out", refreshResult?.error);
-      await signOutAndRedirect();
-      return response; // Return the original 401 response
-    }
+      if (!refreshResult || refreshResult.error || !refreshResult.session) {
+        // Refresh failed - sign out and redirect
+        console.warn(
+          "[Auth Guard] Session refresh failed, signing out",
+          refreshResult?.error
+        );
+        await signOutAndRedirect();
+        return response; // Return the original 401 response
+      }
 
-    // Refresh succeeded - retry the request with new token
-    console.warn("[Auth Guard] Session refreshed, retrying request");
+      // Refresh succeeded - retry the request with new token
+      console.warn("[Auth Guard] Session refreshed, retrying request");
 
-    // Clone the original request init to retry
-    const retryInit: RequestInit = {
-      ...init,
-      headers: {
-        ...init?.headers,
-        Authorization: `Bearer ${refreshResult.session.access_token}`,
-      },
-    };
+      // Clone the original request init to retry
+      const retryInit: RequestInit = {
+        ...init,
+        headers: {
+          ...init?.headers,
+          Authorization: `Bearer ${refreshResult.session.access_token}`,
+        },
+      };
 
-    const retryResponse = await originalFetch(input, retryInit);
+      const retryResponse = await originalFetch(input, retryInit);
 
       // If retry still returns 401, sign out and redirect
       if (retryResponse.status === 401) {
@@ -155,7 +183,12 @@ export function createAuthFetch(originalFetch: typeof fetch): typeof fetch {
       // These are connectivity issues, not authentication problems
       console.warn("[Auth Guard] Network error, not signing out", {
         error: error instanceof Error ? error.message : String(error),
-        url: typeof input === "string" ? input : input instanceof URL ? input.href : input.url,
+        url:
+          typeof input === "string"
+            ? input
+            : input instanceof URL
+              ? input.href
+              : input.url,
       });
       // Re-throw to let React Query handle it
       throw error;

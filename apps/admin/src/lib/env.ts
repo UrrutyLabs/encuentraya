@@ -1,6 +1,6 @@
 /**
  * Environment detection and configuration utilities for Admin app
- * 
+ *
  * Supports:
  * - Development: localhost
  * - Preview/Staging: Vercel preview deployments
@@ -37,21 +37,23 @@ export function getApiUrl(): string {
   }
 
   const env = getEnvironment();
-  
+
   switch (env) {
     case "production":
       // Production API URL - should be set in Vercel environment variables
       // Fallback to a placeholder that will fail clearly if not configured
       throw new Error(
         "NEXT_PUBLIC_API_URL must be set for production. " +
-        "Configure it in Vercel project settings → Environment Variables"
+          "Configure it in Vercel project settings → Environment Variables"
       );
     case "preview":
       // Staging/preview API URL - can use staging API or production
       // Default to production for preview deployments
-      return process.env.NEXT_PUBLIC_STAGING_API_URL || 
-             process.env.NEXT_PUBLIC_API_URL || 
-             "https://api.arreglatodo.com"; // Update with your staging/production URL
+      return (
+        process.env.NEXT_PUBLIC_STAGING_API_URL ||
+        process.env.NEXT_PUBLIC_API_URL ||
+        "https://api.arreglatodo.com"
+      ); // Update with your staging/production URL
     case "development":
     default:
       return "http://localhost:3002";

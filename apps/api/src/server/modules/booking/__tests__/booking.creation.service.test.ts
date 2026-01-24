@@ -27,7 +27,9 @@ describe("BookingCreationService", () => {
   let service: BookingCreationService;
   let mockBookingRepository: ReturnType<typeof createMockBookingRepository>;
   let mockProRepository: ReturnType<typeof createMockProRepository>;
-  let mockClientProfileService: ReturnType<typeof createMockClientProfileService>;
+  let mockClientProfileService: ReturnType<
+    typeof createMockClientProfileService
+  >;
   let mockNotificationService: ReturnType<typeof createMockNotificationService>;
 
   function createMockBookingRepository(): {
@@ -68,7 +70,9 @@ describe("BookingCreationService", () => {
     return { id, role };
   }
 
-  function createMockProProfile(overrides?: Partial<ProProfileEntity>): ProProfileEntity {
+  function createMockProProfile(
+    overrides?: Partial<ProProfileEntity>
+  ): ProProfileEntity {
     return {
       id: "pro-1",
       userId: "user-1",
@@ -86,7 +90,9 @@ describe("BookingCreationService", () => {
     };
   }
 
-  function createMockBooking(overrides?: Partial<BookingEntity>): BookingEntity {
+  function createMockBooking(
+    overrides?: Partial<BookingEntity>
+  ): BookingEntity {
     return {
       id: "booking-1",
       displayId: "A0002",
@@ -111,23 +117,27 @@ describe("BookingCreationService", () => {
     mockNotificationService = createMockNotificationService();
 
     // Mock helper functions
-    vi.spyOn(bookingHelpers, "sendClientNotification").mockResolvedValue(undefined);
-    vi.spyOn(bookingHelpers, "adaptToDomain").mockImplementation((booking, input, hourlyRate) => ({
-      id: booking.id,
-      clientId: booking.clientUserId,
-      proId: booking.proProfileId || input.proId,
-      category: input.category,
-      description: booking.addressText,
-      status: booking.status,
-      scheduledAt: booking.scheduledAt,
-      completedAt: undefined,
-      cancelledAt: undefined,
-      hourlyRate,
-      estimatedHours: booking.hoursEstimate,
-      totalAmount: hourlyRate * booking.hoursEstimate,
-      createdAt: booking.createdAt,
-      updatedAt: booking.updatedAt,
-    }));
+    vi.spyOn(bookingHelpers, "sendClientNotification").mockResolvedValue(
+      undefined
+    );
+    vi.spyOn(bookingHelpers, "adaptToDomain").mockImplementation(
+      (booking, input, hourlyRate) => ({
+        id: booking.id,
+        clientId: booking.clientUserId,
+        proId: booking.proProfileId || input.proId,
+        category: input.category,
+        description: booking.addressText,
+        status: booking.status,
+        scheduledAt: booking.scheduledAt,
+        completedAt: undefined,
+        cancelledAt: undefined,
+        hourlyRate,
+        estimatedHours: booking.hoursEstimate,
+        totalAmount: hourlyRate * booking.hoursEstimate,
+        createdAt: booking.createdAt,
+        updatedAt: booking.updatedAt,
+      })
+    );
 
     // Mock displayId generation
     vi.spyOn(displayIdModule, "getNextDisplayId").mockResolvedValue("A0002");
@@ -140,17 +150,24 @@ describe("BookingCreationService", () => {
     );
 
     vi.clearAllMocks();
-    mockClientProfileService.ensureClientProfileExists.mockResolvedValue(undefined);
-    vi.mocked(bookingHelpers.sendClientNotification).mockResolvedValue(undefined);
+    mockClientProfileService.ensureClientProfileExists.mockResolvedValue(
+      undefined
+    );
+    vi.mocked(bookingHelpers.sendClientNotification).mockResolvedValue(
+      undefined
+    );
     vi.mocked(displayIdModule.getNextDisplayId).mockResolvedValue("A0002");
   });
 
   describe("createBooking", () => {
     it("should create a booking successfully with future date", async () => {
       const actor = createMockActor(Role.CLIENT);
-      const proProfile = createMockProProfile({ id: "pro-1", status: "active" });
+      const proProfile = createMockProProfile({
+        id: "pro-1",
+        status: "active",
+      });
       const booking = createMockBooking({ id: "booking-1" });
-      
+
       // Future date (tomorrow at 10:00)
       const futureDate = new Date();
       futureDate.setUTCDate(futureDate.getUTCDate() + 1);
@@ -170,7 +187,9 @@ describe("BookingCreationService", () => {
       const result = await service.createBooking(actor, input);
 
       expect(result.id).toBe("booking-1");
-      expect(mockClientProfileService.ensureClientProfileExists).toHaveBeenCalledWith(actor.id);
+      expect(
+        mockClientProfileService.ensureClientProfileExists
+      ).toHaveBeenCalledWith(actor.id);
       expect(mockProRepository.findById).toHaveBeenCalledWith("pro-1");
       expect(mockBookingRepository.create).toHaveBeenCalled();
       expect(bookingHelpers.sendClientNotification).toHaveBeenCalled();
@@ -178,9 +197,12 @@ describe("BookingCreationService", () => {
 
     it("should create a booking successfully with today's date and future time", async () => {
       const actor = createMockActor(Role.CLIENT);
-      const proProfile = createMockProProfile({ id: "pro-1", status: "active" });
+      const proProfile = createMockProProfile({
+        id: "pro-1",
+        status: "active",
+      });
       const booking = createMockBooking({ id: "booking-1" });
-      
+
       // Today at 15:00 (future time)
       const today = new Date();
       today.setUTCHours(15, 0, 0, 0);
@@ -209,8 +231,11 @@ describe("BookingCreationService", () => {
 
     it("should throw error if time is not at hour or half-hour", async () => {
       const actor = createMockActor(Role.CLIENT);
-      const proProfile = createMockProProfile({ id: "pro-1", status: "active" });
-      
+      const proProfile = createMockProProfile({
+        id: "pro-1",
+        status: "active",
+      });
+
       // Future date at 10:15 (invalid - not hour or half-hour)
       const futureDate = new Date();
       futureDate.setUTCDate(futureDate.getUTCDate() + 1);
@@ -233,8 +258,11 @@ describe("BookingCreationService", () => {
 
     it("should throw error if scheduled date is in the past", async () => {
       const actor = createMockActor(Role.CLIENT);
-      const proProfile = createMockProProfile({ id: "pro-1", status: "active" });
-      
+      const proProfile = createMockProProfile({
+        id: "pro-1",
+        status: "active",
+      });
+
       // Yesterday at 10:00
       const pastDate = new Date();
       pastDate.setUTCDate(pastDate.getUTCDate() - 1);
@@ -257,12 +285,15 @@ describe("BookingCreationService", () => {
 
     it("should throw error if scheduled time is in the past (today)", async () => {
       const actor = createMockActor(Role.CLIENT);
-      const proProfile = createMockProProfile({ id: "pro-1", status: "active" });
-      
+      const proProfile = createMockProProfile({
+        id: "pro-1",
+        status: "active",
+      });
+
       // Today at 10:00, but current time is 12:00
       const today = new Date();
       today.setUTCHours(10, 0, 0, 0);
-      
+
       vi.useFakeTimers();
       const currentTime = new Date(today);
       currentTime.setUTCHours(12, 0, 0, 0);
@@ -287,9 +318,12 @@ describe("BookingCreationService", () => {
 
     it("should accept booking for today if time is exactly now (edge case)", async () => {
       const actor = createMockActor(Role.CLIENT);
-      const proProfile = createMockProProfile({ id: "pro-1", status: "active" });
+      const proProfile = createMockProProfile({
+        id: "pro-1",
+        status: "active",
+      });
       const booking = createMockBooking({ id: "booking-1" });
-      
+
       // Set current time to 10:00:00
       vi.useFakeTimers();
       const now = new Date();
@@ -320,7 +354,7 @@ describe("BookingCreationService", () => {
 
     it("should throw error if pro not found", async () => {
       const actor = createMockActor(Role.CLIENT);
-      
+
       const futureDate = new Date();
       futureDate.setUTCDate(futureDate.getUTCDate() + 1);
       futureDate.setUTCHours(10, 0, 0, 0);
@@ -335,13 +369,18 @@ describe("BookingCreationService", () => {
         description: "123 Main St",
       };
 
-      await expect(service.createBooking(actor, input)).rejects.toThrow("Pro not found");
+      await expect(service.createBooking(actor, input)).rejects.toThrow(
+        "Pro not found"
+      );
     });
 
     it("should throw error if pro is suspended", async () => {
       const actor = createMockActor(Role.CLIENT);
-      const proProfile = createMockProProfile({ id: "pro-1", status: "suspended" });
-      
+      const proProfile = createMockProProfile({
+        id: "pro-1",
+        status: "suspended",
+      });
+
       const futureDate = new Date();
       futureDate.setUTCDate(futureDate.getUTCDate() + 1);
       futureDate.setUTCHours(10, 0, 0, 0);
@@ -356,14 +395,19 @@ describe("BookingCreationService", () => {
         description: "123 Main St",
       };
 
-      await expect(service.createBooking(actor, input)).rejects.toThrow("Pro is suspended");
+      await expect(service.createBooking(actor, input)).rejects.toThrow(
+        "Pro is suspended"
+      );
     });
 
     it("should accept time at hour (00 minutes)", async () => {
       const actor = createMockActor(Role.CLIENT);
-      const proProfile = createMockProProfile({ id: "pro-1", status: "active" });
+      const proProfile = createMockProProfile({
+        id: "pro-1",
+        status: "active",
+      });
       const booking = createMockBooking({ id: "booking-1" });
-      
+
       const futureDate = new Date();
       futureDate.setUTCDate(futureDate.getUTCDate() + 1);
       futureDate.setUTCHours(13, 0, 0, 0); // 13:00
@@ -388,9 +432,12 @@ describe("BookingCreationService", () => {
 
     it("should accept time at half-hour (30 minutes)", async () => {
       const actor = createMockActor(Role.CLIENT);
-      const proProfile = createMockProProfile({ id: "pro-1", status: "active" });
+      const proProfile = createMockProProfile({
+        id: "pro-1",
+        status: "active",
+      });
       const booking = createMockBooking({ id: "booking-1" });
-      
+
       const futureDate = new Date();
       futureDate.setUTCDate(futureDate.getUTCDate() + 1);
       futureDate.setUTCHours(13, 30, 0, 0); // 13:30

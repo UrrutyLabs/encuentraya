@@ -57,7 +57,7 @@ export class ClientProfileRepositoryImpl implements ClientProfileRepository {
     return profile ? this.mapPrismaToDomain(profile) : null;
   }
 
-  async   createForUser(
+  async createForUser(
     userId: string,
     data?: {
       firstName?: string | null;
@@ -131,12 +131,11 @@ export class ClientProfileRepositoryImpl implements ClientProfileRepository {
       lastName: prismaProfile.lastName,
       email: prismaProfile.email,
       phone: prismaProfile.phone,
-      preferredContactMethod:
-        prismaProfile.preferredContactMethod as
-          | "EMAIL"
-          | "WHATSAPP"
-          | "PHONE"
-          | null,
+      preferredContactMethod: prismaProfile.preferredContactMethod as
+        | "EMAIL"
+        | "WHATSAPP"
+        | "PHONE"
+        | null,
       createdAt: prismaProfile.createdAt,
       updatedAt: prismaProfile.updatedAt,
     };

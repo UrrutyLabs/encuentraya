@@ -7,7 +7,9 @@ import { Card } from "@repo/ui";
 interface ProsFiltersProps {
   status?: "pending" | "active" | "suspended";
   query: string;
-  onStatusChange: (status: "pending" | "active" | "suspended" | undefined) => void;
+  onStatusChange: (
+    status: "pending" | "active" | "suspended" | undefined
+  ) => void;
   onQueryChange: (query: string) => void;
   onClear: () => void;
 }

@@ -2,14 +2,24 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { BookingService } from "../booking.service";
 import type { BookingRepository, BookingEntity } from "../booking.repo";
 import type { ProRepository, ProProfileEntity } from "@modules/pro/pro.repo";
-import type { PaymentRepository, PaymentEntity } from "@modules/payment/payment.repo";
+import type {
+  PaymentRepository,
+  PaymentEntity,
+} from "@modules/payment/payment.repo";
 import type { ClientProfileService } from "@modules/user/clientProfile.service";
 import type { NotificationService } from "@modules/notification/notification.service";
 import type { EarningService } from "@modules/payout/earning.service";
 import type { AuditService } from "@modules/audit/audit.service";
 import type { PaymentService } from "@modules/payment/payment.service";
 import type { PaymentServiceFactory } from "@/server/container";
-import { BookingStatus, PaymentStatus, Role, PaymentProvider, PaymentType, Category } from "@repo/domain";
+import {
+  BookingStatus,
+  PaymentStatus,
+  Role,
+  PaymentProvider,
+  PaymentType,
+  Category,
+} from "@repo/domain";
 import {
   InvalidBookingStateError,
   UnauthorizedBookingActionError,
@@ -22,9 +32,13 @@ describe("BookingService", () => {
   let service: BookingService;
   let mockBookingRepository: ReturnType<typeof createMockBookingRepository>;
   let mockProRepository: ReturnType<typeof createMockProRepository>;
-  let mockPaymentServiceFactory: ReturnType<typeof createMockPaymentServiceFactory>;
+  let mockPaymentServiceFactory: ReturnType<
+    typeof createMockPaymentServiceFactory
+  >;
   let mockPaymentRepository: ReturnType<typeof createMockPaymentRepository>;
-  let mockClientProfileService: ReturnType<typeof createMockClientProfileService>;
+  let mockClientProfileService: ReturnType<
+    typeof createMockClientProfileService
+  >;
   let mockNotificationService: ReturnType<typeof createMockNotificationService>;
   let mockEarningService: ReturnType<typeof createMockEarningService>;
   let mockAuditService: ReturnType<typeof createMockAuditService>;
@@ -124,7 +138,9 @@ describe("BookingService", () => {
     return { id, role };
   }
 
-  function createMockBooking(overrides?: Partial<BookingEntity>): BookingEntity {
+  function createMockBooking(
+    overrides?: Partial<BookingEntity>
+  ): BookingEntity {
     return {
       id: "booking-1",
       displayId: "A0002",
@@ -142,7 +158,9 @@ describe("BookingService", () => {
     };
   }
 
-  function createMockProProfile(overrides?: Partial<ProProfileEntity>): ProProfileEntity {
+  function createMockProProfile(
+    overrides?: Partial<ProProfileEntity>
+  ): ProProfileEntity {
     return {
       id: "pro-1",
       userId: "user-1",
@@ -160,7 +178,9 @@ describe("BookingService", () => {
     };
   }
 
-  function createMockPayment(overrides?: Partial<PaymentEntity>): PaymentEntity {
+  function createMockPayment(
+    overrides?: Partial<PaymentEntity>
+  ): PaymentEntity {
     return {
       id: "payment-1",
       provider: PaymentProvider.MERCADO_PAGO,
@@ -182,17 +202,19 @@ describe("BookingService", () => {
     };
   }
 
-  function createMockClientProfile(overrides?: Partial<{
-    id: string;
-    userId: string;
-    firstName: string | null;
-    lastName: string | null;
-    email: string | null;
-    phone: string | null;
-    preferredContactMethod: "EMAIL" | "WHATSAPP" | "PHONE" | null;
-    createdAt: Date;
-    updatedAt: Date;
-  }>): {
+  function createMockClientProfile(
+    overrides?: Partial<{
+      id: string;
+      userId: string;
+      firstName: string | null;
+      lastName: string | null;
+      email: string | null;
+      phone: string | null;
+      preferredContactMethod: "EMAIL" | "WHATSAPP" | "PHONE" | null;
+      createdAt: Date;
+      updatedAt: Date;
+    }>
+  ): {
     id: string;
     userId: string;
     firstName: string | null;
@@ -253,14 +275,21 @@ describe("BookingService", () => {
   describe("createBooking", () => {
     it("should create a booking successfully", async () => {
       const actor = createMockActor(Role.CLIENT);
-      const proProfile = createMockProProfile({ id: "pro-1", status: "active" });
+      const proProfile = createMockProProfile({
+        id: "pro-1",
+        status: "active",
+      });
       const booking = createMockBooking({ id: "booking-1" });
       const clientProfile = createMockClientProfile({ userId: actor.id });
 
-      mockClientProfileService.ensureClientProfileExists.mockResolvedValue(clientProfile);
+      mockClientProfileService.ensureClientProfileExists.mockResolvedValue(
+        clientProfile
+      );
       mockProRepository.findById.mockResolvedValue(proProfile);
       mockBookingRepository.create.mockResolvedValue(booking);
-      vi.mocked(mockNotificationService.deliverNow).mockResolvedValue(undefined);
+      vi.mocked(mockNotificationService.deliverNow).mockResolvedValue(
+        undefined
+      );
 
       const input = {
         proId: "pro-1",
@@ -273,7 +302,9 @@ describe("BookingService", () => {
       const result = await service.createBooking(actor, input);
 
       expect(result.id).toBe("booking-1");
-      expect(mockClientProfileService.ensureClientProfileExists).toHaveBeenCalledWith(actor.id);
+      expect(
+        mockClientProfileService.ensureClientProfileExists
+      ).toHaveBeenCalledWith(actor.id);
       expect(mockProRepository.findById).toHaveBeenCalledWith("pro-1");
       expect(mockBookingRepository.create).toHaveBeenCalled();
       expect(mockNotificationService.deliverNow).toHaveBeenCalled();
@@ -283,7 +314,9 @@ describe("BookingService", () => {
       const actor = createMockActor(Role.CLIENT);
       const clientProfile = createMockClientProfile({ userId: actor.id });
 
-      mockClientProfileService.ensureClientProfileExists.mockResolvedValue(clientProfile);
+      mockClientProfileService.ensureClientProfileExists.mockResolvedValue(
+        clientProfile
+      );
       mockProRepository.findById.mockResolvedValue(null);
 
       await expect(
@@ -302,7 +335,9 @@ describe("BookingService", () => {
       const proProfile = createMockProProfile({ status: "suspended" });
       const clientProfile = createMockClientProfile({ userId: actor.id });
 
-      mockClientProfileService.ensureClientProfileExists.mockResolvedValue(clientProfile);
+      mockClientProfileService.ensureClientProfileExists.mockResolvedValue(
+        clientProfile
+      );
       mockProRepository.findById.mockResolvedValue(proProfile);
 
       await expect(
@@ -325,7 +360,10 @@ describe("BookingService", () => {
         status: BookingStatus.PENDING,
         proProfileId: "pro-1",
       });
-      const proProfile = createMockProProfile({ id: "pro-1", userId: "user-1" });
+      const proProfile = createMockProProfile({
+        id: "pro-1",
+        userId: "user-1",
+      });
       const updatedBooking = createMockBooking({
         id: "booking-1",
         status: BookingStatus.ACCEPTED,
@@ -336,7 +374,9 @@ describe("BookingService", () => {
       mockProRepository.findByUserId.mockResolvedValue(proProfile);
       mockBookingRepository.updateStatus.mockResolvedValue(updatedBooking);
       mockProRepository.findById.mockResolvedValueOnce(proProfile);
-      vi.mocked(mockClientProfileService.getProfileByUserId).mockResolvedValue(clientProfile);
+      vi.mocked(mockClientProfileService.getProfileByUserId).mockResolvedValue(
+        clientProfile
+      );
 
       const result = await service.acceptBooking(actor, "booking-1");
 
@@ -362,7 +402,9 @@ describe("BookingService", () => {
       mockBookingRepository.findById.mockResolvedValue(booking);
       mockBookingRepository.updateStatus.mockResolvedValue(updatedBooking);
       mockProRepository.findById.mockResolvedValue(proProfile);
-      vi.mocked(mockClientProfileService.getProfileByUserId).mockResolvedValue(clientProfile);
+      vi.mocked(mockClientProfileService.getProfileByUserId).mockResolvedValue(
+        clientProfile
+      );
 
       const result = await service.acceptBooking(actor, "booking-1");
 
@@ -398,7 +440,10 @@ describe("BookingService", () => {
         status: BookingStatus.PENDING,
         proProfileId: "pro-2",
       });
-      const proProfile = createMockProProfile({ id: "pro-1", userId: "user-1" });
+      const proProfile = createMockProProfile({
+        id: "pro-1",
+        userId: "user-1",
+      });
 
       mockBookingRepository.findById.mockResolvedValue(booking);
       mockProRepository.findByUserId.mockResolvedValue(proProfile);
@@ -416,7 +461,10 @@ describe("BookingService", () => {
         status: BookingStatus.PENDING,
         proProfileId: "pro-1",
       });
-      const proProfile = createMockProProfile({ id: "pro-1", userId: "user-1" });
+      const proProfile = createMockProProfile({
+        id: "pro-1",
+        userId: "user-1",
+      });
       const updatedBooking = createMockBooking({
         status: BookingStatus.REJECTED,
       });
@@ -426,7 +474,9 @@ describe("BookingService", () => {
       mockProRepository.findByUserId.mockResolvedValue(proProfile);
       mockBookingRepository.updateStatus.mockResolvedValue(updatedBooking);
       mockProRepository.findById.mockResolvedValue(proProfile);
-      vi.mocked(mockClientProfileService.getProfileByUserId).mockResolvedValue(clientProfile);
+      vi.mocked(mockClientProfileService.getProfileByUserId).mockResolvedValue(
+        clientProfile
+      );
 
       const result = await service.rejectBooking(actor, "booking-1");
 
@@ -442,7 +492,10 @@ describe("BookingService", () => {
         status: BookingStatus.ACCEPTED,
         proProfileId: "pro-1",
       });
-      const proProfile = createMockProProfile({ id: "pro-1", userId: "user-1" });
+      const proProfile = createMockProProfile({
+        id: "pro-1",
+        userId: "user-1",
+      });
       const updatedBooking = createMockBooking({
         status: BookingStatus.ON_MY_WAY,
       });
@@ -452,7 +505,9 @@ describe("BookingService", () => {
       mockProRepository.findByUserId.mockResolvedValue(proProfile);
       mockBookingRepository.updateStatus.mockResolvedValue(updatedBooking);
       mockProRepository.findById.mockResolvedValue(proProfile);
-      vi.mocked(mockClientProfileService.getProfileByUserId).mockResolvedValue(clientProfile);
+      vi.mocked(mockClientProfileService.getProfileByUserId).mockResolvedValue(
+        clientProfile
+      );
 
       const result = await service.markOnMyWay(actor, "booking-1");
 
@@ -468,7 +523,10 @@ describe("BookingService", () => {
         status: BookingStatus.ON_MY_WAY,
         proProfileId: "pro-1",
       });
-      const proProfile = createMockProProfile({ id: "pro-1", userId: "user-1" });
+      const proProfile = createMockProProfile({
+        id: "pro-1",
+        userId: "user-1",
+      });
       const updatedBooking = createMockBooking({
         status: BookingStatus.ARRIVED,
       });
@@ -478,7 +536,9 @@ describe("BookingService", () => {
       mockProRepository.findByUserId.mockResolvedValue(proProfile);
       mockBookingRepository.updateStatus.mockResolvedValue(updatedBooking);
       mockProRepository.findById.mockResolvedValue(proProfile);
-      vi.mocked(mockClientProfileService.getProfileByUserId).mockResolvedValue(clientProfile);
+      vi.mocked(mockClientProfileService.getProfileByUserId).mockResolvedValue(
+        clientProfile
+      );
 
       const result = await service.arriveBooking(actor, "booking-1");
 
@@ -528,7 +588,10 @@ describe("BookingService", () => {
         status: BookingStatus.ARRIVED,
         proProfileId: "pro-1",
       });
-      const proProfile = createMockProProfile({ id: "pro-1", userId: "user-1" });
+      const proProfile = createMockProProfile({
+        id: "pro-1",
+        userId: "user-1",
+      });
       const updatedBooking = createMockBooking({
         status: BookingStatus.COMPLETED,
       });
@@ -541,17 +604,29 @@ describe("BookingService", () => {
       mockProRepository.findByUserId.mockResolvedValue(proProfile);
       mockBookingRepository.updateStatus.mockResolvedValue(updatedBooking);
       mockPaymentRepository.findByBookingId.mockResolvedValue(payment);
-      vi.mocked(mockPaymentService.capturePayment).mockResolvedValue({ capturedAmount: 20000 });
-      vi.mocked(mockEarningService.createEarningForCompletedBooking).mockResolvedValue(undefined);
+      vi.mocked(mockPaymentService.capturePayment).mockResolvedValue({
+        capturedAmount: 20000,
+      });
+      vi.mocked(
+        mockEarningService.createEarningForCompletedBooking
+      ).mockResolvedValue(undefined);
       mockProRepository.findById.mockResolvedValue(proProfile);
-      vi.mocked(mockClientProfileService.getProfileByUserId).mockResolvedValue(clientProfile);
+      vi.mocked(mockClientProfileService.getProfileByUserId).mockResolvedValue(
+        clientProfile
+      );
 
       const result = await service.completeBooking(actor, "booking-1");
 
       expect(result.status).toBe(BookingStatus.COMPLETED);
-      expect(mockPaymentServiceFactory).toHaveBeenCalledWith(PaymentProvider.MERCADO_PAGO);
-      expect(vi.mocked(mockPaymentService.capturePayment)).toHaveBeenCalledWith("payment-1");
-      expect(mockEarningService.createEarningForCompletedBooking).toHaveBeenCalled();
+      expect(mockPaymentServiceFactory).toHaveBeenCalledWith(
+        PaymentProvider.MERCADO_PAGO
+      );
+      expect(vi.mocked(mockPaymentService.capturePayment)).toHaveBeenCalledWith(
+        "payment-1"
+      );
+      expect(
+        mockEarningService.createEarningForCompletedBooking
+      ).toHaveBeenCalled();
       expect(mockNotificationService.deliverNow).toHaveBeenCalled();
     });
 
@@ -561,7 +636,10 @@ describe("BookingService", () => {
         status: BookingStatus.ARRIVED,
         proProfileId: "pro-1",
       });
-      const proProfile = createMockProProfile({ id: "pro-1", userId: "user-1" });
+      const proProfile = createMockProProfile({
+        id: "pro-1",
+        userId: "user-1",
+      });
       const updatedBooking = createMockBooking({
         status: BookingStatus.COMPLETED,
       });
@@ -574,9 +652,13 @@ describe("BookingService", () => {
       mockProRepository.findByUserId.mockResolvedValue(proProfile);
       mockBookingRepository.updateStatus.mockResolvedValue(updatedBooking);
       mockPaymentRepository.findByBookingId.mockResolvedValue(payment);
-      vi.mocked(mockPaymentService.capturePayment).mockRejectedValue(new Error("Capture failed"));
+      vi.mocked(mockPaymentService.capturePayment).mockRejectedValue(
+        new Error("Capture failed")
+      );
       mockProRepository.findById.mockResolvedValue(proProfile);
-      vi.mocked(mockClientProfileService.getProfileByUserId).mockResolvedValue(clientProfile);
+      vi.mocked(mockClientProfileService.getProfileByUserId).mockResolvedValue(
+        clientProfile
+      );
 
       const result = await service.completeBooking(actor, "booking-1");
 
@@ -590,7 +672,10 @@ describe("BookingService", () => {
         status: BookingStatus.ARRIVED,
         proProfileId: "pro-1",
       });
-      const proProfile = createMockProProfile({ id: "pro-1", userId: "user-1" });
+      const proProfile = createMockProProfile({
+        id: "pro-1",
+        userId: "user-1",
+      });
       const updatedBooking = createMockBooking({
         status: BookingStatus.COMPLETED,
       });
@@ -603,14 +688,20 @@ describe("BookingService", () => {
       mockProRepository.findByUserId.mockResolvedValue(proProfile);
       mockBookingRepository.updateStatus.mockResolvedValue(updatedBooking);
       mockPaymentRepository.findByBookingId.mockResolvedValue(payment);
-      vi.mocked(mockEarningService.createEarningForCompletedBooking).mockResolvedValue(undefined);
+      vi.mocked(
+        mockEarningService.createEarningForCompletedBooking
+      ).mockResolvedValue(undefined);
       mockProRepository.findById.mockResolvedValue(proProfile);
-      vi.mocked(mockClientProfileService.getProfileByUserId).mockResolvedValue(clientProfile);
+      vi.mocked(mockClientProfileService.getProfileByUserId).mockResolvedValue(
+        clientProfile
+      );
 
       const result = await service.completeBooking(actor, "booking-1");
 
       expect(result.status).toBe(BookingStatus.COMPLETED);
-      expect(mockEarningService.createEarningForCompletedBooking).toHaveBeenCalled();
+      expect(
+        mockEarningService.createEarningForCompletedBooking
+      ).toHaveBeenCalled();
     });
   });
 
@@ -667,9 +758,9 @@ describe("BookingService", () => {
 
       mockBookingRepository.findById.mockResolvedValue(booking);
 
-      await expect(service.getRebookTemplate(actor, "booking-1")).rejects.toThrow(
-        InvalidBookingStateError
-      );
+      await expect(
+        service.getRebookTemplate(actor, "booking-1")
+      ).rejects.toThrow(InvalidBookingStateError);
     });
 
     it("should throw error if client does not own booking", async () => {
@@ -681,9 +772,9 @@ describe("BookingService", () => {
 
       mockBookingRepository.findById.mockResolvedValue(booking);
 
-      await expect(service.getRebookTemplate(actor, "booking-1")).rejects.toThrow(
-        UnauthorizedBookingActionError
-      );
+      await expect(
+        service.getRebookTemplate(actor, "booking-1")
+      ).rejects.toThrow(UnauthorizedBookingActionError);
     });
   });
 
@@ -724,7 +815,10 @@ describe("BookingService", () => {
 
   describe("getProBookingsByUserId", () => {
     it("should get bookings for a pro by user ID", async () => {
-      const proProfile = createMockProProfile({ id: "pro-1", userId: "user-1" });
+      const proProfile = createMockProProfile({
+        id: "pro-1",
+        userId: "user-1",
+      });
       const bookings = [createMockBooking()];
 
       mockProRepository.findByUserId.mockResolvedValue(proProfile);
@@ -752,7 +846,9 @@ describe("BookingService", () => {
       const proProfile = createMockProProfile();
 
       mockBookingRepository.findAll.mockResolvedValue(bookings);
-      vi.mocked(mockClientProfileService.getProfile).mockResolvedValue(clientProfile);
+      vi.mocked(mockClientProfileService.getProfile).mockResolvedValue(
+        clientProfile
+      );
       mockProRepository.findById.mockResolvedValue(proProfile);
       mockPaymentRepository.findByBookingId.mockResolvedValue(null);
 
@@ -768,7 +864,9 @@ describe("BookingService", () => {
       const proProfile = createMockProProfile();
 
       mockBookingRepository.findAll.mockResolvedValue(bookings);
-      vi.mocked(mockClientProfileService.getProfile).mockResolvedValue(clientProfile);
+      vi.mocked(mockClientProfileService.getProfile).mockResolvedValue(
+        clientProfile
+      );
       mockProRepository.findById.mockResolvedValue(proProfile);
       mockPaymentRepository.findByBookingId.mockResolvedValue(null);
 
@@ -788,7 +886,9 @@ describe("BookingService", () => {
       const payment = createMockPayment();
 
       mockBookingRepository.findById.mockResolvedValue(booking);
-      vi.mocked(mockClientProfileService.getProfile).mockResolvedValue(clientProfile);
+      vi.mocked(mockClientProfileService.getProfile).mockResolvedValue(
+        clientProfile
+      );
       mockProRepository.findById.mockResolvedValue(proProfile);
       mockPaymentRepository.findByBookingId.mockResolvedValue(payment);
 

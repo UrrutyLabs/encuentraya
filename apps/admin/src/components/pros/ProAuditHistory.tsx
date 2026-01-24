@@ -56,7 +56,10 @@ const getEventLabel = (eventType: AuditEventType): string => {
 const getEventBadgeVariant = (
   eventType: AuditEventType
 ): "info" | "success" | "warning" | "danger" => {
-  const variantMap: Record<AuditEventType, "info" | "success" | "warning" | "danger"> = {
+  const variantMap: Record<
+    AuditEventType,
+    "info" | "success" | "warning" | "danger"
+  > = {
     PRO_SUSPENDED: "danger",
     PRO_UNSUSPENDED: "success",
     PRO_APPROVED: "success",

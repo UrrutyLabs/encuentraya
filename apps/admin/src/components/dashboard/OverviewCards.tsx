@@ -104,7 +104,9 @@ export function OverviewCards({
           Cobros pendientes
         </Text>
         <div className="text-xs text-muted">
-          <span>Monto: {formatCurrency(payouts.pendingAmount, "UYU", true)}</span>
+          <span>
+            Monto: {formatCurrency(payouts.pendingAmount, "UYU", true)}
+          </span>
         </div>
       </Card>
 

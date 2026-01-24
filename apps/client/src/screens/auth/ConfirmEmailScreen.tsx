@@ -75,14 +75,18 @@ function ConfirmEmailContent() {
           {email && (
             <div className="flex items-center justify-center gap-2">
               <Mail className="w-4 h-4 text-primary" />
-              <Text variant="body" className="text-primary text-center font-medium">
+              <Text
+                variant="body"
+                className="text-primary text-center font-medium"
+              >
                 {email}
               </Text>
             </div>
           )}
 
           <Text variant="body" className="text-muted text-center">
-            Hacé click en el link del email para confirmar tu cuenta y continuar.
+            Hacé click en el link del email para confirmar tu cuenta y
+            continuar.
           </Text>
 
           {resendSuccess && (

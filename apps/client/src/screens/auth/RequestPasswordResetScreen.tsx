@@ -41,8 +41,8 @@ export function RequestPasswordResetScreen() {
               Email enviado
             </Text>
             <Text variant="body" className="text-muted">
-              Si existe una cuenta con el email {email}, recibirás un enlace para
-              restablecer tu contraseña.
+              Si existe una cuenta con el email {email}, recibirás un enlace
+              para restablecer tu contraseña.
             </Text>
           </div>
           <div className="space-y-3">
@@ -102,7 +102,8 @@ export function RequestPasswordResetScreen() {
             {error && (
               <div className="flex items-center gap-2 p-3 bg-danger/10 border border-danger/20 rounded-md">
                 <Text variant="small" className="text-danger">
-                  {error.message || "Error al enviar el email. Por favor, intentá nuevamente."}
+                  {error.message ||
+                    "Error al enviar el email. Por favor, intentá nuevamente."}
                 </Text>
               </div>
             )}

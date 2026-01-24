@@ -1,6 +1,11 @@
 "use client";
 
-import { QueryClient, QueryClientProvider, QueryCache, MutationCache } from "@tanstack/react-query";
+import {
+  QueryClient,
+  QueryClientProvider,
+  QueryCache,
+  MutationCache,
+} from "@tanstack/react-query";
 import { useState } from "react";
 import { trpc } from "./client";
 import { createTRPCLinks } from "./links";
@@ -63,7 +68,9 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
  */
 export function getQueryClient(): QueryClient {
   if (!queryClientInstance) {
-    throw new Error("QueryClient not initialized. Make sure TRPCProvider is mounted.");
+    throw new Error(
+      "QueryClient not initialized. Make sure TRPCProvider is mounted."
+    );
   }
   return queryClientInstance;
 }

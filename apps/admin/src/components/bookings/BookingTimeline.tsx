@@ -26,7 +26,6 @@ export function BookingTimeline({
     });
   };
 
-
   const timelineItems = [
     {
       label: "Reserva creada",

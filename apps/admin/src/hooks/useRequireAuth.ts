@@ -17,12 +17,14 @@ interface UseRequireAuthReturn {
 /**
  * Simple hook to require authentication
  * Redirects to login if not authenticated
- * 
+ *
  * @param options - Configuration options
  * @param options.redirectTo - Where to redirect if not authenticated (default: '/login')
  * @returns Auth state
  */
-export function useRequireAuth(options: UseRequireAuthOptions = {}): UseRequireAuthReturn {
+export function useRequireAuth(
+  options: UseRequireAuthOptions = {}
+): UseRequireAuthReturn {
   const router = useRouter();
   const { user, loading } = useAuth();
   const { redirectTo = "/login" } = options;

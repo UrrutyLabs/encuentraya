@@ -7,7 +7,7 @@
 /**
  * Performs an authentication redirect to a URL
  * Uses window.location.assign for full page reload to clear stale state
- * 
+ *
  * @param url - The URL to redirect to
  */
 export function performAuthRedirect(url: string): void {
@@ -27,7 +27,7 @@ export function performAuthRedirect(url: string): void {
 /**
  * Redirects to the login page
  * Convenience function for authentication redirects to login
- * 
+ *
  * @param returnUrl - Optional return URL to append as query parameter
  */
 export function redirectToLoginPage(returnUrl?: string | null): void {

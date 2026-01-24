@@ -110,9 +110,7 @@ export class AuditLogRepositoryImpl implements AuditLogRepository {
     return logs.map(this.mapPrismaToDomain);
   }
 
-  async findByEventType(
-    eventType: AuditEventType
-  ): Promise<AuditLogEntity[]> {
+  async findByEventType(eventType: AuditEventType): Promise<AuditLogEntity[]> {
     const logs = await prisma.auditLog.findMany({
       where: {
         eventType: eventType as unknown as $Enums.AuditEventType,

@@ -195,7 +195,9 @@ describe("useRouteGuard", () => {
       renderHook(() => useRouteGuard({ requiredRole: Role.CLIENT }));
 
       await waitFor(() => {
-        expect(mockPerformAuthRedirect).toHaveBeenCalledWith("/pro/download-app");
+        expect(mockPerformAuthRedirect).toHaveBeenCalledWith(
+          "/pro/download-app"
+        );
       });
     });
 

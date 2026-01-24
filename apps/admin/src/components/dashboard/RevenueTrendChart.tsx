@@ -13,7 +13,10 @@ interface RevenueTrendChartProps {
   isLoading?: boolean;
 }
 
-export function RevenueTrendChart({ trends, isLoading }: RevenueTrendChartProps) {
+export function RevenueTrendChart({
+  trends,
+  isLoading,
+}: RevenueTrendChartProps) {
   if (isLoading) {
     return (
       <Card className="p-6 animate-pulse">
@@ -42,9 +45,13 @@ export function RevenueTrendChart({ trends, isLoading }: RevenueTrendChartProps)
       {/* Chart */}
       <div className="h-48 flex items-end justify-between gap-2 mb-4">
         {trends.map((trend, index) => {
-          const height = maxRevenue > 0 ? (trend.revenue / maxRevenue) * 100 : 0;
+          const height =
+            maxRevenue > 0 ? (trend.revenue / maxRevenue) * 100 : 0;
           return (
-            <div key={index} className="flex-1 flex flex-col items-center gap-2">
+            <div
+              key={index}
+              className="flex-1 flex flex-col items-center gap-2"
+            >
               <div className="w-full flex flex-col items-center justify-end h-full">
                 <div
                   className="w-full bg-primary rounded-t transition-all hover:opacity-80 cursor-pointer"

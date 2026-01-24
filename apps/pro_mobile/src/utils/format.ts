@@ -11,7 +11,20 @@ export function formatAmount(amount: number, currency: string): string {
  */
 export function formatDateShort(date: Date | string): string {
   const dateObj = date instanceof Date ? date : new Date(date);
-  const months = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+  const months = [
+    "Ene",
+    "Feb",
+    "Mar",
+    "Abr",
+    "May",
+    "Jun",
+    "Jul",
+    "Ago",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dic",
+  ];
   const day = dateObj.getDate();
   const month = months[dateObj.getMonth()];
   return `${day} ${month}`;

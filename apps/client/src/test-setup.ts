@@ -61,7 +61,8 @@ vi.mock("@/lib/trpc/client", () => {
           useQuery: (...args: unknown[]) => mockTrpcClientProfileGet(...args),
         },
         update: {
-          useMutation: (...args: unknown[]) => mockTrpcClientProfileUpdate(...args),
+          useMutation: (...args: unknown[]) =>
+            mockTrpcClientProfileUpdate(...args),
         },
       },
       auth: {
@@ -69,10 +70,12 @@ vi.mock("@/lib/trpc/client", () => {
           useMutation: (...args: unknown[]) => mockTrpcAuthSignup(...args),
         },
         changePassword: {
-          useMutation: (...args: unknown[]) => mockTrpcAuthChangePassword(...args),
+          useMutation: (...args: unknown[]) =>
+            mockTrpcAuthChangePassword(...args),
         },
         deleteAccount: {
-          useMutation: (...args: unknown[]) => mockTrpcAuthDeleteAccount(...args),
+          useMutation: (...args: unknown[]) =>
+            mockTrpcAuthDeleteAccount(...args),
         },
       },
       booking: {
@@ -89,12 +92,14 @@ vi.mock("@/lib/trpc/client", () => {
           useMutation: (...args: unknown[]) => mockTrpcBookingCancel(...args),
         },
         rebookTemplate: {
-          useQuery: (...args: unknown[]) => mockTrpcBookingRebookTemplate(...args),
+          useQuery: (...args: unknown[]) =>
+            mockTrpcBookingRebookTemplate(...args),
         },
       },
       review: {
         statusByBookingIds: {
-          useQuery: (...args: unknown[]) => mockTrpcReviewStatusByBookingIds(...args),
+          useQuery: (...args: unknown[]) =>
+            mockTrpcReviewStatusByBookingIds(...args),
         },
         byBooking: {
           useQuery: (...args: unknown[]) => mockTrpcReviewByBooking(...args),
@@ -105,10 +110,12 @@ vi.mock("@/lib/trpc/client", () => {
       },
       payment: {
         getByBooking: {
-          useQuery: (...args: unknown[]) => mockTrpcPaymentGetByBooking(...args),
+          useQuery: (...args: unknown[]) =>
+            mockTrpcPaymentGetByBooking(...args),
         },
         createPreauthForBooking: {
-          useMutation: (...args: unknown[]) => mockTrpcPaymentCreatePreauthForBooking(...args),
+          useMutation: (...args: unknown[]) =>
+            mockTrpcPaymentCreatePreauthForBooking(...args),
         },
       },
       contact: {

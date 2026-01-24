@@ -1,6 +1,13 @@
 "use client";
 
-import { useState, useMemo, useRef, useEffect, startTransition, Suspense } from "react";
+import {
+  useState,
+  useMemo,
+  useRef,
+  useEffect,
+  startTransition,
+  Suspense,
+} from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { AlertCircle } from "lucide-react";
@@ -50,8 +57,10 @@ function BookingCreateContent() {
   const [time, setTime] = useState("");
   const [address, setAddress] = useState(rebookValues?.address || "");
   const [hours, setHours] = useState(rebookValues?.hours || "");
-  const [category, setCategory] = useState<Category | "">(rebookValues?.category || "");
-  
+  const [category, setCategory] = useState<Category | "">(
+    rebookValues?.category || ""
+  );
+
   // Track previous rebookValues to update state only when template first loads
   const prevRebookValuesRef = useRef(rebookValues);
 
@@ -62,7 +71,9 @@ function BookingCreateContent() {
   const effectiveProId = rebookTemplate?.proProfileId || proId;
 
   // Fetch pro details to get hourly rate and availability slots
-  const { pro, isLoading: isLoadingPro } = useProDetail(effectiveProId || undefined);
+  const { pro, isLoading: isLoadingPro } = useProDetail(
+    effectiveProId || undefined
+  );
 
   // Generate available booking times with validation
   const { availableTimes, handleDateChange: handleDateChangeWithValidation } =
@@ -117,7 +128,6 @@ function BookingCreateContent() {
       return;
     }
 
-
     // Combine date and time into scheduledAt
     const scheduledAt = new Date(`${date}T${time}`);
 
@@ -132,10 +142,14 @@ function BookingCreateContent() {
       // Success - hook's onSuccess will handle redirect
     } catch (error) {
       // Error is handled by hook state, just log it
-      logger.error("Error creating booking", error instanceof Error ? error : new Error(String(error)), {
-        proId: effectiveProId,
-        category,
-      });
+      logger.error(
+        "Error creating booking",
+        error instanceof Error ? error : new Error(String(error)),
+        {
+          proId: effectiveProId,
+          category,
+        }
+      );
     }
   };
 
@@ -151,7 +165,8 @@ function BookingCreateContent() {
                 No se puede volver a contratar desde esta reserva
               </Text>
               <Text variant="body" className="text-muted mb-4">
-                La reserva seleccionada no está disponible para volver a contratar.
+                La reserva seleccionada no está disponible para volver a
+                contratar.
               </Text>
               <div className="flex gap-2 justify-center">
                 <Link href="/search">
@@ -233,12 +248,11 @@ function BookingCreateContent() {
 
   // Check if should show WhatsApp prompt
   const shouldShowPrompt =
-    profile &&
-    !profile.phone &&
-    profile.preferredContactMethod === "WHATSAPP";
+    profile && !profile.phone && profile.preferredContactMethod === "WHATSAPP";
 
   // Check if pro is suspended when rebooking
-  const isRebookingSuspended = rebookFrom && pro && (pro.isSuspended || !pro.isApproved);
+  const isRebookingSuspended =
+    rebookFrom && pro && (pro.isSuspended || !pro.isApproved);
 
   return (
     <div className="min-h-screen bg-bg">
@@ -265,7 +279,8 @@ function BookingCreateContent() {
                     Profesional suspendido
                   </Text>
                   <Text variant="body" className="text-text">
-                    Este profesional está suspendido y no está disponible para nuevas reservas en este momento.
+                    Este profesional está suspendido y no está disponible para
+                    nuevas reservas en este momento.
                   </Text>
                 </div>
               </div>

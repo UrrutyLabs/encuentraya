@@ -20,24 +20,24 @@ import { TOKENS } from "@/server/container/tokens";
 /**
  * Review service
  * Contains business logic for review operations
- * 
+ *
  * Manual Test Examples:
- * 
+ *
  * 1. Create review on completed booking (should succeed):
  *    - Ensure booking exists with status=COMPLETED
  *    - Call review.create with { bookingId, rating: 4, comment: "Great service!" }
  *    - Expected: Review created successfully
- * 
+ *
  * 2. Create review on non-completed booking (should fail):
  *    - Ensure booking exists with status=PENDING or ACCEPTED
  *    - Call review.create with { bookingId, rating: 4 }
  *    - Expected: BookingNotCompletedError (BAD_REQUEST)
- * 
+ *
  * 3. Create duplicate review (should fail):
  *    - Create a review for a booking
  *    - Try to create another review for the same booking
  *    - Expected: ReviewAlreadyExistsError (CONFLICT)
- * 
+ *
  * 4. Unauthorized review creation (should fail):
  *    - As a PRO role, try to create a review
  *    - Expected: UnauthorizedReviewError (FORBIDDEN)
@@ -96,10 +96,7 @@ export class ReviewService {
 
     // Verify booking is completed
     if (booking.status !== BookingStatus.COMPLETED) {
-      throw new BookingNotCompletedError(
-        input.bookingId,
-        booking.status
-      );
+      throw new BookingNotCompletedError(input.bookingId, booking.status);
     }
 
     // Verify booking has a pro assigned (required for completed bookings)
@@ -240,4 +237,3 @@ export class ReviewService {
     return statusMap;
   }
 }
-

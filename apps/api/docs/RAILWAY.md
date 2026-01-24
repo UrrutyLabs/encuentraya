@@ -103,6 +103,7 @@ To make Railway wait for GitHub CI checks (tests, linters) before deploying:
 ### 6. Deploy
 
 Railway will automatically:
+
 - Wait for GitHub CI checks to pass (if configured)
 - Build your application
 - Run migrations
@@ -112,6 +113,7 @@ Railway will automatically:
 ## Monorepo Configuration
 
 Railway handles monorepos by:
+
 - Detecting `pnpm-workspace.yaml` at root
 - Installing dependencies from root
 - Building the `apps/api` directory
@@ -120,6 +122,7 @@ Railway handles monorepos by:
 ## Database Migrations
 
 Migrations run automatically on each deploy via the `startCommand`:
+
 ```bash
 pnpm db:migrate deploy --config=./prisma/config.ts
 ```
@@ -135,6 +138,7 @@ This ensures your database schema is always up-to-date.
 ## Monitoring
 
 Railway provides:
+
 - **Logs:** View in Railway dashboard
 - **Metrics:** CPU, Memory, Network usage
 - **Deployments:** History and rollback options
@@ -164,6 +168,7 @@ Railway provides:
 ### CI Workflow
 
 The repository includes a `.github/workflows/ci.yml` workflow that runs:
+
 - **Lint:** Checks code style and formatting
 - **Type Check:** Validates TypeScript types
 - **Test:** Runs unit tests
@@ -194,6 +199,7 @@ Railway waits for checks to pass
 ### Manual Override
 
 If you need to deploy without waiting for CI:
+
 - Use Railway dashboard → Deploy → "Deploy Now"
 - Or use Railway CLI: `railway up --detach`
 

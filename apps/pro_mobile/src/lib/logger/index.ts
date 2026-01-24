@@ -1,7 +1,7 @@
 /**
  * Re-export logger from shared monitoring package
  * This maintains backward compatibility with existing imports
- * 
+ *
  * Creates a logger instance for the mobile app
  */
 

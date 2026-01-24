@@ -110,17 +110,20 @@ Everything under `packages/*` must be:
 **Location:** `packages/ui/`
 
 **Structure:**
+
 - `tokens/` - Design tokens (colors, typography, spacing, radius, shadows) - universal
 - `web/atoms/` - Atomic components (Button, Card, Text, Badge, Input, Select) - web only
 - `web/molecules/` - Composite components (EmptyState) - web only
 
 **Rationale:**
+
 - Share common UI components between `client` and `admin` apps (both use Next.js + Tailwind)
 - Reduces duplication and ensures consistency
 - Design tokens remain universal and can be used by mobile app
 - Mobile app has separate component implementations (React Native)
 
 **Rules:**
+
 - ✅ Web components use Tailwind CSS v4 with CSS variables for colors
 - ✅ Use inline styles for colors when Tailwind class detection is unreliable
 - ✅ Components must work identically in both client and admin apps

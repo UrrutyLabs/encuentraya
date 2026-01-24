@@ -23,7 +23,9 @@ describe("useAvailableTimeWindows", () => {
 
       expect(result.current.availableTimeWindows).toHaveLength(4);
       expect(result.current.availableTimeWindows[0].value).toBe("");
-      expect(result.current.availableTimeWindows[0].label).toBe("Cualquier hora");
+      expect(result.current.availableTimeWindows[0].label).toBe(
+        "Cualquier hora"
+      );
       expect(result.current.availableTimeWindows[1].value).toBe("09:00-12:00");
       expect(result.current.availableTimeWindows[2].value).toBe("12:00-15:00");
       expect(result.current.availableTimeWindows[3].value).toBe("15:00-18:00");
@@ -85,7 +87,9 @@ describe("useAvailableTimeWindows", () => {
 
       expect(result.current.availableTimeWindows).toHaveLength(1);
       expect(result.current.availableTimeWindows[0].value).toBe("");
-      expect(result.current.availableTimeWindows[0].label).toBe("Cualquier hora");
+      expect(result.current.availableTimeWindows[0].label).toBe(
+        "Cualquier hora"
+      );
     });
 
     it("should filter out all specific windows if they have passed", () => {

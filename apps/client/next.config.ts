@@ -2,7 +2,12 @@ import { withSentryConfig } from "@sentry/nextjs";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  transpilePackages: ["@repo/domain", "@repo/trpc", "@repo/monitoring", "@repo/content"],
+  transpilePackages: [
+    "@repo/domain",
+    "@repo/trpc",
+    "@repo/monitoring",
+    "@repo/content",
+  ],
 };
 
 // Wrap Next.js config with Sentry

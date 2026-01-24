@@ -14,7 +14,8 @@ if (dsn) {
     tracesSampleRate: process.env.NODE_ENV === "production" ? 0.1 : 1.0,
     // Disable debug mode to prevent console output in development
     debug: false,
-    environment: process.env.NODE_ENV === "production" ? "production" : "development",
+    environment:
+      process.env.NODE_ENV === "production" ? "production" : "development",
     // Filter out known non-critical errors
     beforeSend(event, hint) {
       // Prevent sending events in non-production environments

@@ -28,7 +28,7 @@ describe("useAvailableBookingTimes", () => {
 
       const times = result.current.availableTimes;
       expect(times.length).toBeGreaterThan(0);
-      
+
       // Check first few times
       expect(times[0].value).toBe("09:00");
       expect(times[0].label).toBe("9:00");
@@ -117,7 +117,7 @@ describe("useAvailableBookingTimes", () => {
       );
 
       const times = result.current.availableTimes;
-      
+
       // Should only include times between 10:00 and 14:00
       expect(times.some((t) => t.value === "09:00")).toBe(false);
       expect(times.some((t) => t.value === "10:00")).toBe(true);
@@ -486,7 +486,7 @@ describe("useAvailableBookingTimes", () => {
       );
 
       const times = result.current.availableTimes;
-      
+
       // Should exclude 09:00 and 09:30 (less than 60 min from 10:00)
       // Should include 11:00 onwards (within availability slot and >= 60 min from now)
       expect(times.some((t) => t.value === "09:00")).toBe(false);

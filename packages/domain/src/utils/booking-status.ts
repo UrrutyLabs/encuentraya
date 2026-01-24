@@ -31,7 +31,10 @@ export function getBookingStatusLabel(status: BookingStatus): string {
 export function getBookingStatusVariant(
   status: BookingStatus
 ): "info" | "success" | "warning" | "danger" {
-  const variants: Record<BookingStatus, "info" | "success" | "warning" | "danger"> = {
+  const variants: Record<
+    BookingStatus,
+    "info" | "success" | "warning" | "danger"
+  > = {
     [BookingStatus.PENDING_PAYMENT]: "warning",
     [BookingStatus.PENDING]: "info",
     [BookingStatus.ACCEPTED]: "success",

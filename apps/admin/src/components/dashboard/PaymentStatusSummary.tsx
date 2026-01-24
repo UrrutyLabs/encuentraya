@@ -40,7 +40,10 @@ const statusLabels: Record<PaymentStatus, string> = {
   [PaymentStatus.REFUNDED]: "Reembolsado",
 };
 
-const statusVariants: Record<PaymentStatus, "info" | "success" | "warning" | "danger"> = {
+const statusVariants: Record<
+  PaymentStatus,
+  "info" | "success" | "warning" | "danger"
+> = {
   [PaymentStatus.CREATED]: "info",
   [PaymentStatus.REQUIRES_ACTION]: "warning",
   [PaymentStatus.AUTHORIZED]: "info",
@@ -81,7 +84,10 @@ export function PaymentStatusSummary({
   }
 
   const total = Object.values(breakdown).reduce((sum, count) => sum + count, 0);
-  const totalAmount = Object.values(amounts).reduce((sum, amount) => sum + amount, 0);
+  const totalAmount = Object.values(amounts).reduce(
+    (sum, amount) => sum + amount,
+    0
+  );
 
   return (
     <Card className="p-6">
@@ -104,7 +110,9 @@ export function PaymentStatusSummary({
               onClick={() => router.push(`/admin/payments?status=${status}`)}
             >
               <div className="flex items-center gap-3 flex-1 min-w-0">
-                <Badge variant={statusVariants[status]}>{statusLabels[status]}</Badge>
+                <Badge variant={statusVariants[status]}>
+                  {statusLabels[status]}
+                </Badge>
                 <Text variant="small" className="text-muted">
                   {count} pagos
                 </Text>

@@ -34,17 +34,19 @@ describe("AuditService", () => {
     return { id, role };
   }
 
-  function createMockAuditLog(overrides?: Partial<{
-    id: string;
-    eventType: AuditEventType;
-    actorId: string;
-    actorRole: Role;
-    resourceType: string;
-    resourceId: string;
-    action: string;
-    metadata: Record<string, unknown> | null;
-    createdAt: Date;
-  }>) {
+  function createMockAuditLog(
+    overrides?: Partial<{
+      id: string;
+      eventType: AuditEventType;
+      actorId: string;
+      actorRole: Role;
+      resourceType: string;
+      resourceId: string;
+      action: string;
+      metadata: Record<string, unknown> | null;
+      createdAt: Date;
+    }>
+  ) {
     return {
       id: "log-1",
       eventType: AuditEventType.BOOKING_STATUS_FORCED,
@@ -167,7 +169,11 @@ describe("AuditService", () => {
       const resourceId = "booking-1";
       const mockLogs = [
         createMockAuditLog({ id: "log-1", action: "force_status" }),
-        createMockAuditLog({ id: "log-2", action: "update", eventType: AuditEventType.PAYMENT_SYNCED }),
+        createMockAuditLog({
+          id: "log-2",
+          action: "update",
+          eventType: AuditEventType.PAYMENT_SYNCED,
+        }),
       ];
       mockRepository.findByResource.mockResolvedValue(mockLogs);
 
@@ -175,7 +181,10 @@ describe("AuditService", () => {
       const result = await service.getResourceLogs(resourceType, resourceId);
 
       // Assert
-      expect(mockRepository.findByResource).toHaveBeenCalledWith(resourceType, resourceId);
+      expect(mockRepository.findByResource).toHaveBeenCalledWith(
+        resourceType,
+        resourceId
+      );
       expect(result).toHaveLength(2);
       expect(result[0]).toMatchObject({
         id: "log-1",

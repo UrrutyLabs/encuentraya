@@ -79,7 +79,10 @@ export function PayoutDetailScreen({ payoutId }: PayoutDetailScreenProps) {
         sentAt={payout.sentAt}
       />
 
-      <PayoutEarningsList earnings={payout.earnings} currency={payout.currency} />
+      <PayoutEarningsList
+        earnings={payout.earnings}
+        currency={payout.currency}
+      />
 
       {/* Actions */}
       {payout.status === "FAILED" && (

@@ -40,7 +40,6 @@ type FormHandlers = {
   setPreferredContactMethod: (value: PreferredContactMethod | "") => void;
 };
 
-
 type SecurityHandlers = {
   onChangePasswordClick?: () => void;
   onDeleteAccountClick?: () => void;
@@ -63,9 +62,7 @@ type SettingsSectionConfig = {
   icon: LucideIcon;
   component: AnyComponent;
   isEditable: boolean; // Whether this section requires form submission
-  visible: (data: {
-    profile?: ProfileData | null;
-  }) => boolean;
+  visible: (data: { profile?: ProfileData | null }) => boolean;
   getProps: (data: {
     profile?: ProfileData | null;
     formState: FormState;

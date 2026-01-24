@@ -15,6 +15,7 @@
 **Location:** `src/components/ui/` and `src/components/{domain}/` (domain-specific presentational)
 
 **Responsibilities:**
+
 - Render UI from props
 - No API calls
 - No global state access
@@ -22,6 +23,7 @@
 - No direct tRPC access
 
 **Examples:**
+
 - `Button`, `Card`, `Text`, `Badge`
 - `ProCard`, `BookingForm`, `RatingStars`
 - `PayoutStatusBadge`, `PayoutSummary`, `PayoutEarningsList`
@@ -30,6 +32,7 @@
 If it can be rendered in Storybook with mock props, it's presentational.
 
 **Rules:**
+
 - ✅ Accept all data via props
 - ✅ Call callbacks (`onClick`, `onChange`, etc.) passed as props
 - ✅ Use utility functions for formatting (e.g., `formatDate`, `formatCurrency`)
@@ -42,6 +45,7 @@ If it can be rendered in Storybook with mock props, it's presentational.
 **Location:** `src/screens/` (for full-page screens) or `src/components/containers/` (for reusable containers)
 
 **Responsibilities:**
+
 - Fetch data using hooks (not direct tRPC access)
 - Call mutations using hooks
 - Handle loading/error states
@@ -49,10 +53,12 @@ If it can be rendered in Storybook with mock props, it's presentational.
 - Orchestrate user interactions
 
 **Examples:**
+
 - `PayoutsListScreen`, `PayablesScreen`, `BookingDetailScreen`
 - `SearchProsScreen`, `BookingCreateScreen`
 
 **Rules:**
+
 - ✅ Use custom hooks (e.g., `usePayouts`, `useBookings`) instead of direct `trpc` access
 - ✅ Pass data and callbacks to presentational components
 - ✅ Handle loading/error states at screen level
@@ -66,18 +72,21 @@ If it can be rendered in Storybook with mock props, it's presentational.
 **Location:** `src/hooks/`
 
 **Responsibilities:**
+
 - Encapsulate tRPC queries and mutations
 - Handle cache invalidation
 - Provide consistent API for screens
 - Transform data if needed (though prefer doing this in presentational components)
 
 **Examples:**
+
 - `usePayouts()`, `usePayout()`, `useCreatePayout()`, `useSendPayout()`
 - `useBookings()`, `useBooking()`, `useCancelBooking()`
 - `usePayments()`, `usePayment()`, `useSyncPaymentStatus()`
 - `usePros()`, `usePro()`
 
 **Rules:**
+
 - ✅ One hook per tRPC procedure (or related group)
 - ✅ Handle cache invalidation in mutation hooks using `trpc.useUtils()`
 - ✅ Return standard React Query return values (`data`, `isLoading`, `error`, etc.)
@@ -87,6 +96,7 @@ If it can be rendered in Storybook with mock props, it's presentational.
 - ❌ Never access router in hooks (screens handle navigation)
 
 **Hook Naming Convention:**
+
 - Query hooks: `use{Entity}` (singular) or `use{Entities}` (plural)
   - `usePayout(payoutId)` - get single payout
   - `usePayouts(limit?)` - list payouts
@@ -96,6 +106,7 @@ If it can be rendered in Storybook with mock props, it's presentational.
   - `useCancelBooking()` - cancel booking mutation
 
 **Example Hook Structure:**
+
 ```typescript
 // hooks/usePayouts.ts
 import { trpc } from "@/lib/trpc/client";
@@ -110,7 +121,7 @@ export function usePayout(payoutId: string) {
 
 export function useCreatePayout() {
   const utils = trpc.useUtils();
-  
+
   return trpc.payout.createForPro.useMutation({
     onSuccess: () => {
       utils.payout.listPayablePros.invalidate();
@@ -124,17 +135,20 @@ export function useCreatePayout() {
 **Location:** `src/components/{domain}/` (e.g., `components/admin/payouts/`, `components/admin/modals/`)
 
 **Responsibilities:**
+
 - Break down complex screens into smaller, focused components
 - Encapsulate domain-specific UI patterns
 - Reusable across multiple screens
 
 **Examples:**
+
 - `PayoutSummary` - displays payout summary card
 - `PayoutEarningsList` - displays earnings table
 - `ConfirmModal` - reusable confirmation modal
 - `PayoutStatusBadge` - status badge with formatting
 
 **Rules:**
+
 - ✅ Keep components focused on a single responsibility
 - ✅ Accept all data via props
 - ✅ Use utility functions for formatting
@@ -147,16 +161,19 @@ export function useCreatePayout() {
 **Location:** `src/components/{domain}/utils/` or `src/utils/`
 
 **Responsibilities:**
+
 - Pure functions for formatting and transformation
 - Reusable across components
 - No side effects
 
 **Examples:**
+
 - `formatDate()`, `formatDateShort()` - date formatting
 - `getStatusBadgeVariant()` - status badge variant mapping
 - `getStatusLabel()` - status label mapping
 
 **Rules:**
+
 - ✅ Pure functions (no side effects)
 - ✅ Well-typed inputs and outputs
 - ✅ Can be tested independently
@@ -212,6 +229,7 @@ src/
 - **Subcomponents:** Handle a single UI concern (e.g., summary card, earnings list)
 
 **Example:**
+
 ```typescript
 // ❌ BAD: Screen doing too much
 export function PayoutDetailScreen({ payoutId }: Props) {
@@ -243,6 +261,7 @@ export function PayoutDetailScreen({ payoutId }: Props) {
 - Avoid modifying existing components for unrelated features
 
 **Example:**
+
 ```typescript
 // ✅ GOOD: Extend via composition
 export function PayoutDetailScreen({ payoutId }: Props) {
@@ -264,9 +283,10 @@ export function PayoutDetailScreen({ payoutId }: Props) {
 - Prefer composition over large prop interfaces
 
 **Example:**
+
 ```typescript
 // ❌ BAD: Too many props
-<ProCard 
+<ProCard
   pro={pro}
   onSelect={onSelect}
   showRating={true}
@@ -291,6 +311,7 @@ export function PayoutDetailScreen({ payoutId }: Props) {
 - Presentational components depend on props, not hooks
 
 **Example:**
+
 ```typescript
 // ❌ BAD: Screen depends on concrete tRPC implementation
 export function PayoutsListScreen() {
@@ -345,11 +366,12 @@ UI Utilities (formatDate, PayoutStatusBadge, etc.)
 ## Component Organization Examples
 
 ### Simple List Screen
+
 ```typescript
 // screens/admin/PayoutsListScreen.tsx
 export function PayoutsListScreen() {
   const { data: payouts, isLoading } = usePayouts(100);
-  
+
   return (
     <div>
       <Text variant="h1">Cobros</Text>
@@ -360,23 +382,24 @@ export function PayoutsListScreen() {
 ```
 
 ### Complex Detail Screen with Subcomponents
+
 ```typescript
 // screens/admin/PayoutDetailScreen.tsx
 export function PayoutDetailScreen({ payoutId }: Props) {
   const { data: payout, isLoading, refetch } = usePayout(payoutId);
   const sendMutation = useSendPayout();
-  
+
   if (isLoading) return <LoadingState />;
   if (!payout) return <NotFoundState />;
-  
+
   return (
     <div>
       <Header payoutId={payout.id} status={payout.status} />
       <PayoutSummary {...payout} />
       <PayoutEarningsList earnings={payout.earnings} currency={payout.currency} />
       {payout.status === "FAILED" && (
-        <RetryActions 
-          onRetry={() => sendMutation.mutate({ payoutId }, { onSuccess: refetch })} 
+        <RetryActions
+          onRetry={() => sendMutation.mutate({ payoutId }, { onSuccess: refetch })}
         />
       )}
     </div>
@@ -385,6 +408,7 @@ export function PayoutDetailScreen({ payoutId }: Props) {
 ```
 
 ### Modal Extraction
+
 ```typescript
 // components/admin/modals/ConfirmModal.tsx
 export function ConfirmModal({ title, message, onConfirm, onCancel, isPending }: Props) {
@@ -403,7 +427,7 @@ export function ConfirmModal({ title, message, onConfirm, onCancel, isPending }:
 // screens/admin/PayablesScreen.tsx
 export function PayablesScreen() {
   const [showModal, setShowModal] = useState(false);
-  
+
   return (
     <div>
       {/* ... */}

@@ -31,12 +31,19 @@ export function FinancialSummaryCard({
         {/* Available Amount */}
         <View style={styles.summaryItem}>
           <View style={styles.summaryItemHeader}>
-            <Feather name="check-circle" size={16} color={theme.colors.success} />
+            <Feather
+              name="check-circle"
+              size={16}
+              color={theme.colors.success}
+            />
             <Text variant="small" style={styles.summaryLabel}>
               Disponible
             </Text>
           </View>
-          <Text variant="h2" style={[styles.summaryAmount, styles.successAmount]}>
+          <Text
+            variant="h2"
+            style={[styles.summaryAmount, styles.successAmount]}
+          >
             {formatAmount(available, currency)}
           </Text>
         </View>
@@ -49,7 +56,10 @@ export function FinancialSummaryCard({
               Pendiente
             </Text>
           </View>
-          <Text variant="h2" style={[styles.summaryAmount, styles.warningAmount]}>
+          <Text
+            variant="h2"
+            style={[styles.summaryAmount, styles.warningAmount]}
+          >
             {formatAmount(pending, currency)}
           </Text>
         </View>
@@ -57,12 +67,19 @@ export function FinancialSummaryCard({
         {/* Total Paid */}
         <View style={styles.summaryItem}>
           <View style={styles.summaryItemHeader}>
-            <Feather name="dollar-sign" size={16} color={theme.colors.primary} />
+            <Feather
+              name="dollar-sign"
+              size={16}
+              color={theme.colors.primary}
+            />
             <Text variant="small" style={styles.summaryLabel}>
               Total cobrado
             </Text>
           </View>
-          <Text variant="h2" style={[styles.summaryAmount, styles.primaryAmount]}>
+          <Text
+            variant="h2"
+            style={[styles.summaryAmount, styles.primaryAmount]}
+          >
             {formatAmount(totalPaid, currency)}
           </Text>
         </View>

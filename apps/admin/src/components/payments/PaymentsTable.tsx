@@ -38,15 +38,16 @@ export function PaymentsTable({ payments, isLoading }: PaymentsTableProps) {
   };
 
   const getStatusBadgeVariant = (status: string) => {
-    const statusMap: Record<string, "info" | "success" | "warning" | "danger"> = {
-      CREATED: "info",
-      REQUIRES_ACTION: "warning",
-      AUTHORIZED: "info",
-      CAPTURED: "success",
-      FAILED: "danger",
-      CANCELLED: "danger",
-      REFUNDED: "warning",
-    };
+    const statusMap: Record<string, "info" | "success" | "warning" | "danger"> =
+      {
+        CREATED: "info",
+        REQUIRES_ACTION: "warning",
+        AUTHORIZED: "info",
+        CAPTURED: "success",
+        FAILED: "danger",
+        CANCELLED: "danger",
+        REFUNDED: "warning",
+      };
     return statusMap[status] || "info";
   };
 
@@ -105,16 +106,28 @@ export function PaymentsTable({ payments, isLoading }: PaymentsTableProps) {
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   <div className="space-y-1">
                     <div>
-                      Est: {formatCurrency(payment.amountEstimated, payment.currency)}
+                      Est:{" "}
+                      {formatCurrency(
+                        payment.amountEstimated,
+                        payment.currency
+                      )}
                     </div>
                     {payment.amountAuthorized && (
                       <div className="text-xs text-gray-600">
-                        Aut: {formatCurrency(payment.amountAuthorized, payment.currency)}
+                        Aut:{" "}
+                        {formatCurrency(
+                          payment.amountAuthorized,
+                          payment.currency
+                        )}
                       </div>
                     )}
                     {payment.amountCaptured && (
                       <div className="text-xs text-gray-600">
-                        Cap: {formatCurrency(payment.amountCaptured, payment.currency)}
+                        Cap:{" "}
+                        {formatCurrency(
+                          payment.amountCaptured,
+                          payment.currency
+                        )}
                       </div>
                     )}
                   </div>

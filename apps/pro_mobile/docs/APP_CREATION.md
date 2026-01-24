@@ -1,8 +1,8 @@
 # Mobile App Recreation Prompt
 
 ## Context
-Recreate a complete Expo Router mobile app for "Arreglatodo" - a local services marketplace for pros (professionals) to manage bookings. This is a Pro-focused mobile app (not client-facing).
 
+Recreate a complete Expo Router mobile app for "Arreglatodo" - a local services marketplace for pros (professionals) to manage bookings. This is a Pro-focused mobile app (not client-facing).
 
 ## Project Structure
 
@@ -21,7 +21,7 @@ src/
       availability.tsx          # Delegates to AvailabilityScreen
     booking/
       [bookingId].tsx           # Delegates to BookingDetailScreen
-  
+
   screens/                      # Container components (smart)
     auth/
       LoginScreen.tsx
@@ -34,7 +34,7 @@ src/
       BookingDetailScreen.tsx
     availability/
       AvailabilityScreen.tsx
-  
+
   components/
     ui/                         # UI primitives
       Button.tsx
@@ -44,12 +44,12 @@ src/
       Badge.tsx
     presentational/             # UI-only components
       BookingCard.tsx
-  
+
   hooks/                        # Custom hooks
     useAuth.ts
     useBookingActions.ts
     useAvailability.ts
-  
+
   lib/
     supabase/
       client.ts                 # Supabase client setup
@@ -57,7 +57,7 @@ src/
       client.ts                 # tRPC React client
       links.ts                  # tRPC links with auth headers
       Provider.tsx              # TRPCProvider wrapper
-  
+
   theme/
     index.ts                    # Theme exports from design tokens
 ```
@@ -82,6 +82,7 @@ You have two options:
 Create a local package `packages/ui` or `src/tokens`:
 
 **Structure:**
+
 ```
 packages/ui/
   src/
@@ -96,6 +97,7 @@ packages/ui/
 ```
 
 **package.json:**
+
 ```json
 {
   "name": "@repo/ui",
@@ -108,6 +110,7 @@ packages/ui/
 ```
 
 **src/index.ts:**
+
 ```typescript
 export { colors, type Colors } from "./tokens/colors";
 export { typography, type Typography } from "./tokens/typography";
@@ -121,6 +124,7 @@ export { shadows, type Shadows } from "./tokens/shadows";
 If you don't want a separate package, create `src/tokens/` directory directly in the mobile app and import from there.
 
 ### Colors (Calm Trust Palette)
+
 ```typescript
 export const colors = {
   primary: "#1F3A5F",
@@ -139,6 +143,7 @@ export const colors = {
 ```
 
 ### Typography
+
 ```typescript
 export const typography = {
   sizes: {
@@ -158,20 +163,40 @@ export const typography = {
 ```
 
 ### Spacing
+
 ```typescript
 export const spacing = {
-  0: 0, 1: 4, 2: 8, 3: 12, 4: 16, 5: 20, 6: 24, 8: 32, 10: 40, 12: 48, 16: 64, 20: 80, 24: 96
+  0: 0,
+  1: 4,
+  2: 8,
+  3: 12,
+  4: 16,
+  5: 20,
+  6: 24,
+  8: 32,
+  10: 40,
+  12: 48,
+  16: 64,
+  20: 80,
+  24: 96,
 } as const;
 ```
 
 ### Radius
+
 ```typescript
 export const radius = {
-  none: 0, sm: 4, md: 8, lg: 12, xl: 16, full: 9999
+  none: 0,
+  sm: 4,
+  md: 8,
+  lg: 12,
+  xl: 16,
+  full: 9999,
 } as const;
 ```
 
 ### Shadows
+
 ```typescript
 export const shadows = {
   none: "none",
@@ -185,26 +210,31 @@ export const shadows = {
 ## UI Components
 
 ### Button (`components/ui/Button.tsx`)
+
 - Props: `variant?: "primary" | "secondary" | "accent" | "ghost" | "danger"`, `children: string`, extends `TouchableOpacityProps`
 - Variants use theme colors
 - Ghost variant: transparent bg, border, primary text color
 - Styles: padding, borderRadius (md), center alignment
 
 ### Text (`components/ui/Text.tsx`)
+
 - Props: `variant?: "body" | "small" | "xs" | "h1" | "h2"`, extends `TextProps`
 - Maps to typography tokens (fontSize, lineHeight, fontWeight)
 - Default color: theme.colors.text
 
 ### Card (`components/ui/Card.tsx`)
+
 - Props: extends `ViewProps`
 - Styles: surface bg, border, radius (lg), padding (spacing[4])
 
 ### Input (`components/ui/Input.tsx`)
+
 - Props: `label?: string`, extends `TextInputProps`
 - Optional label above input
 - Styles: border, radius (md), padding, surface bg, text color
 
 ### Badge (`components/ui/Badge.tsx`)
+
 - Props: `variant?: "success" | "warning" | "danger" | "info"`, `children: string`
 - Background: variant color at 10% opacity (1A)
 - Border: variant color at 20% opacity (33)
@@ -214,6 +244,7 @@ export const shadows = {
 ## Presentational Components
 
 ### BookingCard (`components/presentational/BookingCard.tsx`)
+
 - Props: `booking: Booking`, `onPress: () => void`
 - Displays: category (translated), status badge, description (2 lines max), date/time (formatted), total amount
 - Status labels (Spanish): Pendiente, Aceptada, Rechazada, Completada, Cancelada
@@ -224,12 +255,14 @@ export const shadows = {
 ## Hooks
 
 ### useAuth (`hooks/useAuth.ts`)
+
 - Returns: `{ user, session, loading, error, signIn, signUp, signOut }`
 - Uses Supabase: `supabase.auth.getSession()`, `onAuthStateChange()`, `signInWithPassword()`, `signUp()`, `signOut()`
 - Manages session state, loading, errors
 - Error handling: sets error state and throws
 
 ### useBookingActions (`hooks/useBookingActions.ts`)
+
 - Props: `onSuccess?: () => void`
 - Returns: `{ acceptBooking, rejectBooking, completeBooking, isAccepting, isRejecting, isCompleting, error }`
 - Uses tRPC mutations: `trpc.booking.accept.useMutation()`, `reject.useMutation()`, `complete.useMutation()`
@@ -237,6 +270,7 @@ export const shadows = {
 - Error messages (Spanish): "Error al aceptar/rechazar/completar la reserva"
 
 ### useAvailability (`hooks/useAvailability.ts`)
+
 - Returns: `{ isAvailable, isLoading, error, toggleAvailability, isSaving }`
 - Fetches: `trpc.pro.getMyProfile.useQuery()`
 - Availability logic: `pro.isApproved && !pro.isSuspended`
@@ -246,6 +280,7 @@ export const shadows = {
 ## Screens (Containers)
 
 ### LoginScreen (`screens/auth/LoginScreen.tsx`)
+
 - Form: email, password inputs
 - Button: "Ingresar" (primary), loading state "Iniciando sesión..."
 - Link: "¿No tenés cuenta? Registrate" (ghost variant) → `/auth/signup`
@@ -255,12 +290,14 @@ export const shadows = {
 - Centered Card layout, maxWidth 400
 
 ### SignupScreen (`screens/auth/SignupScreen.tsx`)
+
 - Same structure as LoginScreen
 - Button: "Crear cuenta" (primary), loading "Registrando..."
 - Link: "¿Ya tenés cuenta? Iniciar sesión" (ghost) → `router.back()`
 - Uses `useAuth().signUp()`
 
 ### HomeScreen (`screens/home/HomeScreen.tsx`)
+
 - Fetches: `trpc.booking.proInbox.useQuery()`
 - Sections:
   - "Solicitudes nuevas" (PENDING bookings)
@@ -272,6 +309,7 @@ export const shadows = {
 - Uses `useMemo` to filter bookings by status
 
 ### JobsScreen (`screens/jobs/JobsScreen.tsx`)
+
 - Fetches: `trpc.booking.proJobs.useQuery()`
 - Sections:
   - "Próximos" (ACCEPTED bookings)
@@ -280,6 +318,7 @@ export const shadows = {
 - Navigation: tap BookingCard → `/booking/${bookingId}`
 
 ### BookingDetailScreen (`screens/booking/BookingDetailScreen.tsx`)
+
 - Fetches: `trpc.booking.getById.useQuery({ id: bookingId })`
 - Displays:
   - Status badge (with variant mapping)
@@ -294,6 +333,7 @@ export const shadows = {
 - Date format: `Intl.DateTimeFormat("es-UY", { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" })`
 
 ### AvailabilityScreen (`screens/availability/AvailabilityScreen.tsx`)
+
 - Title: "Disponibilidad"
 - Toggle: Switch component (React Native)
 - Label: "Disponible" / "No disponible" (based on state)
@@ -305,6 +345,7 @@ export const shadows = {
 ## Routes (Expo Router Pages)
 
 ### `app/_layout.tsx`
+
 - Loads Inter fonts (400, 500, 600, 700) using `useFonts`
 - Shows ActivityIndicator while fonts load
 - Wraps app in `TRPCProvider`
@@ -319,12 +360,14 @@ export const shadows = {
   - `booking/[bookingId]`: title "Detalle de reserva"
 
 ### `app/index.tsx`
+
 - Uses `useAuth()` hook
 - If loading: ActivityIndicator
 - If session exists: `<Redirect href="/(tabs)/home" />`
 - Else: `<Redirect href="/auth/login" />`
 
 ### `app/(tabs)/_layout.tsx`
+
 - Tabs navigator
 - screenOptions:
   - `headerStyle: { backgroundColor: theme.colors.surface }`
@@ -338,6 +381,7 @@ export const shadows = {
   - `availability`: title "Disponibilidad", tabBarLabel "Disponibilidad"
 
 ### Route Pages (thin wrappers)
+
 - `app/(tabs)/home.tsx`: `export default function HomePage() { return <HomeScreen />; }`
 - `app/(tabs)/jobs.tsx`: `export default function JobsPage() { return <JobsScreen />; }`
 - `app/(tabs)/availability.tsx`: `export default function AvailabilityPage() { return <AvailabilityScreen />; }`
@@ -358,10 +402,10 @@ import { AnyRouter } from "@trpc/server";
 
 /**
  * AppRouter type for type-safe tRPC calls.
- * 
+ *
  * For a standalone app, you can use AnyRouter as a base type.
  * The actual API endpoints must exist on your backend server.
- * 
+ *
  * If you want full type safety, you can define the exact router structure
  * matching your backend API (see Option 2 below).
  */
@@ -377,6 +421,7 @@ If you want full type safety with exact endpoint types, you can define a more de
 **Note**: The detailed type definition is complex and requires deep knowledge of tRPC's type system. For most use cases, Option 1 (`AnyRouter`) is sufficient and will work correctly with your backend API.
 
 ### `lib/trpc/client.ts`
+
 ```typescript
 import { createTRPCReact } from "@trpc/react-query";
 import type { AppRouter } from "./types"; // Import from local types file
@@ -387,6 +432,7 @@ export const trpc = createTRPCReact<AppRouter>();
 **Note**: The `AppRouter` type is only for TypeScript type checking. The actual API endpoints must exist on your backend server. This type definition ensures your mobile app code is type-safe when calling the API.
 
 ### `lib/trpc/links.ts`
+
 - Function: `createTRPCLinks()`
 - Returns: `[httpBatchLink({ ... })]`
 - URL: `${getBaseUrl()}/api/trpc`
@@ -401,21 +447,21 @@ export const trpc = createTRPCReact<AppRouter>();
   - Returns headers object
 
 ### `lib/trpc/Provider.tsx`
+
 - Wraps children with tRPC and React Query providers
 - Creates `QueryClient` with `useState(() => new QueryClient())`
 - Creates `trpcClient` with `trpc.createClient({ links: createTRPCLinks() })`
 - Returns:
   ```tsx
   <trpc.Provider client={trpcClient} queryClient={queryClient}>
-    <QueryClientProvider client={queryClient}>
-      {children}
-    </QueryClientProvider>
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   </trpc.Provider>
   ```
 
 ## Supabase Setup
 
 ### `lib/supabase/client.ts`
+
 ```typescript
 import { createClient } from "@supabase/supabase-js";
 
@@ -428,15 +474,18 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 ## Theme Setup
 
 ### `theme/index.ts`
+
 - Imports tokens from design system (colors, typography, spacing, radius, shadows)
 - Exports: `export const theme = { colors, typography, spacing, radius, shadows }`
 
 ## Environment Variables
+
 - `EXPO_PUBLIC_SUPABASE_URL`
 - `EXPO_PUBLIC_SUPABASE_ANON_KEY`
 - `EXPO_PUBLIC_API_URL` (optional, defaults to localhost:3002)
 
 ## tRPC Endpoints Used
+
 - `trpc.booking.proInbox.useQuery()` - Get pending + accepted bookings for pro
 - `trpc.booking.proJobs.useQuery()` - Get accepted + completed bookings for pro
 - `trpc.booking.getById.useQuery({ id })` - Get booking by ID
@@ -502,10 +551,12 @@ export type Pro = {
 ```
 
 Then update imports throughout the app:
+
 - Replace `import { BookingStatus } from "@repo/domain"` with `import { BookingStatus } from "../types/domain"`
 - Replace `import type { Booking } from "@repo/domain"` with `import type { Booking } from "../types/domain"`
 
 ## UI Text (All Spanish - Rioplatense)
+
 - Auth: "Iniciar sesión", "Registrarse", "Email", "Contraseña", "Ingresar", "Crear cuenta"
 - Home: "Inicio", "Bandeja de trabajos", "Solicitudes nuevas", "Próximos trabajos"
 - Jobs: "Trabajos", "Lista de mis trabajos", "Próximos", "Completados"
@@ -517,6 +568,7 @@ Then update imports throughout the app:
 - Errors: "Error al cargar trabajos", "Error al cargar la reserva", "Reserva no encontrada", etc.
 
 ## Styling Rules
+
 - All components use `StyleSheet.create()` with theme tokens
 - Spacing: use `theme.spacing[number]` (numeric keys: 0, 1, 2, 3, 4, 5, 6, 8, 10, 12, 16, 20, 24)
 - Colors: use `theme.colors.*`
@@ -524,6 +576,7 @@ Then update imports throughout the app:
 - Typography: use `theme.typography.sizes.*` and `theme.typography.weights.*`
 
 ## Architecture Rules
+
 - **Screens are containers**: Handle data fetching, state, navigation logic
 - **Components are presentational**: UI-only, receive props, no tRPC calls
 - **Hooks encapsulate logic**: Business logic in custom hooks
@@ -547,6 +600,7 @@ Then update imports throughout the app:
 ### Complete Component Examples
 
 #### Button Component
+
 ```typescript
 import { TouchableOpacity, Text, StyleSheet, TouchableOpacityProps } from "react-native";
 import { theme } from "../../theme";
@@ -594,6 +648,7 @@ const styles = StyleSheet.create({
 ```
 
 #### Text Component
+
 ```typescript
 import { Text as RNText, TextProps as RNTextProps, StyleSheet } from "react-native";
 import { theme } from "../../theme";
@@ -642,6 +697,7 @@ export function Text({ children, variant = "body", style, ...props }: TextProps)
 ```
 
 #### Card Component
+
 ```typescript
 import { View, ViewProps, StyleSheet } from "react-native";
 import { theme } from "../../theme";
@@ -666,6 +722,7 @@ const styles = StyleSheet.create({
 ```
 
 #### Input Component
+
 ```typescript
 import { TextInput, TextInputProps, Text, View, StyleSheet } from "react-native";
 import { theme } from "../../theme";
@@ -717,6 +774,7 @@ const styles = StyleSheet.create({
 ```
 
 #### Badge Component
+
 ```typescript
 import { View, Text, StyleSheet, ViewProps } from "react-native";
 import { theme } from "../../theme";
@@ -785,6 +843,7 @@ const styles = StyleSheet.create({
 ```
 
 ## Testing Checklist
+
 - [ ] App loads without errors
 - [ ] Fonts load correctly (Inter)
 - [ ] Auth flow: login → redirect to home

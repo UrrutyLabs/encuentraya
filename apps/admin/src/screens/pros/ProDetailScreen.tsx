@@ -267,13 +267,21 @@ export function ProDetailScreen({ proProfileId }: ProDetailScreenProps) {
       </Card>
 
       {/* Audit History */}
-      <ProAuditHistory 
-        logs={auditLogs.map(log => ({
+      <ProAuditHistory
+        logs={auditLogs.map((log) => ({
           ...log,
-          eventType: log.eventType as "PRO_SUSPENDED" | "PRO_UNSUSPENDED" | "PRO_APPROVED" | "BOOKING_STATUS_FORCED" | "PAYMENT_SYNCED" | "PAYOUT_CREATED" | "PAYOUT_SENT" | "USER_ROLE_CHANGED",
+          eventType: log.eventType as
+            | "PRO_SUSPENDED"
+            | "PRO_UNSUSPENDED"
+            | "PRO_APPROVED"
+            | "BOOKING_STATUS_FORCED"
+            | "PAYMENT_SYNCED"
+            | "PAYOUT_CREATED"
+            | "PAYOUT_SENT"
+            | "USER_ROLE_CHANGED",
           actorRole: log.actorRole as string,
-        }))} 
-        isLoading={isLoadingAuditLogs} 
+        }))}
+        isLoading={isLoadingAuditLogs}
       />
 
       {/* Actions */}
@@ -397,7 +405,8 @@ export function ProDetailScreen({ proProfileId }: ProDetailScreenProps) {
               Confirmar Aprobación
             </Text>
             <Text variant="body" className="mb-4">
-              ¿Estás seguro de que querés aprobar a este profesional? Una vez aprobado, podrá recibir solicitudes de clientes.
+              ¿Estás seguro de que querés aprobar a este profesional? Una vez
+              aprobado, podrá recibir solicitudes de clientes.
             </Text>
             <div className="flex gap-2">
               <Button

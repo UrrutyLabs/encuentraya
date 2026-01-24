@@ -119,6 +119,7 @@ apps/client_mobile/
 ## Layout Design
 
 ### Tab Navigator
+
 ```
 ┌─────────────────────────┐
 │  [Search] [Bookings] [Profile]  │  ← Bottom tabs
@@ -126,11 +127,13 @@ apps/client_mobile/
 ```
 
 ### Stack Navigator (Over Tabs)
+
 - Header with back button
 - Screen title
 - ScrollView for content
 
 ### Reusable Components
+
 - `ProCard` (mobile version)
 - `BookingCard` (mobile version)
 - `SearchFilters` (mobile version)
@@ -142,9 +145,11 @@ apps/client_mobile/
 ## Implementation Phases
 
 ### Phase 1: Initial Setup & Authentication (Foundation)
+
 **Goal**: Basic structure and working authentication flow.
 
 **Tasks**:
+
 1. Create `apps/client_mobile` with Expo Router setup
 2. Configure dependencies (same as `pro_mobile`)
 3. Setup tRPC, React Query, Supabase
@@ -160,6 +165,7 @@ apps/client_mobile/
 8. Auth hooks (reuse logic from `client`)
 
 **Deliverables**:
+
 - ✅ App starts and redirects based on auth state
 - ✅ Login/Signup works
 - ✅ Email confirmation works
@@ -167,9 +173,11 @@ apps/client_mobile/
 ---
 
 ### Phase 2: Tab Navigator & Search Screen (Core)
+
 **Goal**: Main navigation and professional search functionality.
 
 **Tasks**:
+
 1. Create `app/(tabs)/_layout.tsx` (3 tabs)
 2. Implement `app/(tabs)/search.tsx`
 3. Create `SearchScreen` component:
@@ -182,6 +190,7 @@ apps/client_mobile/
 7. Hooks: `useSearchPros` (adapt from web)
 
 **Deliverables**:
+
 - ✅ Tab navigator functional
 - ✅ Search with filters works
 - ✅ View professional profile
@@ -190,9 +199,11 @@ apps/client_mobile/
 ---
 
 ### Phase 3: My Bookings (Core)
+
 **Goal**: View and manage client bookings.
 
 **Tasks**:
+
 1. Implement `app/(tabs)/bookings.tsx`
 2. Create `MyBookingsScreen` mobile:
    - "Upcoming" and "Past" sections
@@ -208,6 +219,7 @@ apps/client_mobile/
 6. Hooks: `useMyBookings`, `useBookingDetail`, `useCancelBooking`
 
 **Deliverables**:
+
 - ✅ View booking list
 - ✅ View booking detail
 - ✅ Cancel booking
@@ -216,9 +228,11 @@ apps/client_mobile/
 ---
 
 ### Phase 4: Create Booking (Core)
+
 **Goal**: Complete booking creation flow.
 
 **Tasks**:
+
 1. Implement `app/booking/create.tsx`
 2. Create `BookingCreateScreen` mobile:
    - Booking form
@@ -230,6 +244,7 @@ apps/client_mobile/
 5. Hooks: `useCreateBooking`, `useRebookTemplate`, `useProDetail`
 
 **Deliverables**:
+
 - ✅ Create booking from professional profile
 - ✅ Rebooking from past booking
 - ✅ Validations and error handling
@@ -238,9 +253,11 @@ apps/client_mobile/
 ---
 
 ### Phase 5: Checkout & Payment (Core)
+
 **Goal**: Payment flow for bookings.
 
 **Tasks**:
+
 1. Implement `app/checkout/[bookingId].tsx`
 2. Create `CheckoutScreen` mobile:
    - Booking summary
@@ -251,6 +268,7 @@ apps/client_mobile/
 4. Hooks: `useCheckout` (adapt from web)
 
 **Deliverables**:
+
 - ✅ Checkout screen
 - ✅ Initiate payment process
 - ✅ Redirect to payment provider
@@ -259,9 +277,11 @@ apps/client_mobile/
 ---
 
 ### Phase 6: Reviews (Core)
+
 **Goal**: Create reviews for completed bookings.
 
 **Tasks**:
+
 1. Implement `app/booking/[bookingId]/review.tsx`
 2. Create `ReviewCreateScreen` mobile:
    - Review form
@@ -271,6 +291,7 @@ apps/client_mobile/
 4. Hooks: `useCreateReview`
 
 **Deliverables**:
+
 - ✅ Create review from booking detail
 - ✅ Validation and submission
 - ✅ UI updates after creating review
@@ -278,9 +299,11 @@ apps/client_mobile/
 ---
 
 ### Phase 7: Profile & Settings (Core)
+
 **Goal**: User profile and settings management.
 
 **Tasks**:
+
 1. Implement `app/(tabs)/profile.tsx`
 2. Create `ProfileScreen` mobile:
    - User information
@@ -295,6 +318,7 @@ apps/client_mobile/
 5. Hooks: `useClientProfile`, `useSettingsForm`
 
 **Deliverables**:
+
 - ✅ View user profile
 - ✅ Access settings
 - ✅ Change password
@@ -303,9 +327,11 @@ apps/client_mobile/
 ---
 
 ### Phase 8: Refinements & UX Polish (Polish)
+
 **Goal**: Improve UX and consistency.
 
 **Tasks**:
+
 1. Loading states and skeletons
 2. Error handling and messages
 3. Empty states
@@ -317,6 +343,7 @@ apps/client_mobile/
 9. Basic testing of critical flows
 
 **Deliverables**:
+
 - ✅ Consistent UX
 - ✅ Clear error handling
 - ✅ Optimized performance
@@ -363,6 +390,7 @@ apps/client_mobile/
 ## Dependencies
 
 ### Core Dependencies (from `pro_mobile`)
+
 - `expo` (~54.0.31)
 - `expo-router` (~6.0.21)
 - `react-native` (0.81.5)
@@ -370,12 +398,13 @@ apps/client_mobile/
 - `@trpc/client` (^11.8.1)
 - `@trpc/react-query` (^11.8.1)
 - `@supabase/supabase-js` (^2.90.1)
-- `@repo/domain` (workspace:*)
-- `@repo/trpc` (workspace:*)
-- `@repo/react-query` (workspace:*)
-- `@repo/monitoring` (workspace:*)
+- `@repo/domain` (workspace:\*)
+- `@repo/trpc` (workspace:\*)
+- `@repo/react-query` (workspace:\*)
+- `@repo/monitoring` (workspace:\*)
 
 ### UI Dependencies
+
 - `@expo/vector-icons` (^15.0.3)
 - `react-native-safe-area-context` (~5.6.0)
 - `react-native-gesture-handler` (~2.28.0)

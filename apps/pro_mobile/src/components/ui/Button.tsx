@@ -1,4 +1,9 @@
-import { TouchableOpacity, Text, StyleSheet, TouchableOpacityProps } from "react-native";
+import {
+  TouchableOpacity,
+  Text,
+  StyleSheet,
+  TouchableOpacityProps,
+} from "react-native";
 import { theme } from "../../theme";
 
 interface ButtonProps extends TouchableOpacityProps {
@@ -6,18 +11,35 @@ interface ButtonProps extends TouchableOpacityProps {
   variant?: "primary" | "secondary" | "accent" | "ghost" | "danger";
 }
 
-export function Button({ children, variant = "primary", style, ...props }: ButtonProps) {
+export function Button({
+  children,
+  variant = "primary",
+  style,
+  ...props
+}: ButtonProps) {
   const variantStyles = {
     primary: { backgroundColor: theme.colors.primary },
     secondary: { backgroundColor: theme.colors.secondary },
     accent: { backgroundColor: theme.colors.accent },
-    ghost: { backgroundColor: "transparent", borderWidth: 1, borderColor: theme.colors.border },
+    ghost: {
+      backgroundColor: "transparent",
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+    },
     danger: { backgroundColor: theme.colors.danger },
   };
 
   return (
-    <TouchableOpacity style={[styles.button, variantStyles[variant], style]} {...props}>
-      <Text style={[styles.buttonText, variant === "ghost" && styles.ghostButtonText]}>
+    <TouchableOpacity
+      style={[styles.button, variantStyles[variant], style]}
+      {...props}
+    >
+      <Text
+        style={[
+          styles.buttonText,
+          variant === "ghost" && styles.ghostButtonText,
+        ]}
+      >
         {children}
       </Text>
     </TouchableOpacity>

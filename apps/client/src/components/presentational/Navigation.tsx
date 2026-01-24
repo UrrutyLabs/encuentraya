@@ -59,12 +59,18 @@ export function Navigation({ showLogin = true }: NavigationProps) {
     try {
       const { error } = await signOut();
       if (error) {
-        logger.error("Error signing out", error instanceof Error ? error : new Error(String(error)));
+        logger.error(
+          "Error signing out",
+          error instanceof Error ? error : new Error(String(error))
+        );
         // Even if signOut fails, redirect to home (session might already be invalid)
       }
       router.push("/");
     } catch (error) {
-      logger.error("Error signing out", error instanceof Error ? error : new Error(String(error)));
+      logger.error(
+        "Error signing out",
+        error instanceof Error ? error : new Error(String(error))
+      );
       // Redirect anyway to ensure user is logged out from UI perspective
       router.push("/");
     }
@@ -74,9 +80,7 @@ export function Navigation({ showLogin = true }: NavigationProps) {
     <nav className="px-4 py-4 border-b border-border bg-surface">
       <div className="max-w-6xl mx-auto flex justify-between items-center">
         <Link href={homeLink}>
-          <Text variant="h2">
-            Arreglatodo
-          </Text>
+          <Text variant="h2">Arreglatodo</Text>
         </Link>
         <div className="flex items-center gap-4">
           <Link href="/search">

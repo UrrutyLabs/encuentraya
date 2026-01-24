@@ -2,7 +2,14 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Briefcase, CheckCircle, DollarSign, Clock, Users, ArrowRight } from "lucide-react";
+import {
+  Briefcase,
+  CheckCircle,
+  DollarSign,
+  Clock,
+  Users,
+  ArrowRight,
+} from "lucide-react";
 import { Button } from "@repo/ui";
 import { Text, Card } from "@repo/ui";
 import { ProHeader } from "@/components/pro/ProHeader";
@@ -38,25 +45,26 @@ export function ProLandingScreen() {
                   Arreglatodo para Profesionales
                 </Text>
               </div>
-              <Text 
-                variant="h2" 
+              <Text
+                variant="h2"
                 className="mb-4 text-text max-w-2xl mx-auto lg:mx-0 animate-[fadeInUp_0.6s_ease-out_0.15s_both]"
               >
                 Conseguí trabajos sin intermediarios innecesarios
               </Text>
-              <Text 
-                variant="body" 
+              <Text
+                variant="body"
                 className="mb-8 text-muted max-w-xl mx-auto lg:mx-0 animate-[fadeIn_0.6s_ease-out_0.3s_both]"
               >
-                Sumate a la plataforma líder en servicios para el hogar en Uruguay. 
-                Trabajá de forma independiente y gestioná tus reservas desde tu celular.
+                Sumate a la plataforma líder en servicios para el hogar en
+                Uruguay. Trabajá de forma independiente y gestioná tus reservas
+                desde tu celular.
               </Text>
-              <Link 
+              <Link
                 href="/pro/signup"
                 className="inline-block animate-[fadeInUp_0.6s_ease-out_0.45s_both]"
               >
-                <Button 
-                  variant="primary" 
+                <Button
+                  variant="primary"
                   className="px-8 py-3 text-lg w-full sm:w-auto transition-all duration-200 hover:scale-105 active:scale-95"
                 >
                   Registrarme como profesional
@@ -81,7 +89,10 @@ export function ProLandingScreen() {
       {/* Benefits Section */}
       <section className="px-4 py-16 bg-surface">
         <div className="max-w-6xl mx-auto">
-          <Text variant="h2" className="text-center mb-12 text-text animate-[fadeInDown_0.6s_ease-out]">
+          <Text
+            variant="h2"
+            className="text-center mb-12 text-text animate-[fadeInDown_0.6s_ease-out]"
+          >
             ¿Por qué elegir Arreglatodo?
           </Text>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -93,7 +104,8 @@ export function ProLandingScreen() {
                 </Text>
               </div>
               <Text variant="body" className="text-muted">
-                Cobrá directamente de tus clientes. Sin comisiones ocultas ni tarifas sorpresa.
+                Cobrá directamente de tus clientes. Sin comisiones ocultas ni
+                tarifas sorpresa.
               </Text>
             </Card>
 
@@ -105,7 +117,8 @@ export function ProLandingScreen() {
                 </Text>
               </div>
               <Text variant="body" className="text-muted">
-                Gestioná tu disponibilidad y aceptá solo los trabajos que querés hacer.
+                Gestioná tu disponibilidad y aceptá solo los trabajos que querés
+                hacer.
               </Text>
             </Card>
 
@@ -117,7 +130,8 @@ export function ProLandingScreen() {
                 </Text>
               </div>
               <Text variant="body" className="text-muted">
-                Conectá con clientes que realmente necesitan tus servicios y están dispuestos a pagar.
+                Conectá con clientes que realmente necesitan tus servicios y
+                están dispuestos a pagar.
               </Text>
             </Card>
 
@@ -129,7 +143,8 @@ export function ProLandingScreen() {
                 </Text>
               </div>
               <Text variant="body" className="text-muted">
-                Todo en un solo lugar: reservas, pagos y comunicación con clientes desde tu celular.
+                Todo en un solo lugar: reservas, pagos y comunicación con
+                clientes desde tu celular.
               </Text>
             </Card>
           </div>
@@ -145,56 +160,68 @@ export function ProLandingScreen() {
           <div className="space-y-8">
             <div className="flex gap-6">
               <div className="shrink-0 w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                <Text variant="body" className="text-primary font-semibold">1</Text>
+                <Text variant="body" className="text-primary font-semibold">
+                  1
+                </Text>
               </div>
               <div>
                 <Text variant="h2" className="mb-2 text-text">
                   Registrate
                 </Text>
                 <Text variant="body" className="text-muted">
-                  Creá tu cuenta y completá tu perfil profesional con tus servicios y tarifas.
+                  Creá tu cuenta y completá tu perfil profesional con tus
+                  servicios y tarifas.
                 </Text>
               </div>
             </div>
 
             <div className="flex gap-6">
               <div className="shrink-0 w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                <Text variant="body" className="text-primary font-semibold">2</Text>
+                <Text variant="body" className="text-primary font-semibold">
+                  2
+                </Text>
               </div>
               <div>
                 <Text variant="h2" className="mb-2 text-text">
                   Recibí solicitudes
                 </Text>
                 <Text variant="body" className="text-muted">
-                  Los clientes te encontrarán y te enviarán solicitudes de trabajo cuando estés disponible.
+                  Los clientes te encontrarán y te enviarán solicitudes de
+                  trabajo cuando estés disponible.
                 </Text>
               </div>
             </div>
 
             <div className="flex gap-6">
               <div className="shrink-0 w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                <Text variant="body" className="text-primary font-semibold">3</Text>
+                <Text variant="body" className="text-primary font-semibold">
+                  3
+                </Text>
               </div>
               <div>
                 <Text variant="h2" className="mb-2 text-text">
                   Aceptá y trabajá
                 </Text>
                 <Text variant="body" className="text-muted">
-                  Revisá las solicitudes, aceptá las que te interesen y completá el trabajo.
+                  Revisá las solicitudes, aceptá las que te interesen y completá
+                  el trabajo.
                 </Text>
               </div>
             </div>
 
             <div className="flex gap-6">
               <div className="shrink-0 w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                <Text variant="body" className="text-primary font-semibold">4</Text>
+                <Text variant="body" className="text-primary font-semibold">
+                  4
+                </Text>
               </div>
               <div>
                 <Text variant="h2" className="mb-2 text-text">
                   Cobrá
                 </Text>
                 <Text variant="body" className="text-muted">
-                  Recibí el pago directamente de tus clientes. Sin esperas ni complicaciones.
+                  Recibí el pago directamente de tus clientes. Sin esperas ni
+                  complicaciones.
                 </Text>
               </div>
             </div>
@@ -205,15 +232,24 @@ export function ProLandingScreen() {
       {/* CTA Section */}
       <section className="px-4 py-16 bg-surface">
         <div className="max-w-4xl mx-auto text-center">
-          <Text variant="h2" className="mb-4 text-text animate-[fadeInDown_0.6s_ease-out]">
+          <Text
+            variant="h2"
+            className="mb-4 text-text animate-[fadeInDown_0.6s_ease-out]"
+          >
             ¿Listo para empezar?
           </Text>
-          <Text variant="body" className="mb-8 text-muted max-w-xl mx-auto animate-[fadeIn_0.6s_ease-out_0.15s_both]">
+          <Text
+            variant="body"
+            className="mb-8 text-muted max-w-xl mx-auto animate-[fadeIn_0.6s_ease-out_0.15s_both]"
+          >
             Registrate ahora y comenzá a recibir trabajos en los próximos días.
           </Text>
-          <Link href="/pro/signup" className="inline-block animate-[fadeInUp_0.6s_ease-out_0.3s_both]">
-            <Button 
-              variant="primary" 
+          <Link
+            href="/pro/signup"
+            className="inline-block animate-[fadeInUp_0.6s_ease-out_0.3s_both]"
+          >
+            <Button
+              variant="primary"
               className="px-8 py-3 text-lg flex items-center gap-2 mx-auto transition-all duration-200 hover:scale-105 active:scale-95 group"
             >
               Crear cuenta profesional

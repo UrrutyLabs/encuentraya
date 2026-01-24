@@ -8,7 +8,12 @@ import { Badge } from "@components/ui/Badge";
 import { Button } from "@components/ui/Button";
 import { BookingDetailSkeleton } from "@components/presentational/BookingDetailSkeleton";
 import { useBookingActions, useBookingDetail } from "@hooks/booking";
-import { BookingStatus, Category, getBookingStatusLabel, getBookingStatusVariant } from "@repo/domain";
+import {
+  BookingStatus,
+  Category,
+  getBookingStatusLabel,
+  getBookingStatusVariant,
+} from "@repo/domain";
 import { theme } from "../../theme";
 
 const categoryLabels: Record<string, string> = {
@@ -19,7 +24,6 @@ const categoryLabels: Record<string, string> = {
   [Category.PAINTING]: "Pintura",
 };
 
-
 export function BookingDetailScreen() {
   const { bookingId } = useLocalSearchParams<{ bookingId: string }>();
   const [localStatus, setLocalStatus] = useState<BookingStatus | null>(null);
@@ -27,13 +31,26 @@ export function BookingDetailScreen() {
   // Fetch booking by id via hook
   const { booking, isLoading, error, refetch } = useBookingDetail(bookingId);
 
-  const { acceptBooking, rejectBooking, markOnMyWay, arriveBooking, completeBooking, isAccepting, isRejecting, isMarkingOnMyWay, isArriving, isCompleting, error: actionError } = useBookingActions(() => {
+  const {
+    acceptBooking,
+    rejectBooking,
+    markOnMyWay,
+    arriveBooking,
+    completeBooking,
+    isAccepting,
+    isRejecting,
+    isMarkingOnMyWay,
+    isArriving,
+    isCompleting,
+    error: actionError,
+  } = useBookingActions(() => {
     // Refetch booking data after successful action
     refetch();
   });
 
   // Use local status if set, otherwise use booking status
-  const displayStatus: BookingStatus | null = localStatus || (booking?.status as BookingStatus) || null;
+  const displayStatus: BookingStatus | null =
+    localStatus || (booking?.status as BookingStatus) || null;
 
   // Memoize handlers to prevent unnecessary re-renders
   // Must be called before early returns (React Rules of Hooks)
@@ -89,15 +106,21 @@ export function BookingDetailScreen() {
 
   // Memoize computed values (must be before early returns)
   const statusLabel = useMemo(
-    () => (displayStatus ? getBookingStatusLabel(displayStatus as BookingStatus) : ""),
+    () =>
+      displayStatus
+        ? getBookingStatusLabel(displayStatus as BookingStatus)
+        : "",
     [displayStatus]
   );
-  
+
   const statusVariant = useMemo(
-    () => (displayStatus ? getBookingStatusVariant(displayStatus as BookingStatus) : "info"),
+    () =>
+      displayStatus
+        ? getBookingStatusVariant(displayStatus as BookingStatus)
+        : "info",
     [displayStatus]
   );
-  
+
   const categoryLabel = useMemo(
     () => (booking ? categoryLabels[booking.category] || booking.category : ""),
     [booking]
@@ -137,7 +160,10 @@ export function BookingDetailScreen() {
   const canMarkOnMyWay = displayStatus === BookingStatus.ACCEPTED;
   const canArrive = displayStatus === BookingStatus.ON_MY_WAY;
   const canComplete = displayStatus === BookingStatus.ARRIVED;
-  const isReadOnly = displayStatus === BookingStatus.COMPLETED || displayStatus === BookingStatus.CANCELLED || displayStatus === BookingStatus.REJECTED;
+  const isReadOnly =
+    displayStatus === BookingStatus.COMPLETED ||
+    displayStatus === BookingStatus.CANCELLED ||
+    displayStatus === BookingStatus.REJECTED;
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
@@ -156,11 +182,7 @@ export function BookingDetailScreen() {
               Resumen
             </Text>
           </View>
-          {booking.isFirstBooking && (
-            <Badge variant="new">
-              Nuevo Cliente
-            </Badge>
-          )}
+          {booking.isFirstBooking && <Badge variant="new">Nuevo Cliente</Badge>}
         </View>
         <View style={styles.row}>
           <View style={styles.labelRow}>
@@ -226,7 +248,11 @@ export function BookingDetailScreen() {
       {actionError && (
         <Card style={styles.errorCard}>
           <View style={styles.errorRow}>
-            <Feather name="alert-circle" size={16} color={theme.colors.danger} />
+            <Feather
+              name="alert-circle"
+              size={16}
+              color={theme.colors.danger}
+            />
             <Text variant="small" style={styles.errorText}>
               {actionError}
             </Text>

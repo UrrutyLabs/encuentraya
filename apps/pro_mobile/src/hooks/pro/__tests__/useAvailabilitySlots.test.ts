@@ -180,7 +180,9 @@ describe("useAvailabilitySlots", () => {
         isLoading: false,
       });
 
-      let onMutateCallback: (variables: { slots: { dayOfWeek: number; startTime: string; endTime: string }[] }) => Promise<{ previousSlots: AvailabilitySlot[]; previousPro: any }>;
+      let onMutateCallback: (variables: {
+        slots: { dayOfWeek: number; startTime: string; endTime: string }[];
+      }) => Promise<{ previousSlots: AvailabilitySlot[]; previousPro: any }>;
       mockUseMutation.mockImplementation((options) => {
         onMutateCallback = options.onMutate;
         return {
@@ -208,7 +210,9 @@ describe("useAvailabilitySlots", () => {
     });
 
     it("should rollback on error", async () => {
-      const mockMutateAsync = jest.fn().mockRejectedValue(new Error("Network error"));
+      const mockMutateAsync = jest
+        .fn()
+        .mockRejectedValue(new Error("Network error"));
       const previousSlots: AvailabilitySlot[] = [
         {
           id: "slot-1",
@@ -228,7 +232,11 @@ describe("useAvailabilitySlots", () => {
 
       mockQueryClient.getQueryData.mockReturnValue(previousPro);
 
-      let onErrorCallback: (error: Error, variables: any, context: { previousSlots: AvailabilitySlot[]; previousPro: any }) => void;
+      let onErrorCallback: (
+        error: Error,
+        variables: any,
+        context: { previousSlots: AvailabilitySlot[]; previousPro: any }
+      ) => void;
       mockUseMutation.mockImplementation((options) => {
         onErrorCallback = options.onError;
         return {
@@ -370,7 +378,9 @@ describe("useAvailabilitySlots", () => {
 
     it("should set error message on mutation error", async () => {
       const errorMessage = "Failed to update availability slots";
-      const mockMutateAsync = jest.fn().mockRejectedValue(new Error(errorMessage));
+      const mockMutateAsync = jest
+        .fn()
+        .mockRejectedValue(new Error(errorMessage));
       const previousSlots: AvailabilitySlot[] = [];
       const previousPro = { id: "pro-1", isAvailable: false };
 
@@ -381,7 +391,11 @@ describe("useAvailabilitySlots", () => {
 
       mockQueryClient.getQueryData.mockReturnValue(previousPro);
 
-      let onErrorCallback: (error: Error, variables: any, context: { previousSlots: AvailabilitySlot[]; previousPro: any }) => void;
+      let onErrorCallback: (
+        error: Error,
+        variables: any,
+        context: { previousSlots: AvailabilitySlot[]; previousPro: any }
+      ) => void;
       mockUseMutation.mockImplementation((options) => {
         onErrorCallback = options.onError;
         return {

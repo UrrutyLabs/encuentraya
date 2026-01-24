@@ -1,10 +1,7 @@
 import { injectable, inject } from "tsyringe";
 import type { BookingRepository } from "./booking.repo";
 import type { ProRepository } from "@modules/pro/pro.repo";
-import type {
-  BookingCreateInput,
-  BookingCreateOutput,
-} from "@repo/domain";
+import type { BookingCreateInput, BookingCreateOutput } from "@repo/domain";
 import type { Actor } from "@infra/auth/roles";
 import { TOKENS } from "@/server/container";
 import type { ClientProfileService } from "@modules/user/clientProfile.service";
@@ -47,22 +44,24 @@ export class BookingCreationService {
     // Validate time is at hour or half-hour (00 or 30 minutes)
     const scheduledMinutes = scheduledAt.getUTCMinutes();
     if (scheduledMinutes !== 0 && scheduledMinutes !== 30) {
-      throw new Error("Booking time must be at the hour or half-hour (e.g., 13:00 or 13:30)");
+      throw new Error(
+        "Booking time must be at the hour or half-hour (e.g., 13:00 or 13:30)"
+      );
     }
 
     // Get today's date in UTC (date-only, no time)
-    const todayUTC = new Date(Date.UTC(
-      now.getUTCFullYear(),
-      now.getUTCMonth(),
-      now.getUTCDate()
-    ));
+    const todayUTC = new Date(
+      Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())
+    );
 
     // Get scheduled date in UTC (date-only, no time)
-    const scheduledDateUTC = new Date(Date.UTC(
-      scheduledAt.getUTCFullYear(),
-      scheduledAt.getUTCMonth(),
-      scheduledAt.getUTCDate()
-    ));
+    const scheduledDateUTC = new Date(
+      Date.UTC(
+        scheduledAt.getUTCFullYear(),
+        scheduledAt.getUTCMonth(),
+        scheduledAt.getUTCDate()
+      )
+    );
 
     // Check if scheduled date is in the past
     if (scheduledDateUTC < todayUTC) {
@@ -90,7 +89,9 @@ export class BookingCreationService {
     }
 
     // Check if this is the client's first booking
-    const existingBookings = await this.bookingRepository.findByClientUserId(actor.id);
+    const existingBookings = await this.bookingRepository.findByClientUserId(
+      actor.id
+    );
     const isFirstBooking = existingBookings.length === 0;
 
     // Create booking via repository

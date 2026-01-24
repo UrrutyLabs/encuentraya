@@ -61,7 +61,9 @@ export const reviewRouter = router({
     .output(z.record(z.string(), z.boolean()))
     .query(async ({ input }) => {
       try {
-        return await reviewService.getReviewStatusByBookingIds(input.bookingIds);
+        return await reviewService.getReviewStatusByBookingIds(
+          input.bookingIds
+        );
       } catch (error) {
         throw mapDomainErrorToTRPCError(error);
       }

@@ -26,36 +26,43 @@ export function LandingHero() {
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
           {/* Text Content */}
           <div className="text-center lg:text-left">
-            <Text 
-              variant="h1" 
+            <Text
+              variant="h1"
               className="mb-6 text-primary animate-[fadeInDown_0.6s_ease-out]"
             >
               Arreglatodo
             </Text>
-            <Text 
-              variant="h2" 
+            <Text
+              variant="h2"
               className="mb-4 text-text max-w-2xl mx-auto lg:mx-0 animate-[fadeInUp_0.6s_ease-out_0.15s_both]"
             >
               Soluciones confiables para tu hogar, en un solo lugar.
             </Text>
-            <Text 
-              variant="body" 
+            <Text
+              variant="body"
               className="mb-8 text-muted max-w-xl mx-auto lg:mx-0 animate-[fadeIn_0.6s_ease-out_0.3s_both]"
             >
-              Encontrá, reservá y pagá profesionales verificados para arreglos y servicios cotidianos.
+              Encontrá, reservá y pagá profesionales verificados para arreglos y
+              servicios cotidianos.
             </Text>
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-              <Link href="/search" className="animate-[fadeInUp_0.6s_ease-out_0.45s_both]">
-                <Button 
-                  variant="primary" 
+              <Link
+                href="/search"
+                className="animate-[fadeInUp_0.6s_ease-out_0.45s_both]"
+              >
+                <Button
+                  variant="primary"
                   className="px-8 py-3 text-lg w-full sm:w-auto transition-all duration-200 hover:scale-105 active:scale-95"
                 >
                   Buscar profesionales
                 </Button>
               </Link>
-              <Link href="/pro" className="animate-[fadeInUp_0.6s_ease-out_0.5s_both]">
-                <Button 
-                  variant="ghost" 
+              <Link
+                href="/pro"
+                className="animate-[fadeInUp_0.6s_ease-out_0.5s_both]"
+              >
+                <Button
+                  variant="ghost"
                   className="px-8 py-3 text-lg w-full sm:w-auto transition-all duration-200 hover:scale-105 active:scale-95"
                 >
                   Soy profesional

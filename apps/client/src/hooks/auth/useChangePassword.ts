@@ -15,7 +15,7 @@ export function useChangePassword() {
     onSuccess: async () => {
       // Backend revokes all sessions automatically via Supabase Admin API
       // But we need to clear client-side cache and storage immediately
-      
+
       // 1. Clear React Query cache (especially auth.me and user-related queries)
       queryClient.resetQueries({
         queryKey: [["auth", "me"]],
@@ -24,29 +24,40 @@ export function useChangePassword() {
       queryClient.invalidateQueries({
         predicate: (query) => {
           const key = query.queryKey;
-          return Array.isArray(key) && key[0] && Array.isArray(key[0]) && key[0][0] === "auth";
+          return (
+            Array.isArray(key) &&
+            key[0] &&
+            Array.isArray(key[0]) &&
+            key[0][0] === "auth"
+          );
         },
       });
-      
+
       // 2. Clear Supabase local storage
       await clearSessionStorage();
-      
+
       // 3. Sign out locally to ensure session is cleared from Supabase client
       try {
         await supabase.auth.signOut({ scope: "local" });
       } catch (err) {
         // Ignore errors - session might already be invalid
-        logger.info("Sign out after password change (expected if session already revoked)", {
-          error: err instanceof Error ? err.message : String(err),
-        });
+        logger.info(
+          "Sign out after password change (expected if session already revoked)",
+          {
+            error: err instanceof Error ? err.message : String(err),
+          }
+        );
       }
-      
+
       // 4. Use window.location for full page reload to ensure all state is cleared
       // This guarantees a clean state after password change
       window.location.href = "/login?passwordChanged=true";
     },
     onError: (error) => {
-      logger.error("Error changing password", error instanceof Error ? error : new Error(String(error)));
+      logger.error(
+        "Error changing password",
+        error instanceof Error ? error : new Error(String(error))
+      );
     },
   });
 

@@ -33,7 +33,7 @@ export interface SmartPollingReturn {
  * - Polls when app is in foreground
  * - Stops polling when app is in background (saves battery)
  * - Automatically refetches when app comes to foreground
- * 
+ *
  * @param options Polling configuration
  * @returns React Query options with smart polling enabled
  */
@@ -41,11 +41,7 @@ export function useSmartPolling(
   options: SmartPollingOptions
 ): SmartPollingReturn {
   const isForeground = useAppState();
-  const {
-    interval,
-    enabled = true,
-    refetchOnForeground = true,
-  } = options;
+  const { interval, enabled = true, refetchOnForeground = true } = options;
 
   return useMemo(() => {
     // Only poll when app is in foreground and polling is enabled

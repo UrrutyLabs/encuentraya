@@ -11,7 +11,7 @@ import { useProInbox } from "@hooks/booking";
 
 export function HomeScreen() {
   const router = useRouter();
-  
+
   // Fetch pro inbox bookings via hook
   const { bookings, isLoading, error } = useProInbox();
 
@@ -20,7 +20,7 @@ export function HomeScreen() {
     const pendingBookings = bookings.filter(
       (booking: Booking) => booking.status === BookingStatus.PENDING
     );
-    
+
     const upcomingBookings = bookings.filter(
       (booking: Booking) => booking.status === BookingStatus.ACCEPTED
     );
@@ -41,7 +41,10 @@ export function HomeScreen() {
 
   if (isLoading) {
     return (
-      <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={styles.content}
+      >
         <HomeSkeleton />
       </ScrollView>
     );

@@ -5,6 +5,7 @@ The tRPC API server for the Arreglatodo marketplace platform.
 ## Overview
 
 This Next.js application serves as the backend API for the entire platform, providing type-safe endpoints via tRPC for:
+
 - Client web app
 - Admin dashboard
 - Professional mobile app
@@ -53,6 +54,7 @@ pnpm install
 ### Environment Setup
 
 1. Copy `.env.example` to `.env.local`:
+
    ```bash
    cp .env.example .env.local
    ```
@@ -165,29 +167,34 @@ See [Backend Best Practices](../../docs/BE_BEST_PRACTICES.md) for detailed archi
 ## Key Modules
 
 ### Authentication (`modules/auth/`)
+
 - User authentication via Supabase
 - Role-based access control (client, pro, admin)
 - Session management
 
 ### Bookings (`modules/booking/`)
+
 - Booking creation and lifecycle management
 - Status transitions (pending → accepted → completed)
 - Availability checking
 - Admin booking management
 
 ### Payments (`modules/payment/`)
+
 - MercadoPago integration
 - Payment pre-authorization
 - Payment capture and refunds
 - Payment status synchronization
 
 ### Payouts (`modules/payout/`)
+
 - Earnings calculation
 - Payout profile management
 - Payout processing (MercadoPago, bank transfer, manual)
 - Payout status tracking
 
 ### Notifications (`modules/notification/`)
+
 - Multi-channel notifications (Email, WhatsApp, Push)
 - Notification delivery tracking
 - Notification policies
@@ -200,7 +207,7 @@ The API is accessible at `/api/trpc` and uses tRPC's type-safe RPC protocol.
 
 ```typescript
 // From client apps
-import { trpc } from '@/lib/trpc/client';
+import { trpc } from "@/lib/trpc/client";
 
 // Query
 const bookings = trpc.booking.getMine.useQuery();
@@ -214,6 +221,7 @@ const createBooking = trpc.booking.create.useMutation();
 ### Prisma Schema
 
 The database schema is defined in `prisma/schema.prisma`. Key models:
+
 - `User` - Base user model with roles
 - `ProProfile` - Professional profiles
 - `ClientProfile` - Client profiles

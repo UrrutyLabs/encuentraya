@@ -14,7 +14,11 @@ export function isClientError(error: unknown): boolean {
     // Check for tRPC error structure
     if ("data" in error) {
       const errorData = (error as { data?: unknown }).data;
-      if (errorData && typeof errorData === "object" && "httpStatus" in errorData) {
+      if (
+        errorData &&
+        typeof errorData === "object" &&
+        "httpStatus" in errorData
+      ) {
         const status = (errorData as { httpStatus: number }).httpStatus;
         return status >= 400 && status < 500;
       }
@@ -37,7 +41,11 @@ export function isServerError(error: unknown): boolean {
     // Check for tRPC error structure
     if ("data" in error) {
       const errorData = (error as { data?: unknown }).data;
-      if (errorData && typeof errorData === "object" && "httpStatus" in errorData) {
+      if (
+        errorData &&
+        typeof errorData === "object" &&
+        "httpStatus" in errorData
+      ) {
         const status = (errorData as { httpStatus: number }).httpStatus;
         return status >= 500;
       }
@@ -91,10 +99,17 @@ export function createOptimisticUpdate<TData, TVariables>(
       // Return context with previous data for rollback
       return { previousData };
     },
-    onError: (error: Error, variables: TVariables, context: { previousData?: TData }) => {
+    onError: (
+      error: Error,
+      variables: TVariables,
+      context: { previousData?: TData }
+    ) => {
       // Rollback on error
       if (config.rollback && context?.previousData !== undefined) {
-        queryClient.setQueryData<TData>(config.queryKey, config.rollback(context.previousData));
+        queryClient.setQueryData<TData>(
+          config.queryKey,
+          config.rollback(context.previousData)
+        );
       } else if (context?.previousData !== undefined) {
         queryClient.setQueryData<TData>(config.queryKey, context.previousData);
       }

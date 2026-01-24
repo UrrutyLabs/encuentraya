@@ -63,10 +63,15 @@ export function OnboardingScreen() {
     }
 
     // Get fresh session to ensure we have the latest
-    const { data: { session: currentSession } } = await supabase.auth.getSession();
-    
+    const {
+      data: { session: currentSession },
+    } = await supabase.auth.getSession();
+
     if (!currentSession?.user?.email) {
-      setErrors({ submit: "No se encontró la sesión. Por favor, iniciá sesión nuevamente." });
+      setErrors({
+        submit:
+          "No se encontró la sesión. Por favor, iniciá sesión nuevamente.",
+      });
       return;
     }
 
@@ -116,7 +121,11 @@ export function OnboardingScreen() {
         />
         {errors.name && (
           <View style={styles.errorContainer}>
-            <Feather name="alert-circle" size={14} color={theme.colors.danger} />
+            <Feather
+              name="alert-circle"
+              size={14}
+              color={theme.colors.danger}
+            />
             <Text variant="small" style={styles.error}>
               {errors.name}
             </Text>
@@ -139,7 +148,11 @@ export function OnboardingScreen() {
         />
         {errors.phone && (
           <View style={styles.errorContainer}>
-            <Feather name="alert-circle" size={14} color={theme.colors.danger} />
+            <Feather
+              name="alert-circle"
+              size={14}
+              color={theme.colors.danger}
+            />
             <Text variant="small" style={styles.error}>
               {errors.phone}
             </Text>
@@ -162,7 +175,11 @@ export function OnboardingScreen() {
         />
         {errors.hourlyRate && (
           <View style={styles.errorContainer}>
-            <Feather name="alert-circle" size={14} color={theme.colors.danger} />
+            <Feather
+              name="alert-circle"
+              size={14}
+              color={theme.colors.danger}
+            />
             <Text variant="small" style={styles.error}>
               {errors.hourlyRate}
             </Text>
@@ -180,7 +197,11 @@ export function OnboardingScreen() {
         />
         {errors.categories && (
           <View style={styles.errorContainer}>
-            <Feather name="alert-circle" size={14} color={theme.colors.danger} />
+            <Feather
+              name="alert-circle"
+              size={14}
+              color={theme.colors.danger}
+            />
             <Text variant="small" style={styles.error}>
               {errors.categories}
             </Text>
@@ -199,14 +220,18 @@ export function OnboardingScreen() {
 
         {(error || errors.submit) && (
           <View style={styles.errorContainer}>
-            <Feather name="alert-circle" size={14} color={theme.colors.danger} />
+            <Feather
+              name="alert-circle"
+              size={14}
+              color={theme.colors.danger}
+            />
             <Text variant="small" style={styles.error}>
               {error || errors.submit}
             </Text>
           </View>
         )}
 
-        {(isLoading || sessionLoading) ? (
+        {isLoading || sessionLoading ? (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color={theme.colors.primary} />
           </View>

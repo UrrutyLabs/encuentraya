@@ -4,18 +4,21 @@ import {
   NotificationDeliveryRepositoryImpl,
   type NotificationDeliveryRepository,
 } from "@modules/notification/notificationDelivery.repo";
-import {
-  NotificationService,
-} from "@modules/notification/notification.service";
+import { NotificationService } from "@modules/notification/notification.service";
 
 /**
  * Register notification module dependencies
  */
-export function registerNotificationModule(container: DependencyContainer): void {
+export function registerNotificationModule(
+  container: DependencyContainer
+): void {
   // Register repository
-  container.register<NotificationDeliveryRepository>(TOKENS.NotificationDeliveryRepository, {
-    useClass: NotificationDeliveryRepositoryImpl,
-  });
+  container.register<NotificationDeliveryRepository>(
+    TOKENS.NotificationDeliveryRepository,
+    {
+      useClass: NotificationDeliveryRepositoryImpl,
+    }
+  );
 
   // Register service
   container.register(TOKENS.NotificationService, {

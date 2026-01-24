@@ -6,7 +6,7 @@
 /**
  * Detects if an error is a network/server error (not auth error)
  * Used to prevent redirect loops when API is down (502, 503, CORS, etc.)
- * 
+ *
  * @param error - The error to check
  * @returns true if the error is a network/server error
  */
@@ -46,7 +46,7 @@ export function isNetworkError(error: unknown): boolean {
 
 /**
  * Detects if an error is an authentication error (401)
- * 
+ *
  * @param error - The error to check
  * @returns true if the error is an auth error
  */

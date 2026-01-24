@@ -8,7 +8,11 @@ interface EmptyStateProps {
   description?: string;
 }
 
-export function EmptyState({ icon: Icon, title, description }: EmptyStateProps) {
+export function EmptyState({
+  icon: Icon,
+  title,
+  description,
+}: EmptyStateProps) {
   return (
     <Card className="p-12">
       <div className="flex flex-col items-center justify-center text-center">

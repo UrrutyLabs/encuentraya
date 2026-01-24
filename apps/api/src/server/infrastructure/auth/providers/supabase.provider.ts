@@ -29,9 +29,10 @@ export class SupabaseAuthProvider implements AuthProvider {
     });
   }
 
-  async verifyAccessToken(
-    token: string
-  ): Promise<{ userId: string; userMetadata?: Record<string, unknown> } | null> {
+  async verifyAccessToken(token: string): Promise<{
+    userId: string;
+    userMetadata?: Record<string, unknown>;
+  } | null> {
     try {
       const {
         data: { user },

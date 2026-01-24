@@ -32,6 +32,7 @@ const pollingOptions = useSmartPolling({
 ```
 
 **Features:**
+
 - Automatically detects app state (foreground/background) using `AppState` API
 - Returns React Query options that can be spread into query configurations
 - Pauses polling when app goes to background
@@ -56,13 +57,10 @@ const pollingOptions = useSmartPolling({
   refetchOnForeground: true,
 });
 
-const { data: bookings = [] } = trpc.booking.proInbox.useQuery(
-  undefined,
-  { 
-    retry: false,
-    ...pollingOptions,
-  }
-);
+const { data: bookings = [] } = trpc.booking.proInbox.useQuery(undefined, {
+  retry: false,
+  ...pollingOptions,
+});
 ```
 
 ### JobsScreen
@@ -74,13 +72,10 @@ const pollingOptions = useSmartPolling({
   refetchOnForeground: true,
 });
 
-const { data: bookings = [] } = trpc.booking.proJobs.useQuery(
-  undefined,
-  { 
-    retry: false,
-    ...pollingOptions,
-  }
-);
+const { data: bookings = [] } = trpc.booking.proJobs.useQuery(undefined, {
+  retry: false,
+  ...pollingOptions,
+});
 ```
 
 ### BookingDetailScreen
@@ -94,7 +89,7 @@ const pollingOptions = useSmartPolling({
 
 const { data: booking } = trpc.booking.getById.useQuery(
   { id: bookingId || "" },
-  { 
+  {
     enabled: !!bookingId,
     retry: false,
     ...pollingOptions,
@@ -106,28 +101,31 @@ const { data: booking } = trpc.booking.getById.useQuery(
 
 ## Polling Intervals
 
-| Screen | Interval | Reason |
-|--------|----------|--------|
-| HomeScreen | 10 seconds | List view, less critical |
-| JobsScreen | 10 seconds | List view, less critical |
-| BookingDetailScreen | 5 seconds | Detail view, more critical |
-| Background | **Stopped** | No polling (saves battery) |
+| Screen              | Interval    | Reason                     |
+| ------------------- | ----------- | -------------------------- |
+| HomeScreen          | 10 seconds  | List view, less critical   |
+| JobsScreen          | 10 seconds  | List view, less critical   |
+| BookingDetailScreen | 5 seconds   | Detail view, more critical |
+| Background          | **Stopped** | No polling (saves battery) |
 
 ---
 
 ## How It Works
 
 ### 1. App in Foreground
+
 - Polls at configured interval (5s for detail, 10s for lists)
 - Updates UI automatically when data changes
 - Network requests happen at regular intervals
 
 ### 2. App in Background
+
 - Polling **stops** (`refetchInterval = false`)
 - **No network requests** made
 - Saves battery and reduces server load
 
 ### 3. App Returns to Foreground
+
 - **Immediately refetches** data (`refetchOnWindowFocus`)
 - Resumes polling at configured interval
 - User sees latest data right away
@@ -142,7 +140,7 @@ const { data: booking } = trpc.booking.getById.useQuery(
 ✅ **Battery efficient**: Stops polling when app is in background  
 ✅ **Good UX**: Immediate refresh when app becomes active  
 ✅ **Easy to test**: Standard HTTP requests  
-✅ **Type-safe**: Full TypeScript support  
+✅ **Type-safe**: Full TypeScript support
 
 ---
 
@@ -150,7 +148,7 @@ const { data: booking } = trpc.booking.getById.useQuery(
 
 ⚠️ **Not truly real-time**: 5-10 second delay  
 ⚠️ **More network requests**: Constant polling when active  
-⚠️ **Server load**: More requests than WebSocket (but paused in background)  
+⚠️ **Server load**: More requests than WebSocket (but paused in background)
 
 **For MVP, these trade-offs are acceptable!**
 

@@ -144,17 +144,19 @@ describe("useReviewForm", () => {
 
       let onSuccessCallback: (() => void) | undefined;
 
-      mockTrpcReviewCreate.mockImplementation((options?: { onSuccess?: () => void }) => {
-        onSuccessCallback = options?.onSuccess;
-        return {
-          mutateAsync: async (input: unknown) => {
-            onSuccessCallback?.();
-            return input;
-          },
-          isPending: false,
-          error: null,
-        };
-      });
+      mockTrpcReviewCreate.mockImplementation(
+        (options?: { onSuccess?: () => void }) => {
+          onSuccessCallback = options?.onSuccess;
+          return {
+            mutateAsync: async (input: unknown) => {
+              onSuccessCallback?.();
+              return input;
+            },
+            isPending: false,
+            error: null,
+          };
+        }
+      );
 
       const { result } = renderHook(() => useReviewForm("booking-1"));
 
@@ -164,7 +166,9 @@ describe("useReviewForm", () => {
 
       await waitFor(
         () => {
-          expect(mockRouter.push).toHaveBeenCalledWith("/my-bookings/booking-1");
+          expect(mockRouter.push).toHaveBeenCalledWith(
+            "/my-bookings/booking-1"
+          );
         },
         { timeout: 2000 }
       );
@@ -192,18 +196,20 @@ describe("useReviewForm", () => {
 
       let onSuccessCallback: (() => void) | undefined;
 
-      mockTrpcReviewCreate.mockImplementation((options?: { onSuccess?: () => void }) => {
-        onSuccessCallback = options?.onSuccess;
-        return {
-          mutateAsync: async (input: unknown) => {
-            const result = await mockMutateAsync(input);
-            onSuccessCallback?.();
-            return result;
-          },
-          isPending: false,
-          error: null,
-        };
-      });
+      mockTrpcReviewCreate.mockImplementation(
+        (options?: { onSuccess?: () => void }) => {
+          onSuccessCallback = options?.onSuccess;
+          return {
+            mutateAsync: async (input: unknown) => {
+              const result = await mockMutateAsync(input);
+              onSuccessCallback?.();
+              return result;
+            },
+            isPending: false,
+            error: null,
+          };
+        }
+      );
 
       const { result } = renderHook(() => useReviewForm("booking-1"));
 
@@ -240,18 +246,20 @@ describe("useReviewForm", () => {
 
       let onSuccessCallback: (() => void) | undefined;
 
-      mockTrpcReviewCreate.mockImplementation((options?: { onSuccess?: () => void }) => {
-        onSuccessCallback = options?.onSuccess;
-        return {
-          mutateAsync: async (input: unknown) => {
-            const result = await mockMutateAsync(input);
-            onSuccessCallback?.();
-            return result;
-          },
-          isPending: false,
-          error: null,
-        };
-      });
+      mockTrpcReviewCreate.mockImplementation(
+        (options?: { onSuccess?: () => void }) => {
+          onSuccessCallback = options?.onSuccess;
+          return {
+            mutateAsync: async (input: unknown) => {
+              const result = await mockMutateAsync(input);
+              onSuccessCallback?.();
+              return result;
+            },
+            isPending: false,
+            error: null,
+          };
+        }
+      );
 
       const { result } = renderHook(() => useReviewForm("booking-1"));
 

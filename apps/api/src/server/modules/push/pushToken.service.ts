@@ -34,11 +34,17 @@ export class PushTokenService {
    * Register a push token for the authenticated user
    * Requires actor to be logged in
    */
-  async registerToken(actor: Actor, input: PushTokenRegisterInput): Promise<void> {
+  async registerToken(
+    actor: Actor,
+    input: PushTokenRegisterInput
+  ): Promise<void> {
     await this.devicePushTokenRepository.upsertToken({
       userId: actor.id,
       provider: $Enums.PushProvider.EXPO,
-      platform: input.platform === "IOS" ? $Enums.DevicePlatform.IOS : $Enums.DevicePlatform.ANDROID,
+      platform:
+        input.platform === "IOS"
+          ? $Enums.DevicePlatform.IOS
+          : $Enums.DevicePlatform.ANDROID,
       token: input.token,
     });
   }
@@ -47,7 +53,10 @@ export class PushTokenService {
    * Unregister a push token for the authenticated user
    * Requires actor to be logged in
    */
-  async unregisterToken(actor: Actor, input: PushTokenUnregisterInput): Promise<void> {
+  async unregisterToken(
+    actor: Actor,
+    input: PushTokenUnregisterInput
+  ): Promise<void> {
     await this.devicePushTokenRepository.deactivateToken(input.token);
   }
 }

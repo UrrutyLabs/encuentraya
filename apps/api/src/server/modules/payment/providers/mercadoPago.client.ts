@@ -24,9 +24,9 @@ interface MercadoPagoPayment {
 
 /**
  * Mercado Pago payment provider client
- * 
+ *
  * Mercado Pago Status Mapping:
- * 
+ *
  * MP Status          -> Internal PaymentStatus
  * ------------------    ---------------------
  * "pending"         -> REQUIRES_ACTION
@@ -38,7 +38,7 @@ interface MercadoPagoPayment {
  * "cancelled"       -> CANCELLED
  * "refunded"        -> REFUNDED
  * "charged_back"    -> REFUNDED
- * 
+ *
  * Note: MP uses "approved" for authorized payments that can be captured later.
  * For preauth flow, we map "approved" to AUTHORIZED status.
  */
@@ -125,14 +125,19 @@ export class MercadoPagoClient implements PaymentProviderClient {
 
       return {
         providerReference: preference.id, // Preference ID
-        checkoutUrl: preference.init_point || preference.sandbox_init_point || null, // Checkout URL
+        checkoutUrl:
+          preference.init_point || preference.sandbox_init_point || null, // Checkout URL
         status,
       };
     } catch (error) {
       if (error instanceof Error) {
-        throw new Error(`Failed to create Mercado Pago preference: ${error.message}`);
+        throw new Error(
+          `Failed to create Mercado Pago preference: ${error.message}`
+        );
       }
-      throw new Error("Failed to create Mercado Pago preference: Unknown error");
+      throw new Error(
+        "Failed to create Mercado Pago preference: Unknown error"
+      );
     }
   }
 
@@ -190,7 +195,7 @@ export class MercadoPagoClient implements PaymentProviderClient {
   ): Promise<ProviderPaymentStatus> {
     // Try to fetch as payment ID first
     const payment = await this.fetchPaymentDetails(providerReference);
-    
+
     // If not found, it might be a preference ID - try to get payments for that preference
     if (!payment) {
       // For preferences, we'd need to search payments by external_reference
@@ -205,8 +210,10 @@ export class MercadoPagoClient implements PaymentProviderClient {
 
     return {
       status,
-      authorizedAmount: status === PaymentStatus.AUTHORIZED ? transactionAmount : null,
-      capturedAmount: status === PaymentStatus.CAPTURED ? transactionAmount : null,
+      authorizedAmount:
+        status === PaymentStatus.AUTHORIZED ? transactionAmount : null,
+      capturedAmount:
+        status === PaymentStatus.CAPTURED ? transactionAmount : null,
     };
   }
 
@@ -216,7 +223,10 @@ export class MercadoPagoClient implements PaymentProviderClient {
    * Note: MP doesn't have explicit capture - "approved" payments are already captured
    * But we can use this endpoint to confirm capture or handle partial captures
    */
-  async capture(providerReference: string, amount?: number): Promise<{ capturedAmount: number }> {
+  async capture(
+    providerReference: string,
+    amount?: number
+  ): Promise<{ capturedAmount: number }> {
     const captureAmount = amount ? amount / 100 : undefined; // Convert to major units
 
     const capturePayload: Record<string, unknown> = {};
@@ -245,7 +255,7 @@ export class MercadoPagoClient implements PaymentProviderClient {
       }
 
       const result = (await response.json()) as MercadoPagoPayment;
-      
+
       // Return captured amount in minor units
       const capturedAmount = result.transaction_amount
         ? Math.round(result.transaction_amount * 100)
@@ -254,7 +264,9 @@ export class MercadoPagoClient implements PaymentProviderClient {
       return { capturedAmount };
     } catch (error) {
       if (error instanceof Error) {
-        throw new Error(`Failed to capture Mercado Pago payment: ${error.message}`);
+        throw new Error(
+          `Failed to capture Mercado Pago payment: ${error.message}`
+        );
       }
       throw new Error("Failed to capture Mercado Pago payment: Unknown error");
     }
@@ -292,7 +304,9 @@ export class MercadoPagoClient implements PaymentProviderClient {
       }
     } catch (error) {
       if (error instanceof Error) {
-        throw new Error(`Failed to refund Mercado Pago payment: ${error.message}`);
+        throw new Error(
+          `Failed to refund Mercado Pago payment: ${error.message}`
+        );
       }
       throw new Error("Failed to refund Mercado Pago payment: Unknown error");
     }
@@ -301,7 +315,9 @@ export class MercadoPagoClient implements PaymentProviderClient {
   /**
    * Fetch payment details from Mercado Pago API
    */
-  private async fetchPaymentDetails(paymentId: string): Promise<MercadoPagoPayment | null> {
+  private async fetchPaymentDetails(
+    paymentId: string
+  ): Promise<MercadoPagoPayment | null> {
     try {
       const response = await fetch(`${this.baseUrl}/v1/payments/${paymentId}`, {
         headers: {

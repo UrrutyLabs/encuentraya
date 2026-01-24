@@ -65,7 +65,9 @@ export class TwilioWhatsAppProvider implements NotificationProvider {
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
-      throw new Error(`Failed to send WhatsApp message via Twilio: ${errorMessage}`);
+      throw new Error(
+        `Failed to send WhatsApp message via Twilio: ${errorMessage}`
+      );
     }
   }
 

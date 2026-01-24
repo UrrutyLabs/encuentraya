@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@repo/domain": "workspace:*",
+    "@repo/monitoring": "workspace:*",
     "@repo/trpc": "workspace:*",
     "@repo/ui": "workspace:*",
     "@supabase/supabase-js": "^2.90.1",

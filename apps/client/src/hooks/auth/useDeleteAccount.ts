@@ -16,7 +16,10 @@ export function useDeleteAccount() {
       router.push("/");
     },
     onError: (error) => {
-      logger.error("Error deleting account", error instanceof Error ? error : new Error(String(error)));
+      logger.error(
+        "Error deleting account",
+        error instanceof Error ? error : new Error(String(error))
+      );
     },
   });
 

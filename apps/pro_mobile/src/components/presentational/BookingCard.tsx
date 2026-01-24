@@ -5,7 +5,12 @@ import { Card } from "../ui/Card";
 import { Text } from "../ui/Text";
 import { Badge } from "../ui/Badge";
 import type { Booking } from "@repo/domain";
-import { Category, BookingStatus, getBookingStatusLabel, getBookingStatusVariant } from "@repo/domain";
+import {
+  Category,
+  BookingStatus,
+  getBookingStatusLabel,
+  getBookingStatusVariant,
+} from "@repo/domain";
 import { theme } from "../../theme";
 
 interface BookingCardProps {
@@ -27,12 +32,12 @@ function BookingCardComponent({ booking, onPress }: BookingCardProps) {
     () => categoryLabels[booking.category] || booking.category,
     [booking.category]
   );
-  
+
   const statusLabel = useMemo(
     () => getBookingStatusLabel(booking.status),
     [booking.status]
   );
-  
+
   const statusVariant = useMemo(
     () => getBookingStatusVariant(booking.status),
     [booking.status]
@@ -65,11 +70,10 @@ function BookingCardComponent({ booking, onPress }: BookingCardProps) {
             </Text>
           </View>
           <View style={styles.badgesContainer}>
-            {booking.isFirstBooking && booking.status !== BookingStatus.COMPLETED && (
-              <Badge variant="new">
-                Nuevo Cliente
-              </Badge>
-            )}
+            {booking.isFirstBooking &&
+              booking.status !== BookingStatus.COMPLETED && (
+                <Badge variant="new">Nuevo Cliente</Badge>
+              )}
             <Badge variant={statusVariant} showIcon>
               {statusLabel}
             </Badge>
@@ -146,12 +150,15 @@ const styles = StyleSheet.create({
 });
 
 // Memoize component to prevent unnecessary re-renders
-export const BookingCard = React.memo(BookingCardComponent, (prevProps, nextProps) => {
-  // Only re-render if booking ID or status changes, or onPress reference changes
-  return (
-    prevProps.booking.id === nextProps.booking.id &&
-    prevProps.booking.status === nextProps.booking.status &&
-    prevProps.booking.isFirstBooking === nextProps.booking.isFirstBooking &&
-    prevProps.onPress === nextProps.onPress
-  );
-});
+export const BookingCard = React.memo(
+  BookingCardComponent,
+  (prevProps, nextProps) => {
+    // Only re-render if booking ID or status changes, or onPress reference changes
+    return (
+      prevProps.booking.id === nextProps.booking.id &&
+      prevProps.booking.status === nextProps.booking.status &&
+      prevProps.booking.isFirstBooking === nextProps.booking.isFirstBooking &&
+      prevProps.onPress === nextProps.onPress
+    );
+  }
+);

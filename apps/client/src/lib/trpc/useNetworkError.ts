@@ -31,7 +31,8 @@ export function useNetworkError(): {
       const queryError = query.state.error;
       if (queryError && isNetworkErrorHelper(queryError)) {
         // Use errorUpdatedAt if available, otherwise use dataUpdatedAt or current time
-        const errorTime = query.state.errorUpdatedAt || query.state.dataUpdatedAt || Date.now();
+        const errorTime =
+          query.state.errorUpdatedAt || query.state.dataUpdatedAt || Date.now();
         if (errorTime > latestErrorTime) {
           latestErrorTime = errorTime;
           latestError = queryError as Error;

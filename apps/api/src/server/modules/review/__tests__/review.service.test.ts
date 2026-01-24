@@ -53,12 +53,14 @@ describe("ReviewService", () => {
     return { id, role };
   }
 
-  function createMockBooking(overrides?: Partial<{
-    id: string;
-    clientUserId: string;
-    proProfileId: string | null;
-    status: BookingStatus;
-  }>) {
+  function createMockBooking(
+    overrides?: Partial<{
+      id: string;
+      clientUserId: string;
+      proProfileId: string | null;
+      status: BookingStatus;
+    }>
+  ) {
     return {
       id: "booking-1",
       clientUserId: "client-1",
@@ -74,12 +76,14 @@ describe("ReviewService", () => {
     };
   }
 
-  function createMockReview(overrides?: Partial<{
-    id: string;
-    bookingId: string;
-    rating: number;
-    comment: string | null;
-  }>) {
+  function createMockReview(
+    overrides?: Partial<{
+      id: string;
+      bookingId: string;
+      rating: number;
+      comment: string | null;
+    }>
+  ) {
     return {
       id: "review-1",
       bookingId: "booking-1",
@@ -90,7 +94,9 @@ describe("ReviewService", () => {
     };
   }
 
-  function createMockProProfile(overrides?: Partial<ProProfileEntity>): ProProfileEntity {
+  function createMockProProfile(
+    overrides?: Partial<ProProfileEntity>
+  ): ProProfileEntity {
     return {
       id: "pro-1",
       userId: "user-1",
@@ -147,8 +153,12 @@ describe("ReviewService", () => {
       const result = await service.createReview(actor, input);
 
       // Assert
-      expect(mockBookingRepository.findById).toHaveBeenCalledWith(input.bookingId);
-      expect(mockReviewRepository.findByBookingId).toHaveBeenCalledWith(input.bookingId);
+      expect(mockBookingRepository.findById).toHaveBeenCalledWith(
+        input.bookingId
+      );
+      expect(mockReviewRepository.findByBookingId).toHaveBeenCalledWith(
+        input.bookingId
+      );
       expect(mockReviewRepository.create).toHaveBeenCalledWith({
         bookingId: input.bookingId,
         proProfileId: booking.proProfileId,
@@ -174,7 +184,9 @@ describe("ReviewService", () => {
       };
 
       // Act & Assert
-      await expect(service.createReview(actor, input)).rejects.toThrow(UnauthorizedReviewError);
+      await expect(service.createReview(actor, input)).rejects.toThrow(
+        UnauthorizedReviewError
+      );
       await expect(service.createReview(actor, input)).rejects.toThrow(
         "Only clients can create reviews"
       );
@@ -220,7 +232,9 @@ describe("ReviewService", () => {
       mockBookingRepository.findById.mockResolvedValue(null);
 
       // Act & Assert
-      await expect(service.createReview(actor, input)).rejects.toThrow(BookingNotFoundError);
+      await expect(service.createReview(actor, input)).rejects.toThrow(
+        BookingNotFoundError
+      );
     });
 
     it("should throw UnauthorizedReviewError when booking does not belong to client", async () => {
@@ -237,7 +251,9 @@ describe("ReviewService", () => {
       mockBookingRepository.findById.mockResolvedValue(booking);
 
       // Act & Assert
-      await expect(service.createReview(actor, input)).rejects.toThrow(UnauthorizedReviewError);
+      await expect(service.createReview(actor, input)).rejects.toThrow(
+        UnauthorizedReviewError
+      );
       await expect(service.createReview(actor, input)).rejects.toThrow(
         "Booking does not belong to this client"
       );
@@ -258,7 +274,9 @@ describe("ReviewService", () => {
       mockBookingRepository.findById.mockResolvedValue(booking);
 
       // Act & Assert
-      await expect(service.createReview(actor, input)).rejects.toThrow(BookingNotCompletedError);
+      await expect(service.createReview(actor, input)).rejects.toThrow(
+        BookingNotCompletedError
+      );
     });
 
     it("should throw error when booking has no pro assigned", async () => {
@@ -299,7 +317,9 @@ describe("ReviewService", () => {
       mockReviewRepository.findByBookingId.mockResolvedValue(existingReview);
 
       // Act & Assert
-      await expect(service.createReview(actor, input)).rejects.toThrow(ReviewAlreadyExistsError);
+      await expect(service.createReview(actor, input)).rejects.toThrow(
+        ReviewAlreadyExistsError
+      );
       expect(mockReviewRepository.create).not.toHaveBeenCalled();
     });
 
@@ -410,7 +430,10 @@ describe("ReviewService", () => {
         proProfileId: "pro-1",
       });
       const review = createMockReview({ bookingId });
-      const proProfile = createMockProProfile({ id: "pro-1", userId: actor.id });
+      const proProfile = createMockProProfile({
+        id: "pro-1",
+        userId: actor.id,
+      });
 
       mockBookingRepository.findById.mockResolvedValue(booking);
       mockProRepository.findByUserId.mockResolvedValue(proProfile);
@@ -449,7 +472,10 @@ describe("ReviewService", () => {
         id: bookingId,
         proProfileId: "different-pro",
       });
-      const proProfile = createMockProProfile({ id: "pro-1", userId: actor.id });
+      const proProfile = createMockProProfile({
+        id: "pro-1",
+        userId: actor.id,
+      });
 
       mockBookingRepository.findById.mockResolvedValue(booking);
       mockProRepository.findByUserId.mockResolvedValue(proProfile);
@@ -489,7 +515,11 @@ describe("ReviewService", () => {
       const result = await service.listForPro(proProfileId);
 
       // Assert
-      expect(mockReviewRepository.listForPro).toHaveBeenCalledWith(proProfileId, undefined, undefined);
+      expect(mockReviewRepository.listForPro).toHaveBeenCalledWith(
+        proProfileId,
+        undefined,
+        undefined
+      );
       expect(result).toHaveLength(2);
       expect(result[0]).toMatchObject({
         id: "review-1",
@@ -510,7 +540,11 @@ describe("ReviewService", () => {
       await service.listForPro(proProfileId, limit, cursor);
 
       // Assert
-      expect(mockReviewRepository.listForPro).toHaveBeenCalledWith(proProfileId, limit, cursor);
+      expect(mockReviewRepository.listForPro).toHaveBeenCalledWith(
+        proProfileId,
+        limit,
+        cursor
+      );
     });
 
     it("should return empty array when pro has no reviews", async () => {
@@ -542,7 +576,9 @@ describe("ReviewService", () => {
       const result = await service.getReviewStatusByBookingIds(bookingIds);
 
       // Assert
-      expect(mockReviewRepository.findByBookingIds).toHaveBeenCalledWith(bookingIds);
+      expect(mockReviewRepository.findByBookingIds).toHaveBeenCalledWith(
+        bookingIds
+      );
       expect(result).toEqual({
         "booking-1": true,
         "booking-2": false,

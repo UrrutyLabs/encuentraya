@@ -1,12 +1,18 @@
 import { useEffect } from "react";
 import { Stack } from "expo-router";
 import { useFonts } from "expo-font";
-import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from "@expo-google-fonts/inter";
+import {
+  Inter_400Regular,
+  Inter_500Medium,
+  Inter_600SemiBold,
+  Inter_700Bold,
+} from "@expo-google-fonts/inter";
 import { ActivityIndicator, View } from "react-native";
 import { TRPCProvider } from "@lib/trpc/Provider";
 import { ErrorBoundary } from "@components/ErrorBoundary";
 import { OfflineIndicator } from "@components/OfflineIndicator";
 import { initCrashReporting } from "@lib/crash-reporting";
+import { initializeEnvValidation } from "@lib/env-validation";
 import { theme } from "../src/theme";
 
 export default function RootLayout() {
@@ -17,8 +23,9 @@ export default function RootLayout() {
     Inter_700Bold,
   });
 
-  // Initialize crash reporting on app start
+  // Validate environment variables and initialize crash reporting on app start
   useEffect(() => {
+    initializeEnvValidation();
     initCrashReporting();
   }, []);
 
@@ -41,7 +48,10 @@ export default function RootLayout() {
           }}
         >
           <Stack.Screen name="index" options={{ headerShown: false }} />
-          <Stack.Screen name="auth/login" options={{ title: "Iniciar sesión" }} />
+          <Stack.Screen
+            name="auth/login"
+            options={{ title: "Iniciar sesión" }}
+          />
           <Stack.Screen name="auth/signup" options={{ title: "Registrarse" }} />
           <Stack.Screen
             name="auth/confirm-email"
@@ -58,40 +68,40 @@ export default function RootLayout() {
             }}
           />
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen 
-            name="booking/[bookingId]" 
-            options={{ 
+          <Stack.Screen
+            name="booking/[bookingId]"
+            options={{
               title: "Detalle de reserva",
               headerBackTitle: "Atrás",
-            }} 
+            }}
           />
-          <Stack.Screen 
-            name="settings/payout" 
-            options={{ 
+          <Stack.Screen
+            name="settings/payout"
+            options={{
               title: "Cobros",
               headerBackTitle: "Atrás",
-            }} 
+            }}
           />
-          <Stack.Screen 
-            name="settings/help" 
-            options={{ 
+          <Stack.Screen
+            name="settings/help"
+            options={{
               title: "Ayuda",
               headerBackTitle: "Atrás",
-            }} 
+            }}
           />
-          <Stack.Screen 
-            name="profile/earnings" 
-            options={{ 
+          <Stack.Screen
+            name="profile/earnings"
+            options={{
               title: "Historial de ingresos",
               headerBackTitle: "Atrás",
-            }} 
+            }}
           />
-          <Stack.Screen 
-            name="profile/edit" 
-            options={{ 
+          <Stack.Screen
+            name="profile/edit"
+            options={{
               title: "Editar perfil",
               headerBackTitle: "Atrás",
-            }} 
+            }}
           />
         </Stack>
       </TRPCProvider>

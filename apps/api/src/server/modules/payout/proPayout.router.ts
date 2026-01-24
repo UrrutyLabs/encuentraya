@@ -90,9 +90,7 @@ export const proPayoutRouter = router({
     .input(
       z
         .object({
-          status: z
-            .enum(["PENDING", "PAYABLE", "PAID", "REVERSED"])
-            .optional(),
+          status: z.enum(["PENDING", "PAYABLE", "PAID", "REVERSED"]).optional(),
           limit: z.number().int().positive().max(100).optional(),
           offset: z.number().int().nonnegative().optional(),
         })
@@ -109,9 +107,7 @@ export const proPayoutRouter = router({
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message:
-            error instanceof Error
-              ? error.message
-              : "Failed to get earnings",
+            error instanceof Error ? error.message : "Failed to get earnings",
         });
       }
     }),

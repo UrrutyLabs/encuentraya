@@ -83,16 +83,27 @@ export class Logger {
   /**
    * Format log message with context
    */
-  private formatMessage(level: LogLevel, message: string, context?: LogContext): string {
+  private formatMessage(
+    level: LogLevel,
+    message: string,
+    context?: LogContext
+  ): string {
     const levelName = LogLevel[level];
-    const contextStr = context ? ` ${JSON.stringify(this.sanitize(context))}` : "";
+    const contextStr = context
+      ? ` ${JSON.stringify(this.sanitize(context))}`
+      : "";
     return `[${levelName}] ${message}${contextStr}`;
   }
 
   /**
    * Internal log method
    */
-  private log(level: LogLevel, message: string, context?: LogContext, error?: Error) {
+  private log(
+    level: LogLevel,
+    message: string,
+    context?: LogContext,
+    error?: Error
+  ) {
     if (level < this.config.minLevel) {
       return;
     }
@@ -118,7 +129,12 @@ export class Logger {
     }
 
     // Crash reporting for errors
-    if (level === LogLevel.ERROR && error && this.config.enableCrashReporting && this.crashReporter) {
+    if (
+      level === LogLevel.ERROR &&
+      error &&
+      this.config.enableCrashReporting &&
+      this.crashReporter
+    ) {
       this.crashReporter(error, context);
     }
   }

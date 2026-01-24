@@ -52,7 +52,9 @@ export function BookingDetailSkeleton() {
             <View style={styles.labelPlaceholder} />
           </View>
           <View style={styles.descriptionPlaceholder} />
-          <View style={[styles.descriptionPlaceholder, styles.descriptionShort]} />
+          <View
+            style={[styles.descriptionPlaceholder, styles.descriptionShort]}
+          />
         </View>
 
         {/* Amount Row */}

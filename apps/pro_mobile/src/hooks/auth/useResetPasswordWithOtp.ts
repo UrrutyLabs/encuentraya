@@ -16,7 +16,11 @@ export function useResetPasswordWithOtp() {
     },
   });
 
-  const resetPassword = async (email: string, otp: string, newPassword: string) => {
+  const resetPassword = async (
+    email: string,
+    otp: string,
+    newPassword: string
+  ) => {
     try {
       await resetPasswordMutation.mutateAsync({ email, otp, newPassword });
       // Success - mutation's onSuccess will handle redirect

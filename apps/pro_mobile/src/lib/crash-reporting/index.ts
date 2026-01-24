@@ -2,7 +2,7 @@
  * Crash reporting setup and utilities
  * Uses Sentry for error tracking and crash reporting
  * Uses shared monitoring package for utilities
- * 
+ *
  * Note: Sentry is disabled when running in Expo Go (no custom native modules supported)
  */
 
@@ -14,14 +14,14 @@ const isExpoGo = Constants.executionEnvironment === "storeClient";
 
 // Conditionally import Sentry only if not in Expo Go
 let Sentry: typeof import("@sentry/react-native") | null = null;
-let adapter: ReturnType<typeof import("@repo/monitoring/sentry").createReactNativeAdapter> | null = null;
+let adapter: ReturnType<
+  typeof import("@repo/monitoring/sentry").createReactNativeAdapter
+> | null = null;
 
 if (!isExpoGo) {
   try {
     Sentry = require("@sentry/react-native");
-    const {
-      createReactNativeAdapter,
-    } = require("@repo/monitoring/sentry");
+    const { createReactNativeAdapter } = require("@repo/monitoring/sentry");
     adapter = createReactNativeAdapter(Sentry);
   } catch (error) {
     logger.warn("Sentry not available (may be running in Expo Go)", {
@@ -35,7 +35,7 @@ let isInitialized = false;
 /**
  * Initialize Sentry crash reporting
  * Call this early in the app lifecycle (in _layout.tsx or index.tsx)
- * 
+ *
  * Note: Automatically disabled when running in Expo Go
  */
 export function initCrashReporting() {
@@ -46,7 +46,9 @@ export function initCrashReporting() {
 
   // Skip Sentry initialization in Expo Go (custom native modules not supported)
   if (isExpoGo) {
-    logger.info("Running in Expo Go - Sentry disabled (custom native modules not supported)");
+    logger.info(
+      "Running in Expo Go - Sentry disabled (custom native modules not supported)"
+    );
     isInitialized = true; // Mark as initialized to prevent retries
     return;
   }
@@ -78,7 +80,7 @@ export function initCrashReporting() {
       tracesSampleRate: __DEV__ ? 1.0 : 0.1,
       // Attach user context when available
       beforeSend(event, hint) {
-        // Prevent sending events in non-production environments 
+        // Prevent sending events in non-production environments
         if (__DEV__) {
           return null;
         }
@@ -88,7 +90,10 @@ export function initCrashReporting() {
           const error = hint.originalException;
           if (error instanceof Error) {
             // Don't report permission denied errors for push notifications
-            if (error.message.includes("permission") || error.message.includes("notification")) {
+            if (
+              error.message.includes("permission") ||
+              error.message.includes("notification")
+            ) {
               return null;
             }
           }
@@ -108,9 +113,14 @@ export function initCrashReporting() {
     });
 
     isInitialized = true;
-    logger.info("Crash reporting initialized", { environment: __DEV__ ? "development" : "production" });
+    logger.info("Crash reporting initialized", {
+      environment: __DEV__ ? "development" : "production",
+    });
   } catch (error) {
-    logger.error("Failed to initialize crash reporting", error instanceof Error ? error : new Error(String(error)));
+    logger.error(
+      "Failed to initialize crash reporting",
+      error instanceof Error ? error : new Error(String(error))
+    );
   }
 }
 
@@ -120,14 +130,20 @@ export function initCrashReporting() {
  */
 export function setUserContext(userId: string, email?: string) {
   if (!adapter || isExpoGo) {
-    logger.debug("User context set (Sentry disabled)", { userId, hasEmail: !!email });
+    logger.debug("User context set (Sentry disabled)", {
+      userId,
+      hasEmail: !!email,
+    });
     return;
   }
   const {
     setUserContext: setUserContextShared,
   } = require("@repo/monitoring/sentry");
   setUserContextShared(adapter, userId, email);
-  logger.debug("User context set for crash reporting", { userId, hasEmail: !!email });
+  logger.debug("User context set for crash reporting", {
+    userId,
+    hasEmail: !!email,
+  });
 }
 
 /**
@@ -150,7 +166,10 @@ export function clearUserContext() {
  * Capture a manual error/exception
  * No-op when running in Expo Go
  */
-export function captureException(error: Error, context?: Record<string, unknown>) {
+export function captureException(
+  error: Error,
+  context?: Record<string, unknown>
+) {
   if (!adapter || isExpoGo) {
     // In Expo Go, just log the error (Sentry is disabled)
     // Don't show "Sentry disabled" for expected errors to reduce noise
@@ -176,7 +195,10 @@ export function captureException(error: Error, context?: Record<string, unknown>
  * Capture a message (non-error)
  * No-op when running in Expo Go
  */
-export function captureMessage(message: string, level: "info" | "warning" | "error" = "info") {
+export function captureMessage(
+  message: string,
+  level: "info" | "warning" | "error" = "info"
+) {
   if (!adapter || isExpoGo) {
     logger.info(`Message captured (Sentry disabled): ${message}`, { level });
     return;
@@ -192,7 +214,11 @@ export function captureMessage(message: string, level: "info" | "warning" | "err
  * Add breadcrumb for debugging
  * No-op when running in Expo Go
  */
-export function addBreadcrumb(message: string, category: string, data?: Record<string, unknown>) {
+export function addBreadcrumb(
+  message: string,
+  category: string,
+  data?: Record<string, unknown>
+) {
   if (!adapter || isExpoGo) {
     return;
   }

@@ -76,7 +76,10 @@ export interface PaymentProviderClient {
    * If amount is not provided, captures the full authorized amount
    * Returns the captured amount in minor units
    */
-  capture(providerReference: string, amount?: number): Promise<{ capturedAmount: number }>;
+  capture(
+    providerReference: string,
+    amount?: number
+  ): Promise<{ capturedAmount: number }>;
 
   /**
    * Refund a payment (optional for MVP)

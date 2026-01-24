@@ -26,7 +26,11 @@ export function EditProfileScreen() {
   const [bio, setBio] = useState("");
 
   // Fetch current pro profile
-  const { data: pro, isLoading, refetch } = trpc.pro.getMyProfile.useQuery(undefined, {
+  const {
+    data: pro,
+    isLoading,
+    refetch,
+  } = trpc.pro.getMyProfile.useQuery(undefined, {
     retry: false,
   });
 
@@ -59,7 +63,11 @@ export function EditProfileScreen() {
       ]);
     },
     onError: (error) => {
-      Alert.alert("Error", error.message || "No se pudo guardar el perfil. Por favor, intentá nuevamente.");
+      Alert.alert(
+        "Error",
+        error.message ||
+          "No se pudo guardar el perfil. Por favor, intentá nuevamente."
+      );
     },
   });
 
@@ -109,7 +117,10 @@ export function EditProfileScreen() {
 
   if (isLoading) {
     return (
-      <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={styles.content}
+      >
         <View style={styles.loadingContainer}>
           <Feather name="loader" size={24} color={theme.colors.muted} />
           <Text variant="body" style={styles.loadingText}>
@@ -121,7 +132,11 @@ export function EditProfileScreen() {
   }
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.content}
+      keyboardShouldPersistTaps="handled"
+    >
       <View style={styles.titleRow}>
         <Feather name="edit" size={24} color={theme.colors.primary} />
         <Text variant="h1" style={styles.title}>
@@ -190,7 +205,10 @@ export function EditProfileScreen() {
           style={styles.input}
         />
 
-        <CategorySelector selected={selectedCategories} onSelectionChange={setSelectedCategories} />
+        <CategorySelector
+          selected={selectedCategories}
+          onSelectionChange={setSelectedCategories}
+        />
 
         <Input
           label="Área de servicio (opcional)"
@@ -211,7 +229,8 @@ export function EditProfileScreen() {
           </Text>
         </View>
         <Text variant="body" style={styles.bioDescription}>
-          Contá a tus clientes sobre tu experiencia, especialidades y lo que te hace único.
+          Contá a tus clientes sobre tu experiencia, especialidades y lo que te
+          hace único.
         </Text>
         <View style={styles.bioInputContainer}>
           <TextInput

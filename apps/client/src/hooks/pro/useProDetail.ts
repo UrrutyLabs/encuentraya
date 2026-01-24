@@ -5,7 +5,11 @@ import { trpc } from "@/lib/trpc/client";
  * Encapsulates the pro.getById query
  */
 export function useProDetail(proId: string | undefined) {
-  const { data: pro, isLoading, error } = trpc.pro.getById.useQuery(
+  const {
+    data: pro,
+    isLoading,
+    error,
+  } = trpc.pro.getById.useQuery(
     { id: proId! },
     {
       enabled: !!proId,

@@ -51,7 +51,10 @@ Este mensaje fue enviado desde el formulario de contacto.
     `.trim();
 
     // Get admin email from environment (fallback to a default)
-    const adminEmail = process.env.ADMIN_EMAIL || process.env.SUPPORT_EMAIL || "support@arreglatodo.com";
+    const adminEmail =
+      process.env.ADMIN_EMAIL ||
+      process.env.SUPPORT_EMAIL ||
+      "support@arreglatodo.com";
 
     // Send notification via NotificationService
     const idempotencyKey = `contact:${input.email}:${Date.now()}`;

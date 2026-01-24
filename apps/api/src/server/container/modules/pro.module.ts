@@ -1,9 +1,6 @@
 import { DependencyContainer } from "tsyringe";
 import { TOKENS } from "../tokens";
-import {
-  ProRepository,
-  ProRepositoryImpl,
-} from "@modules/pro/pro.repo";
+import { ProRepository, ProRepositoryImpl } from "@modules/pro/pro.repo";
 import {
   AvailabilityRepository,
   AvailabilityRepositoryImpl,

@@ -68,7 +68,8 @@ export function CategoryPerformance({
       </div>
       <div className="space-y-4">
         {sorted.map((item) => {
-          const revenuePercentage = maxRevenue > 0 ? (item.revenue / maxRevenue) * 100 : 0;
+          const revenuePercentage =
+            maxRevenue > 0 ? (item.revenue / maxRevenue) * 100 : 0;
           const bookingsPercentage =
             totalBookings > 0 ? (item.bookings / totalBookings) * 100 : 0;
 

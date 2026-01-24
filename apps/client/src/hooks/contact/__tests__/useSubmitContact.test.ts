@@ -13,7 +13,8 @@ describe("useSubmitContact", () => {
     it("should return success data", async () => {
       const mockMutateAsync = vi.fn().mockResolvedValue({
         success: true,
-        message: "Your message has been sent successfully. We'll get back to you soon!",
+        message:
+          "Your message has been sent successfully. We'll get back to you soon!",
       });
 
       mockTrpcContactSubmit.mockImplementation(() => ({
@@ -59,7 +60,8 @@ describe("useSubmitContact", () => {
         name: "Jane Smith",
         email: "jane@example.com",
         subject: "Help Request",
-        message: "I need help with my booking. Please contact me as soon as possible.",
+        message:
+          "I need help with my booking. Please contact me as soon as possible.",
       };
 
       await act(async () => {
@@ -70,7 +72,8 @@ describe("useSubmitContact", () => {
         name: "Jane Smith",
         email: "jane@example.com",
         subject: "Help Request",
-        message: "I need help with my booking. Please contact me as soon as possible.",
+        message:
+          "I need help with my booking. Please contact me as soon as possible.",
       });
     });
   });
@@ -98,7 +101,9 @@ describe("useSubmitContact", () => {
       };
 
       await act(async () => {
-        await expect(result.current.submitContact(input)).rejects.toThrow("Failed to send message");
+        await expect(result.current.submitContact(input)).rejects.toThrow(
+          "Failed to send message"
+        );
       });
 
       expect(mockMutateAsync).toHaveBeenCalledWith(input);
@@ -131,7 +136,9 @@ describe("useSubmitContact", () => {
       };
 
       await act(async () => {
-        await expect(result.current.submitContact(input)).rejects.toEqual(mockError);
+        await expect(result.current.submitContact(input)).rejects.toEqual(
+          mockError
+        );
       });
     });
   });

@@ -68,7 +68,10 @@ export interface PaymentRepository {
     limit?: number;
     cursor?: string;
   }): Promise<PaymentEntity[]>;
-  updateStatusAndAmounts(id: string, patch: PaymentUpdateInput): Promise<PaymentEntity>;
+  updateStatusAndAmounts(
+    id: string,
+    patch: PaymentUpdateInput
+  ): Promise<PaymentEntity>;
   setCheckoutUrl(id: string, url: string): Promise<PaymentEntity>;
   setProviderReference(id: string, reference: string): Promise<PaymentEntity>;
   findPendingByClientUserId(clientUserId: string): Promise<PaymentEntity[]>;
@@ -82,8 +85,8 @@ export class PaymentRepositoryImpl implements PaymentRepository {
   async create(input: PaymentCreateInput): Promise<PaymentEntity> {
     const payment = await prisma.payment.create({
       data: {
-        provider: input.provider  as $Enums.PaymentProvider,
-        type: input.type  as $Enums.PaymentType,
+        provider: input.provider as $Enums.PaymentProvider,
+        type: input.type as $Enums.PaymentType,
         status: PaymentStatus.CREATED as $Enums.PaymentStatus,
         bookingId: input.bookingId,
         clientUserId: input.clientUserId,
@@ -168,7 +171,9 @@ export class PaymentRepositoryImpl implements PaymentRepository {
     const payment = await prisma.payment.update({
       where: { id },
       data: {
-        ...(patch.status !== undefined && { status: patch.status as unknown as $Enums.PaymentStatus }),
+        ...(patch.status !== undefined && {
+          status: patch.status as unknown as $Enums.PaymentStatus,
+        }),
         ...(patch.amountAuthorized !== undefined && {
           amountAuthorized: patch.amountAuthorized,
         }),
@@ -178,7 +183,9 @@ export class PaymentRepositoryImpl implements PaymentRepository {
         ...(patch.providerReference !== undefined && {
           providerReference: patch.providerReference,
         }),
-        ...(patch.checkoutUrl !== undefined && { checkoutUrl: patch.checkoutUrl }),
+        ...(patch.checkoutUrl !== undefined && {
+          checkoutUrl: patch.checkoutUrl,
+        }),
       },
     });
 
@@ -194,7 +201,10 @@ export class PaymentRepositoryImpl implements PaymentRepository {
     return this.mapPrismaToDomain(payment);
   }
 
-  async setProviderReference(id: string, reference: string): Promise<PaymentEntity> {
+  async setProviderReference(
+    id: string,
+    reference: string
+  ): Promise<PaymentEntity> {
     const payment = await prisma.payment.update({
       where: { id },
       data: { providerReference: reference },
@@ -208,7 +218,9 @@ export class PaymentRepositoryImpl implements PaymentRepository {
    * Pending payments are those with status: CREATED, REQUIRES_ACTION, AUTHORIZED
    * These prevent account deletion
    */
-  async findPendingByClientUserId(clientUserId: string): Promise<PaymentEntity[]> {
+  async findPendingByClientUserId(
+    clientUserId: string
+  ): Promise<PaymentEntity[]> {
     const pendingStatuses: PaymentStatus[] = [
       PaymentStatus.CREATED,
       PaymentStatus.REQUIRES_ACTION,
@@ -227,7 +239,9 @@ export class PaymentRepositoryImpl implements PaymentRepository {
     return payments.map(this.mapPrismaToDomain);
   }
 
-  private mapPrismaToDomain(prismaPayment: Prisma.PaymentGetPayload<Record<string, never>>): PaymentEntity {
+  private mapPrismaToDomain(
+    prismaPayment: Prisma.PaymentGetPayload<Record<string, never>>
+  ): PaymentEntity {
     return {
       id: prismaPayment.id,
       provider: prismaPayment.provider as PaymentProvider,

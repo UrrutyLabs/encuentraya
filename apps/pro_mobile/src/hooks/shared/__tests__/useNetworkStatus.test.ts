@@ -4,7 +4,10 @@ import { useNetworkStatus } from "../useNetworkStatus";
 
 // Access the mocked NetInfo
 const mockNetInfo = NetInfo as jest.Mocked<typeof NetInfo> & {
-  _setState: (state: { isConnected: boolean | null; isInternetReachable?: boolean }) => void;
+  _setState: (state: {
+    isConnected: boolean | null;
+    isInternetReachable?: boolean;
+  }) => void;
 };
 
 describe("useNetworkStatus", () => {
@@ -40,37 +43,39 @@ describe("useNetworkStatus", () => {
     // Mock both addEventListener and fetch to delay callbacks
     const originalAddEventListener = mockNetInfo.addEventListener;
     const originalFetch = mockNetInfo.fetch;
-    
+
     // Prevent addEventListener from calling callback immediately
-    (mockNetInfo.addEventListener as jest.Mock).mockImplementationOnce((callback) => {
-      // Don't call callback immediately
-      return () => {};
-    });
-    
+    (mockNetInfo.addEventListener as jest.Mock).mockImplementationOnce(
+      (callback) => {
+        // Don't call callback immediately
+        return () => {};
+      }
+    );
+
     // Mock fetch to delay resolution
     let resolveFetch: ((value: any) => void) | undefined;
     const fetchPromise = new Promise((resolve) => {
       resolveFetch = resolve;
     });
     (mockNetInfo.fetch as jest.Mock).mockImplementationOnce(() => fetchPromise);
-    
+
     const { result } = renderHook(() => useNetworkStatus());
 
     // Initially should be checking (before state is set)
     expect(result.current.isChecking).toBe(true);
-    
+
     // Resolve the fetch promise and wait for state update
     await act(async () => {
       resolveFetch!({ isConnected: true, isInternetReachable: true } as any);
       // Wait a tick for state to update
       await new Promise((resolve) => setTimeout(resolve, 0));
     });
-    
+
     // Wait for async operations to complete to avoid act() warnings
     await waitFor(() => {
       expect(result.current.isChecking).toBe(false);
     });
-    
+
     // Restore original implementations
     mockNetInfo.addEventListener = originalAddEventListener;
     mockNetInfo.fetch = originalFetch;

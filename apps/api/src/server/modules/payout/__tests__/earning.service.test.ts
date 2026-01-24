@@ -1,10 +1,21 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { EarningService, EarningCreationError } from "../earning.service";
 import type { EarningRepository, EarningEntity } from "../earning.repo";
-import type { BookingRepository, BookingEntity } from "@modules/booking/booking.repo";
-import type { PaymentRepository, PaymentEntity } from "@modules/payment/payment.repo";
+import type {
+  BookingRepository,
+  BookingEntity,
+} from "@modules/booking/booking.repo";
+import type {
+  PaymentRepository,
+  PaymentEntity,
+} from "@modules/payment/payment.repo";
 import type { ProRepository } from "@modules/pro/pro.repo";
-import { BookingStatus, PaymentStatus, PaymentProvider, PaymentType } from "@repo/domain";
+import {
+  BookingStatus,
+  PaymentStatus,
+  PaymentProvider,
+  PaymentType,
+} from "@repo/domain";
 import { BookingNotFoundError } from "@modules/booking/booking.errors";
 import type { Actor } from "@infra/auth/roles";
 
@@ -66,14 +77,19 @@ describe("EarningService", () => {
     };
   }
 
-  function createMockActor(role: "CLIENT" | "PRO" | "ADMIN" | "SYSTEM" = "ADMIN", id = "actor-1"): Actor | { role: "SYSTEM" } {
+  function createMockActor(
+    role: "CLIENT" | "PRO" | "ADMIN" | "SYSTEM" = "ADMIN",
+    id = "actor-1"
+  ): Actor | { role: "SYSTEM" } {
     if (role === "SYSTEM") {
       return { role: "SYSTEM" };
     }
     return { id, role: role as Actor["role"] };
   }
 
-  function createMockBooking(overrides?: Partial<BookingEntity>): BookingEntity {
+  function createMockBooking(
+    overrides?: Partial<BookingEntity>
+  ): BookingEntity {
     return {
       id: "booking-1",
       displayId: "A0002",
@@ -91,7 +107,9 @@ describe("EarningService", () => {
     };
   }
 
-  function createMockPayment(overrides?: Partial<PaymentEntity>): PaymentEntity {
+  function createMockPayment(
+    overrides?: Partial<PaymentEntity>
+  ): PaymentEntity {
     return {
       id: "payment-1",
       provider: PaymentProvider.MERCADO_PAGO,
@@ -113,7 +131,9 @@ describe("EarningService", () => {
     };
   }
 
-  function createMockEarning(overrides?: Partial<EarningEntity>): EarningEntity {
+  function createMockEarning(
+    overrides?: Partial<EarningEntity>
+  ): EarningEntity {
     return {
       id: "earning-1",
       bookingId: "booking-1",
@@ -169,8 +189,12 @@ describe("EarningService", () => {
       await service.createEarningForCompletedBooking(actor, "booking-1");
 
       expect(mockBookingRepository.findById).toHaveBeenCalledWith("booking-1");
-      expect(mockEarningRepository.findByBookingId).toHaveBeenCalledWith("booking-1");
-      expect(mockPaymentRepository.findByBookingId).toHaveBeenCalledWith("booking-1");
+      expect(mockEarningRepository.findByBookingId).toHaveBeenCalledWith(
+        "booking-1"
+      );
+      expect(mockPaymentRepository.findByBookingId).toHaveBeenCalledWith(
+        "booking-1"
+      );
       expect(mockEarningRepository.createFromBooking).toHaveBeenCalledWith({
         bookingId: "booking-1",
         proProfileId: "pro-1",
@@ -353,7 +377,9 @@ describe("EarningService", () => {
     });
 
     it("should use current date if no date provided", async () => {
-      const dueEarnings = [createMockEarning({ id: "earning-1", status: "PENDING" })];
+      const dueEarnings = [
+        createMockEarning({ id: "earning-1", status: "PENDING" }),
+      ];
 
       mockEarningRepository.listPendingDue.mockResolvedValue(dueEarnings);
       mockEarningRepository.markManyStatus.mockResolvedValue([

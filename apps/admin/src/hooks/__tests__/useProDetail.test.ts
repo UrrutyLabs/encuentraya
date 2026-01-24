@@ -50,7 +50,9 @@ describe("useProDetail", () => {
     );
 
     // Setup useQuery mocks
-    (trpc.pro.adminById.useQuery as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
+    (
+      trpc.pro.adminById.useQuery as unknown as ReturnType<typeof vi.fn>
+    ).mockReturnValue({
       data: mockPro,
       isLoading: false,
       refetch: vi.fn(),
@@ -70,9 +72,9 @@ describe("useProDetail", () => {
       isPending: false,
     });
 
-    (trpc.pro.suspend.useMutation as unknown as ReturnType<typeof vi.fn>).mockReturnValue(
-      mockUseMutation()
-    );
+    (
+      trpc.pro.suspend.useMutation as unknown as ReturnType<typeof vi.fn>
+    ).mockReturnValue(mockUseMutation());
     (
       trpc.pro.unsuspend.useMutation as unknown as ReturnType<typeof vi.fn>
     ).mockReturnValue(mockUseMutation());
@@ -82,9 +84,7 @@ describe("useProDetail", () => {
   });
 
   it("should return pro data and audit logs", () => {
-    const { result } = renderHook(() =>
-      useProDetail({ proProfileId })
-    );
+    const { result } = renderHook(() => useProDetail({ proProfileId }));
 
     expect(result.current.pro).toEqual(mockPro);
     expect(result.current.auditLogs).toEqual(mockAuditLogs);

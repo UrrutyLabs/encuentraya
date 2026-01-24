@@ -16,7 +16,9 @@ describe("PushDeliveryResolver", () => {
 
   beforeEach(() => {
     mockRepository = createMockRepository();
-    resolver = new PushDeliveryResolver(mockRepository as unknown as DevicePushTokenRepository);
+    resolver = new PushDeliveryResolver(
+      mockRepository as unknown as DevicePushTokenRepository
+    );
   });
 
   describe("resolvePushTokens", () => {
@@ -33,7 +35,9 @@ describe("PushDeliveryResolver", () => {
       const result = await resolver.resolvePushTokens(userId);
 
       // Assert
-      expect(mockRepository.listActiveTokensByUserId).toHaveBeenCalledWith(userId);
+      expect(mockRepository.listActiveTokensByUserId).toHaveBeenCalledWith(
+        userId
+      );
       expect(result).toEqual(tokens);
     });
 
@@ -43,7 +47,9 @@ describe("PushDeliveryResolver", () => {
       mockRepository.listActiveTokensByUserId.mockResolvedValue([]);
 
       // Act & Assert
-      await expect(resolver.resolvePushTokens(userId)).rejects.toThrow(NoActivePushTokensError);
+      await expect(resolver.resolvePushTokens(userId)).rejects.toThrow(
+        NoActivePushTokensError
+      );
       await expect(resolver.resolvePushTokens(userId)).rejects.toThrow(
         `No active push tokens found for user: ${userId}`
       );

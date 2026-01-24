@@ -165,6 +165,7 @@ apps/api/src/server/
 
 **Module Structure:**
 Each module (`modules/{domain}/`) contains:
+
 - `{domain}.service.ts` - Business logic (or split into `{domain}.{useCase}.service.ts` files)
 - `{domain}.helpers.ts` - Shared utilities (optional, for large modules)
 - `{domain}.repo.ts` - Data access (may have multiple repos)
@@ -173,6 +174,7 @@ Each module (`modules/{domain}/`) contains:
 - Domain-specific files (e.g., `payment/provider.ts`, `payment/registry.ts`)
 
 **Benefits:**
+
 - Clear module boundaries for microservices extraction
 - Self-contained modules (easy to test in isolation)
 - Matches DI module structure
@@ -183,12 +185,14 @@ Each module (`modules/{domain}/`) contains:
 The API uses **TSyringe** for dependency injection, enabling modular architecture and easy testing.
 
 **Container Setup:**
+
 - Main container: `container/container.ts`
 - Module registrations: `container/modules/{domain}.module.ts`
 - DI tokens: `container/tokens.ts`
 
 **Module Registration:**
 Each module registers its dependencies in `container/modules/{domain}.module.ts`:
+
 ```typescript
 export function registerBookingModule(container: DependencyContainer): void {
   container.register<BookingRepository>(TOKENS.BookingRepository, {
@@ -201,6 +205,7 @@ export function registerBookingModule(container: DependencyContainer): void {
 ```
 
 **Using DI in Services:**
+
 ```typescript
 @injectable()
 export class BookingService {
@@ -214,12 +219,14 @@ export class BookingService {
 ```
 
 **Using DI in Routers:**
+
 ```typescript
 import { container, TOKENS } from "../../container";
 const bookingService = container.resolve<BookingService>(TOKENS.BookingService);
 ```
 
 **Rules:**
+
 - All services and repositories are `@injectable()`
 - Use `@inject(TOKENS.TokenName)` for constructor injection
 - Import types with `import type` when used in decorators
@@ -247,6 +254,7 @@ modules/{domain}/
 **Example: Booking Service Split**
 
 Instead of one `booking.service.ts` (1058 lines), split into:
+
 - `booking.creation.service.ts` - `createBooking()` and creation validation
 - `booking.lifecycle.service.ts` - All state transition methods (`acceptBooking`, `rejectBooking`, `cancelBooking`, `markOnMyWay`, `arriveBooking`)
 - `booking.completion.service.ts` - `completeBooking()` with payment capture and earning creation logic
@@ -255,6 +263,7 @@ Instead of one `booking.service.ts` (1058 lines), split into:
 - `booking.helpers.ts` - `sendClientNotification()`, `validateStateTransition()`, `mapBookingEntityToDomain()`, authorization helpers
 
 **Benefits:**
+
 - Each service focuses on a single business use case
 - Easier to understand and maintain
 - Better alignment with domain boundaries
@@ -263,6 +272,7 @@ Instead of one `booking.service.ts` (1058 lines), split into:
 
 **Registration:**
 Register all services in `container/modules/{domain}.module.ts`:
+
 ```typescript
 container.register<BookingCreationService>(TOKENS.BookingCreationService, {
   useClass: BookingCreationService,
@@ -274,16 +284,19 @@ container.register<BookingLifecycleService>(TOKENS.BookingLifecycleService, {
 ```
 
 **Dependencies:**
+
 - Services can depend on each other via DI (e.g., `BookingCompletionService` may depend on `BookingLifecycleService`)
 - Shared helpers (`{domain}.helpers.ts`) are pure functions or classes that can be imported directly (no DI needed)
 - Repositories and cross-module services are injected via DI
 
 **When to Split:**
+
 - Service exceeds ~500 lines
 - Service handles multiple distinct business use cases
 - Service has multiple responsibilities (creation, lifecycle, completion, queries, admin)
 
 **When NOT to Split:**
+
 - Service is cohesive and under ~500 lines
 - Splitting would create artificial boundaries
 - All methods are tightly coupled to a single workflow
@@ -322,11 +335,13 @@ container.register<BookingLifecycleService>(TOKENS.BookingLifecycleService, {
 ### Module Boundaries and Cross-Module Dependencies
 
 **Module Independence:**
+
 - Each module (`modules/{domain}/`) is self-contained
 - Modules can depend on other modules via DI (injected dependencies)
 - Avoid circular dependencies between modules
 
 **Dependency Flow:**
+
 ```
 User (foundation)
   ↓
@@ -336,6 +351,7 @@ Booking, Payment (depend on Pro/Review)
 ```
 
 **Cross-Module Access:**
+
 - Use dependency injection to access other modules
 - Import types with `import type` for cross-module type references
 - Access via container: `container.resolve<ServiceType>(TOKENS.ServiceToken)`
@@ -380,16 +396,19 @@ modules/{domain}/
 **Purpose:** Test business logic in isolation with mocked dependencies.
 
 **What to Mock:**
+
 - **Repositories** - Mock all repository methods (services test business logic, not data access)
 - **External Services** - Mock NotificationService, PaymentServiceFactory, etc.
 - **Cross-Module Services** - Mock or use real (prefer mock for unit tests, real for integration)
 
 **What NOT to Mock:**
+
 - **Domain Types** - Use real types from `@repo/domain`
 - **Helpers** - Use real helper functions (they're pure functions)
 - **Error Classes** - Use real error classes
 
 **Example Structure:**
+
 ```typescript
 // apps/api/src/server/modules/booking/__tests__/booking.creation.service.test.ts
 import { describe, it, expect, beforeEach, vi } from "vitest";
@@ -445,6 +464,7 @@ describe("BookingCreationService", () => {
 ```
 
 **Benefits:**
+
 - Fast execution (no database)
 - Isolated tests (test only business logic)
 - Easy to test edge cases
@@ -457,17 +477,20 @@ describe("BookingCreationService", () => {
 **Location:** `modules/{domain}/__tests__/integration/`
 
 **What to Use:**
+
 - **Real Repositories** - Use actual repository implementations
 - **Test Database** - Use separate test database or in-memory SQLite
 - **Real Services** - Use real service implementations (or mock only external APIs)
 
 **When to Use:**
+
 - Critical business workflows (e.g., booking creation → payment → completion)
 - Authorization flows across multiple services
 - Complex state transitions
 - End-to-end module behavior
 
 **Example Structure:**
+
 ```typescript
 // apps/api/src/server/modules/booking/__tests__/integration/booking.workflow.test.ts
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
@@ -497,13 +520,16 @@ describe("BookingCreationService (integration)", () => {
 
   it("should create booking and persist to database", async () => {
     const result = await service.createBooking(actor, input);
-    const booking = await prisma.booking.findUnique({ where: { id: result.id } });
+    const booking = await prisma.booking.findUnique({
+      where: { id: result.id },
+    });
     expect(booking).toBeTruthy();
   });
 });
 ```
 
 **Benefits:**
+
 - Tests real repository behavior
 - Catches integration bugs
 - More confidence in data layer
@@ -522,7 +548,9 @@ export function createMockActor(role: Role, id = "test-user"): Actor {
   return { id, role };
 }
 
-export function createMockBooking(input?: Partial<BookingEntity>): BookingEntity {
+export function createMockBooking(
+  input?: Partial<BookingEntity>
+): BookingEntity {
   return {
     id: "booking-1",
     status: BookingStatus.PENDING,
@@ -537,6 +565,7 @@ export function createMockBooking(input?: Partial<BookingEntity>): BookingEntity
 #### Testing Rules
 
 **DO:**
+
 - Write unit tests for all service methods
 - Mock repositories in unit tests
 - Test business rules and edge cases
@@ -546,6 +575,7 @@ export function createMockBooking(input?: Partial<BookingEntity>): BookingEntity
 - **Always run tests for the module as the last step when making changes** (see "Development Workflow" below)
 
 **DON'T:**
+
 - Don't test implementation details (test behavior, not internals)
 - Don't mock domain types (use real types)
 - Don't write tests that require database in unit tests (use integration tests)
@@ -557,6 +587,7 @@ export function createMockBooking(input?: Partial<BookingEntity>): BookingEntity
 **Recommended:** Vitest (faster, Vite-based, TypeScript-first)
 
 **Configuration:** `apps/api/vitest.config.ts`
+
 ```typescript
 import { defineConfig } from "vitest/config";
 import path from "path";
@@ -579,6 +610,7 @@ export default defineConfig({
 ```
 
 **Scripts:** Add to `apps/api/package.json`:
+
 ```json
 {
   "scripts": {
@@ -590,6 +622,7 @@ export default defineConfig({
 ```
 
 **Setup File:** Create `apps/api/src/test-setup.ts`:
+
 ```typescript
 import "reflect-metadata";
 ```
@@ -602,20 +635,23 @@ This ensures TSyringe decorators work correctly in tests.
 
 1. Make your changes to the module (service, repository, router, etc.)
 2. Run tests for that specific module:
+
    ```bash
    # Run all tests
    pnpm test
-   
+
    # Run tests for a specific module (watch mode)
    pnpm test --watch src/server/modules/{domain}/
-   
+
    # Run tests with coverage
    pnpm test:coverage
    ```
+
 3. Ensure all tests pass before committing
 4. If tests fail, fix the issues before proceeding
 
 **Why this matters:**
+
 - Catches regressions immediately
 - Ensures business logic still works after refactoring
 - Validates that new features don't break existing functionality
@@ -626,6 +662,7 @@ This ensures TSyringe decorators work correctly in tests.
 For frontend-specific best practices, see [FE_BEST_PRACTICES.md](./FE_BEST_PRACTICES.md).
 
 **Key Points:**
+
 - Frontend uses hooks to encapsulate tRPC queries/mutations (no direct `trpc` access in screens)
 - Screens orchestrate data fetching and user actions
 - Presentational components are pure (props in, JSX out)

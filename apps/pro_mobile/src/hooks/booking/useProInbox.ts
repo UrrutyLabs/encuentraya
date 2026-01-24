@@ -17,14 +17,15 @@ export function useProInbox() {
     refetchOnForeground: true,
   });
 
-  const { data: bookings = [], isLoading, error } = trpc.booking.proInbox.useQuery(
-    undefined,
-    {
-      enabled: !!user, // Only fetch when user is authenticated
-      retry: false,
-      ...pollingOptions, // Spread smart polling options
-    }
-  );
+  const {
+    data: bookings = [],
+    isLoading,
+    error,
+  } = trpc.booking.proInbox.useQuery(undefined, {
+    enabled: !!user, // Only fetch when user is authenticated
+    retry: false,
+    ...pollingOptions, // Spread smart polling options
+  });
 
   return {
     bookings,

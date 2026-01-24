@@ -279,7 +279,9 @@ describe("useAuth", () => {
     it("should set error and throw when signInWithPassword fails", async () => {
       const errorMessage = "Invalid credentials";
       // Create an Error-like object that will be caught and handled
-      const mockError = Object.assign(new Error(errorMessage), { message: errorMessage });
+      const mockError = Object.assign(new Error(errorMessage), {
+        message: errorMessage,
+      });
       mockSignInWithPassword.mockResolvedValue({
         data: { session: null, user: null },
         error: mockError,
@@ -393,7 +395,9 @@ describe("useAuth", () => {
     it("should set error and throw when signUp fails", async () => {
       const errorMessage = "Email already exists";
       // Create an Error instance so the catch block preserves the message
-      const mockError = Object.assign(new Error(errorMessage), { message: errorMessage });
+      const mockError = Object.assign(new Error(errorMessage), {
+        message: errorMessage,
+      });
       mockSignUp.mockResolvedValue({
         data: { session: null, user: null },
         error: mockError,
@@ -490,7 +494,9 @@ describe("useAuth", () => {
     it("should set error and throw when signOut fails", async () => {
       const errorMessage = "Failed to sign out";
       // Create an Error instance so the catch block preserves the message
-      const mockError = Object.assign(new Error(errorMessage), { message: errorMessage });
+      const mockError = Object.assign(new Error(errorMessage), {
+        message: errorMessage,
+      });
       mockSignOut.mockResolvedValue({
         error: mockError,
       });

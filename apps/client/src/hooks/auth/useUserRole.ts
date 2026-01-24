@@ -8,7 +8,7 @@ import type { Role } from "@repo/domain";
  * Hook to fetch current user's role
  * Only fetches when user is authenticated
  * Returns role, loading state, and error
- * 
+ *
  * Automatically resets query cache when user changes to prevent stale role data.
  * This ensures that when user A signs out and user B signs in, user B gets
  * a fresh query instead of user A's cached role.
@@ -36,7 +36,11 @@ export function useUserRole() {
     previousUserIdRef.current = currentUserId;
   }, [user?.id, queryClient]);
 
-  const { data: userInfo, isLoading, error } = trpc.auth.me.useQuery(undefined, {
+  const {
+    data: userInfo,
+    isLoading,
+    error,
+  } = trpc.auth.me.useQuery(undefined, {
     enabled: !!user, // Only fetch when user is authenticated
     retry: false,
   });

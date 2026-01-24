@@ -16,8 +16,11 @@ export function useSettingsForm() {
   const queryClient = useQueryClient();
 
   // Fetch current profile
-  const { profile, isLoading: isLoadingProfile, error: profileError } =
-    useClientProfile();
+  const {
+    profile,
+    isLoading: isLoadingProfile,
+    error: profileError,
+  } = useClientProfile();
 
   // Derive initial form values from profile
   const initialValues = useMemo(
@@ -32,8 +35,9 @@ export function useSettingsForm() {
 
   // Form state
   const [phone, setPhone] = useState(initialValues.phone);
-  const [preferredContactMethod, setPreferredContactMethod] =
-    useState<PreferredContactMethod | "">(initialValues.preferredContactMethod);
+  const [preferredContactMethod, setPreferredContactMethod] = useState<
+    PreferredContactMethod | ""
+  >(initialValues.preferredContactMethod);
 
   // Update form state when profile loads or changes
   useEffect(() => {
@@ -43,15 +47,16 @@ export function useSettingsForm() {
 
   // Update mutation
   const updateMutation = trpc.clientProfile.update.useMutation({
-    ...invalidateRelatedQueries(queryClient, [
-      [["clientProfile", "get"]],
-    ]),
+    ...invalidateRelatedQueries(queryClient, [[["clientProfile", "get"]]]),
     onSuccess: () => {
       // Redirect immediately - profile will refetch when user navigates back
       router.push("/my-bookings");
     },
     onError: (error) => {
-      logger.error("Error updating profile", error instanceof Error ? error : new Error(String(error)));
+      logger.error(
+        "Error updating profile",
+        error instanceof Error ? error : new Error(String(error))
+      );
     },
   });
 

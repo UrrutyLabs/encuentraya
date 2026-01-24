@@ -12,7 +12,11 @@ export function HelpScreen() {
       {/* FAQs Section */}
       <Card style={styles.sectionCard}>
         <View style={styles.sectionHeader}>
-          <Feather name="message-circle" size={20} color={theme.colors.primary} />
+          <Feather
+            name="message-circle"
+            size={20}
+            color={theme.colors.primary}
+          />
           <Text variant="h2" style={styles.sectionTitle}>
             Preguntas frecuentes
           </Text>
@@ -32,7 +36,8 @@ export function HelpScreen() {
           </Text>
         </View>
         <Text variant="body" style={styles.sectionDescription}>
-          Próximamente: podrás chatear directamente con nuestro equipo de soporte desde aquí.
+          Próximamente: podrás chatear directamente con nuestro equipo de
+          soporte desde aquí.
         </Text>
       </Card>
     </ScrollView>

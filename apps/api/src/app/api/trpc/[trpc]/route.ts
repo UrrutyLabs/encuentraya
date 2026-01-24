@@ -50,7 +50,10 @@ const handler = async (req: Request) => {
         // Log at appropriate level based on error code
         if (error.code === "INTERNAL_SERVER_ERROR") {
           requestLogger.error(logData, "tRPC Internal Server Error");
-        } else if (error.code === "UNAUTHORIZED" || error.code === "FORBIDDEN") {
+        } else if (
+          error.code === "UNAUTHORIZED" ||
+          error.code === "FORBIDDEN"
+        ) {
           requestLogger.warn(logData, "tRPC Authorization Error");
         } else {
           requestLogger.info(logData, "tRPC Error");
@@ -62,9 +65,14 @@ const handler = async (req: Request) => {
           {
             ...errorContext,
             error: {
-              name: unknownError instanceof Error ? unknownError.name : "Unknown",
-              message: unknownError instanceof Error ? unknownError.message : String(unknownError),
-              stack: unknownError instanceof Error ? unknownError.stack : undefined,
+              name:
+                unknownError instanceof Error ? unknownError.name : "Unknown",
+              message:
+                unknownError instanceof Error
+                  ? unknownError.message
+                  : String(unknownError),
+              stack:
+                unknownError instanceof Error ? unknownError.stack : undefined,
             },
           },
           "Unexpected tRPC Error"

@@ -70,8 +70,7 @@ export async function createContext(req: Request): Promise<{
     // Check for intended role in user metadata (set during signup)
     // This allows pro_mobile app to create users with PRO role directly
     const intendedRole = userMetadata?.intendedRole;
-    const role =
-      intendedRole === "pro" ? Role.PRO : Role.CLIENT;
+    const role = intendedRole === "pro" ? Role.PRO : Role.CLIENT;
 
     user = await userRepository.create(role, supabaseUserId);
   }

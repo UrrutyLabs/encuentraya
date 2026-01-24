@@ -1,7 +1,11 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { useChangePassword } from "../useChangePassword";
-import { mockTrpcAuthChangePassword, mockSignOut, mockQueryClient } from "@/test-setup";
+import {
+  mockTrpcAuthChangePassword,
+  mockSignOut,
+  mockQueryClient,
+} from "@/test-setup";
 
 // Add resetQueries to the mockQueryClient from test-setup
 const mockResetQueries = vi.fn();
@@ -199,22 +203,24 @@ describe("useChangePassword", () => {
     it("should clear cache, sign out, and redirect on success", async () => {
       let onSuccessCallback: (() => Promise<void>) | undefined;
 
-      mockTrpcAuthChangePassword.mockImplementation((options?: { onSuccess?: () => Promise<void> }) => {
-        onSuccessCallback = options?.onSuccess;
-        return {
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Test mock, input not needed
-          mutate: async (_input: unknown) => {
-            // Call onSuccess asynchronously after mutate is called
-            if (onSuccessCallback) {
-              await onSuccessCallback();
-            }
-          },
-          isPending: false,
-          error: null,
-          isSuccess: true,
-          reset: vi.fn(),
-        };
-      });
+      mockTrpcAuthChangePassword.mockImplementation(
+        (options?: { onSuccess?: () => Promise<void> }) => {
+          onSuccessCallback = options?.onSuccess;
+          return {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Test mock, input not needed
+            mutate: async (_input: unknown) => {
+              // Call onSuccess asynchronously after mutate is called
+              if (onSuccessCallback) {
+                await onSuccessCallback();
+              }
+            },
+            isPending: false,
+            error: null,
+            isSuccess: true,
+            reset: vi.fn(),
+          };
+        }
+      );
 
       const { result } = renderHook(() => useChangePassword());
 

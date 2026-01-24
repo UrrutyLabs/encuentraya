@@ -39,11 +39,14 @@ export function useBookingActions(
           { id: variables.bookingId },
         ];
         await queryClient.cancelQueries({ queryKey: bookingQueryKey });
-        await queryClient.cancelQueries({ queryKey: [["booking", "proInbox"]] });
+        await queryClient.cancelQueries({
+          queryKey: [["booking", "proInbox"]],
+        });
         await queryClient.cancelQueries({ queryKey: [["booking", "proJobs"]] });
 
         // Snapshot previous values
-        const previousBooking = queryClient.getQueryData<Booking>(bookingQueryKey);
+        const previousBooking =
+          queryClient.getQueryData<Booking>(bookingQueryKey);
 
         // Optimistically update booking status
         if (previousBooking) {
@@ -66,10 +69,17 @@ export function useBookingActions(
             ["booking", "getById"],
             { id: variables.bookingId },
           ];
-          queryClient.setQueryData<Booking>(bookingQueryKey, context.previousBooking);
+          queryClient.setQueryData<Booking>(
+            bookingQueryKey,
+            context.previousBooking
+          );
         }
       },
-      onSettled: (data: unknown, error: unknown, variables: { bookingId: string }) => {
+      onSettled: (
+        data: unknown,
+        error: unknown,
+        variables: { bookingId: string }
+      ) => {
         // Invalidate related queries after mutation settles
         const bookingQueryKey: [string[], { id: string }] = [
           ["booking", "getById"],

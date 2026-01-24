@@ -1,4 +1,10 @@
-import { TextInput, TextInputProps, Text, View, StyleSheet } from "react-native";
+import {
+  TextInput,
+  TextInputProps,
+  Text,
+  View,
+  StyleSheet,
+} from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { theme } from "../../theme";
 
@@ -23,7 +29,12 @@ export function Input({ label, icon, style, ...props }: InputProps) {
       <View>
         <View style={styles.labelRow}>
           {icon && (
-            <Feather name={icon} size={14} color={theme.colors.muted} style={styles.labelIcon} />
+            <Feather
+              name={icon}
+              size={14}
+              color={theme.colors.muted}
+              style={styles.labelIcon}
+            />
           )}
           <Text style={styles.label}>{label}</Text>
         </View>

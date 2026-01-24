@@ -77,14 +77,18 @@ export function PayablesTable({
                   {pro.earningsCount}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <Badge variant={pro.payoutProfileComplete ? "success" : "warning"}>
+                  <Badge
+                    variant={pro.payoutProfileComplete ? "success" : "warning"}
+                  >
                     {pro.payoutProfileComplete ? "Completo" : "Incompleto"}
                   </Badge>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <Button
                     variant="primary"
-                    onClick={() => onCreatePayout(pro.proProfileId, pro.displayName)}
+                    onClick={() =>
+                      onCreatePayout(pro.proProfileId, pro.displayName)
+                    }
                     disabled={!pro.payoutProfileComplete}
                   >
                     Crear payout

@@ -109,12 +109,18 @@ export function LoginScreen() {
           footerLink={{
             text: "¿No tenés cuenta?",
             linkText: "Registrate",
-            href: returnUrl ? `/signup?returnUrl=${encodeURIComponent(returnUrl)}` : "/signup",
+            href: returnUrl
+              ? `/signup?returnUrl=${encodeURIComponent(returnUrl)}`
+              : "/signup",
           }}
         />
         <div className="text-center">
           <a
-            href={returnUrl ? `/forgot-password?returnUrl=${encodeURIComponent(returnUrl)}` : "/forgot-password"}
+            href={
+              returnUrl
+                ? `/forgot-password?returnUrl=${encodeURIComponent(returnUrl)}`
+                : "/forgot-password"
+            }
             className="text-sm text-primary hover:underline"
           >
             ¿Olvidaste tu contraseña?

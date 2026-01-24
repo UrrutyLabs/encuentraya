@@ -33,7 +33,7 @@ export interface SmartPollingReturn {
  * - Polls when page is visible
  * - Stops polling when page is hidden (saves resources)
  * - Automatically refetches when page becomes visible
- * 
+ *
  * @param options Polling configuration
  * @returns React Query options with smart polling enabled
  */
@@ -41,11 +41,7 @@ export function useSmartPolling(
   options: SmartPollingOptions
 ): SmartPollingReturn {
   const isForeground = useAppState();
-  const {
-    interval,
-    enabled = true,
-    refetchOnForeground = true,
-  } = options;
+  const { interval, enabled = true, refetchOnForeground = true } = options;
 
   return useMemo(() => {
     // Only poll when page is visible and polling is enabled

@@ -23,7 +23,12 @@ import { Button } from "@repo/ui";
 import { Badge } from "@repo/ui";
 import { Navigation } from "@/components/presentational/Navigation";
 import { BookingDetailSkeleton } from "@/components/presentational/BookingDetailSkeleton";
-import { BookingStatus, formatCurrency, getBookingStatusLabel, getBookingStatusVariant } from "@repo/domain";
+import {
+  BookingStatus,
+  formatCurrency,
+  getBookingStatusLabel,
+  getBookingStatusVariant,
+} from "@repo/domain";
 import { useBookingDetail } from "@/hooks/booking";
 import { useCancelBooking } from "@/hooks/booking";
 import { logger } from "@/lib/logger";
@@ -64,7 +69,8 @@ export function BookingDetailScreen() {
     useBookingDetail(bookingId);
 
   // Cancel booking hook
-  const { cancelBooking, isPending: isCancelling } = useCancelBooking(bookingId);
+  const { cancelBooking, isPending: isCancelling } =
+    useCancelBooking(bookingId);
 
   const canCancel =
     booking &&
@@ -81,9 +87,13 @@ export function BookingDetailScreen() {
         // Success - hook's onSuccess will handle redirect
       } catch (error) {
         // Error is handled by hook state, just log it
-        logger.error("Error cancelling booking", error instanceof Error ? error : new Error(String(error)), {
-          bookingId: booking.id,
-        });
+        logger.error(
+          "Error cancelling booking",
+          error instanceof Error ? error : new Error(String(error)),
+          {
+            bookingId: booking.id,
+          }
+        );
       }
     }
   };
@@ -127,7 +137,9 @@ export function BookingDetailScreen() {
   }
 
   const statusLabel = getBookingStatusLabel(booking.status as BookingStatus);
-  const statusVariant = getBookingStatusVariant(booking.status as BookingStatus);
+  const statusVariant = getBookingStatusVariant(
+    booking.status as BookingStatus
+  );
   const categoryLabel = CATEGORY_LABELS[booking.category] || booking.category;
 
   // Check if pro is active (approved and not suspended)
@@ -177,7 +189,12 @@ export function BookingDetailScreen() {
                   {payment && (
                     <div className="mt-2">
                       <Text variant="body" className="text-text font-medium">
-                        Monto estimado: {formatCurrency(payment.amountEstimated, payment.currency, true)}
+                        Monto estimado:{" "}
+                        {formatCurrency(
+                          payment.amountEstimated,
+                          payment.currency,
+                          true
+                        )}
                       </Text>
                     </div>
                   )}
@@ -273,7 +290,8 @@ export function BookingDetailScreen() {
                   </Text>
                 </div>
                 <Text variant="body" className="text-text">
-                  {booking.estimatedHours} {booking.estimatedHours === 1 ? "hora" : "horas"}
+                  {booking.estimatedHours}{" "}
+                  {booking.estimatedHours === 1 ? "hora" : "horas"}
                 </Text>
               </div>
               <div className="md:col-span-2">
@@ -356,10 +374,14 @@ export function BookingDetailScreen() {
                     </Text>
                   </div>
                   <Text variant="body" className="text-muted mb-4">
-                    Compartí tu experiencia y ayudá a otros a encontrar el mejor profesional.
+                    Compartí tu experiencia y ayudá a otros a encontrar el mejor
+                    profesional.
                   </Text>
                   <Link href={`/my-bookings/${bookingId}/review`}>
-                    <Button variant="primary" className="flex items-center gap-2">
+                    <Button
+                      variant="primary"
+                      className="flex items-center gap-2"
+                    >
                       <Star className="w-4 h-4" />
                       Dejar reseña
                     </Button>
@@ -367,9 +389,13 @@ export function BookingDetailScreen() {
                 </Card>
               )}
               {booking.proId && (
-                <Card className={`p-6 mb-6 ${isProActive ? "bg-primary/5 border-primary/20" : "bg-muted/10 border-muted/20"}`}>
+                <Card
+                  className={`p-6 mb-6 ${isProActive ? "bg-primary/5 border-primary/20" : "bg-muted/10 border-muted/20"}`}
+                >
                   <div className="flex items-center gap-2 mb-3">
-                    <RotateCcw className={`w-5 h-5 ${isProActive ? "text-primary" : "text-muted"}`} />
+                    <RotateCcw
+                      className={`w-5 h-5 ${isProActive ? "text-primary" : "text-muted"}`}
+                    />
                     <Text variant="h2" className="text-text">
                       ¿Querés que vuelva este profesional?
                     </Text>
@@ -380,7 +406,10 @@ export function BookingDetailScreen() {
                         Creá una nueva solicitud para el mismo profesional.
                       </Text>
                       <Link href={`/book?rebookFrom=${bookingId}`}>
-                        <Button variant="primary" className="flex items-center gap-2">
+                        <Button
+                          variant="primary"
+                          className="flex items-center gap-2"
+                        >
                           <RotateCcw className="w-4 h-4" />
                           Volver a contratar
                         </Button>
@@ -393,7 +422,11 @@ export function BookingDetailScreen() {
                           ? "Este profesional está suspendido y no está disponible para nuevas reservas en este momento."
                           : "Este profesional no está disponible para nuevas reservas en este momento."}
                       </Text>
-                      <Button variant="primary" disabled className="flex items-center gap-2 opacity-50">
+                      <Button
+                        variant="primary"
+                        disabled
+                        className="flex items-center gap-2 opacity-50"
+                      >
                         <RotateCcw className="w-4 h-4" />
                         Volver a contratar
                       </Button>

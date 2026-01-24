@@ -29,9 +29,13 @@ export function useCancelBooking(bookingId?: string) {
       await cancelBooking.mutateAsync({ bookingId });
       // Success - mutation's onSuccess will handle redirect
     } catch (error) {
-      logger.error("Error cancelling booking", error instanceof Error ? error : new Error(String(error)), {
-        bookingId,
-      });
+      logger.error(
+        "Error cancelling booking",
+        error instanceof Error ? error : new Error(String(error)),
+        {
+          bookingId,
+        }
+      );
       throw error;
     }
   };

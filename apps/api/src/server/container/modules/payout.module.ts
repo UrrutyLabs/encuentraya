@@ -53,10 +53,7 @@ export function registerPayoutModule(container: DependencyContainer): void {
     useClass: PayoutService,
   });
 
-  container.register<ProPayoutProfileService>(
-    TOKENS.ProPayoutProfileService,
-    {
-      useClass: ProPayoutProfileService,
-    }
-  );
+  container.register<ProPayoutProfileService>(TOKENS.ProPayoutProfileService, {
+    useClass: ProPayoutProfileService,
+  });
 }

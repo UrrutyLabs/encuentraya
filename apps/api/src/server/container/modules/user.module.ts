@@ -1,9 +1,6 @@
 import { DependencyContainer } from "tsyringe";
 import { TOKENS } from "../tokens";
-import {
-  UserRepository,
-  UserRepositoryImpl,
-} from "@modules/user/user.repo";
+import { UserRepository, UserRepositoryImpl } from "@modules/user/user.repo";
 import {
   ClientProfileRepository,
   ClientProfileRepositoryImpl,

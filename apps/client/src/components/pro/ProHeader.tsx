@@ -36,12 +36,18 @@ export function ProHeader() {
     try {
       const { error } = await signOut();
       if (error) {
-        logger.error("Error signing out", error instanceof Error ? error : new Error(String(error)));
+        logger.error(
+          "Error signing out",
+          error instanceof Error ? error : new Error(String(error))
+        );
         // Even if signOut fails, redirect to pro landing (session might already be invalid)
       }
       router.push("/pro");
     } catch (error) {
-      logger.error("Error signing out", error instanceof Error ? error : new Error(String(error)));
+      logger.error(
+        "Error signing out",
+        error instanceof Error ? error : new Error(String(error))
+      );
       // Redirect anyway to ensure user is logged out from UI perspective
       router.push("/pro");
     }

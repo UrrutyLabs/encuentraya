@@ -27,7 +27,9 @@ export const paymentRouter = router({
     )
     .mutation(async ({ input, ctx }) => {
       try {
-        const paymentService = await paymentServiceFactory(PaymentProvider.MERCADO_PAGO);
+        const paymentService = await paymentServiceFactory(
+          PaymentProvider.MERCADO_PAGO
+        );
         return await paymentService.createPreauthForBooking(ctx.actor, input);
       } catch (error) {
         if (error instanceof Error) {
@@ -65,8 +67,12 @@ export const paymentRouter = router({
     )
     .query(async ({ input, ctx }) => {
       try {
-        const paymentRepo = container.resolve<PaymentRepository>(TOKENS.PaymentRepository);
-        const bookingRepo = container.resolve<BookingRepository>(TOKENS.BookingRepository);
+        const paymentRepo = container.resolve<PaymentRepository>(
+          TOKENS.PaymentRepository
+        );
+        const bookingRepo = container.resolve<BookingRepository>(
+          TOKENS.BookingRepository
+        );
 
         // Get booking to verify ownership
         const booking = await bookingRepo.findById(input.bookingId);
@@ -75,7 +81,10 @@ export const paymentRouter = router({
         }
 
         // Authorization: Only booking client or admin can view payment
-        if (ctx.actor.role !== "admin" && booking.clientUserId !== ctx.actor.id) {
+        if (
+          ctx.actor.role !== "admin" &&
+          booking.clientUserId !== ctx.actor.id
+        ) {
           throw new TRPCError({
             code: "FORBIDDEN",
             message: "You can only view payments for your own bookings",
@@ -116,7 +125,9 @@ export const paymentRouter = router({
     .input(z.object({ paymentId: z.string() }))
     .mutation(async ({ input, ctx }) => {
       try {
-        const paymentRepo = container.resolve<PaymentRepository>(TOKENS.PaymentRepository);
+        const paymentRepo = container.resolve<PaymentRepository>(
+          TOKENS.PaymentRepository
+        );
         const payment = await paymentRepo.findById(input.paymentId);
 
         if (!payment) {
@@ -162,15 +173,15 @@ export const paymentRouter = router({
     .query(async ({ input }) => {
       try {
         // Use service factory with default provider for admin methods
-        const service = await paymentServiceFactory(PaymentProvider.MERCADO_PAGO);
+        const service = await paymentServiceFactory(
+          PaymentProvider.MERCADO_PAGO
+        );
         return await service.adminListPayments(input);
       } catch (error) {
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message:
-            error instanceof Error
-              ? error.message
-              : "Failed to list payments",
+            error instanceof Error ? error.message : "Failed to list payments",
         });
       }
     }),
@@ -183,7 +194,9 @@ export const paymentRouter = router({
     .query(async ({ input }) => {
       try {
         // Use service factory with default provider for admin methods
-        const service = await paymentServiceFactory(PaymentProvider.MERCADO_PAGO);
+        const service = await paymentServiceFactory(
+          PaymentProvider.MERCADO_PAGO
+        );
         return await service.adminGetPaymentById(input.paymentId);
       } catch (error) {
         if (error instanceof TRPCError) {
@@ -192,9 +205,7 @@ export const paymentRouter = router({
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message:
-            error instanceof Error
-              ? error.message
-              : "Failed to get payment",
+            error instanceof Error ? error.message : "Failed to get payment",
         });
       }
     }),

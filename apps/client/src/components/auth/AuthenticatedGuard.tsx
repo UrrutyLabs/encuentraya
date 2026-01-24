@@ -16,9 +16,9 @@ interface AuthenticatedGuardProps {
  * Container component that guards authenticated routes
  * Handles authentication check and optional role-based access control
  * Renders children only when user is authenticated and has the required role (if specified)
- * 
+ *
  * Uses the new useRouteGuard hook (refactored architecture)
- * 
+ *
  * @param requiredRole - Optional role requirement (CLIENT, PRO, ADMIN)
  *                       If provided, only users with matching role can access
  */

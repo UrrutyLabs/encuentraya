@@ -12,53 +12,55 @@ import { asyncStoragePersister } from "../react-query/persistence";
 let queryClientInstance: QueryClient | null = null;
 
 export function TRPCProvider({ children }: { children: React.ReactNode }) {
-  const [queryClient] = useState(
-    () => {
-      const client = new QueryClient({
-        queryCache: new QueryCache({
-          onError: (error: Error) => {
-            // Check if it's a JSON parse error (usually means API returned HTML)
-            const isJsonParseError = error.message.includes("JSON Parse error");
-            const errorContext: Record<string, unknown> = {
-              type: "query",
-            };
-            
-            if (isJsonParseError) {
-              errorContext.hint = "API may be returning HTML instead of JSON. Check if API server is running and accessible.";
-              errorContext.apiUrl = process.env.EXPO_PUBLIC_API_URL || "http://localhost:3002";
-            }
-            
-            logger.error("React Query error", error, errorContext);
-            captureException(error, errorContext);
-          },
-        }),
-        mutationCache: new MutationCache({
-          onError: (error: Error) => {
-            // Check if it's a JSON parse error (usually means API returned HTML)
-            const isJsonParseError = error.message.includes("JSON Parse error");
-            const errorContext: Record<string, unknown> = {
-              type: "mutation",
-            };
-            
-            if (isJsonParseError) {
-              errorContext.hint = "API may be returning HTML instead of JSON. Check if API server is running and accessible.";
-              errorContext.apiUrl = process.env.EXPO_PUBLIC_API_URL || "http://localhost:3002";
-            }
-            
-            logger.error("React Query mutation error", error, errorContext);
-            captureException(error, errorContext);
-          },
-        }),
-        defaultOptions: createQueryClientDefaults({
-          refetchOnWindowFocus: !__DEV__,
-          queryNetworkMode: "offlineFirst",
-          mutationNetworkMode: "offlineFirst",
-        }),
-      });
-      queryClientInstance = client;
-      return client;
-    }
-  );
+  const [queryClient] = useState(() => {
+    const client = new QueryClient({
+      queryCache: new QueryCache({
+        onError: (error: Error) => {
+          // Check if it's a JSON parse error (usually means API returned HTML)
+          const isJsonParseError = error.message.includes("JSON Parse error");
+          const errorContext: Record<string, unknown> = {
+            type: "query",
+          };
+
+          if (isJsonParseError) {
+            errorContext.hint =
+              "API may be returning HTML instead of JSON. Check if API server is running and accessible.";
+            errorContext.apiUrl =
+              process.env.EXPO_PUBLIC_API_URL || "http://localhost:3002";
+          }
+
+          logger.error("React Query error", error, errorContext);
+          captureException(error, errorContext);
+        },
+      }),
+      mutationCache: new MutationCache({
+        onError: (error: Error) => {
+          // Check if it's a JSON parse error (usually means API returned HTML)
+          const isJsonParseError = error.message.includes("JSON Parse error");
+          const errorContext: Record<string, unknown> = {
+            type: "mutation",
+          };
+
+          if (isJsonParseError) {
+            errorContext.hint =
+              "API may be returning HTML instead of JSON. Check if API server is running and accessible.";
+            errorContext.apiUrl =
+              process.env.EXPO_PUBLIC_API_URL || "http://localhost:3002";
+          }
+
+          logger.error("React Query mutation error", error, errorContext);
+          captureException(error, errorContext);
+        },
+      }),
+      defaultOptions: createQueryClientDefaults({
+        refetchOnWindowFocus: !__DEV__,
+        queryNetworkMode: "offlineFirst",
+        mutationNetworkMode: "offlineFirst",
+      }),
+    });
+    queryClientInstance = client;
+    return client;
+  });
 
   const [trpcClient] = useState(() =>
     trpc.createClient({
@@ -95,7 +97,9 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
  */
 export function getQueryClient(): QueryClient {
   if (!queryClientInstance) {
-    throw new Error("QueryClient not initialized. Make sure TRPCProvider is mounted.");
+    throw new Error(
+      "QueryClient not initialized. Make sure TRPCProvider is mounted."
+    );
   }
   return queryClientInstance;
 }

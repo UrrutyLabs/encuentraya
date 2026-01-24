@@ -114,7 +114,11 @@ export function ResetPasswordScreen() {
         />
         {(error || validationError) && (
           <View style={styles.errorContainer}>
-            <Feather name="alert-circle" size={16} color={theme.colors.danger} />
+            <Feather
+              name="alert-circle"
+              size={16}
+              color={theme.colors.danger}
+            />
             <Text variant="small" style={styles.error}>
               {validationError ||
                 error?.message ||
@@ -125,7 +129,9 @@ export function ResetPasswordScreen() {
         <Button
           variant="primary"
           onPress={handleSubmit}
-          disabled={isPending || !email || !otp || !newPassword || !confirmPassword}
+          disabled={
+            isPending || !email || !otp || !newPassword || !confirmPassword
+          }
           style={styles.button}
         >
           {isPending ? "Restableciendo..." : "Restablecer contraseña"}

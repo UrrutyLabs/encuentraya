@@ -20,12 +20,17 @@ export function getTokenExpiration(token: string | undefined): number | null {
     }
 
     // Decode the payload (second part)
-    const payload = JSON.parse(atob(parts[1].replace(/-/g, "+").replace(/_/g, "/")));
-    
+    const payload = JSON.parse(
+      atob(parts[1].replace(/-/g, "+").replace(/_/g, "/"))
+    );
+
     // Return expiration time (exp claim is in seconds)
     return payload.exp || null;
   } catch (err) {
-    logger.error("Error decoding JWT token", err instanceof Error ? err : new Error(String(err)));
+    logger.error(
+      "Error decoding JWT token",
+      err instanceof Error ? err : new Error(String(err))
+    );
     return null;
   }
 }
@@ -88,7 +93,9 @@ export async function clearSessionStorage(): Promise<void> {
   if (projectRef) {
     const storageKey = `sb-${projectRef}-auth-token`;
     window.localStorage.removeItem(storageKey);
-    logger.info("Cleared expired Supabase session from localStorage", { key: storageKey });
+    logger.info("Cleared expired Supabase session from localStorage", {
+      key: storageKey,
+    });
   }
 
   // Also clear any other potential Supabase keys
@@ -109,14 +116,16 @@ export async function clearSessionStorage(): Promise<void> {
  * @param session - The session to validate
  * @returns Valid session or null if invalid/expired
  */
-export async function validateAndRefreshSession(session: Session | null): Promise<Session | null> {
+export async function validateAndRefreshSession(
+  session: Session | null
+): Promise<Session | null> {
   if (!session) {
     return null;
   }
 
   // Check if session appears expired before refreshing
   const isExpired = isSessionExpired(session);
-  
+
   if (isExpired) {
     logger.info("Session appears expired, attempting refresh", {
       expires_at: session.expires_at,
@@ -127,11 +136,12 @@ export async function validateAndRefreshSession(session: Session | null): Promis
   // Always try refreshSession() - it will validate the refresh token
   // If refresh token is invalid/expired, it will fail
   try {
-    const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
-    
+    const { data: refreshData, error: refreshError } =
+      await supabase.auth.refreshSession();
+
     if (refreshError) {
       // Refresh failed - session is invalid
-      logger.info("Session refresh failed, clearing", { 
+      logger.info("Session refresh failed, clearing", {
         error: refreshError,
         errorMessage: refreshError.message,
       });
@@ -187,11 +197,17 @@ export function translateAuthError(error: AuthError | null): string {
   // Check error message as fallback (for cases where code might not be set)
   const message = error.message.toLowerCase();
 
-  if (message.includes("email not confirmed") || message.includes("email address is not confirmed")) {
+  if (
+    message.includes("email not confirmed") ||
+    message.includes("email address is not confirmed")
+  ) {
     return "Tu email no ha sido confirmado. Por favor, revisá tu correo y hacé clic en el enlace de confirmación.";
   }
 
-  if (message.includes("invalid login credentials") || message.includes("invalid credentials")) {
+  if (
+    message.includes("invalid login credentials") ||
+    message.includes("invalid credentials")
+  ) {
     return "Email o contraseña incorrectos. Por favor, intentá nuevamente.";
   }
 
@@ -213,5 +229,7 @@ export function translateAuthError(error: AuthError | null): string {
 
   // Generic fallback - return original message if we can't translate it
   // This ensures we don't lose important error information
-  return error.message || "Error al iniciar sesión. Por favor, intentá nuevamente.";
+  return (
+    error.message || "Error al iniciar sesión. Por favor, intentá nuevamente."
+  );
 }

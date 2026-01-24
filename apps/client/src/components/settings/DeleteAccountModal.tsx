@@ -14,13 +14,8 @@ export function DeleteAccountModal({
   isOpen,
   onClose,
 }: DeleteAccountModalProps) {
-  const {
-    password,
-    setPassword,
-    handleDelete,
-    isPending,
-    error,
-  } = useDeleteAccount();
+  const { password, setPassword, handleDelete, isPending, error } =
+    useDeleteAccount();
 
   const [showPassword, setShowPassword] = useState(false);
   const [confirmText, setConfirmText] = useState("");

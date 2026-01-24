@@ -5,7 +5,12 @@ interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
   children: ReactNode;
 }
 
-export function Select({ label, className = "", children, ...props }: SelectProps) {
+export function Select({
+  label,
+  className = "",
+  children,
+  ...props
+}: SelectProps) {
   const selectClasses = `w-full px-3 py-2 border border-border rounded-md bg-surface text-text focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent ${className}`;
 
   if (label) {
@@ -21,5 +26,9 @@ export function Select({ label, className = "", children, ...props }: SelectProp
     );
   }
 
-  return <select className={selectClasses} {...props}>{children}</select>;
+  return (
+    <select className={selectClasses} {...props}>
+      {children}
+    </select>
+  );
 }

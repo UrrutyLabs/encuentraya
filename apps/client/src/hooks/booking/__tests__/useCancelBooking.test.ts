@@ -25,17 +25,19 @@ describe("useCancelBooking", () => {
     it("should redirect to my-bookings on success", async () => {
       let onSuccessCallback: (() => void) | undefined;
 
-      mockTrpcBookingCancel.mockImplementation((options?: { onSuccess?: () => void }) => {
-        onSuccessCallback = options?.onSuccess;
-        return {
-          mutateAsync: async (input: unknown) => {
-            onSuccessCallback?.();
-            return input;
-          },
-          isPending: false,
-          error: null,
-        };
-      });
+      mockTrpcBookingCancel.mockImplementation(
+        (options?: { onSuccess?: () => void }) => {
+          onSuccessCallback = options?.onSuccess;
+          return {
+            mutateAsync: async (input: unknown) => {
+              onSuccessCallback?.();
+              return input;
+            },
+            isPending: false,
+            error: null,
+          };
+        }
+      );
 
       const { result } = renderHook(() => useCancelBooking("booking-1"));
 
@@ -56,18 +58,20 @@ describe("useCancelBooking", () => {
 
       let onSuccessCallback: (() => void) | undefined;
 
-      mockTrpcBookingCancel.mockImplementation((options?: { onSuccess?: () => void }) => {
-        onSuccessCallback = options?.onSuccess;
-        return {
-          mutateAsync: async (input: unknown) => {
-            const result = await mockMutateAsync(input);
-            onSuccessCallback?.();
-            return result;
-          },
-          isPending: false,
-          error: null,
-        };
-      });
+      mockTrpcBookingCancel.mockImplementation(
+        (options?: { onSuccess?: () => void }) => {
+          onSuccessCallback = options?.onSuccess;
+          return {
+            mutateAsync: async (input: unknown) => {
+              const result = await mockMutateAsync(input);
+              onSuccessCallback?.();
+              return result;
+            },
+            isPending: false,
+            error: null,
+          };
+        }
+      );
 
       const { result } = renderHook(() => useCancelBooking("booking-1"));
 

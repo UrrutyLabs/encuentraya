@@ -1,8 +1,5 @@
 import { injectable, inject } from "tsyringe";
-import {
-  type BookingRepository,
-  type BookingEntity,
-} from "./booking.repo";
+import { type BookingRepository, type BookingEntity } from "./booking.repo";
 import type { ProRepository } from "@modules/pro/pro.repo";
 import type {
   Booking,
@@ -422,35 +419,40 @@ export class BookingService {
     // This ensures funds are charged when work is completed
     try {
       const payment = await this.paymentRepository.findByBookingId(bookingId);
-      
+
       if (payment && payment.status === PaymentStatus.AUTHORIZED) {
         // Get payment service using factory
-        const paymentService = await this.paymentServiceFactory(payment.provider);
-        
+        const paymentService = await this.paymentServiceFactory(
+          payment.provider
+        );
+
         // Attempt to capture payment (non-blocking - if it fails, booking still completes)
         // Payment can be captured manually later if needed
-        await paymentService.capturePayment(payment.id).then(async () => {
-          // After successful capture, create earning record
-          // Use system actor since this is an automated process
-          try {
-            await this.earningService.createEarningForCompletedBooking(
-              { role: "SYSTEM" },
-              bookingId
-            );
-          } catch (error) {
-            // Log but don't fail booking completion if earning creation fails
+        await paymentService
+          .capturePayment(payment.id)
+          .then(async () => {
+            // After successful capture, create earning record
+            // Use system actor since this is an automated process
+            try {
+              await this.earningService.createEarningForCompletedBooking(
+                { role: "SYSTEM" },
+                bookingId
+              );
+            } catch (error) {
+              // Log but don't fail booking completion if earning creation fails
+              console.error(
+                `Failed to create earning for booking ${bookingId}:`,
+                error
+              );
+            }
+          })
+          .catch((error) => {
             console.error(
-              `Failed to create earning for booking ${bookingId}:`,
+              `Failed to capture payment ${payment.id} for booking ${bookingId}:`,
               error
             );
-          }
-        }).catch((error) => {
-          console.error(
-            `Failed to capture payment ${payment.id} for booking ${bookingId}:`,
-            error
-          );
-          // Don't throw - booking completion should succeed even if capture fails
-        });
+            // Don't throw - booking completion should succeed even if capture fails
+          });
       } else if (payment && payment.status === PaymentStatus.CAPTURED) {
         // Payment already captured, create earning record
         try {
@@ -468,7 +470,10 @@ export class BookingService {
       }
     } catch (error) {
       // Log but don't fail booking completion if payment capture fails
-      console.error(`Error attempting to capture payment for booking ${bookingId}:`, error);
+      console.error(
+        `Error attempting to capture payment for booking ${bookingId}:`,
+        error
+      );
     }
 
     // Send notification to client
@@ -490,13 +495,13 @@ export class BookingService {
   async getBookingById(id: string): Promise<Booking | null> {
     const booking = await this.bookingRepository.findById(id);
     if (!booking) return null;
-    
+
     // Get pro to get hourly rate
     const pro = booking.proProfileId
       ? await this.proRepository.findById(booking.proProfileId)
       : null;
     const hourlyRate = pro?.hourlyRate ?? 0;
-    
+
     return this.mapBookingEntityToDomain(booking, hourlyRate);
   }
 
@@ -562,7 +567,7 @@ export class BookingService {
    */
   async getClientBookings(clientId: string): Promise<Booking[]> {
     const bookings = await this.bookingRepository.findByClientUserId(clientId);
-    
+
     // Get pros for all bookings to get hourly rates
     const proIds = bookings
       .map((b) => b.proProfileId)
@@ -571,12 +576,14 @@ export class BookingService {
       proIds.map((id) => this.proRepository.findById(id))
     );
     const proMap = new Map(
-      pros.filter((p): p is NonNullable<typeof p> => p !== null).map((p) => [p.id, p.hourlyRate])
+      pros
+        .filter((p): p is NonNullable<typeof p> => p !== null)
+        .map((p) => [p.id, p.hourlyRate])
     );
-    
+
     return bookings.map((booking) => {
       const hourlyRate = booking.proProfileId
-        ? proMap.get(booking.proProfileId) ?? 0
+        ? (proMap.get(booking.proProfileId) ?? 0)
         : 0;
       return this.mapBookingEntityToDomain(booking, hourlyRate);
     });
@@ -587,11 +594,11 @@ export class BookingService {
    */
   async getProBookings(proId: string): Promise<Booking[]> {
     const bookings = await this.bookingRepository.findByProProfileId(proId);
-    
+
     // Get pro to get hourly rate
     const pro = await this.proRepository.findById(proId);
     const hourlyRate = pro?.hourlyRate ?? 0;
-    
+
     return bookings.map((booking) =>
       this.mapBookingEntityToDomain(booking, hourlyRate)
     );
@@ -622,17 +629,19 @@ export class BookingService {
     dateTo?: Date;
     limit?: number;
     cursor?: string;
-  }): Promise<Array<{
-    id: string;
-    createdAt: Date;
-    status: BookingStatus;
-    clientEmail: string | null;
-    clientName: string | null;
-    proName: string | null;
-    estimatedAmount: number;
-    paymentStatus: string | null;
-    currency: string;
-  }>> {
+  }): Promise<
+    Array<{
+      id: string;
+      createdAt: Date;
+      status: BookingStatus;
+      clientEmail: string | null;
+      clientName: string | null;
+      proName: string | null;
+      estimatedAmount: number;
+      paymentStatus: string | null;
+      currency: string;
+    }>
+  > {
     // Get bookings with filters
     const bookings = await this.bookingRepository.findAll({
       status: filters?.status,
@@ -665,7 +674,9 @@ export class BookingService {
       proIds.map((id) => this.proRepository.findById(id))
     );
     const proMap = new Map(
-      pros.filter((p): p is NonNullable<typeof p> => p !== null).map((p) => [p.id, p])
+      pros
+        .filter((p): p is NonNullable<typeof p> => p !== null)
+        .map((p) => [p.id, p])
     );
 
     // Get payments for bookings
@@ -683,7 +694,9 @@ export class BookingService {
     // Combine and filter by query if provided
     let results = bookings.map((booking) => {
       const clientProfile = clientMap.get(booking.clientUserId);
-      const pro = booking.proProfileId ? proMap.get(booking.proProfileId) : null;
+      const pro = booking.proProfileId
+        ? proMap.get(booking.proProfileId)
+        : null;
       const payment = paymentMap.get(booking.id);
       const hourlyRate = pro?.hourlyRate ?? 0;
       const estimatedAmount = hourlyRate * booking.hoursEstimate;
@@ -694,7 +707,8 @@ export class BookingService {
         status: booking.status,
         clientEmail: clientProfile?.email ?? null,
         clientName: clientProfile
-          ? `${clientProfile.firstName || ""} ${clientProfile.lastName || ""}`.trim() || null
+          ? `${clientProfile.firstName || ""} ${clientProfile.lastName || ""}`.trim() ||
+            null
           : null,
         proName: pro?.displayName ?? null,
         estimatedAmount,
@@ -992,9 +1006,7 @@ export class BookingService {
         BookingStatus.ARRIVED,
         BookingStatus.CANCELLED,
       ],
-      [BookingStatus.ARRIVED]: [
-        BookingStatus.COMPLETED,
-      ],
+      [BookingStatus.ARRIVED]: [BookingStatus.COMPLETED],
       [BookingStatus.REJECTED]: [], // Terminal state
       [BookingStatus.COMPLETED]: [], // Terminal state
       [BookingStatus.CANCELLED]: [], // Terminal state
@@ -1056,4 +1068,3 @@ export class BookingService {
     };
   }
 }
-

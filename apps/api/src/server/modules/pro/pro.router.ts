@@ -172,9 +172,7 @@ export const proRouter = router({
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message:
-            error instanceof Error
-              ? error.message
-              : "Failed to update profile",
+            error instanceof Error ? error.message : "Failed to update profile",
         });
       }
     }),
@@ -222,8 +220,7 @@ export const proRouter = router({
         }
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
-          message:
-            error instanceof Error ? error.message : "Failed to get pro",
+          message: error instanceof Error ? error.message : "Failed to get pro",
         });
       }
     }),
@@ -240,7 +237,11 @@ export const proRouter = router({
     )
     .mutation(async ({ input, ctx }) => {
       try {
-        await proService.suspendPro(input.proProfileId, input.reason, ctx.actor);
+        await proService.suspendPro(
+          input.proProfileId,
+          input.reason,
+          ctx.actor
+        );
         return { success: true };
       } catch (error) {
         if (error instanceof Error && error.message.includes("not found")) {

@@ -2,8 +2,14 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { PayoutService, PayoutError } from "../payout.service";
 import type { EarningRepository, EarningEntity } from "../earning.repo";
 import type { PayoutRepository, PayoutEntity } from "../payout.repo";
-import type { PayoutItemRepository, PayoutItemEntity } from "../payoutItem.repo";
-import type { ProPayoutProfileRepository, ProPayoutProfileEntity } from "../proPayoutProfile.repo";
+import type {
+  PayoutItemRepository,
+  PayoutItemEntity,
+} from "../payoutItem.repo";
+import type {
+  ProPayoutProfileRepository,
+  ProPayoutProfileEntity,
+} from "../proPayoutProfile.repo";
 import type { ProRepository, ProProfileEntity } from "@modules/pro/pro.repo";
 import type { PayoutProviderClient } from "../provider";
 import { Role } from "@repo/domain";
@@ -18,8 +24,12 @@ describe("PayoutService", () => {
   let service: PayoutService;
   let mockEarningRepository: ReturnType<typeof createMockEarningRepository>;
   let mockPayoutRepository: ReturnType<typeof createMockPayoutRepository>;
-  let mockPayoutItemRepository: ReturnType<typeof createMockPayoutItemRepository>;
-  let mockProPayoutProfileRepository: ReturnType<typeof createMockProPayoutProfileRepository>;
+  let mockPayoutItemRepository: ReturnType<
+    typeof createMockPayoutItemRepository
+  >;
+  let mockProPayoutProfileRepository: ReturnType<
+    typeof createMockProPayoutProfileRepository
+  >;
   let mockProRepository: ReturnType<typeof createMockProRepository>;
   let mockProviderClient: ReturnType<typeof createMockProviderClient>;
 
@@ -87,7 +97,9 @@ describe("PayoutService", () => {
     return { id, role };
   }
 
-  function createMockProProfile(overrides?: Partial<ProProfileEntity>): ProProfileEntity {
+  function createMockProProfile(
+    overrides?: Partial<ProProfileEntity>
+  ): ProProfileEntity {
     return {
       id: "pro-1",
       userId: "user-1",
@@ -105,7 +117,9 @@ describe("PayoutService", () => {
     };
   }
 
-  function createMockEarning(overrides?: Partial<EarningEntity>): EarningEntity {
+  function createMockEarning(
+    overrides?: Partial<EarningEntity>
+  ): EarningEntity {
     return {
       id: "earning-1",
       bookingId: "booking-1",
@@ -123,7 +137,9 @@ describe("PayoutService", () => {
     };
   }
 
-  function createMockPayoutProfile(overrides?: Partial<ProPayoutProfileEntity>): ProPayoutProfileEntity {
+  function createMockPayoutProfile(
+    overrides?: Partial<ProPayoutProfileEntity>
+  ): ProPayoutProfileEntity {
     return {
       id: "payout-profile-1",
       proProfileId: "pro-1",
@@ -159,7 +175,9 @@ describe("PayoutService", () => {
     };
   }
 
-  function createMockPayoutItem(overrides?: Partial<PayoutItemEntity>): PayoutItemEntity {
+  function createMockPayoutItem(
+    overrides?: Partial<PayoutItemEntity>
+  ): PayoutItemEntity {
     return {
       id: "payout-item-1",
       payoutId: "payout-1",
@@ -206,7 +224,9 @@ describe("PayoutService", () => {
 
       mockProRepository.findById.mockResolvedValue(proProfile);
       mockEarningRepository.listPayableByPro.mockResolvedValue(earnings);
-      mockProPayoutProfileRepository.findByProProfileId.mockResolvedValue(payoutProfile);
+      mockProPayoutProfileRepository.findByProProfileId.mockResolvedValue(
+        payoutProfile
+      );
       mockPayoutRepository.createPayout.mockResolvedValue(payout);
       mockPayoutItemRepository.createMany.mockResolvedValue(payoutItems);
 
@@ -218,7 +238,9 @@ describe("PayoutService", () => {
       expect(result.payoutId).toBe("payout-1");
       expect(mockProRepository.findById).toHaveBeenCalledWith("pro-1");
       expect(mockEarningRepository.listPayableByPro).toHaveBeenCalled();
-      expect(mockProPayoutProfileRepository.findByProProfileId).toHaveBeenCalledWith("pro-1");
+      expect(
+        mockProPayoutProfileRepository.findByProProfileId
+      ).toHaveBeenCalledWith("pro-1");
       expect(mockPayoutRepository.createPayout).toHaveBeenCalledWith({
         proProfileId: "pro-1",
         provider: "BANK_TRANSFER",
@@ -298,7 +320,9 @@ describe("PayoutService", () => {
 
       mockProRepository.findById.mockResolvedValue(proProfile);
       mockEarningRepository.listPayableByPro.mockResolvedValue(earnings);
-      mockProPayoutProfileRepository.findByProProfileId.mockResolvedValue(payoutProfile);
+      mockProPayoutProfileRepository.findByProProfileId.mockResolvedValue(
+        payoutProfile
+      );
 
       await expect(
         service.createPayoutForPro(adminActor, {
@@ -316,7 +340,9 @@ describe("PayoutService", () => {
 
       mockProRepository.findById.mockResolvedValue(proProfile);
       mockEarningRepository.listPayableByPro.mockResolvedValue(earnings);
-      mockProPayoutProfileRepository.findByProProfileId.mockResolvedValue(payoutProfile);
+      mockProPayoutProfileRepository.findByProProfileId.mockResolvedValue(
+        payoutProfile
+      );
 
       await expect(
         service.createPayoutForPro(adminActor, {
@@ -354,7 +380,9 @@ describe("PayoutService", () => {
       });
 
       mockPayoutRepository.findById.mockResolvedValue(payout);
-      mockProPayoutProfileRepository.findByProProfileId.mockResolvedValue(payoutProfile);
+      mockProPayoutProfileRepository.findByProProfileId.mockResolvedValue(
+        payoutProfile
+      );
       vi.mocked(mockProviderClient.createPayout).mockResolvedValue({
         provider: "BANK_TRANSFER",
         providerReference: "provider-ref-123",
@@ -366,12 +394,16 @@ describe("PayoutService", () => {
         createMockEarning({ id: "earning-2", status: "PAID" }),
       ]);
 
-      const result = await service.sendPayout(adminActor, { payoutId: "payout-1" });
+      const result = await service.sendPayout(adminActor, {
+        payoutId: "payout-1",
+      });
 
       expect(result.payoutId).toBe("payout-1");
       expect(result.providerReference).toBe("provider-ref-123");
       expect(mockPayoutRepository.findById).toHaveBeenCalledWith("payout-1");
-      expect(mockProPayoutProfileRepository.findByProProfileId).toHaveBeenCalledWith("pro-1");
+      expect(
+        mockProPayoutProfileRepository.findByProProfileId
+      ).toHaveBeenCalledWith("pro-1");
       expect(mockProviderClient.createPayout).toHaveBeenCalledWith({
         money: {
           amount: 18000,
@@ -452,9 +484,17 @@ describe("PayoutService", () => {
         createMockEarning({ id: "earning-1", netAmount: 10000 }),
         createMockEarning({ id: "earning-2", netAmount: 8000 }),
       ];
-      const earnings2 = [createMockEarning({ id: "earning-3", netAmount: 5000 })];
-      const payoutProfile1 = createMockPayoutProfile({ proProfileId: "pro-1", isComplete: true });
-      const payoutProfile2 = createMockPayoutProfile({ proProfileId: "pro-2", isComplete: false });
+      const earnings2 = [
+        createMockEarning({ id: "earning-3", netAmount: 5000 }),
+      ];
+      const payoutProfile1 = createMockPayoutProfile({
+        proProfileId: "pro-1",
+        isComplete: true,
+      });
+      const payoutProfile2 = createMockPayoutProfile({
+        proProfileId: "pro-2",
+        isComplete: false,
+      });
 
       mockProRepository.findAll.mockResolvedValue(pros);
       mockEarningRepository.listPayableByPro
@@ -548,8 +588,16 @@ describe("PayoutService", () => {
         createMockPayoutItem({ earningId: "earning-2" }),
       ];
       const earnings = [
-        createMockEarning({ id: "earning-1", bookingId: "booking-1", netAmount: 10000 }),
-        createMockEarning({ id: "earning-2", bookingId: "booking-2", netAmount: 8000 }),
+        createMockEarning({
+          id: "earning-1",
+          bookingId: "booking-1",
+          netAmount: 10000,
+        }),
+        createMockEarning({
+          id: "earning-2",
+          bookingId: "booking-2",
+          netAmount: 8000,
+        }),
       ];
 
       mockPayoutRepository.findById.mockResolvedValue(payout);
@@ -566,13 +614,17 @@ describe("PayoutService", () => {
       expect(result.earnings[0].bookingId).toBe("booking-1");
       expect(result.earnings[0].netAmount).toBe(10000);
       expect(mockPayoutRepository.findById).toHaveBeenCalledWith("payout-1");
-      expect(mockPayoutItemRepository.findByPayoutId).toHaveBeenCalledWith("payout-1");
+      expect(mockPayoutItemRepository.findByPayoutId).toHaveBeenCalledWith(
+        "payout-1"
+      );
     });
 
     it("should throw error if actor is not admin", async () => {
       const actor = createMockActor(Role.PRO);
 
-      await expect(service.getPayout(actor, "payout-1")).rejects.toThrow(PayoutError);
+      await expect(service.getPayout(actor, "payout-1")).rejects.toThrow(
+        PayoutError
+      );
     });
 
     it("should throw error if payout not found", async () => {

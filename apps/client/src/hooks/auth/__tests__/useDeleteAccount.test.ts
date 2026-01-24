@@ -102,20 +102,22 @@ describe("useDeleteAccount", () => {
     it("should sign out and redirect to home on success", async () => {
       let onSuccessCallback: (() => void) | undefined;
 
-      mockTrpcAuthDeleteAccount.mockImplementation((options?: { onSuccess?: () => void }) => {
-        onSuccessCallback = options?.onSuccess;
-        return {
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Test mock, input not needed
-          mutate: (_input: unknown) => {
-            // Call onSuccess synchronously after mutate is called
-            setTimeout(() => {
-              onSuccessCallback?.();
-            }, 0);
-          },
-          isPending: false,
-          error: null,
-        };
-      });
+      mockTrpcAuthDeleteAccount.mockImplementation(
+        (options?: { onSuccess?: () => void }) => {
+          onSuccessCallback = options?.onSuccess;
+          return {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Test mock, input not needed
+            mutate: (_input: unknown) => {
+              // Call onSuccess synchronously after mutate is called
+              setTimeout(() => {
+                onSuccessCallback?.();
+              }, 0);
+            },
+            isPending: false,
+            error: null,
+          };
+        }
+      );
 
       const { result } = renderHook(() => useDeleteAccount());
 

@@ -168,7 +168,7 @@ export class ProRepositoryImpl implements ProRepository {
       categories?: Category[];
       serviceArea?: string | null;
     } = {};
-    
+
     if (data.displayName !== undefined) {
       updateData.displayName = data.displayName;
     }
@@ -190,7 +190,7 @@ export class ProRepositoryImpl implements ProRepository {
     if (data.serviceArea !== undefined) {
       updateData.serviceArea = data.serviceArea ?? null;
     }
-    
+
     const proProfile = await prisma.proProfile.update({
       where: { id },
       data: updateData,

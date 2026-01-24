@@ -30,7 +30,11 @@ export function RequestPasswordResetScreen() {
       <ScrollView contentContainerStyle={styles.container}>
         <Card style={styles.card}>
           <View style={styles.titleRow}>
-            <Feather name="check-circle" size={24} color={theme.colors.success} />
+            <Feather
+              name="check-circle"
+              size={24}
+              color={theme.colors.success}
+            />
             <Text variant="h1" style={styles.title}>
               Email enviado
             </Text>
@@ -96,9 +100,14 @@ export function RequestPasswordResetScreen() {
         />
         {error && (
           <View style={styles.errorContainer}>
-            <Feather name="alert-circle" size={16} color={theme.colors.danger} />
+            <Feather
+              name="alert-circle"
+              size={16}
+              color={theme.colors.danger}
+            />
             <Text variant="small" style={styles.error}>
-              {error.message || "Error al enviar el email. Por favor, intentá nuevamente."}
+              {error.message ||
+                "Error al enviar el email. Por favor, intentá nuevamente."}
             </Text>
           </View>
         )}

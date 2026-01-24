@@ -46,9 +46,7 @@ export function PayoutSummary({
           <Text variant="small" className="text-gray-600">
             Monto
           </Text>
-          <Text variant="body">
-            {formatCurrency(amount, currency, true)}
-          </Text>
+          <Text variant="body">{formatCurrency(amount, currency, true)}</Text>
         </div>
         <div>
           <Text variant="small" className="text-gray-600">

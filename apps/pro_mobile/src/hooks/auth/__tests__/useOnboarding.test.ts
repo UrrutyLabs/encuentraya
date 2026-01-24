@@ -137,7 +137,9 @@ describe("useOnboarding", () => {
 
   it("should set error message on mutation error", async () => {
     const errorMessage = "Failed to create profile";
-    const mockMutateAsync = jest.fn().mockRejectedValue(new Error(errorMessage));
+    const mockMutateAsync = jest
+      .fn()
+      .mockRejectedValue(new Error(errorMessage));
     let onErrorCallback: (err: Error) => void;
 
     mockUseMutation.mockImplementation((options) => {

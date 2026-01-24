@@ -1,10 +1,4 @@
-import {
-  Filter,
-  Calendar,
-  Clock,
-  MapPin,
-  Hourglass,
-} from "lucide-react";
+import { Filter, Calendar, Clock, MapPin, Hourglass } from "lucide-react";
 import { Button } from "@repo/ui";
 import { Input } from "@repo/ui";
 import { Text } from "@repo/ui";
@@ -176,7 +170,12 @@ export function BookingForm({
         </Text>
       )}
 
-      <Button type="submit" variant="primary" className="w-full" disabled={loading}>
+      <Button
+        type="submit"
+        variant="primary"
+        className="w-full"
+        disabled={loading}
+      >
         {loading ? "Creando reserva..." : "Confirmar reserva"}
       </Button>
     </form>

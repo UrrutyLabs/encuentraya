@@ -29,9 +29,12 @@ export function registerBookingModule(container: DependencyContainer): void {
     useClass: BookingLifecycleService,
   });
 
-  container.register<BookingCompletionService>(TOKENS.BookingCompletionService, {
-    useClass: BookingCompletionService,
-  });
+  container.register<BookingCompletionService>(
+    TOKENS.BookingCompletionService,
+    {
+      useClass: BookingCompletionService,
+    }
+  );
 
   container.register<BookingQueryService>(TOKENS.BookingQueryService, {
     useClass: BookingQueryService,

@@ -99,7 +99,10 @@ export function ProProfileScreen() {
                 El profesional que buscas no existe o fue eliminado.
               </Text>
               <Link href="/search">
-                <Button variant="primary" className="flex items-center gap-2 mx-auto">
+                <Button
+                  variant="primary"
+                  className="flex items-center gap-2 mx-auto"
+                >
                   <ArrowLeft className="w-4 h-4" />
                   Volver a búsqueda
                 </Button>
@@ -127,15 +130,9 @@ export function ProProfileScreen() {
                   </Text>
                   <div className="flex gap-1 flex-wrap">
                     {pro.isSuspended && (
-                      <Badge variant="danger">
-                        Suspendido
-                      </Badge>
+                      <Badge variant="danger">Suspendido</Badge>
                     )}
-                    {isActive && (
-                      <Badge variant="info">
-                        Verificado
-                      </Badge>
-                    )}
+                    {isActive && <Badge variant="info">Verificado</Badge>}
                   </div>
                 </div>
 
@@ -148,7 +145,9 @@ export function ProProfileScreen() {
                       <Calendar className="w-4 h-4 text-primary" />
                     )}
                     <Text variant="body" className="text-muted">
-                      {availabilityHint === "today" ? "Disponible hoy" : "Disponible mañana"}
+                      {availabilityHint === "today"
+                        ? "Disponible hoy"
+                        : "Disponible mañana"}
                     </Text>
                   </div>
                 )}
@@ -179,7 +178,8 @@ export function ProProfileScreen() {
                   <div className="flex items-center justify-end gap-1">
                     <Star className="w-4 h-4 text-warning fill-warning" />
                     <Text variant="body" className="text-muted">
-                      {pro.rating.toFixed(1)} ({pro.reviewCount} {pro.reviewCount === 1 ? "reseña" : "reseñas"})
+                      {pro.rating.toFixed(1)} ({pro.reviewCount}{" "}
+                      {pro.reviewCount === 1 ? "reseña" : "reseñas"})
                     </Text>
                   </div>
                 ) : (
@@ -220,7 +220,9 @@ export function ProProfileScreen() {
                   <Text variant="body" className="text-muted">
                     Profesional en {pro.serviceArea} con experiencia en{" "}
                     {pro.categories
-                      .map((cat: Category | string) => CATEGORY_LABELS[cat] || cat)
+                      .map(
+                        (cat: Category | string) => CATEGORY_LABELS[cat] || cat
+                      )
                       .join(", ")}
                     .
                   </Text>
@@ -228,7 +230,9 @@ export function ProProfileScreen() {
                   <Text variant="body" className="text-muted">
                     Profesional con experiencia en{" "}
                     {pro.categories
-                      .map((cat: Category | string) => CATEGORY_LABELS[cat] || cat)
+                      .map(
+                        (cat: Category | string) => CATEGORY_LABELS[cat] || cat
+                      )
                       .join(", ")}
                     .
                   </Text>
@@ -248,7 +252,8 @@ export function ProProfileScreen() {
             {pro.reviewCount > 0 ? (
               <div className="flex items-center gap-2">
                 <Text variant="body" className="text-muted">
-                  {pro.reviewCount} {pro.reviewCount === 1 ? "reseña" : "reseñas"}
+                  {pro.reviewCount}{" "}
+                  {pro.reviewCount === 1 ? "reseña" : "reseñas"}
                 </Text>
                 {pro.rating && (
                   <>

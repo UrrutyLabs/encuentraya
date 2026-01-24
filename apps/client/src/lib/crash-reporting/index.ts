@@ -38,10 +38,14 @@ export function initCrashReporting() {
     });
 
     isInitialized = true;
-    const environment = process.env.NODE_ENV === "production" ? "production" : "development";
+    const environment =
+      process.env.NODE_ENV === "production" ? "production" : "development";
     logger.info("Crash reporting initialized", { environment });
   } catch (error) {
-    logger.error("Failed to initialize crash reporting", error instanceof Error ? error : new Error(String(error)));
+    logger.error(
+      "Failed to initialize crash reporting",
+      error instanceof Error ? error : new Error(String(error))
+    );
   }
 }
 
@@ -50,7 +54,10 @@ export function initCrashReporting() {
  */
 export function setUserContext(userId: string, email?: string) {
   setUserContextShared(adapter, userId, email);
-  logger.debug("User context set for crash reporting", { userId, hasEmail: !!email });
+  logger.debug("User context set for crash reporting", {
+    userId,
+    hasEmail: !!email,
+  });
 }
 
 /**
@@ -64,7 +71,10 @@ export function clearUserContext() {
 /**
  * Capture a manual error/exception
  */
-export function captureException(error: Error, context?: Record<string, unknown>) {
+export function captureException(
+  error: Error,
+  context?: Record<string, unknown>
+) {
   captureExceptionShared(adapter, error, context);
   logger.error("Exception captured", error, context);
 }
@@ -72,7 +82,10 @@ export function captureException(error: Error, context?: Record<string, unknown>
 /**
  * Capture a message (non-error)
  */
-export function captureMessage(message: string, level: "info" | "warning" | "error" = "info") {
+export function captureMessage(
+  message: string,
+  level: "info" | "warning" | "error" = "info"
+) {
   captureMessageShared(adapter, message, level);
   logger.info(`Message captured: ${message}`, { level });
 }
@@ -80,7 +93,11 @@ export function captureMessage(message: string, level: "info" | "warning" | "err
 /**
  * Add breadcrumb for debugging
  */
-export function addBreadcrumb(message: string, category: string, data?: Record<string, unknown>) {
+export function addBreadcrumb(
+  message: string,
+  category: string,
+  data?: Record<string, unknown>
+) {
   addBreadcrumbShared(adapter, message, category, data);
 }
 

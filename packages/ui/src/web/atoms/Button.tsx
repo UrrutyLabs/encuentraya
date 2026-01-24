@@ -20,7 +20,8 @@ export function Button({
       "bg-secondary text-white hover:opacity-90 focus:ring-secondary disabled:hover:opacity-50",
     ghost:
       "bg-transparent text-primary border border-border hover:bg-surface focus:ring-primary disabled:hover:bg-transparent",
-    danger: "bg-danger text-white hover:opacity-90 focus:ring-danger disabled:hover:opacity-50",
+    danger:
+      "bg-danger text-white hover:opacity-90 focus:ring-danger disabled:hover:opacity-50",
   };
 
   return (

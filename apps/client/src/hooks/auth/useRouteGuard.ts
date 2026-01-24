@@ -1,16 +1,19 @@
 /**
  * Hook for route guards (page-level authentication)
  * Use this in page components or layout components to protect routes
- * 
+ *
  * This hook handles authentication and role-based access control for routes.
  * It redirects users who are not authenticated or don't have the required role.
- * 
+ *
  * Network errors are handled by NetworkErrorHandler, not this hook.
  */
 
 import { useEffect, useRef } from "react";
 import { useAuthState } from "./useAuthState";
-import { getRedirectDestination, buildRedirectUrl } from "@/lib/auth/auth-helpers";
+import {
+  getRedirectDestination,
+  buildRedirectUrl,
+} from "@/lib/auth/auth-helpers";
 import { isNetworkError } from "@/lib/auth/error-detection";
 import { performAuthRedirect } from "@/lib/auth/redirect-helpers";
 import type { Role } from "@repo/domain";
@@ -44,25 +47,25 @@ export interface UseRouteGuardReturn {
 
 /**
  * Hook to protect routes with authentication and optional role-based access
- * 
+ *
  * Automatically redirects if:
  * - User is not authenticated
  * - User doesn't have the required role (if specified)
- * 
+ *
  * Does NOT redirect on network errors (handled by NetworkErrorHandler)
- * 
+ *
  * @param options - Guard configuration options
  * @returns Auth state and loading state
- * 
+ *
  * @example
  * ```tsx
  * // Protect route, require CLIENT role
  * function MyBookingsPage() {
  *   const { isAuthenticated, isLoading } = useRouteGuard({ requiredRole: Role.CLIENT });
- *   
+ *
  *   if (isLoading) return <Loading />;
  *   if (!isAuthenticated) return null; // Redirect handled by hook
- *   
+ *
  *   return <MyBookingsContent />;
  * }
  * ```
@@ -70,7 +73,11 @@ export interface UseRouteGuardReturn {
 export function useRouteGuard(
   options: UseRouteGuardOptions = {}
 ): UseRouteGuardReturn {
-  const { requiredRole, redirectTo: defaultRedirect = "/login", returnUrl } = options;
+  const {
+    requiredRole,
+    redirectTo: defaultRedirect = "/login",
+    returnUrl,
+  } = options;
   const authState = useAuthState();
   const hasRedirectedRef = useRef(false);
 
@@ -89,7 +96,10 @@ export function useRouteGuard(
     // This prevents redirect loops when the API is down (502, 503, etc.)
     // Network errors are handled by NetworkErrorHandler
     if (authState.roleError && isNetworkError(authState.roleError)) {
-      console.warn("[useRouteGuard] Network error fetching role, not redirecting", authState.roleError);
+      console.warn(
+        "[useRouteGuard] Network error fetching role, not redirecting",
+        authState.roleError
+      );
       return;
     }
 

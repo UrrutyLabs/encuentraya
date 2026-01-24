@@ -86,4 +86,7 @@ export {
 export { formatCurrency } from "./utils/format";
 
 // Booking status utilities
-export { getBookingStatusLabel, getBookingStatusVariant } from "./utils/booking-status";
+export {
+  getBookingStatusLabel,
+  getBookingStatusVariant,
+} from "./utils/booking-status";

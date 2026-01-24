@@ -6,7 +6,11 @@ interface CardProps extends ViewProps {
 }
 
 export function Card({ children, style, ...props }: CardProps) {
-  return <View style={[styles.card, style]} {...props}>{children}</View>;
+  return (
+    <View style={[styles.card, style]} {...props}>
+      {children}
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({

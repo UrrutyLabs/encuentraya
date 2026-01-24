@@ -1,14 +1,17 @@
 /**
  * Hook for action guards (callback protection)
  * Use this to protect callbacks, button clicks, etc. that require authentication
- * 
+ *
  * Returns a wrapper function that checks authentication before executing the callback.
  * If not authenticated or wrong role, redirects instead of executing.
  */
 
 import { useCallback } from "react";
 import { useAuthState } from "./useAuthState";
-import { getRedirectDestination, buildRedirectUrl } from "@/lib/auth/auth-helpers";
+import {
+  getRedirectDestination,
+  buildRedirectUrl,
+} from "@/lib/auth/auth-helpers";
 import { performAuthRedirect } from "@/lib/auth/redirect-helpers";
 import type { Role } from "@repo/domain";
 
@@ -30,35 +33,41 @@ export interface UseActionGuardOptions {
 
 /**
  * Hook to protect actions (callbacks) with authentication and optional role-based access
- * 
+ *
  * Returns a wrapper function that:
  * - Checks authentication before executing
  * - Checks role if requiredRole is specified
  * - Redirects if not authenticated or wrong role
  * - Executes callback if authenticated and has correct role
- * 
+ *
  * @param options - Guard configuration options
  * @returns Wrapper function that protects callbacks
- * 
+ *
  * @example
  * ```tsx
  * // Protect a button click
  * function CreateBookingButton() {
  *   const requireAuth = useActionGuard({ requiredRole: Role.CLIENT });
- *   
+ *
  *   const handleClick = requireAuth(() => {
  *     // This only executes if user is authenticated and has CLIENT role
  *     createBooking();
  *   });
- *   
+ *
  *   return <Button onClick={handleClick}>Crear reserva</Button>;
  * }
  * ```
  */
 export function useActionGuard(
   options: UseActionGuardOptions = {}
-): <T extends unknown[]>(callback: (...args: T) => void) => (...args: T) => void {
-  const { requiredRole, redirectTo: defaultRedirect = "/login", returnUrl } = options;
+): <T extends unknown[]>(
+  callback: (...args: T) => void
+) => (...args: T) => void {
+  const {
+    requiredRole,
+    redirectTo: defaultRedirect = "/login",
+    returnUrl,
+  } = options;
   const authState = useAuthState();
 
   return useCallback(

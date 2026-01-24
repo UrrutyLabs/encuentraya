@@ -31,7 +31,9 @@ describe("BookingLifecycleService", () => {
   let service: BookingLifecycleService;
   let mockBookingRepository: ReturnType<typeof createMockBookingRepository>;
   let mockProRepository: ReturnType<typeof createMockProRepository>;
-  let mockClientProfileService: ReturnType<typeof createMockClientProfileService>;
+  let mockClientProfileService: ReturnType<
+    typeof createMockClientProfileService
+  >;
   let mockNotificationService: ReturnType<typeof createMockNotificationService>;
 
   function createMockBookingRepository(): {
@@ -74,7 +76,9 @@ describe("BookingLifecycleService", () => {
     return { id, role };
   }
 
-  function createMockProProfile(overrides?: Partial<ProProfileEntity>): ProProfileEntity {
+  function createMockProProfile(
+    overrides?: Partial<ProProfileEntity>
+  ): ProProfileEntity {
     return {
       id: "pro-1",
       userId: "user-1",
@@ -92,7 +96,9 @@ describe("BookingLifecycleService", () => {
     };
   }
 
-  function createMockBooking(overrides?: Partial<BookingEntity>): BookingEntity {
+  function createMockBooking(
+    overrides?: Partial<BookingEntity>
+  ): BookingEntity {
     return {
       id: "booking-1",
       displayId: "A0002",
@@ -110,17 +116,19 @@ describe("BookingLifecycleService", () => {
     };
   }
 
-  function createMockClientProfile(overrides?: Partial<{
-    id: string;
-    userId: string;
-    firstName: string | null;
-    lastName: string | null;
-    email: string | null;
-    phone: string | null;
-    preferredContactMethod: "EMAIL" | "WHATSAPP" | "PHONE" | null;
-    createdAt: Date;
-    updatedAt: Date;
-  }>): {
+  function createMockClientProfile(
+    overrides?: Partial<{
+      id: string;
+      userId: string;
+      firstName: string | null;
+      lastName: string | null;
+      email: string | null;
+      phone: string | null;
+      preferredContactMethod: "EMAIL" | "WHATSAPP" | "PHONE" | null;
+      createdAt: Date;
+      updatedAt: Date;
+    }>
+  ): {
     id: string;
     userId: string;
     firstName: string | null;
@@ -152,10 +160,16 @@ describe("BookingLifecycleService", () => {
     mockNotificationService = createMockNotificationService();
 
     // Mock helper functions
-    vi.spyOn(bookingHelpers, "sendClientNotification").mockResolvedValue(undefined);
-    vi.spyOn(bookingHelpers, "validateStateTransition").mockImplementation(() => {});
+    vi.spyOn(bookingHelpers, "sendClientNotification").mockResolvedValue(
+      undefined
+    );
+    vi.spyOn(bookingHelpers, "validateStateTransition").mockImplementation(
+      () => {}
+    );
     vi.spyOn(bookingHelpers, "authorizeProAction").mockResolvedValue(undefined);
-    vi.spyOn(bookingHelpers, "authorizeClientAction").mockImplementation(() => {});
+    vi.spyOn(bookingHelpers, "authorizeClientAction").mockImplementation(
+      () => {}
+    );
 
     service = new BookingLifecycleService(
       mockBookingRepository as unknown as BookingRepository,
@@ -180,13 +194,18 @@ describe("BookingLifecycleService", () => {
         status: BookingStatus.ACCEPTED,
         proProfileId: "pro-1",
       });
-      const proProfile = createMockProProfile({ id: "pro-1", userId: "user-1" });
+      const proProfile = createMockProProfile({
+        id: "pro-1",
+        userId: "user-1",
+      });
       const clientProfile = createMockClientProfile();
 
       mockBookingRepository.findById.mockResolvedValue(booking);
       mockBookingRepository.updateStatus.mockResolvedValue(updatedBooking);
       mockProRepository.findById.mockResolvedValue(proProfile);
-      mockClientProfileService.getProfileByUserId.mockResolvedValue(clientProfile);
+      mockClientProfileService.getProfileByUserId.mockResolvedValue(
+        clientProfile
+      );
 
       const result = await service.acceptBooking(actor, "booking-1");
 
@@ -222,7 +241,9 @@ describe("BookingLifecycleService", () => {
       mockBookingRepository.findById.mockResolvedValue(booking);
       mockBookingRepository.updateStatus.mockResolvedValue(updatedBooking);
       mockProRepository.findById.mockResolvedValue(proProfile);
-      mockClientProfileService.getProfileByUserId.mockResolvedValue(clientProfile);
+      mockClientProfileService.getProfileByUserId.mockResolvedValue(
+        clientProfile
+      );
 
       const result = await service.acceptBooking(actor, "booking-1");
 
@@ -247,9 +268,14 @@ describe("BookingLifecycleService", () => {
       });
 
       mockBookingRepository.findById.mockResolvedValue(booking);
-      vi.mocked(bookingHelpers.validateStateTransition).mockImplementation(() => {
-        throw new InvalidBookingStateError(BookingStatus.COMPLETED, BookingStatus.ACCEPTED);
-      });
+      vi.mocked(bookingHelpers.validateStateTransition).mockImplementation(
+        () => {
+          throw new InvalidBookingStateError(
+            BookingStatus.COMPLETED,
+            BookingStatus.ACCEPTED
+          );
+        }
+      );
 
       await expect(service.acceptBooking(actor, "booking-1")).rejects.toThrow(
         InvalidBookingStateError
@@ -304,13 +330,18 @@ describe("BookingLifecycleService", () => {
         status: BookingStatus.REJECTED,
         proProfileId: "pro-1",
       });
-      const proProfile = createMockProProfile({ id: "pro-1", userId: "user-1" });
+      const proProfile = createMockProProfile({
+        id: "pro-1",
+        userId: "user-1",
+      });
       const clientProfile = createMockClientProfile();
 
       mockBookingRepository.findById.mockResolvedValue(booking);
       mockBookingRepository.updateStatus.mockResolvedValue(updatedBooking);
       mockProRepository.findById.mockResolvedValue(proProfile);
-      mockClientProfileService.getProfileByUserId.mockResolvedValue(clientProfile);
+      mockClientProfileService.getProfileByUserId.mockResolvedValue(
+        clientProfile
+      );
 
       const result = await service.rejectBooking(actor, "booking-1");
 
@@ -344,7 +375,9 @@ describe("BookingLifecycleService", () => {
       mockBookingRepository.findById.mockResolvedValue(booking);
       mockBookingRepository.updateStatus.mockResolvedValue(updatedBooking);
       mockProRepository.findById.mockResolvedValue(proProfile);
-      mockClientProfileService.getProfileByUserId.mockResolvedValue(clientProfile);
+      mockClientProfileService.getProfileByUserId.mockResolvedValue(
+        clientProfile
+      );
 
       const result = await service.rejectBooking(actor, "booking-1");
 
@@ -368,9 +401,14 @@ describe("BookingLifecycleService", () => {
       });
 
       mockBookingRepository.findById.mockResolvedValue(booking);
-      vi.mocked(bookingHelpers.validateStateTransition).mockImplementation(() => {
-        throw new InvalidBookingStateError(BookingStatus.COMPLETED, BookingStatus.REJECTED);
-      });
+      vi.mocked(bookingHelpers.validateStateTransition).mockImplementation(
+        () => {
+          throw new InvalidBookingStateError(
+            BookingStatus.COMPLETED,
+            BookingStatus.REJECTED
+          );
+        }
+      );
 
       await expect(service.rejectBooking(actor, "booking-1")).rejects.toThrow(
         InvalidBookingStateError
@@ -407,13 +445,18 @@ describe("BookingLifecycleService", () => {
         status: BookingStatus.ON_MY_WAY,
         proProfileId: "pro-1",
       });
-      const proProfile = createMockProProfile({ id: "pro-1", userId: "user-1" });
+      const proProfile = createMockProProfile({
+        id: "pro-1",
+        userId: "user-1",
+      });
       const clientProfile = createMockClientProfile();
 
       mockBookingRepository.findById.mockResolvedValue(booking);
       mockBookingRepository.updateStatus.mockResolvedValue(updatedBooking);
       mockProRepository.findById.mockResolvedValue(proProfile);
-      mockClientProfileService.getProfileByUserId.mockResolvedValue(clientProfile);
+      mockClientProfileService.getProfileByUserId.mockResolvedValue(
+        clientProfile
+      );
 
       const result = await service.markOnMyWay(actor, "booking-1");
 
@@ -447,7 +490,9 @@ describe("BookingLifecycleService", () => {
       mockBookingRepository.findById.mockResolvedValue(booking);
       mockBookingRepository.updateStatus.mockResolvedValue(updatedBooking);
       mockProRepository.findById.mockResolvedValue(proProfile);
-      mockClientProfileService.getProfileByUserId.mockResolvedValue(clientProfile);
+      mockClientProfileService.getProfileByUserId.mockResolvedValue(
+        clientProfile
+      );
 
       const result = await service.markOnMyWay(actor, "booking-1");
 
@@ -471,9 +516,14 @@ describe("BookingLifecycleService", () => {
       });
 
       mockBookingRepository.findById.mockResolvedValue(booking);
-      vi.mocked(bookingHelpers.validateStateTransition).mockImplementation(() => {
-        throw new InvalidBookingStateError(BookingStatus.PENDING, BookingStatus.ON_MY_WAY);
-      });
+      vi.mocked(bookingHelpers.validateStateTransition).mockImplementation(
+        () => {
+          throw new InvalidBookingStateError(
+            BookingStatus.PENDING,
+            BookingStatus.ON_MY_WAY
+          );
+        }
+      );
 
       await expect(service.markOnMyWay(actor, "booking-1")).rejects.toThrow(
         InvalidBookingStateError
@@ -510,13 +560,18 @@ describe("BookingLifecycleService", () => {
         status: BookingStatus.ARRIVED,
         proProfileId: "pro-1",
       });
-      const proProfile = createMockProProfile({ id: "pro-1", userId: "user-1" });
+      const proProfile = createMockProProfile({
+        id: "pro-1",
+        userId: "user-1",
+      });
       const clientProfile = createMockClientProfile();
 
       mockBookingRepository.findById.mockResolvedValue(booking);
       mockBookingRepository.updateStatus.mockResolvedValue(updatedBooking);
       mockProRepository.findById.mockResolvedValue(proProfile);
-      mockClientProfileService.getProfileByUserId.mockResolvedValue(clientProfile);
+      mockClientProfileService.getProfileByUserId.mockResolvedValue(
+        clientProfile
+      );
 
       const result = await service.arriveBooking(actor, "booking-1");
 
@@ -550,7 +605,9 @@ describe("BookingLifecycleService", () => {
       mockBookingRepository.findById.mockResolvedValue(booking);
       mockBookingRepository.updateStatus.mockResolvedValue(updatedBooking);
       mockProRepository.findById.mockResolvedValue(proProfile);
-      mockClientProfileService.getProfileByUserId.mockResolvedValue(clientProfile);
+      mockClientProfileService.getProfileByUserId.mockResolvedValue(
+        clientProfile
+      );
 
       const result = await service.arriveBooking(actor, "booking-1");
 
@@ -574,9 +631,14 @@ describe("BookingLifecycleService", () => {
       });
 
       mockBookingRepository.findById.mockResolvedValue(booking);
-      vi.mocked(bookingHelpers.validateStateTransition).mockImplementation(() => {
-        throw new InvalidBookingStateError(BookingStatus.PENDING, BookingStatus.ARRIVED);
-      });
+      vi.mocked(bookingHelpers.validateStateTransition).mockImplementation(
+        () => {
+          throw new InvalidBookingStateError(
+            BookingStatus.PENDING,
+            BookingStatus.ARRIVED
+          );
+        }
+      );
 
       await expect(service.arriveBooking(actor, "booking-1")).rejects.toThrow(
         InvalidBookingStateError
@@ -696,9 +758,14 @@ describe("BookingLifecycleService", () => {
       });
 
       mockBookingRepository.findById.mockResolvedValue(booking);
-      vi.mocked(bookingHelpers.validateStateTransition).mockImplementation(() => {
-        throw new InvalidBookingStateError(BookingStatus.COMPLETED, BookingStatus.CANCELLED);
-      });
+      vi.mocked(bookingHelpers.validateStateTransition).mockImplementation(
+        () => {
+          throw new InvalidBookingStateError(
+            BookingStatus.COMPLETED,
+            BookingStatus.CANCELLED
+          );
+        }
+      );
 
       await expect(service.cancelBooking(actor, "booking-1")).rejects.toThrow(
         InvalidBookingStateError
@@ -715,7 +782,10 @@ describe("BookingLifecycleService", () => {
 
       mockBookingRepository.findById.mockResolvedValue(booking);
       vi.mocked(bookingHelpers.authorizeClientAction).mockImplementation(() => {
-        throw new UnauthorizedBookingActionError("cancel booking", "Not authorized");
+        throw new UnauthorizedBookingActionError(
+          "cancel booking",
+          "Not authorized"
+        );
       });
 
       await expect(service.cancelBooking(actor, "booking-1")).rejects.toThrow(

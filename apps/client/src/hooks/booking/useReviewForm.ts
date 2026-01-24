@@ -10,22 +10,24 @@ export function useReviewForm(bookingId: string | undefined) {
   const router = useRouter();
 
   // Fetch booking to verify it exists
-  const { data: booking, isLoading: isLoadingBooking } = trpc.booking.getById.useQuery(
-    { id: bookingId! },
-    {
-      enabled: !!bookingId,
-      retry: false,
-    }
-  );
+  const { data: booking, isLoading: isLoadingBooking } =
+    trpc.booking.getById.useQuery(
+      { id: bookingId! },
+      {
+        enabled: !!bookingId,
+        retry: false,
+      }
+    );
 
   // Fetch existing review for this booking
-  const { data: existingReview, isLoading: isLoadingReview } = trpc.review.byBooking.useQuery(
-    { bookingId: bookingId! },
-    {
-      enabled: !!bookingId,
-      retry: false,
-    }
-  );
+  const { data: existingReview, isLoading: isLoadingReview } =
+    trpc.review.byBooking.useQuery(
+      { bookingId: bookingId! },
+      {
+        enabled: !!bookingId,
+        retry: false,
+      }
+    );
 
   const createReview = trpc.review.create.useMutation({
     onSuccess: () => {

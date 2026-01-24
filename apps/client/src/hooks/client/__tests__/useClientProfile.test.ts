@@ -25,12 +25,9 @@ describe("useClientProfile", () => {
 
       const { result } = renderHook(() => useClientProfile());
 
-      expect(mockTrpcClientProfileGet).toHaveBeenCalledWith(
-        undefined,
-        {
-          retry: false,
-        }
-      );
+      expect(mockTrpcClientProfileGet).toHaveBeenCalledWith(undefined, {
+        retry: false,
+      });
 
       expect(result.current.profile).toEqual(mockProfile);
       expect(result.current.isLoading).toBe(false);

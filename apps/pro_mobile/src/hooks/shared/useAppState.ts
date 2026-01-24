@@ -10,9 +10,12 @@ export function useAppState(): boolean {
 
   useEffect(() => {
     // Check initial state
-    const subscription = AppState.addEventListener("change", (nextAppState: AppStateStatus) => {
-      setIsForeground(nextAppState === "active");
-    });
+    const subscription = AppState.addEventListener(
+      "change",
+      (nextAppState: AppStateStatus) => {
+        setIsForeground(nextAppState === "active");
+      }
+    );
 
     // Set initial state
     setIsForeground(AppState.currentState === "active");

@@ -82,7 +82,7 @@ export class BookingRepositoryImpl implements BookingRepository {
         hoursEstimate: input.hoursEstimate,
         addressText: input.addressText,
         isFirstBooking: input.isFirstBooking ?? false,
-        status: BookingStatus.PENDING_PAYMENT  as $Enums.BookingStatus,
+        status: BookingStatus.PENDING_PAYMENT as $Enums.BookingStatus,
       },
     });
 
@@ -187,7 +187,9 @@ export class BookingRepositoryImpl implements BookingRepository {
     return this.mapPrismaToDomain(booking);
   }
 
-  async findActiveByClientUserId(clientUserId: string): Promise<BookingEntity[]> {
+  async findActiveByClientUserId(
+    clientUserId: string
+  ): Promise<BookingEntity[]> {
     const activeStatuses: BookingStatus[] = [
       BookingStatus.PENDING,
       BookingStatus.ACCEPTED,

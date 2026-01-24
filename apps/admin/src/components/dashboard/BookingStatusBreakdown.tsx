@@ -3,7 +3,11 @@
 import { Card } from "@repo/ui";
 import { Text } from "@repo/ui";
 import { Badge } from "@repo/ui";
-import { BookingStatus, getBookingStatusLabel, getBookingStatusVariant } from "@repo/domain";
+import {
+  BookingStatus,
+  getBookingStatusLabel,
+  getBookingStatusVariant,
+} from "@repo/domain";
 import { useRouter } from "next/navigation";
 
 interface BookingStatusBreakdownProps {
@@ -19,7 +23,6 @@ interface BookingStatusBreakdownProps {
   };
   isLoading?: boolean;
 }
-
 
 export function BookingStatusBreakdown({
   breakdown,

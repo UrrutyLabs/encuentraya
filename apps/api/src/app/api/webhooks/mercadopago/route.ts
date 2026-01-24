@@ -11,15 +11,15 @@ import { getWebhookCorsHeaders } from "@/server/infrastructure/cors";
 /**
  * Mercado Pago webhook endpoint
  * Handles payment status updates from Mercado Pago
- * 
+ *
  * Idempotency: Events are stored in PaymentEvent table, allowing safe replay
- * 
+ *
  * Flow:
  * 1. Parse webhook payload using MercadoPagoClient.parseWebhook
  * 2. Pass event to PaymentService.handleProviderWebhook
  * 3. PaymentService updates Payment and Booking status safely
  * 4. Return 200 quickly (async processing)
- * 
+ *
  * Example curl (for testing with real MP payload):
  * ```bash
  * curl -X POST http://localhost:3002/api/webhooks/mercadopago \
@@ -61,13 +61,18 @@ export async function POST(req: NextRequest) {
     });
 
     // Get Mercado Pago provider client
-    const providerClient = await getPaymentProviderClient(PaymentProvider.MERCADO_PAGO);
+    const providerClient = await getPaymentProviderClient(
+      PaymentProvider.MERCADO_PAGO
+    );
 
     // Parse webhook payload
     const event = await providerClient.parseWebhook(webhookRequest);
 
     if (!event) {
-      logger.warn({ headers, bodyLength: rawBody.length }, "Invalid or unrecognized webhook payload");
+      logger.warn(
+        { headers, bodyLength: rawBody.length },
+        "Invalid or unrecognized webhook payload"
+      );
       return NextResponse.json(
         { error: "Invalid webhook payload" },
         { status: 400 }

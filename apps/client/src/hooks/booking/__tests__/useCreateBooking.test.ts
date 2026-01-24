@@ -29,20 +29,26 @@ describe("useCreateBooking", () => {
         status: BookingStatus.PENDING_PAYMENT,
       });
 
-      let onSuccessCallback: ((data: { id: string; status: BookingStatus }) => void) | undefined;
+      let onSuccessCallback:
+        | ((data: { id: string; status: BookingStatus }) => void)
+        | undefined;
 
-      mockTrpcBookingCreate.mockImplementation((options?: { onSuccess?: (data: { id: string; status: BookingStatus }) => void }) => {
-        onSuccessCallback = options?.onSuccess;
-        return {
-          mutateAsync: async (input: unknown) => {
-            const result = await mockMutateAsync(input);
-            onSuccessCallback?.(result);
-            return result;
-          },
-          isPending: false,
-          error: null,
-        };
-      });
+      mockTrpcBookingCreate.mockImplementation(
+        (options?: {
+          onSuccess?: (data: { id: string; status: BookingStatus }) => void;
+        }) => {
+          onSuccessCallback = options?.onSuccess;
+          return {
+            mutateAsync: async (input: unknown) => {
+              const result = await mockMutateAsync(input);
+              onSuccessCallback?.(result);
+              return result;
+            },
+            isPending: false,
+            error: null,
+          };
+        }
+      );
 
       const { result } = renderHook(() => useCreateBooking());
 
@@ -66,7 +72,9 @@ describe("useCreateBooking", () => {
 
       await waitFor(
         () => {
-          expect(mockRouter.push).toHaveBeenCalledWith("/checkout?bookingId=booking-1");
+          expect(mockRouter.push).toHaveBeenCalledWith(
+            "/checkout?bookingId=booking-1"
+          );
         },
         { timeout: 2000 }
       );
@@ -78,20 +86,26 @@ describe("useCreateBooking", () => {
         status: BookingStatus.PENDING,
       });
 
-      let onSuccessCallback: ((data: { id: string; status: BookingStatus }) => void) | undefined;
+      let onSuccessCallback:
+        | ((data: { id: string; status: BookingStatus }) => void)
+        | undefined;
 
-      mockTrpcBookingCreate.mockImplementation((options?: { onSuccess?: (data: { id: string; status: BookingStatus }) => void }) => {
-        onSuccessCallback = options?.onSuccess;
-        return {
-          mutateAsync: async (input: unknown) => {
-            const result = await mockMutateAsync(input);
-            onSuccessCallback?.(result);
-            return result;
-          },
-          isPending: false,
-          error: null,
-        };
-      });
+      mockTrpcBookingCreate.mockImplementation(
+        (options?: {
+          onSuccess?: (data: { id: string; status: BookingStatus }) => void;
+        }) => {
+          onSuccessCallback = options?.onSuccess;
+          return {
+            mutateAsync: async (input: unknown) => {
+              const result = await mockMutateAsync(input);
+              onSuccessCallback?.(result);
+              return result;
+            },
+            isPending: false,
+            error: null,
+          };
+        }
+      );
 
       const { result } = renderHook(() => useCreateBooking());
 
@@ -107,7 +121,9 @@ describe("useCreateBooking", () => {
 
       await waitFor(
         () => {
-          expect(mockRouter.push).toHaveBeenCalledWith("/my-bookings/booking-1");
+          expect(mockRouter.push).toHaveBeenCalledWith(
+            "/my-bookings/booking-1"
+          );
         },
         { timeout: 2000 }
       );

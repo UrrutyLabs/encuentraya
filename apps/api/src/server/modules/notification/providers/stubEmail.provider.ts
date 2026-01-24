@@ -1,4 +1,8 @@
-import type { NotificationProvider, NotificationMessage, NotificationSendResult } from "../provider";
+import type {
+  NotificationProvider,
+  NotificationMessage,
+  NotificationSendResult,
+} from "../provider";
 
 /**
  * Stub email provider for development/testing

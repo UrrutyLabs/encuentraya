@@ -1,5 +1,11 @@
 import { useState } from "react";
-import { StyleSheet, ScrollView, Alert, TouchableOpacity, View } from "react-native";
+import {
+  StyleSheet,
+  ScrollView,
+  Alert,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { useRouter } from "expo-router";
 import { Feather } from "@expo/vector-icons";
 import { Card } from "@components/ui/Card";
@@ -14,34 +20,30 @@ export function ProfileScreen() {
   const [isSigningOut, setIsSigningOut] = useState(false);
 
   const handleSignOut = async () => {
-    Alert.alert(
-      "Cerrar sesión",
-      "¿Estás seguro de que querés cerrar sesión?",
-      [
-        {
-          text: "Cancelar",
-          style: "cancel",
+    Alert.alert("Cerrar sesión", "¿Estás seguro de que querés cerrar sesión?", [
+      {
+        text: "Cancelar",
+        style: "cancel",
+      },
+      {
+        text: "Cerrar sesión",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            setIsSigningOut(true);
+            await signOut();
+            router.replace("/auth/login");
+          } catch {
+            Alert.alert(
+              "Error",
+              "No se pudo cerrar sesión. Por favor, intentá nuevamente."
+            );
+          } finally {
+            setIsSigningOut(false);
+          }
         },
-        {
-          text: "Cerrar sesión",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              setIsSigningOut(true);
-              await signOut();
-              router.replace("/auth/login");
-            } catch {
-              Alert.alert(
-                "Error",
-                "No se pudo cerrar sesión. Por favor, intentá nuevamente."
-              );
-            } finally {
-              setIsSigningOut(false);
-            }
-          },
-        },
-      ]
-    );
+      },
+    ]);
   };
 
   return (
@@ -85,8 +87,6 @@ export function ProfileScreen() {
           <Feather name="chevron-right" size={20} color={theme.colors.muted} />
         </TouchableOpacity>
       </Card>
-
-    
 
       <Card style={styles.card}>
         <TouchableOpacity

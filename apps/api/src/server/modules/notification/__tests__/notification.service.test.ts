@@ -1,6 +1,9 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { NotificationService } from "../notification.service";
-import type { NotificationDeliveryRepository, NotificationDeliveryEntity } from "../notificationDelivery.repo";
+import type {
+  NotificationDeliveryRepository,
+  NotificationDeliveryEntity,
+} from "../notificationDelivery.repo";
 import type { NotificationMessage, NotificationProvider } from "../provider";
 import { $Enums } from "@infra/db/prisma";
 import * as registryModule from "../registry";
@@ -54,7 +57,9 @@ describe("NotificationService", () => {
     };
   }
 
-  function createMockDelivery(overrides?: Partial<NotificationDeliveryEntity>): NotificationDeliveryEntity {
+  function createMockDelivery(
+    overrides?: Partial<NotificationDeliveryEntity>
+  ): NotificationDeliveryEntity {
     return {
       id: "delivery-1",
       channel: NotificationChannel.EMAIL as $Enums.NotificationChannel,
@@ -64,7 +69,8 @@ describe("NotificationService", () => {
       idempotencyKey: "key-1",
       provider: null,
       providerMessageId: null,
-      status: NotificationDeliveryStatus.QUEUED as $Enums.NotificationDeliveryStatus,
+      status:
+        NotificationDeliveryStatus.QUEUED as $Enums.NotificationDeliveryStatus,
       error: null,
       attemptCount: 0,
       lastAttemptAt: null,
@@ -75,7 +81,9 @@ describe("NotificationService", () => {
     };
   }
 
-  function createMockMessage(overrides?: Partial<NotificationMessage>): NotificationMessage {
+  function createMockMessage(
+    overrides?: Partial<NotificationMessage>
+  ): NotificationMessage {
     return {
       channel: "EMAIL",
       recipientRef: "user-1",
@@ -89,7 +97,9 @@ describe("NotificationService", () => {
   beforeEach(() => {
     mockRepository = createMockRepository();
     mockProvider = createMockProvider();
-    service = new NotificationService(mockRepository as unknown as NotificationDeliveryRepository);
+    service = new NotificationService(
+      mockRepository as unknown as NotificationDeliveryRepository
+    );
     vi.clearAllMocks();
   });
 
@@ -99,7 +109,8 @@ describe("NotificationService", () => {
       const message = createMockMessage();
       const existingDelivery = createMockDelivery({
         idempotencyKey: message.idempotencyKey,
-        status: NotificationDeliveryStatus.SENT as $Enums.NotificationDeliveryStatus,
+        status:
+          NotificationDeliveryStatus.SENT as $Enums.NotificationDeliveryStatus,
       });
       mockRepository.findByIdempotencyKey.mockResolvedValue(existingDelivery);
 
@@ -107,7 +118,9 @@ describe("NotificationService", () => {
       const result = await service.enqueue(message);
 
       // Assert
-      expect(mockRepository.findByIdempotencyKey).toHaveBeenCalledWith(message.idempotencyKey);
+      expect(mockRepository.findByIdempotencyKey).toHaveBeenCalledWith(
+        message.idempotencyKey
+      );
       expect(mockRepository.createQueued).not.toHaveBeenCalled();
       expect(result).toEqual({
         id: existingDelivery.id,
@@ -125,7 +138,8 @@ describe("NotificationService", () => {
       const message = createMockMessage();
       const newDelivery = createMockDelivery({
         idempotencyKey: message.idempotencyKey,
-        status: NotificationDeliveryStatus.QUEUED as $Enums.NotificationDeliveryStatus,
+        status:
+          NotificationDeliveryStatus.QUEUED as $Enums.NotificationDeliveryStatus,
       });
       mockRepository.findByIdempotencyKey.mockResolvedValue(null);
       mockRepository.createQueued.mockResolvedValue(newDelivery);
@@ -134,7 +148,9 @@ describe("NotificationService", () => {
       const result = await service.enqueue(message);
 
       // Assert
-      expect(mockRepository.findByIdempotencyKey).toHaveBeenCalledWith(message.idempotencyKey);
+      expect(mockRepository.findByIdempotencyKey).toHaveBeenCalledWith(
+        message.idempotencyKey
+      );
       expect(mockRepository.createQueued).toHaveBeenCalledWith({
         channel: message.channel as $Enums.NotificationChannel,
         recipientRef: message.recipientRef,
@@ -160,7 +176,8 @@ describe("NotificationService", () => {
       const message = createMockMessage();
       const sentDelivery = createMockDelivery({
         idempotencyKey: message.idempotencyKey,
-        status: NotificationDeliveryStatus.SENT as $Enums.NotificationDeliveryStatus,
+        status:
+          NotificationDeliveryStatus.SENT as $Enums.NotificationDeliveryStatus,
         provider: "sendgrid",
         providerMessageId: "msg-123",
       });
@@ -194,7 +211,8 @@ describe("NotificationService", () => {
       });
       const sentDelivery = createMockDelivery({
         ...updatedDelivery,
-        status: NotificationDeliveryStatus.SENT as $Enums.NotificationDeliveryStatus,
+        status:
+          NotificationDeliveryStatus.SENT as $Enums.NotificationDeliveryStatus,
         provider: "sendgrid",
         providerMessageId: "msg-123",
         sentAt: new Date(),
@@ -204,7 +222,9 @@ describe("NotificationService", () => {
       mockRepository.createQueued.mockResolvedValue(queuedDelivery);
       mockRepository.incrementAttempt.mockResolvedValue(updatedDelivery);
       mockRepository.markSent.mockResolvedValue(sentDelivery);
-      vi.mocked(registryModule.getNotificationProvider).mockReturnValue(mockProvider as NotificationProvider);
+      vi.mocked(registryModule.getNotificationProvider).mockReturnValue(
+        mockProvider as NotificationProvider
+      );
       mockProvider.send.mockResolvedValue({
         provider: "sendgrid",
         providerMessageId: "msg-123",
@@ -214,8 +234,13 @@ describe("NotificationService", () => {
       const result = await service.deliverNow(message);
 
       // Assert
-      expect(mockRepository.incrementAttempt).toHaveBeenCalledWith(queuedDelivery.id, expect.any(Date));
-      expect(vi.mocked(registryModule.getNotificationProvider)).toHaveBeenCalledWith(message.channel);
+      expect(mockRepository.incrementAttempt).toHaveBeenCalledWith(
+        queuedDelivery.id,
+        expect.any(Date)
+      );
+      expect(
+        vi.mocked(registryModule.getNotificationProvider)
+      ).toHaveBeenCalledWith(message.channel);
       expect(mockProvider.send).toHaveBeenCalledWith(message);
       expect(mockRepository.markSent).toHaveBeenCalledWith(queuedDelivery.id, {
         provider: "sendgrid",
@@ -244,7 +269,8 @@ describe("NotificationService", () => {
       });
       const failedDelivery = createMockDelivery({
         ...updatedDelivery,
-        status: NotificationDeliveryStatus.FAILED as $Enums.NotificationDeliveryStatus,
+        status:
+          NotificationDeliveryStatus.FAILED as $Enums.NotificationDeliveryStatus,
         error: "Provider error",
         failedAt: new Date(),
       });
@@ -253,7 +279,9 @@ describe("NotificationService", () => {
       mockRepository.createQueued.mockResolvedValue(queuedDelivery);
       mockRepository.incrementAttempt.mockResolvedValue(updatedDelivery);
       mockRepository.markFailed.mockResolvedValue(failedDelivery);
-      vi.mocked(registryModule.getNotificationProvider).mockReturnValue(mockProvider as NotificationProvider);
+      vi.mocked(registryModule.getNotificationProvider).mockReturnValue(
+        mockProvider as NotificationProvider
+      );
       mockProvider.send.mockRejectedValue(new Error("Provider error"));
 
       // Act
@@ -261,10 +289,13 @@ describe("NotificationService", () => {
 
       // Assert
       expect(mockProvider.send).toHaveBeenCalledWith(message);
-      expect(mockRepository.markFailed).toHaveBeenCalledWith(queuedDelivery.id, {
-        error: "Provider error",
-        failedAt: expect.any(Date),
-      });
+      expect(mockRepository.markFailed).toHaveBeenCalledWith(
+        queuedDelivery.id,
+        {
+          error: "Provider error",
+          failedAt: expect.any(Date),
+        }
+      );
       expect(result).toEqual({
         id: failedDelivery.id,
         status: failedDelivery.status,
@@ -286,7 +317,8 @@ describe("NotificationService", () => {
       });
       const failedDelivery = createMockDelivery({
         ...updatedDelivery,
-        status: NotificationDeliveryStatus.FAILED as $Enums.NotificationDeliveryStatus,
+        status:
+          NotificationDeliveryStatus.FAILED as $Enums.NotificationDeliveryStatus,
         error: "Unknown error",
         failedAt: new Date(),
       });
@@ -295,17 +327,22 @@ describe("NotificationService", () => {
       mockRepository.createQueued.mockResolvedValue(queuedDelivery);
       mockRepository.incrementAttempt.mockResolvedValue(updatedDelivery);
       mockRepository.markFailed.mockResolvedValue(failedDelivery);
-      vi.mocked(registryModule.getNotificationProvider).mockReturnValue(mockProvider as NotificationProvider);
+      vi.mocked(registryModule.getNotificationProvider).mockReturnValue(
+        mockProvider as NotificationProvider
+      );
       mockProvider.send.mockRejectedValue("String error");
 
       // Act
       const result = await service.deliverNow(message);
 
       // Assert
-      expect(mockRepository.markFailed).toHaveBeenCalledWith(queuedDelivery.id, {
-        error: "String error",
-        failedAt: expect.any(Date),
-      });
+      expect(mockRepository.markFailed).toHaveBeenCalledWith(
+        queuedDelivery.id,
+        {
+          error: "String error",
+          failedAt: expect.any(Date),
+        }
+      );
       expect(result.status).toBe(NotificationDeliveryStatus.FAILED);
     });
   });
@@ -317,40 +354,55 @@ describe("NotificationService", () => {
         createMockDelivery({
           id: "delivery-1",
           idempotencyKey: "key-1",
-          status: NotificationDeliveryStatus.QUEUED as $Enums.NotificationDeliveryStatus,
+          status:
+            NotificationDeliveryStatus.QUEUED as $Enums.NotificationDeliveryStatus,
         }),
         createMockDelivery({
           id: "delivery-2",
           idempotencyKey: "key-2",
-          status: NotificationDeliveryStatus.QUEUED as $Enums.NotificationDeliveryStatus,
+          status:
+            NotificationDeliveryStatus.QUEUED as $Enums.NotificationDeliveryStatus,
         }),
       ];
 
       const sentDelivery1 = createMockDelivery({
         ...queuedDeliveries[0],
-        status: NotificationDeliveryStatus.SENT as $Enums.NotificationDeliveryStatus,
+        status:
+          NotificationDeliveryStatus.SENT as $Enums.NotificationDeliveryStatus,
       });
       const failedDelivery2 = createMockDelivery({
         ...queuedDeliveries[1],
-        status: NotificationDeliveryStatus.FAILED as $Enums.NotificationDeliveryStatus,
+        status:
+          NotificationDeliveryStatus.FAILED as $Enums.NotificationDeliveryStatus,
       });
 
       mockRepository.listQueued.mockResolvedValue(queuedDeliveries);
-      
+
       // First delivery succeeds
       mockRepository.findByIdempotencyKey.mockResolvedValueOnce(null);
       mockRepository.createQueued.mockResolvedValueOnce(queuedDeliveries[0]);
-      mockRepository.incrementAttempt.mockResolvedValueOnce(queuedDeliveries[0]);
+      mockRepository.incrementAttempt.mockResolvedValueOnce(
+        queuedDeliveries[0]
+      );
       mockRepository.markSent.mockResolvedValueOnce(sentDelivery1);
-      vi.mocked(registryModule.getNotificationProvider).mockReturnValueOnce(mockProvider as NotificationProvider);
-      mockProvider.send.mockResolvedValueOnce({ provider: "sendgrid", providerMessageId: "msg-1" });
+      vi.mocked(registryModule.getNotificationProvider).mockReturnValueOnce(
+        mockProvider as NotificationProvider
+      );
+      mockProvider.send.mockResolvedValueOnce({
+        provider: "sendgrid",
+        providerMessageId: "msg-1",
+      });
 
       // Second delivery fails
       mockRepository.findByIdempotencyKey.mockResolvedValueOnce(null);
       mockRepository.createQueued.mockResolvedValueOnce(queuedDeliveries[1]);
-      mockRepository.incrementAttempt.mockResolvedValueOnce(queuedDeliveries[1]);
+      mockRepository.incrementAttempt.mockResolvedValueOnce(
+        queuedDeliveries[1]
+      );
       mockRepository.markFailed.mockResolvedValueOnce(failedDelivery2);
-      vi.mocked(registryModule.getNotificationProvider).mockReturnValueOnce(mockProvider as NotificationProvider);
+      vi.mocked(registryModule.getNotificationProvider).mockReturnValueOnce(
+        mockProvider as NotificationProvider
+      );
       mockProvider.send.mockRejectedValueOnce(new Error("Provider error"));
 
       // Act

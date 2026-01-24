@@ -81,7 +81,8 @@ export class EarningService {
     }
 
     // Check if earning already exists
-    const existingEarning = await this.earningRepository.findByBookingId(bookingId);
+    const existingEarning =
+      await this.earningRepository.findByBookingId(bookingId);
     if (existingEarning) {
       // Idempotent: if earning already exists, skip creation
       return;
@@ -146,42 +147,42 @@ export class EarningService {
     // Find all PENDING earnings that are due (availableAt <= now)
     // Note: listPayableByPro filters by PAYABLE status, so we need to query differently
     // We'll use a different approach: query PENDING earnings and filter by availableAt
-    
+
     // Since we don't have a direct query method, we'll need to add one to the repository
     // For now, let's use markManyStatus after finding the IDs
     // Actually, let's check the repository interface again...
-    
+
     // The repository has listPayableByPro which filters by PAYABLE status,
     // but we need to find PENDING earnings with availableAt <= now
     // We need to add a method to find pending earnings due, or we can query all and filter
-    
+
     // For MVP, let's add a helper method to the repository
     // But wait, the requirement says to use existing methods if possible
-    
+
     // Actually, looking at the requirement again: "moves all earnings with status=PENDING and availableAt <= now to PAYABLE"
     // We need to query PENDING earnings where availableAt <= now
-    
+
     // Since the repository doesn't have this exact query, we'll need to add it
     // But the requirement says to use existing repositories... Let me check if we can work around it
-    
+
     // Actually, I think we need to add a method to the repository for this
     // But let's implement it in the service using a workaround first, then we can optimize
-    
+
     // For now, let's implement markPayableIfDue by querying the database directly
     // But that violates the "no Prisma outside repos" rule
-    
+
     // Let me add a method to the repository interface for this specific use case
     // Actually, let me check the earning.repo.ts again to see what methods exist
-    
+
     // Looking at the interface, we have:
     // - createFromBooking
     // - findByBookingId
     // - listPayableByPro (filters by PAYABLE status)
     // - markStatus
     // - markManyStatus
-    
+
     const pendingDueEarnings = await this.earningRepository.listPendingDue(now);
-    
+
     if (pendingDueEarnings.length === 0) {
       return 0;
     }

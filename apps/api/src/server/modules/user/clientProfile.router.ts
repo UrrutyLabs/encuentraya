@@ -12,10 +12,14 @@ const clientProfileService = container.resolve<ClientProfileService>(
 export const clientProfileRouter = router({
   get: protectedProcedure.query(async ({ ctx }) => {
     try {
-      const profile = await clientProfileService.getProfileByUserId(ctx.actor.id);
+      const profile = await clientProfileService.getProfileByUserId(
+        ctx.actor.id
+      );
       if (!profile) {
         // Ensure profile exists
-        return await clientProfileService.ensureClientProfileExists(ctx.actor.id);
+        return await clientProfileService.ensureClientProfileExists(
+          ctx.actor.id
+        );
       }
       return profile;
     } catch (error) {

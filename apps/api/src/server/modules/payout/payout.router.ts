@@ -7,7 +7,11 @@ import { TRPCError } from "@trpc/server";
 // Resolve service from container
 const payoutService = container.resolve<PayoutService>(TOKENS.PayoutService);
 
-const payoutProviderSchema = z.enum(["MERCADO_PAGO", "BANK_TRANSFER", "MANUAL"]);
+const payoutProviderSchema = z.enum([
+  "MERCADO_PAGO",
+  "BANK_TRANSFER",
+  "MANUAL",
+]);
 
 export const payoutRouter = router({
   /**
@@ -43,7 +47,9 @@ export const payoutRouter = router({
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
         message:
-          error instanceof Error ? error.message : "Failed to list payable pros",
+          error instanceof Error
+            ? error.message
+            : "Failed to list payable pros",
       });
     }
   }),
@@ -88,9 +94,7 @@ export const payoutRouter = router({
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message:
-            error instanceof Error
-              ? error.message
-              : "Failed to send payout",
+            error instanceof Error ? error.message : "Failed to send payout",
         });
       }
     }),
@@ -111,9 +115,7 @@ export const payoutRouter = router({
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message:
-            error instanceof Error
-              ? error.message
-              : "Failed to get payout",
+            error instanceof Error ? error.message : "Failed to get payout",
         });
       }
     }),

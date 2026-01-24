@@ -38,12 +38,16 @@ export interface ProPayoutProfileUpdateInput {
  * Handles all data access for pro payout profiles
  */
 export interface ProPayoutProfileRepository {
-  findByProProfileId(proProfileId: string): Promise<ProPayoutProfileEntity | null>;
+  findByProProfileId(
+    proProfileId: string
+  ): Promise<ProPayoutProfileEntity | null>;
   upsertForProProfile(
     proProfileId: string,
     patch: ProPayoutProfileUpdateInput
   ): Promise<ProPayoutProfileEntity>;
-  markCompleteIfValid(proProfileId: string): Promise<ProPayoutProfileEntity | null>;
+  markCompleteIfValid(
+    proProfileId: string
+  ): Promise<ProPayoutProfileEntity | null>;
 }
 
 /**
@@ -69,7 +73,8 @@ export class ProPayoutProfileRepositoryImpl implements ProPayoutProfileRepositor
       where: { proProfileId },
       create: {
         proProfileId,
-        payoutMethod: (patch.payoutMethod || "BANK_TRANSFER") as $Enums.PayoutMethod,
+        payoutMethod: (patch.payoutMethod ||
+          "BANK_TRANSFER") as $Enums.PayoutMethod,
         fullName: patch.fullName ?? null,
         documentId: patch.documentId ?? null,
         bankName: patch.bankName ?? null,
@@ -83,16 +88,20 @@ export class ProPayoutProfileRepositoryImpl implements ProPayoutProfileRepositor
           ? (patch.payoutMethod as $Enums.PayoutMethod)
           : undefined,
         fullName: patch.fullName !== undefined ? patch.fullName : undefined,
-        documentId: patch.documentId !== undefined ? patch.documentId : undefined,
+        documentId:
+          patch.documentId !== undefined ? patch.documentId : undefined,
         bankName: patch.bankName !== undefined ? patch.bankName : undefined,
         bankAccountType:
-          patch.bankAccountType !== undefined ? patch.bankAccountType : undefined,
+          patch.bankAccountType !== undefined
+            ? patch.bankAccountType
+            : undefined,
         bankAccountNumber:
           patch.bankAccountNumber !== undefined
             ? patch.bankAccountNumber
             : undefined,
         currency: patch.currency !== undefined ? patch.currency : undefined,
-        isComplete: patch.isComplete !== undefined ? patch.isComplete : undefined,
+        isComplete:
+          patch.isComplete !== undefined ? patch.isComplete : undefined,
       },
     });
 

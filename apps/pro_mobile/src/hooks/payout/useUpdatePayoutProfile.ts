@@ -11,7 +11,9 @@ export function useUpdatePayoutProfile() {
     onSuccess: () => {
       // Invalidate queries to refresh the UI
       queryClient.invalidateQueries({ queryKey: [["proPayout", "getMine"]] });
-      queryClient.invalidateQueries({ queryKey: [["proPayout", "getSummary"]] });
+      queryClient.invalidateQueries({
+        queryKey: [["proPayout", "getSummary"]],
+      });
       queryClient.invalidateQueries({ queryKey: [["pro", "getMyProfile"]] });
     },
   });

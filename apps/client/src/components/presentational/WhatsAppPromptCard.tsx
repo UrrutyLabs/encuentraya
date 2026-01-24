@@ -14,7 +14,10 @@ export function WhatsAppPromptCard() {
             ¿Querés recibir avisos por WhatsApp?
           </Text>
           <Link href="/settings">
-            <Button variant="secondary" className="w-full sm:w-auto flex items-center gap-2">
+            <Button
+              variant="secondary"
+              className="w-full sm:w-auto flex items-center gap-2"
+            >
               <MessageCircle className="w-4 h-4" />
               Configurar
             </Button>

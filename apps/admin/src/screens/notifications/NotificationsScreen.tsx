@@ -1,7 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { useFailedNotifications, useRetryFailed, useDrainQueued } from "@/hooks/useNotifications";
+import {
+  useFailedNotifications,
+  useRetryFailed,
+  useDrainQueued,
+} from "@/hooks/useNotifications";
 import { NotificationsTable } from "@/components/notifications/NotificationsTable";
 import { Button } from "@repo/ui";
 import { Text } from "@repo/ui";
@@ -9,7 +13,11 @@ import { Card } from "@repo/ui";
 
 export function NotificationsScreen() {
   const [limit] = useState(100);
-  const { data: failedNotifications, isLoading, refetch } = useFailedNotifications(limit);
+  const {
+    data: failedNotifications,
+    isLoading,
+    refetch,
+  } = useFailedNotifications(limit);
   const retryMutation = useRetryFailed();
   const drainMutation = useDrainQueued();
 
@@ -60,7 +68,9 @@ export function NotificationsScreen() {
             onClick={handleRetryFailed}
             disabled={retryMutation.isPending || isLoading}
           >
-            {retryMutation.isPending ? "Reintentando..." : "Reintentar fallidas"}
+            {retryMutation.isPending
+              ? "Reintentando..."
+              : "Reintentar fallidas"}
           </Button>
           <Button
             variant="secondary"

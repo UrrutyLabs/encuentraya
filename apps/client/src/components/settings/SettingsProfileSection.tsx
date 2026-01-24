@@ -59,7 +59,8 @@ export function SettingsProfileSection({
               </Text>
             </div>
             <Text variant="body" className="text-text">
-              {[firstName, lastName].filter(Boolean).join(" ") || "No especificado"}
+              {[firstName, lastName].filter(Boolean).join(" ") ||
+                "No especificado"}
             </Text>
           </div>
         )}

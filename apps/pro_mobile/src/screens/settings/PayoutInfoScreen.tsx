@@ -13,7 +13,12 @@ import { NextPayoutCardSkeleton } from "@components/presentational/NextPayoutCar
 import { PayoutHistoryCard } from "@components/presentational/PayoutHistoryCard";
 import { PayoutHistoryCardSkeleton } from "@components/presentational/PayoutHistoryCardSkeleton";
 import { ErrorCard } from "@components/presentational/ErrorCard";
-import { usePayoutProfile, usePayoutSummary, usePayouts, useUpdatePayoutProfile } from "@hooks/payout";
+import {
+  usePayoutProfile,
+  usePayoutSummary,
+  usePayouts,
+  useUpdatePayoutProfile,
+} from "@hooks/payout";
 import { theme } from "../../theme";
 
 export function PayoutInfoScreen() {
@@ -73,10 +78,17 @@ export function PayoutInfoScreen() {
       },
       {
         onSuccess: () => {
-          Alert.alert("Guardado", "Tus datos de cobro fueron guardados correctamente.");
+          Alert.alert(
+            "Guardado",
+            "Tus datos de cobro fueron guardados correctamente."
+          );
         },
         onError: (error) => {
-          Alert.alert("Error", error.message || "No se pudieron guardar los datos. Por favor, intentá nuevamente.");
+          Alert.alert(
+            "Error",
+            error.message ||
+              "No se pudieron guardar los datos. Por favor, intentá nuevamente."
+          );
         },
       }
     );
@@ -84,7 +96,10 @@ export function PayoutInfoScreen() {
 
   if (isLoading) {
     return (
-      <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={styles.content}
+      >
         <PayoutInfoSkeleton />
       </ScrollView>
     );
@@ -115,7 +130,9 @@ export function PayoutInfoScreen() {
       ) : summaryError ? (
         <ErrorCard
           title="Error al cargar resumen"
-          message={summaryError?.message || "No se pudo cargar el resumen financiero"}
+          message={
+            summaryError?.message || "No se pudo cargar el resumen financiero"
+          }
           onRetry={handleRetrySummary}
         />
       ) : summary ? (
@@ -132,7 +149,11 @@ export function PayoutInfoScreen() {
         <NextPayoutCardSkeleton />
       ) : summaryError ? null : summary ? (
         <NextPayoutCard
-          amount={summary.availableAmount > 0 ? summary.availableAmount : summary.pendingAmount}
+          amount={
+            summary.availableAmount > 0
+              ? summary.availableAmount
+              : summary.pendingAmount
+          }
           currency={summary.currency}
           status={getNextPayoutStatus()}
         />
@@ -144,7 +165,9 @@ export function PayoutInfoScreen() {
       ) : payoutsError ? (
         <ErrorCard
           title="Error al cargar historial"
-          message={payoutsError?.message || "No se pudo cargar el historial de pagos"}
+          message={
+            payoutsError?.message || "No se pudo cargar el historial de pagos"
+          }
           onRetry={handleRetryPayouts}
         />
       ) : payouts ? (

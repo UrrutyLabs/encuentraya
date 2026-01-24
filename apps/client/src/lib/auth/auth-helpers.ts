@@ -7,7 +7,7 @@ import { Role } from "@repo/domain";
 
 /**
  * Determines if a user has access based on their role
- * 
+ *
  * @param userRole - The user's current role (or null/undefined)
  * @param requiredRole - The role required for access
  * @returns true if user has the required role
@@ -25,7 +25,7 @@ export function hasRoleAccess(
  * - PRO user tries to access CLIENT route -> redirect to /pro/download-app
  * - CLIENT user tries to access PRO route -> redirect to /my-bookings
  * - No role requirement -> use default redirect
- * 
+ *
  * @param userRole - The user's current role (or null/undefined)
  * @param requiredRole - The role required for the route (optional)
  * @param defaultRedirect - Default redirect destination (default: "/login")
@@ -60,7 +60,7 @@ export function getRedirectDestination(
 
 /**
  * Builds a redirect URL with optional returnUrl query parameter
- * 
+ *
  * @param destination - The base destination URL
  * @param returnUrl - Optional return URL to append as query parameter
  * @param defaultRedirect - Default redirect if destination matches this (prevents adding returnUrl to role-based redirects)

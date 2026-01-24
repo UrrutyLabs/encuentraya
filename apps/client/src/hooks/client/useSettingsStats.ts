@@ -30,12 +30,17 @@ export function useSettingsStats() {
       .reduce((sum, b) => sum + (b.totalAmount || 0), 0);
 
     // Find favorite category (most booked)
-    const categoryCounts: Record<Category, number> = {} as Record<Category, number>;
+    const categoryCounts: Record<Category, number> = {} as Record<
+      Category,
+      number
+    >;
     bookings.forEach((b) => {
       categoryCounts[b.category] = (categoryCounts[b.category] || 0) + 1;
     });
 
-    const favoriteCategoryEntry = (Object.entries(categoryCounts) as [Category, number][]).reduce<[Category | undefined, number]>(
+    const favoriteCategoryEntry = (
+      Object.entries(categoryCounts) as [Category, number][]
+    ).reduce<[Category | undefined, number]>(
       (max, [category, count]) => {
         return count > max[1] ? [category, count] : max;
       },

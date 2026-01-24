@@ -77,19 +77,16 @@ export class ProService {
   /**
    * Convert an existing user to PRO role and create their pro profile
    * Used when a user signs up via pro_mobile app
-   * 
+   *
    * Note: With user metadata approach, users from pro_mobile are created with PRO role
    * in the context. This method serves as a safety check and ensures pro profile is created.
-   * 
+   *
    * Business rules:
    * - User must exist (created by context on first API call)
    * - User must not already have a pro profile
    * - User role will be updated to PRO if not already PRO (safety check)
    */
-  async convertUserToPro(
-    userId: string,
-    input: ProOnboardInput
-  ): Promise<Pro> {
+  async convertUserToPro(userId: string, input: ProOnboardInput): Promise<Pro> {
     // Check if user already has a pro profile
     const existingPro = await this.proRepository.findByUserId(userId);
     if (existingPro) {
@@ -264,7 +261,7 @@ export class ProService {
 
     // Map ProOnboardInput fields to ProProfileCreateInput fields
     const updateData: Partial<ProProfileCreateInput> = {};
-    
+
     if (input.name !== undefined) {
       updateData.displayName = input.name;
     }
@@ -289,7 +286,7 @@ export class ProService {
 
     // Update pro profile
     const updated = await this.proRepository.update(proProfile.id, updateData);
-    
+
     if (!updated) {
       throw new Error("Failed to update pro profile");
     }
@@ -305,22 +302,26 @@ export class ProService {
     status?: "pending" | "active" | "suspended";
     limit?: number;
     cursor?: string;
-  }): Promise<Array<{
-    id: string;
-    displayName: string;
-    email: string;
-    status: "pending" | "active" | "suspended";
-    completedJobsCount: number;
-    isPayoutProfileComplete: boolean;
-    createdAt: Date;
-  }>> {
+  }): Promise<
+    Array<{
+      id: string;
+      displayName: string;
+      email: string;
+      status: "pending" | "active" | "suspended";
+      completedJobsCount: number;
+      isPayoutProfileComplete: boolean;
+      createdAt: Date;
+    }>
+  > {
     const proProfiles = await this.proRepository.findAllWithFilters(filters);
 
     // Get completed jobs count and payout profile completion for each pro
     const prosWithStats = await Promise.all(
       proProfiles.map(async (pro) => {
         // Get completed bookings count
-        const bookings = await this.bookingRepository.findByProProfileId(pro.id);
+        const bookings = await this.bookingRepository.findByProProfileId(
+          pro.id
+        );
         const completedJobsCount = bookings.filter(
           (b) => b.status === BookingStatus.COMPLETED
         ).length;
@@ -465,7 +466,9 @@ export class ProService {
     }
 
     if (proProfile.status !== "pending") {
-      throw new Error(`Pro profile is not pending. Current status: ${proProfile.status}`);
+      throw new Error(
+        `Pro profile is not pending. Current status: ${proProfile.status}`
+      );
     }
 
     const previousStatus = proProfile.status;
@@ -561,10 +564,13 @@ export class ProService {
 
     // Calculate isAvailable from availability slots array
     // Pro is available if they have at least one availability slot
-    const isAvailable = await this.availabilityService.hasAvailabilitySlots(entity.id);
+    const isAvailable = await this.availabilityService.hasAvailabilitySlots(
+      entity.id
+    );
 
     // Get availability slots for this pro
-    const availabilitySlots = await this.availabilityService.getAvailabilitySlots(entity.id);
+    const availabilitySlots =
+      await this.availabilityService.getAvailabilitySlots(entity.id);
 
     // Map categories from string[] to Category[]
     const categories = entity.categories.map(
@@ -591,4 +597,3 @@ export class ProService {
     };
   }
 }
-

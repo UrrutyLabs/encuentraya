@@ -13,7 +13,12 @@ export function useBookingDetail(bookingId: string | undefined) {
     refetchOnForeground: true,
   });
 
-  const { data: booking, isLoading, error, refetch } = trpc.booking.getById.useQuery(
+  const {
+    data: booking,
+    isLoading,
+    error,
+    refetch,
+  } = trpc.booking.getById.useQuery(
     { id: bookingId || "" },
     {
       enabled: !!bookingId,

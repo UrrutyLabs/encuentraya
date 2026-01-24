@@ -16,12 +16,16 @@ export function useResetPassword() {
   const { role, isLoading: isLoadingRole } = useUserRole();
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState<{ message: string } | null>(null);
-  const [hasRecoverySession, setHasRecoverySession] = useState<boolean | null>(null);
+  const [hasRecoverySession, setHasRecoverySession] = useState<boolean | null>(
+    null
+  );
 
   // Check if we have a recovery session (user clicked reset link)
   useEffect(() => {
     const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       // Recovery session exists if session exists after clicking reset link
       // Supabase automatically creates a recovery session when user clicks reset link
       setHasRecoverySession(!!session);
@@ -44,10 +48,13 @@ export function useResetPassword() {
 
     try {
       // Check if we have a session (recovery session from reset link)
-      const { data: { session } } = await supabase.auth.getSession();
-      
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
       if (!session) {
-        const errorMessage = "No se encontró una sesión de recuperación. Por favor, solicitá un nuevo enlace.";
+        const errorMessage =
+          "No se encontró una sesión de recuperación. Por favor, solicitá un nuevo enlace.";
         setError({ message: errorMessage });
         throw new Error(errorMessage);
       }

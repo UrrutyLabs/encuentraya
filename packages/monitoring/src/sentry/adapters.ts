@@ -5,8 +5,14 @@
 
 export interface SentryAdapter {
   setUser: (user: { id: string; email?: string } | null) => void;
-  captureException: (error: Error, options?: { extra?: Record<string, unknown> }) => void;
-  captureMessage: (message: string, options?: { level?: string } | string) => void;
+  captureException: (
+    error: Error,
+    options?: { extra?: Record<string, unknown> }
+  ) => void;
+  captureMessage: (
+    message: string,
+    options?: { level?: string } | string
+  ) => void;
   addBreadcrumb: (breadcrumb: {
     message: string;
     category: string;
@@ -18,7 +24,7 @@ export interface SentryAdapter {
 
 /**
  * Create a Sentry adapter from @sentry/react-native
- * 
+ *
  * @example
  * ```typescript
  * import * as Sentry from "@sentry/react-native";
@@ -29,7 +35,8 @@ export interface SentryAdapter {
 export function createReactNativeAdapter(sentry: any): SentryAdapter {
   return {
     setUser: (user) => sentry.setUser(user),
-    captureException: (error, options) => sentry.captureException(error, options),
+    captureException: (error, options) =>
+      sentry.captureException(error, options),
     captureMessage: (message, options) => {
       // Handle both object and string level options
       if (typeof options === "string") {
@@ -49,7 +56,7 @@ export function createReactNativeAdapter(sentry: any): SentryAdapter {
 /**
  * Create a Sentry adapter from @sentry/nextjs
  * Works for both client and admin Next.js apps
- * 
+ *
  * @example
  * ```typescript
  * import * as Sentry from "@sentry/nextjs";
@@ -60,7 +67,8 @@ export function createReactNativeAdapter(sentry: any): SentryAdapter {
 export function createNextjsAdapter(sentry: any): SentryAdapter {
   return {
     setUser: (user) => sentry.setUser(user),
-    captureException: (error, options) => sentry.captureException(error, options),
+    captureException: (error, options) =>
+      sentry.captureException(error, options),
     captureMessage: (message, options) => {
       // Handle both object and string level options
       if (typeof options === "string") {

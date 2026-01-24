@@ -56,11 +56,12 @@ export class SearchService {
 
           if (hasDateFilter && hasTimeWindowFilter) {
             // Both date and timeWindow: check if pro has slots that overlap with the window on that day
-            isAvailable = await this.availabilityService.isProAvailableInTimeWindow(
-              pro.id,
-              filters.date!,
-              filters.timeWindow!
-            );
+            isAvailable =
+              await this.availabilityService.isProAvailableInTimeWindow(
+                pro.id,
+                filters.date!,
+                filters.timeWindow!
+              );
           } else if (hasDateFilter) {
             // Date only: check if pro has availability slots for that day of week
             isAvailable = await this.availabilityService.isProAvailableOnDay(
@@ -69,10 +70,11 @@ export class SearchService {
             );
           } else if (hasTimeWindowFilter) {
             // TimeWindow only: check if pro has availability slots that overlap with the window
-            isAvailable = await this.availabilityService.isProAvailableInTimeWindowOnly(
-              pro.id,
-              filters.timeWindow!
-            );
+            isAvailable =
+              await this.availabilityService.isProAvailableInTimeWindowOnly(
+                pro.id,
+                filters.timeWindow!
+              );
           }
 
           return isAvailable ? pro : null;

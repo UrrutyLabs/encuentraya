@@ -24,7 +24,10 @@ interface PayoutHistoryCardProps {
 /**
  * Get status label and variant for payout
  */
-function getPayoutStatus(status: Payout["status"]): { label: string; variant: "success" | "warning" | "danger" | "info" } {
+function getPayoutStatus(status: Payout["status"]): {
+  label: string;
+  variant: "success" | "warning" | "danger" | "info";
+} {
   switch (status) {
     case "SETTLED":
       return { label: "Completado", variant: "success" };
@@ -39,7 +42,10 @@ function getPayoutStatus(status: Payout["status"]): { label: string; variant: "s
   }
 }
 
-export function PayoutHistoryCard({ payouts, onViewAll }: PayoutHistoryCardProps) {
+export function PayoutHistoryCard({
+  payouts,
+  onViewAll,
+}: PayoutHistoryCardProps) {
   // Show last 3 payouts
   const displayPayouts = payouts.slice(0, 3);
 
@@ -63,14 +69,22 @@ export function PayoutHistoryCard({ payouts, onViewAll }: PayoutHistoryCardProps
         <>
           {displayPayouts.map((payout) => {
             const { label, variant } = getPayoutStatus(payout.status);
-            const displayDateRaw = payout.settledAt || payout.sentAt || payout.createdAt;
-            const displayDate = displayDateRaw instanceof Date ? displayDateRaw : new Date(displayDateRaw);
+            const displayDateRaw =
+              payout.settledAt || payout.sentAt || payout.createdAt;
+            const displayDate =
+              displayDateRaw instanceof Date
+                ? displayDateRaw
+                : new Date(displayDateRaw);
 
             return (
               <View key={payout.id} style={styles.payoutRow}>
                 <View style={styles.payoutLeft}>
                   <View style={styles.payoutDateRow}>
-                    <Feather name="calendar" size={14} color={theme.colors.muted} />
+                    <Feather
+                      name="calendar"
+                      size={14}
+                      color={theme.colors.muted}
+                    />
                     <Text variant="small" style={styles.payoutDate}>
                       {formatDateShort(displayDate)}
                     </Text>
@@ -79,9 +93,7 @@ export function PayoutHistoryCard({ payouts, onViewAll }: PayoutHistoryCardProps
                     {formatAmount(payout.amount, payout.currency)}
                   </Text>
                 </View>
-                <Badge variant={variant}>
-                  {label}
-                </Badge>
+                <Badge variant={variant}>{label}</Badge>
               </View>
             );
           })}
@@ -91,7 +103,11 @@ export function PayoutHistoryCard({ payouts, onViewAll }: PayoutHistoryCardProps
               <Text variant="small" style={styles.viewAllText}>
                 Ver todos los pagos
               </Text>
-              <Feather name="chevron-right" size={16} color={theme.colors.primary} />
+              <Feather
+                name="chevron-right"
+                size={16}
+                color={theme.colors.primary}
+              />
             </TouchableOpacity>
           )}
         </>

@@ -19,7 +19,9 @@ export const notificationRouter = router({
       })
     )
     .mutation(async ({ input }) => {
-      const notificationService = container.resolve<NotificationService>(TOKENS.NotificationService);
+      const notificationService = container.resolve<NotificationService>(
+        TOKENS.NotificationService
+      );
 
       const idempotencyKey = `test:${Date.now()}:${input.recipientRef}:${input.channel}`;
 
@@ -45,7 +47,9 @@ export const notificationRouter = router({
       })
     )
     .mutation(async ({ input }) => {
-      const notificationService = container.resolve<NotificationService>(TOKENS.NotificationService);
+      const notificationService = container.resolve<NotificationService>(
+        TOKENS.NotificationService
+      );
 
       const result = await notificationService.drainQueued(input.limit);
 
@@ -63,11 +67,14 @@ export const notificationRouter = router({
       })
     )
     .query(async ({ input }) => {
-      const notificationDeliveryRepository = container.resolve<NotificationDeliveryRepository>(
-        TOKENS.NotificationDeliveryRepository
-      );
+      const notificationDeliveryRepository =
+        container.resolve<NotificationDeliveryRepository>(
+          TOKENS.NotificationDeliveryRepository
+        );
 
-      const failed = await notificationDeliveryRepository.listFailed(input.limit);
+      const failed = await notificationDeliveryRepository.listFailed(
+        input.limit
+      );
 
       return failed;
     }),
@@ -83,12 +90,17 @@ export const notificationRouter = router({
       })
     )
     .mutation(async ({ input }) => {
-      const notificationDeliveryRepository = container.resolve<NotificationDeliveryRepository>(
-        TOKENS.NotificationDeliveryRepository
+      const notificationDeliveryRepository =
+        container.resolve<NotificationDeliveryRepository>(
+          TOKENS.NotificationDeliveryRepository
+        );
+      const notificationService = container.resolve<NotificationService>(
+        TOKENS.NotificationService
       );
-      const notificationService = container.resolve<NotificationService>(TOKENS.NotificationService);
 
-      const failed = await notificationDeliveryRepository.listFailed(input.limit);
+      const failed = await notificationDeliveryRepository.listFailed(
+        input.limit
+      );
       let retried = 0;
       let sent = 0;
       let failedAgain = 0;

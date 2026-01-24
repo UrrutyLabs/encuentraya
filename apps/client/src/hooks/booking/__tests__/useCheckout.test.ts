@@ -128,20 +128,26 @@ describe("useCheckout", () => {
         error: null,
       });
 
-      let onSuccessCallback: ((data: { checkoutUrl?: string }) => void) | undefined;
+      let onSuccessCallback:
+        | ((data: { checkoutUrl?: string }) => void)
+        | undefined;
 
-      mockTrpcPaymentCreatePreauthForBooking.mockImplementation((options?: { onSuccess?: (data: { checkoutUrl?: string }) => void }) => {
-        onSuccessCallback = options?.onSuccess;
-        return {
-          mutateAsync: async () => {
-            const result = { checkoutUrl: "https://checkout.example.com" };
-            onSuccessCallback?.(result);
-            return result;
-          },
-          isPending: false,
-          error: null,
-        };
-      });
+      mockTrpcPaymentCreatePreauthForBooking.mockImplementation(
+        (options?: {
+          onSuccess?: (data: { checkoutUrl?: string }) => void;
+        }) => {
+          onSuccessCallback = options?.onSuccess;
+          return {
+            mutateAsync: async () => {
+              const result = { checkoutUrl: "https://checkout.example.com" };
+              onSuccessCallback?.(result);
+              return result;
+            },
+            isPending: false,
+            error: null,
+          };
+        }
+      );
 
       const { result } = renderHook(() => useCheckout("booking-1"));
 
@@ -174,20 +180,26 @@ describe("useCheckout", () => {
         error: null,
       });
 
-      let onSuccessCallback: ((data: { checkoutUrl?: string }) => void) | undefined;
+      let onSuccessCallback:
+        | ((data: { checkoutUrl?: string }) => void)
+        | undefined;
 
-      mockTrpcPaymentCreatePreauthForBooking.mockImplementation((options?: { onSuccess?: (data: { checkoutUrl?: string }) => void }) => {
-        onSuccessCallback = options?.onSuccess;
-        return {
-          mutateAsync: async () => {
-            const result = {};
-            onSuccessCallback?.(result);
-            return result;
-          },
-          isPending: false,
-          error: null,
-        };
-      });
+      mockTrpcPaymentCreatePreauthForBooking.mockImplementation(
+        (options?: {
+          onSuccess?: (data: { checkoutUrl?: string }) => void;
+        }) => {
+          onSuccessCallback = options?.onSuccess;
+          return {
+            mutateAsync: async () => {
+              const result = {};
+              onSuccessCallback?.(result);
+              return result;
+            },
+            isPending: false,
+            error: null,
+          };
+        }
+      );
 
       const { result } = renderHook(() => useCheckout("booking-1"));
 
@@ -199,7 +211,9 @@ describe("useCheckout", () => {
         await new Promise((resolve) => setTimeout(resolve, 10));
       });
 
-      expect(result.current.error).toBe("No se pudo obtener la URL de pago. Probá de nuevo.");
+      expect(result.current.error).toBe(
+        "No se pudo obtener la URL de pago. Probá de nuevo."
+      );
       expect(mockAssign).not.toHaveBeenCalled();
     });
 
@@ -223,17 +237,19 @@ describe("useCheckout", () => {
 
       let onErrorCallback: (() => void) | undefined;
 
-      mockTrpcPaymentCreatePreauthForBooking.mockImplementation((options?: { onError?: () => void }) => {
-        onErrorCallback = options?.onError;
-        return {
-          mutateAsync: async () => {
-            onErrorCallback?.();
-            throw new Error("Payment failed");
-          },
-          isPending: false,
-          error: null,
-        };
-      });
+      mockTrpcPaymentCreatePreauthForBooking.mockImplementation(
+        (options?: { onError?: () => void }) => {
+          onErrorCallback = options?.onError;
+          return {
+            mutateAsync: async () => {
+              onErrorCallback?.();
+              throw new Error("Payment failed");
+            },
+            isPending: false,
+            error: null,
+          };
+        }
+      );
 
       const { result } = renderHook(() => useCheckout("booking-1"));
 
@@ -245,7 +261,9 @@ describe("useCheckout", () => {
         await new Promise((resolve) => setTimeout(resolve, 10));
       });
 
-      expect(result.current.error).toBe("No pudimos iniciar el pago. Probá de nuevo.");
+      expect(result.current.error).toBe(
+        "No pudimos iniciar el pago. Probá de nuevo."
+      );
     });
 
     it("should call mutation with bookingId", async () => {
@@ -266,22 +284,30 @@ describe("useCheckout", () => {
         error: null,
       });
 
-      const mockMutateAsync = vi.fn().mockResolvedValue({ checkoutUrl: "https://checkout.example.com" });
+      const mockMutateAsync = vi
+        .fn()
+        .mockResolvedValue({ checkoutUrl: "https://checkout.example.com" });
 
-      let onSuccessCallback: ((data: { checkoutUrl?: string }) => void) | undefined;
+      let onSuccessCallback:
+        | ((data: { checkoutUrl?: string }) => void)
+        | undefined;
 
-      mockTrpcPaymentCreatePreauthForBooking.mockImplementation((options?: { onSuccess?: (data: { checkoutUrl?: string }) => void }) => {
-        onSuccessCallback = options?.onSuccess;
-        return {
-          mutateAsync: async (input: unknown) => {
-            const result = await mockMutateAsync(input);
-            onSuccessCallback?.(result);
-            return result;
-          },
-          isPending: false,
-          error: null,
-        };
-      });
+      mockTrpcPaymentCreatePreauthForBooking.mockImplementation(
+        (options?: {
+          onSuccess?: (data: { checkoutUrl?: string }) => void;
+        }) => {
+          onSuccessCallback = options?.onSuccess;
+          return {
+            mutateAsync: async (input: unknown) => {
+              const result = await mockMutateAsync(input);
+              onSuccessCallback?.(result);
+              return result;
+            },
+            isPending: false,
+            error: null,
+          };
+        }
+      );
 
       const { result } = renderHook(() => useCheckout("booking-1"));
 
@@ -310,22 +336,30 @@ describe("useCheckout", () => {
         error: null,
       });
 
-      const mockMutateAsync = vi.fn().mockResolvedValue({ checkoutUrl: "https://checkout.example.com" });
+      const mockMutateAsync = vi
+        .fn()
+        .mockResolvedValue({ checkoutUrl: "https://checkout.example.com" });
 
-      let onSuccessCallback: ((data: { checkoutUrl?: string }) => void) | undefined;
+      let onSuccessCallback:
+        | ((data: { checkoutUrl?: string }) => void)
+        | undefined;
 
-      mockTrpcPaymentCreatePreauthForBooking.mockImplementation((options?: { onSuccess?: (data: { checkoutUrl?: string }) => void }) => {
-        onSuccessCallback = options?.onSuccess;
-        return {
-          mutateAsync: async (input: unknown) => {
-            const result = await mockMutateAsync(input);
-            onSuccessCallback?.(result);
-            return result;
-          },
-          isPending: false,
-          error: null,
-        };
-      });
+      mockTrpcPaymentCreatePreauthForBooking.mockImplementation(
+        (options?: {
+          onSuccess?: (data: { checkoutUrl?: string }) => void;
+        }) => {
+          onSuccessCallback = options?.onSuccess;
+          return {
+            mutateAsync: async (input: unknown) => {
+              const result = await mockMutateAsync(input);
+              onSuccessCallback?.(result);
+              return result;
+            },
+            isPending: false,
+            error: null,
+          };
+        }
+      );
 
       const { result } = renderHook(() => useCheckout("booking-1"));
 

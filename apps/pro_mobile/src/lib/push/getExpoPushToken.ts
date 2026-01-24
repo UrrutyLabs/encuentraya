@@ -17,7 +17,8 @@ export interface ExpoPushTokenResult {
 export async function getExpoPushToken(): Promise<ExpoPushTokenResult | null> {
   try {
     // Request permissions
-    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    const { status: existingStatus } =
+      await Notifications.getPermissionsAsync();
     let finalStatus = existingStatus;
 
     if (existingStatus !== "granted") {
@@ -36,7 +37,8 @@ export async function getExpoPushToken(): Promise<ExpoPushTokenResult | null> {
     });
 
     // Detect platform
-    const platform: "IOS" | "ANDROID" = Platform.OS === "ios" ? "IOS" : "ANDROID";
+    const platform: "IOS" | "ANDROID" =
+      Platform.OS === "ios" ? "IOS" : "ANDROID";
 
     return {
       token: tokenData.data,

@@ -81,7 +81,10 @@ export class AuthService {
 
     try {
       // 2. Create User in our DB
-      const user = await this.userRepository.create(Role.CLIENT, supabaseUserId);
+      const user = await this.userRepository.create(
+        Role.CLIENT,
+        supabaseUserId
+      );
 
       // 3. Create ClientProfile with all provided data
       await this.clientProfileService.updateProfile(supabaseUserId, {
@@ -212,12 +215,10 @@ export class AuthService {
     // This is less secure but allows the feature to work in development
 
     // 3. Update password using admin client
-    const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(
-      userId,
-      {
+    const { error: updateError } =
+      await supabaseAdmin.auth.admin.updateUserById(userId, {
         password: newPassword,
-      }
-    );
+      });
 
     if (updateError) {
       throw new Error(updateError.message || "Failed to update password");
@@ -233,7 +234,9 @@ export class AuthService {
   async requestPasswordReset(email: string): Promise<void> {
     const supabaseUrl = process.env.SUPABASE_URL;
     // Try SUPABASE_ANON_KEY first, then fallback to NEXT_PUBLIC_SUPABASE_ANON_KEY for convenience
-    const anonKey = process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    const anonKey =
+      process.env.SUPABASE_ANON_KEY ||
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
     if (!supabaseUrl || !anonKey) {
       throw new Error(
@@ -275,7 +278,7 @@ export class AuthService {
    * Reset password with OTP code
    * Verifies the OTP code from email and updates the password
    * This is used for mobile apps that don't support deep links
-   * 
+   *
    * Note: Supabase's OTP-based password reset flow works as follows:
    * 1. User requests password reset via requestPasswordReset
    * 2. Supabase sends email with OTP code (if email template is configured)
@@ -290,7 +293,9 @@ export class AuthService {
   ): Promise<void> {
     const supabaseUrl = process.env.SUPABASE_URL;
     // Try SUPABASE_ANON_KEY first, then fallback to NEXT_PUBLIC_SUPABASE_ANON_KEY for convenience
-    const anonKey = process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    const anonKey =
+      process.env.SUPABASE_ANON_KEY ||
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
     if (!supabaseUrl || !anonKey) {
       throw new Error(
@@ -322,12 +327,10 @@ export class AuthService {
 
     // Update password using admin client
     const supabaseAdmin = this.getSupabaseAdmin();
-    const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(
-      userId,
-      {
+    const { error: updateError } =
+      await supabaseAdmin.auth.admin.updateUserById(userId, {
         password: newPassword,
-      }
-    );
+      });
 
     if (updateError) {
       throw new Error(updateError.message || "Failed to reset password");
@@ -338,7 +341,7 @@ export class AuthService {
    * Reset password with token
    * Verifies the reset token and updates the password
    * This is called when user clicks the reset link and submits new password
-   * 
+   *
    * Note: Supabase's password reset flow works as follows:
    * 1. User clicks reset link from email (contains access_token in URL hash)
    * 2. Frontend extracts access_token from URL hash
@@ -368,12 +371,10 @@ export class AuthService {
     const userId = userData.user.id;
 
     // Update password using admin API
-    const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(
-      userId,
-      {
+    const { error: updateError } =
+      await supabaseAdmin.auth.admin.updateUserById(userId, {
         password: newPassword,
-      }
-    );
+      });
 
     if (updateError) {
       throw new Error(updateError.message || "Failed to reset password");
@@ -382,7 +383,7 @@ export class AuthService {
 
   /**
    * Delete user account (Hybrid Approach: Soft Delete + Anonymization)
-   * 
+   *
    * 1. Prevents deletion if there are active bookings or pending payments
    * 2. Anonymizes ClientProfile (removes PII for GDPR compliance)
    * 3. Soft deletes User (sets deletedAt timestamp)
@@ -432,9 +433,8 @@ export class AuthService {
     // This is less secure but allows the feature to work in development
 
     // 3. Check for active bookings (prevent deletion if active)
-    const activeBookings = await this.bookingRepository.findActiveByClientUserId(
-      userId
-    );
+    const activeBookings =
+      await this.bookingRepository.findActiveByClientUserId(userId);
     if (activeBookings.length > 0) {
       throw new Error(
         `Cannot delete account: ${activeBookings.length} active booking(s) exist. Please complete or cancel all active bookings first.`
@@ -442,9 +442,8 @@ export class AuthService {
     }
 
     // 4. Check for pending payments (prevent deletion if pending)
-    const pendingPayments = await this.paymentRepository.findPendingByClientUserId(
-      userId
-    );
+    const pendingPayments =
+      await this.paymentRepository.findPendingByClientUserId(userId);
     if (pendingPayments.length > 0) {
       throw new Error(
         `Cannot delete account: ${pendingPayments.length} pending payment(s) exist. Please wait for payments to settle or be refunded.`
@@ -461,9 +460,8 @@ export class AuthService {
 
     // 7. Delete Supabase auth user
     // This prevents login but keeps all database records intact
-    const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(
-      userId
-    );
+    const { error: deleteError } =
+      await supabaseAdmin.auth.admin.deleteUser(userId);
 
     if (deleteError) {
       throw new Error(deleteError.message || "Failed to delete account");

@@ -18,7 +18,9 @@ export function JobsSkeleton() {
               <View style={styles.badgePlaceholder} />
             </View>
             <View style={styles.descriptionPlaceholder} />
-            <View style={[styles.descriptionPlaceholder, styles.descriptionShort]} />
+            <View
+              style={[styles.descriptionPlaceholder, styles.descriptionShort]}
+            />
             <View style={styles.dateRow}>
               <View style={styles.iconSmallPlaceholder} />
               <View style={styles.datePlaceholder} />
@@ -44,7 +46,9 @@ export function JobsSkeleton() {
               <View style={styles.badgePlaceholder} />
             </View>
             <View style={styles.descriptionPlaceholder} />
-            <View style={[styles.descriptionPlaceholder, styles.descriptionShort]} />
+            <View
+              style={[styles.descriptionPlaceholder, styles.descriptionShort]}
+            />
             <View style={styles.dateRow}>
               <View style={styles.iconSmallPlaceholder} />
               <View style={styles.datePlaceholder} />

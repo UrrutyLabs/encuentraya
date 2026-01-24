@@ -16,7 +16,10 @@ interface NextPayoutCardProps {
 /**
  * Format date to relative string
  */
-function formatAvailabilityStatus(availableDate: Date | null | undefined, status: "available" | "pending" | "no_data"): string {
+function formatAvailabilityStatus(
+  availableDate: Date | null | undefined,
+  status: "available" | "pending" | "no_data"
+): string {
   if (status === "available") {
     return "Disponible ahora";
   }
@@ -26,7 +29,7 @@ function formatAvailabilityStatus(availableDate: Date | null | undefined, status
   if (!availableDate) {
     return "Pendiente";
   }
-  
+
   const days = getDaysUntil(availableDate);
   if (days <= 0) {
     return "Disponible ahora";
@@ -44,12 +47,21 @@ export function NextPayoutCard({
   status,
 }: NextPayoutCardProps) {
   const statusText = formatAvailabilityStatus(availableDate, status);
-  const badgeVariant = status === "available" ? "success" : status === "no_data" ? "danger" : "warning";
+  const badgeVariant =
+    status === "available"
+      ? "success"
+      : status === "no_data"
+        ? "danger"
+        : "warning";
 
   return (
     <Card style={styles.card}>
       <View style={styles.header}>
-        <Feather name="arrow-down-circle" size={20} color={theme.colors.primary} />
+        <Feather
+          name="arrow-down-circle"
+          size={20}
+          color={theme.colors.primary}
+        />
         <Text variant="h2" style={styles.title}>
           Próximo pago
         </Text>
@@ -70,9 +82,7 @@ export function NextPayoutCard({
             </Text>
           </View>
           <View style={styles.statusRow}>
-            <Badge variant={badgeVariant}>
-              {statusText}
-            </Badge>
+            <Badge variant={badgeVariant}>{statusText}</Badge>
           </View>
         </>
       )}

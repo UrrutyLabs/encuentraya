@@ -29,7 +29,9 @@ export const auditRouter = router({
 
         // Filter by event types if provided
         if (input.eventTypes && input.eventTypes.length > 0) {
-          return logs.filter((log) => input.eventTypes!.includes(log.eventType));
+          return logs.filter((log) =>
+            input.eventTypes!.includes(log.eventType)
+          );
         }
 
         return logs;
@@ -37,9 +39,7 @@ export const auditRouter = router({
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message:
-            error instanceof Error
-              ? error.message
-              : "Failed to get audit logs",
+            error instanceof Error ? error.message : "Failed to get audit logs",
         });
       }
     }),

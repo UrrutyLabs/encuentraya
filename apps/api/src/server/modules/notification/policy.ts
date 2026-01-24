@@ -23,7 +23,7 @@ export type RecipientRole = "CLIENT" | "PRO";
 /**
  * Build notification messages for an event
  * Returns array of NotificationMessage objects with deterministic idempotencyKeys
- * 
+ *
  * Channel selection rules:
  * - CLIENT: EMAIL always; WHATSAPP only for important events
  * - PRO: PUSH always; WHATSAPP only for important/fallback
@@ -36,7 +36,8 @@ export function buildNotificationMessages(params: {
   templateId: string;
   payload: unknown;
 }): NotificationMessage[] {
-  const { event, bookingId, recipientRef, recipientRole, templateId, payload } = params;
+  const { event, bookingId, recipientRef, recipientRole, templateId, payload } =
+    params;
 
   // Determine if event is "important" (triggers WhatsApp)
   const importantEvents: NotificationEvent[] = [

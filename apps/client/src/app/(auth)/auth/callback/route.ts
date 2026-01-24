@@ -57,7 +57,8 @@ export async function GET(request: NextRequest) {
     const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
     // Exchange code for session
-    const { data: sessionData, error } = await supabase.auth.exchangeCodeForSession(code);
+    const { data: sessionData, error } =
+      await supabase.auth.exchangeCodeForSession(code);
 
     if (error) {
       // Redirect to login with error
@@ -72,12 +73,14 @@ export async function GET(request: NextRequest) {
     // If we have a session, check user role to determine redirect
     if (sessionData?.session?.access_token) {
       const userRole = await getUserRole(sessionData.session.access_token);
-      
+
       // If user is PRO and no explicit next parameter, redirect to download app
       if (userRole === Role.PRO && !next) {
-        return NextResponse.redirect(new URL("/pro/download-app", requestUrl.origin));
+        return NextResponse.redirect(
+          new URL("/pro/download-app", requestUrl.origin)
+        );
       }
-      
+
       // If user is CLIENT and no explicit next parameter, redirect to search
       if (userRole === Role.CLIENT && !next) {
         return NextResponse.redirect(new URL("/search", requestUrl.origin));

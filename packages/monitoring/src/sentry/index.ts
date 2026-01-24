@@ -12,7 +12,11 @@ export { createReactNativeAdapter, createNextjsAdapter } from "./adapters";
  * Set user context for crash reports
  * Works with any Sentry SDK via adapter pattern
  */
-export function setUserContext(adapter: SentryAdapter, userId: string, email?: string) {
+export function setUserContext(
+  adapter: SentryAdapter,
+  userId: string,
+  email?: string
+) {
   adapter.setUser({
     id: userId,
     email,

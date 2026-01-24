@@ -112,6 +112,7 @@ The current `eas.json` configuration:
 #### Build Profiles
 
 **Development** (`development`):
+
 - Creates a development client build
 - Includes debugging tools
 - For internal testing
@@ -119,6 +120,7 @@ The current `eas.json` configuration:
 - Android: APK format
 
 **Preview** (`preview`):
+
 - Production-like build for testing
 - Internal distribution only
 - No debugging tools
@@ -126,6 +128,7 @@ The current `eas.json` configuration:
 - iOS: Ad-hoc distribution
 
 **Production** (`production`):
+
 - Store-ready builds
 - Auto-increments build numbers
 - Optimized and minified
@@ -160,6 +163,7 @@ Key fields for EAS:
 ```
 
 **Important Fields**:
+
 - **`bundleIdentifier`** (iOS): Unique identifier (e.g., `com.yourcompany.arreglatodopros`)
 - **`package`** (Android): Same as bundleIdentifier format
 - **`version`**: Semantic version (e.g., `1.0.0`)
@@ -253,6 +257,7 @@ eas build --platform all --profile development
 ```
 
 **Characteristics**:
+
 - Includes React Native debugger
 - Development client included
 - Can connect to local Metro bundler
@@ -267,6 +272,7 @@ eas build --platform all --profile preview
 ```
 
 **Characteristics**:
+
 - Production-optimized code
 - No debugging tools
 - Internal distribution only
@@ -288,6 +294,7 @@ eas build --platform all --profile production
 ```
 
 **Characteristics**:
+
 - Fully optimized and minified
 - Store-ready format
 - Auto-increments build numbers
@@ -361,10 +368,12 @@ eas credentials
 ```
 
 Choose:
+
 - **iOS** → **Production** → **Set up credentials**
 - Select **"Let EAS manage credentials"** (recommended)
 
 Or provide your own:
+
 - Distribution certificate (`.p12`)
 - Provisioning profile (`.mobileprovision`)
 
@@ -467,6 +476,7 @@ eas submit --platform ios --id <build-id>
 ```
 
 **Track Options**:
+
 - `internal`: Internal testing track
 - `alpha`: Alpha testing track
 - `beta`: Beta testing track
@@ -570,8 +580,8 @@ on:
   push:
     branches: [main]
     paths:
-      - 'apps/pro_mobile/**'
-      - 'packages/**'
+      - "apps/pro_mobile/**"
+      - "packages/**"
   workflow_dispatch:
 
 jobs:
@@ -585,7 +595,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '24'
+          node-version: "24"
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4

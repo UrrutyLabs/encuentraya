@@ -5,7 +5,8 @@ import { trpc } from "@lib/trpc/client";
  * Sends password reset email with OTP code to the provided email address
  */
 export function useRequestPasswordReset() {
-  const requestPasswordResetMutation = trpc.auth.requestPasswordReset.useMutation();
+  const requestPasswordResetMutation =
+    trpc.auth.requestPasswordReset.useMutation();
 
   const requestPasswordReset = async (email: string) => {
     try {

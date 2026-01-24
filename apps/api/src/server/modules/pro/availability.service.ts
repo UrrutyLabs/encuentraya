@@ -64,10 +64,8 @@ export class AvailabilityService {
     // Use UTC to match the date selected by the user regardless of server timezone
     const dayOfWeek = date.getUTCDay();
 
-
     // Get all availability slots for this pro
     const slots = await this.availabilityRepository.findByProProfileId(proId);
-
 
     // Check if there are any slots for the requested day
     return slots.some((slot) => slot.dayOfWeek === dayOfWeek);
@@ -96,10 +94,15 @@ export class AvailabilityService {
    * @param timeWindow - Time window in format "HH:MM-HH:MM" (e.g., "09:00-12:00")
    * @returns Object with startTime and endTime
    */
-  private parseTimeWindow(timeWindow: string): { startTime: string; endTime: string } {
+  private parseTimeWindow(timeWindow: string): {
+    startTime: string;
+    endTime: string;
+  } {
     const [startTime, endTime] = timeWindow.split("-");
     if (!startTime || !endTime) {
-      throw new Error(`Invalid time window format: ${timeWindow}. Expected format: "HH:MM-HH:MM"`);
+      throw new Error(
+        `Invalid time window format: ${timeWindow}. Expected format: "HH:MM-HH:MM"`
+      );
     }
     return { startTime: startTime.trim(), endTime: endTime.trim() };
   }
@@ -139,7 +142,8 @@ export class AvailabilityService {
     const dayOfWeek = date.getUTCDay();
 
     // Parse time window
-    const { startTime: windowStart, endTime: windowEnd } = this.parseTimeWindow(timeWindow);
+    const { startTime: windowStart, endTime: windowEnd } =
+      this.parseTimeWindow(timeWindow);
 
     // Get all availability slots for this pro
     const slots = await this.availabilityRepository.findByProProfileId(proId);
@@ -151,10 +155,14 @@ export class AvailabilityService {
       return false;
     }
 
-
     // Check if any slot overlaps with the time window
     return daySlots.some((slot) =>
-      this.timeRangesOverlap(slot.startTime, slot.endTime, windowStart, windowEnd)
+      this.timeRangesOverlap(
+        slot.startTime,
+        slot.endTime,
+        windowStart,
+        windowEnd
+      )
     );
   }
 
@@ -164,16 +172,25 @@ export class AvailabilityService {
    * @param timeWindow - Time window in format "HH:MM-HH:MM" (e.g., "09:00-12:00")
    * @returns true if the pro has any availability slot that overlaps with the time window
    */
-  async isProAvailableInTimeWindowOnly(proId: string, timeWindow: string): Promise<boolean> {
+  async isProAvailableInTimeWindowOnly(
+    proId: string,
+    timeWindow: string
+  ): Promise<boolean> {
     // Parse time window
-    const { startTime: windowStart, endTime: windowEnd } = this.parseTimeWindow(timeWindow);
+    const { startTime: windowStart, endTime: windowEnd } =
+      this.parseTimeWindow(timeWindow);
 
     // Get all availability slots for this pro
     const slots = await this.availabilityRepository.findByProProfileId(proId);
 
     // Check if any slot overlaps with the time window
     return slots.some((slot) =>
-      this.timeRangesOverlap(slot.startTime, slot.endTime, windowStart, windowEnd)
+      this.timeRangesOverlap(
+        slot.startTime,
+        slot.endTime,
+        windowStart,
+        windowEnd
+      )
     );
   }
 

@@ -8,7 +8,11 @@ interface SearchFilters {
 }
 
 export function useSearchPros(filters: SearchFilters) {
-  const { data: pros, isLoading, error } = trpc.client.searchPros.useQuery(
+  const {
+    data: pros,
+    isLoading,
+    error,
+  } = trpc.client.searchPros.useQuery(
     {
       category: filters.category,
       date: filters.date ? new Date(filters.date) : undefined,

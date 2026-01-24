@@ -30,22 +30,24 @@ function CheckoutContent() {
   const [error, setError] = useState<string | null>(null);
 
   // Fetch booking details
-  const { data: booking, isLoading: isLoadingBooking } = trpc.booking.getById.useQuery(
-    { id: bookingId! },
-    {
-      enabled: !!bookingId,
-      retry: false,
-    }
-  );
+  const { data: booking, isLoading: isLoadingBooking } =
+    trpc.booking.getById.useQuery(
+      { id: bookingId! },
+      {
+        enabled: !!bookingId,
+        retry: false,
+      }
+    );
 
   // Fetch payment summary
-  const { data: payment, isLoading: isLoadingPayment } = trpc.payment.getByBooking.useQuery(
-    { bookingId: bookingId! },
-    {
-      enabled: !!bookingId,
-      retry: false,
-    }
-  );
+  const { data: payment, isLoading: isLoadingPayment } =
+    trpc.payment.getByBooking.useQuery(
+      { bookingId: bookingId! },
+      {
+        enabled: !!bookingId,
+        retry: false,
+      }
+    );
 
   // Fetch client profile for WhatsApp prompt
   const { profile } = useClientProfile();
@@ -88,7 +90,10 @@ function CheckoutContent() {
                 Falta el identificador de la reserva.
               </Text>
               <Link href="/my-bookings">
-                <Button variant="secondary" className="mt-4 flex items-center gap-2 mx-auto">
+                <Button
+                  variant="secondary"
+                  className="mt-4 flex items-center gap-2 mx-auto"
+                >
                   <ArrowLeft className="w-4 h-4" />
                   Volver a mis reservas
                 </Button>
@@ -163,7 +168,7 @@ function CheckoutContent() {
   };
 
   // Calculate amount: use payment if exists (minor units), otherwise use booking (major units)
-  const amountEstimated = payment?.amountEstimated ?? (booking?.totalAmount ?? 0);
+  const amountEstimated = payment?.amountEstimated ?? booking?.totalAmount ?? 0;
   const isAmountInMinorUnits = !!payment; // Payment amounts are in minor units, booking.totalAmount is in major units
   const currency = payment?.currency || "UYU";
 
@@ -194,7 +199,8 @@ function CheckoutContent() {
                     </Text>
                   </div>
                   <Text variant="body" className="text-text">
-                    {formatDate(booking.scheduledAt)} a las {formatTime(booking.scheduledAt)}
+                    {formatDate(booking.scheduledAt)} a las{" "}
+                    {formatTime(booking.scheduledAt)}
                   </Text>
                 </div>
                 {booking.description && (
@@ -219,7 +225,8 @@ function CheckoutContent() {
                       </Text>
                     </div>
                     <Text variant="body" className="text-text">
-                      {booking.estimatedHours} {booking.estimatedHours === 1 ? "hora" : "horas"}
+                      {booking.estimatedHours}{" "}
+                      {booking.estimatedHours === 1 ? "hora" : "horas"}
                     </Text>
                   </div>
                 )}
@@ -231,12 +238,17 @@ function CheckoutContent() {
           <Card className="p-6 mb-6">
             <div className="mb-4">
               <Text variant="h2" className="text-text">
-                Monto estimado: {formatCurrency(amountEstimated, currency, isAmountInMinorUnits)}
+                Monto estimado:{" "}
+                {formatCurrency(
+                  amountEstimated,
+                  currency,
+                  isAmountInMinorUnits
+                )}
               </Text>
             </div>
             <Text variant="small" className="text-muted">
-              Este es un monto estimado. El cobro final depende del trabajo realizado. Nunca se
-              cobrará más sin aviso.
+              Este es un monto estimado. El cobro final depende del trabajo
+              realizado. Nunca se cobrará más sin aviso.
             </Text>
           </Card>
 

@@ -5,6 +5,7 @@ The professional mobile application for the Arreglatodo marketplace platform.
 ## Overview
 
 An Expo (React Native) mobile application that enables professionals to:
+
 - Manage availability and service areas
 - Receive and respond to job requests
 - Track bookings and job status
@@ -57,6 +58,7 @@ pnpm install
 ### Environment Setup
 
 1. Copy `.env.example` to `.env`:
+
    ```bash
    cp .env.example .env
    ```
@@ -168,27 +170,32 @@ See [Frontend Best Practices](../../docs/FE_BEST_PRACTICES.md) for architecture 
 ## Key Features
 
 ### Home Tab
+
 - New job requests
 - Upcoming jobs
 - Quick actions (accept/reject)
 
 ### Jobs Tab
+
 - List of all jobs (upcoming, completed)
 - Job status tracking
 - Job details and actions
 
 ### Availability Tab
+
 - Set available time slots
 - Toggle availability on/off
 - Manage service areas
 
 ### Profile Tab
+
 - Professional profile information
 - Earnings summary
 - Payout history
 - Settings and help
 
 ### Booking Management
+
 - Accept/reject job requests
 - Update job status (on my way, arrived, completed)
 - View booking details
@@ -240,6 +247,7 @@ eas update --branch preview --message "Preview update"
 ### Release Workflow
 
 Releases are handled via GitHub Actions. See:
+
 - **[Release Workflow](./docs/RELEASE_WORKFLOW.md)** - How to release
 - **[Versioning Guide](./docs/VERSIONING.md)** - Version management
 - **[EAS Build & Deployment](./docs/EAS_BUILD_AND_DEPLOYMENT.md)** - Complete build guide
@@ -262,6 +270,7 @@ pnpm test:coverage
 ## Offline Support
 
 The app includes offline support with:
+
 - Query persistence (React Query)
 - Network status detection
 - Automatic retry when online

@@ -35,7 +35,11 @@ export interface ReviewRepository {
   findByBookingId(bookingId: string): Promise<ReviewEntity | null>;
   findByBookingIds(bookingIds: string[]): Promise<ReviewEntity[]>;
   findByProProfileId(proProfileId: string): Promise<ReviewEntity[]>;
-  listForPro(proProfileId: string, limit?: number, cursor?: string): Promise<ReviewEntity[]>;
+  listForPro(
+    proProfileId: string,
+    limit?: number,
+    cursor?: string
+  ): Promise<ReviewEntity[]>;
 }
 
 /**
