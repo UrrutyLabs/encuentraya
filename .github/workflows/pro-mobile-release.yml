@@ -1,0 +1,176 @@
+name: Pro Mobile Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_type:
+        description: 'Version bump type'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+      platform:
+        description: 'Platform to build (ios, android, or all)'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - ios
+          - android
+      publish_ota:
+        description: 'Publish OTA update after build'
+        required: true
+        default: true
+        type: boolean
+
+jobs:
+  release:
+    name: Release Pro Mobile App
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # Required to create tags and commits
+      id-token: write # Required for EAS authentication
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch full history for standard-version
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 10
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Bump version
+        id: version-bump
+        run: |
+          cd apps/pro_mobile
+          
+          # Run standard-version based on version type
+          # standard-version will create commit and tag automatically
+          if [ "${{ github.event.inputs.version_type }}" == "patch" ]; then
+            pnpm release:patch
+          elif [ "${{ github.event.inputs.version_type }}" == "minor" ]; then
+            pnpm release:minor
+          elif [ "${{ github.event.inputs.version_type }}" == "major" ]; then
+            pnpm release:major
+          fi
+          
+          # Extract new version from app.json
+          NEW_VERSION=$(node -p "require('./app.json').expo.version")
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "new_tag=v$NEW_VERSION" >> $GITHUB_OUTPUT
+          
+          echo "✅ Version bumped to $NEW_VERSION"
+
+      - name: Push version changes
+        run: |
+          # Push the version bump commit
+          git push origin HEAD:main
+          # Push the tag created by standard-version
+          git push origin --tags
+          echo "✅ Pushed version changes and tags"
+
+      - name: Setup EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Build iOS
+        if: github.event.inputs.platform == 'ios' || github.event.inputs.platform == 'all'
+        run: |
+          cd apps/pro_mobile
+          eas build --platform ios \
+            --profile production \
+            --non-interactive \
+            --wait
+
+      - name: Build Android
+        if: github.event.inputs.platform == 'android' || github.event.inputs.platform == 'all'
+        run: |
+          cd apps/pro_mobile
+          eas build --platform android \
+            --profile production \
+            --non-interactive \
+            --wait
+
+      - name: Publish OTA Update
+        if: github.event.inputs.publish_ota == 'true'
+        run: |
+          cd apps/pro_mobile
+          VERSION="${{ steps.version-bump.outputs.new_version }}"
+          
+          eas update --branch production \
+            --message "Release $VERSION - Deployed from CI: ${{ github.sha }}" \
+            --non-interactive
+          
+          echo "✅ Published OTA update for version $VERSION to production branch"
+
+      - name: Create GitHub Release
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const version = '${{ steps.version-bump.outputs.new_version }}';
+            const tag = '${{ steps.version-bump.outputs.new_tag }}';
+            const platform = '${{ github.event.inputs.platform }}';
+            const publishOta = '${{ github.event.inputs.publish_ota }}';
+            
+            // Try to read CHANGELOG if it exists
+            let body = `🚀 Pro Mobile app release ${version}\n\n`;
+            body += `**Platforms:** ${platform === 'all' ? 'iOS & Android' : platform}\n`;
+            body += `**OTA Update:** ${publishOta === 'true' ? 'Published' : 'Skipped'}\n\n`;
+            body += `See [EAS Build Dashboard](https://expo.dev/accounts/your-account/projects/arreglatodo-pros/builds) for build artifacts.\n`;
+            body += `\n**Workflow:** [View run](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`;
+            
+            try {
+              const fs = require('fs');
+              const changelog = fs.readFileSync('apps/pro_mobile/CHANGELOG.md', 'utf8');
+              // Extract the latest release notes
+              const match = changelog.match(/## \[?(\d+\.\d+\.\d+)\]?[^\n]*\n([\s\S]*?)(?=\n## |$)/);
+              if (match && match[2]) {
+                body = match[2].trim() + '\n\n---\n\n' + body;
+              }
+            } catch (e) {
+              // CHANGELOG doesn't exist or couldn't be read, use default body
+            }
+            
+            await github.rest.repos.createRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: tag,
+              name: `Pro Mobile App ${version}`,
+              body: body,
+              draft: false,
+              prerelease: false
+            });
+
+      - name: Release Summary
+        run: |
+          echo "## 🎉 Pro Mobile Release Complete" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Version:** ${{ steps.version-bump.outputs.new_version }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Tag:** ${{ steps.version-bump.outputs.new_tag }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Platform:** ${{ github.event.inputs.platform }}" >> $GITHUB_STEP_SUMMARY
+          echo "**OTA Update:** ${{ github.event.inputs.publish_ota == 'true' && 'Published' || 'Skipped' }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Version bumped, built, and deployed successfully!" >> $GITHUB_STEP_SUMMARY

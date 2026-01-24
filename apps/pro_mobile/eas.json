@@ -12,6 +12,9 @@
       },
       "android": {
         "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_ENVIRONMENT": "development"
       }
     },
     "preview": {
@@ -22,23 +25,20 @@
       },
       "android": {
         "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_ENVIRONMENT": "preview",
+        "EXPO_PUBLIC_SUPABASE_URL": "https://uohnsadumfvuppdwdsfh.supabase.co",
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "sb_publishable_SvvzoTW2Cvdcc5QN4PZ6vw_nukbLZVu"
       }
     },
     "production": {
-      "autoIncrement": true
-    }
-  },
-  "submit": {
-    "preview": {
-      "ios": {
-        "appleId": "your-apple-id@example.com",
-        "ascAppId": "your-app-store-connect-app-id"
-      },
-      "android": {
-        "serviceAccountKeyPath": "./google-service-account.json",
-        "track": "internal"
+      "autoIncrement": true,
+      "env": {
+        "EXPO_PUBLIC_ENVIRONMENT": "production",
+        "EXPO_PUBLIC_SUPABASE_URL": "https://nqlgrcfjbhznnpfcemvg.supabase.co",
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "sb_publishable_2Mr9krv8iOPW9iyj0qWdwA_SBFGCDmj"
       }
-    },
-    "production": {}
+    }
   }
 }

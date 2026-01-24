@@ -72,12 +72,21 @@ export function initCrashReporting() {
   }
 
   try {
+    // Determine environment: use EXPO_PUBLIC_ENVIRONMENT if set, otherwise infer from __DEV__
+    const environment =
+      process.env.EXPO_PUBLIC_ENVIRONMENT ||
+      (__DEV__ ? "development" : "production");
+
+    // Lower sample rate for preview builds to reduce noise
+    const isPreview = environment === "preview";
+    const tracesSampleRate = __DEV__ ? 1.0 : isPreview ? 0.05 : 0.1; // 5% for preview, 10% for production
+
     Sentry.init({
       dsn,
       debug: false, // Disable debug mode to prevent console output
-      environment: __DEV__ ? "development" : "production",
-      // Set tracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring
-      tracesSampleRate: __DEV__ ? 1.0 : 0.1,
+      environment,
+      // Set tracesSampleRate based on environment
+      tracesSampleRate,
       // Attach user context when available
       beforeSend(event, hint) {
         // Prevent sending events in non-production environments
@@ -113,9 +122,7 @@ export function initCrashReporting() {
     });
 
     isInitialized = true;
-    logger.info("Crash reporting initialized", {
-      environment: __DEV__ ? "development" : "production",
-    });
+    logger.info("Crash reporting initialized", { environment });
   } catch (error) {
     logger.error(
       "Failed to initialize crash reporting",
