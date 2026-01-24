@@ -24,6 +24,6 @@
   },
   "peerDependencies": {
     "@sentry/react-native": "^7.0.0",
-    "@sentry/nextjs": "^8.0.0"
+    "@sentry/nextjs": "^10.36.0"
   }
 }

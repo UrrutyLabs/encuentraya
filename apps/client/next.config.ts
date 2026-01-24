@@ -22,11 +22,11 @@ export default withSentryConfig(nextConfig, {
   // Only upload source maps in production
   silent: !process.env.CI,
   widenClientFileUpload: true,
-  hideSourceMaps: true,
   disableLogger: true,
   automaticVercelMonitors: true,
 
   // Delete source maps after upload to avoid serving them to users
+  // This is now the default behavior in v9+, but kept explicit for clarity
   sourcemaps: {
     deleteSourcemapsAfterUpload: true,
   },

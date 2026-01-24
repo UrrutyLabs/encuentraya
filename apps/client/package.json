@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev --port 3000",
     "dev:prod": "pnpm build:prod && pnpm start:prod",
-    "build": "next build --webpack",
+    "build": "next build",
     "build:prod": "NODE_ENV=production VERCEL_ENV=production pnpm build",
     "start": "next start",
     "start:prod": "NODE_ENV=production VERCEL_ENV=production next start --port 3000",
@@ -21,7 +21,7 @@
     "@repo/react-query": "workspace:*",
     "@repo/trpc": "workspace:*",
     "@repo/ui": "workspace:*",
-    "@sentry/nextjs": "^8.45.0",
+    "@sentry/nextjs": "^10.36.0",
     "@supabase/supabase-js": "^2.90.1",
     "@tanstack/react-query": "^5.80.3",
     "@trpc/client": "^11.8.1",
