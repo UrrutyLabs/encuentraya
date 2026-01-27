@@ -208,6 +208,7 @@ model Booking {
   clientUserId   String
   proProfileId   String?
   category       Category
+  subcategoryId  String?
   status         BookingStatus @default(pending)
   scheduledAt    DateTime
   hoursEstimate  Float
@@ -219,6 +220,7 @@ model Booking {
   // Relations
   client     User         @relation("ClientBookings", fields: [clientUserId], references: [id], onDelete: Cascade)
   proProfile ProProfile?  @relation("ProBookings", fields: [proProfileId], references: [id], onDelete: SetNull)
+  subcategory Subcategory? @relation(fields: [subcategoryId], references: [id], onDelete: SetNull)
   review     Review?
   payment    Payment?
   earning    Earning?
@@ -228,6 +230,7 @@ model Booking {
   @@index([status])
   @@index([scheduledAt])
   @@index([category])
+  @@index([subcategoryId])
   @@map("bookings")
 }
 
@@ -439,4 +442,42 @@ model AuditLog {
   @@index([actorId])
   @@index([createdAt])
   @@map("audit_logs")
+}
+
+model CategoryMetadata {
+  id          String   @id @default(cuid())
+  category    Category  @unique
+  displayName String
+  iconName    String?  // e.g., "Wrench" (for Lucide icons)
+  description String?
+  displayOrder Int     @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([category])
+  @@index([isActive])
+  @@map("category_metadata")
+}
+
+model Subcategory {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String
+  category    Category
+  imageUrl    String?
+  description String?
+  displayOrder Int     @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  bookings    Booking[]
+
+  @@unique([slug, category])
+  @@index([category])
+  @@index([slug])
+  @@index([isActive])
+  @@map("subcategories")
 }

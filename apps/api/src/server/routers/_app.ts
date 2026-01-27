@@ -13,6 +13,8 @@ import { proPayoutRouter } from "@modules/payout/proPayout.router";
 import { auditRouter } from "@modules/audit/audit.router";
 import { searchRouter } from "@modules/search/search.router";
 import { contactRouter } from "@modules/contact/contact.router";
+import { categoryRouter } from "@modules/category/category.router";
+import { subcategoryRouter } from "@modules/subcategory/subcategory.router";
 
 export const appRouter = router({
   health: router({
@@ -36,6 +38,8 @@ export const appRouter = router({
   proPayout: proPayoutRouter,
   audit: auditRouter,
   contact: contactRouter,
+  category: categoryRouter,
+  subcategory: subcategoryRouter,
   client: router({
     searchPros: searchRouter.searchPros,
   }),

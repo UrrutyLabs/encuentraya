@@ -114,3 +114,13 @@ export type PayoutItem = Prisma.PayoutItemModel
  * 
  */
 export type AuditLog = Prisma.AuditLogModel
+/**
+ * Model CategoryMetadata
+ * 
+ */
+export type CategoryMetadata = Prisma.CategoryMetadataModel
+/**
+ * Model Subcategory
+ * 
+ */
+export type Subcategory = Prisma.SubcategoryModel

@@ -29,6 +29,7 @@ export class SearchService {
    */
   async searchPros(filters: {
     category?: Category;
+    subcategory?: string; // Subcategory slug (for future filtering)
     date?: Date;
     timeWindow?: string; // Format: "HH:MM-HH:MM" (e.g., "09:00-12:00")
   }): Promise<Pro[]> {

@@ -21,6 +21,8 @@ export const TOKENS = {
   PayoutItemRepository: "PayoutItemRepository",
   ProPayoutProfileRepository: "ProPayoutProfileRepository",
   AuditLogRepository: "AuditLogRepository",
+  CategoryMetadataRepository: "CategoryMetadataRepository",
+  SubcategoryRepository: "SubcategoryRepository",
 
   // Services
   AuthService: "AuthService",
@@ -45,6 +47,8 @@ export const TOKENS = {
   SearchService: "SearchService",
   AvailabilityService: "AvailabilityService",
   ContactService: "ContactService",
+  CategoryService: "CategoryService",
+  SubcategoryService: "SubcategoryService",
 
   // Infrastructure
   Logger: "Logger",

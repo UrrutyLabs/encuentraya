@@ -65,7 +65,9 @@ export const ModelName = {
   Earning: 'Earning',
   Payout: 'Payout',
   PayoutItem: 'PayoutItem',
-  AuditLog: 'AuditLog'
+  AuditLog: 'AuditLog',
+  CategoryMetadata: 'CategoryMetadata',
+  Subcategory: 'Subcategory'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -146,6 +148,7 @@ export const BookingScalarFieldEnum = {
   clientUserId: 'clientUserId',
   proProfileId: 'proProfileId',
   category: 'category',
+  subcategoryId: 'subcategoryId',
   status: 'status',
   scheduledAt: 'scheduledAt',
   hoursEstimate: 'hoursEstimate',
@@ -321,6 +324,37 @@ export const AuditLogScalarFieldEnum = {
 } as const
 
 export type AuditLogScalarFieldEnum = (typeof AuditLogScalarFieldEnum)[keyof typeof AuditLogScalarFieldEnum]
+
+
+export const CategoryMetadataScalarFieldEnum = {
+  id: 'id',
+  category: 'category',
+  displayName: 'displayName',
+  iconName: 'iconName',
+  description: 'description',
+  displayOrder: 'displayOrder',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CategoryMetadataScalarFieldEnum = (typeof CategoryMetadataScalarFieldEnum)[keyof typeof CategoryMetadataScalarFieldEnum]
+
+
+export const SubcategoryScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  slug: 'slug',
+  category: 'category',
+  imageUrl: 'imageUrl',
+  description: 'description',
+  displayOrder: 'displayOrder',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SubcategoryScalarFieldEnum = (typeof SubcategoryScalarFieldEnum)[keyof typeof SubcategoryScalarFieldEnum]
 
 
 export const SortOrder = {
