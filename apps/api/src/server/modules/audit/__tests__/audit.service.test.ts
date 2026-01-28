@@ -49,11 +49,11 @@ describe("AuditService", () => {
   ) {
     return {
       id: "log-1",
-      eventType: AuditEventType.BOOKING_STATUS_FORCED,
+      eventType: AuditEventType.ORDER_STATUS_FORCED,
       actorId: "actor-1",
       actorRole: Role.ADMIN,
-      resourceType: "booking",
-      resourceId: "booking-1",
+      resourceType: "order",
+      resourceId: "order-1",
       action: "force_status",
       metadata: { previousStatus: "PENDING", newStatus: "COMPLETED" },
       createdAt: new Date("2024-01-01"),
@@ -72,10 +72,10 @@ describe("AuditService", () => {
       // Arrange
       const actor = createMockActor();
       const input = {
-        eventType: AuditEventType.BOOKING_STATUS_FORCED,
+        eventType: AuditEventType.ORDER_STATUS_FORCED,
         actor,
-        resourceType: "booking",
-        resourceId: "booking-1",
+        resourceType: "order",
+        resourceId: "order-1",
         action: "force_status",
         metadata: { previousStatus: "PENDING", newStatus: "COMPLETED" },
       };
@@ -165,8 +165,8 @@ describe("AuditService", () => {
   describe("getResourceLogs", () => {
     it("should return audit logs for a resource", async () => {
       // Arrange
-      const resourceType = "booking";
-      const resourceId = "booking-1";
+      const resourceType = "order";
+      const resourceId = "order-1";
       const mockLogs = [
         createMockAuditLog({ id: "log-1", action: "force_status" }),
         createMockAuditLog({
@@ -188,7 +188,7 @@ describe("AuditService", () => {
       expect(result).toHaveLength(2);
       expect(result[0]).toMatchObject({
         id: "log-1",
-        eventType: AuditEventType.BOOKING_STATUS_FORCED,
+        eventType: AuditEventType.ORDER_STATUS_FORCED,
         actorId: "actor-1",
         actorRole: Role.ADMIN,
         action: "force_status",
@@ -202,7 +202,7 @@ describe("AuditService", () => {
       mockRepository.findByResource.mockResolvedValue([]);
 
       // Act
-      const result = await service.getResourceLogs("booking", "booking-1");
+      const result = await service.getResourceLogs("order", "order-1");
 
       // Assert
       expect(result).toEqual([]);
@@ -227,9 +227,9 @@ describe("AuditService", () => {
       expect(result).toHaveLength(2);
       expect(result[0]).toMatchObject({
         id: "log-1",
-        eventType: AuditEventType.BOOKING_STATUS_FORCED,
-        resourceType: "booking",
-        resourceId: "booking-1",
+        eventType: AuditEventType.ORDER_STATUS_FORCED,
+        resourceType: "order",
+        resourceId: "order-1",
         action: "force_status",
         metadata: expect.any(Object),
         createdAt: expect.any(Date),

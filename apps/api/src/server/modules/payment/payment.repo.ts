@@ -11,7 +11,7 @@ export interface PaymentEntity {
   provider: PaymentProvider;
   type: PaymentType;
   status: PaymentStatus;
-  bookingId: string;
+  orderId: string;
   clientUserId: string;
   proProfileId: string | null;
   currency: string;
@@ -31,7 +31,7 @@ export interface PaymentEntity {
 export interface PaymentCreateInput {
   provider: PaymentProvider;
   type: PaymentType;
-  bookingId: string;
+  orderId: string;
   clientUserId: string;
   proProfileId: string | null;
   currency: string;
@@ -57,14 +57,14 @@ export interface PaymentUpdateInput {
 export interface PaymentRepository {
   create(input: PaymentCreateInput): Promise<PaymentEntity>;
   findById(id: string): Promise<PaymentEntity | null>;
-  findByBookingId(bookingId: string): Promise<PaymentEntity | null>;
+  findByOrderId(orderId: string): Promise<PaymentEntity | null>;
   findByProviderReference(
     provider: PaymentProvider,
     providerReference: string
   ): Promise<PaymentEntity | null>;
   findAll(filters?: {
     status?: PaymentStatus;
-    query?: string; // Search by bookingId or providerReference
+    query?: string; // Search by orderId or providerReference
     limit?: number;
     cursor?: string;
   }): Promise<PaymentEntity[]>;
@@ -88,7 +88,7 @@ export class PaymentRepositoryImpl implements PaymentRepository {
         provider: input.provider as $Enums.PaymentProvider,
         type: input.type as $Enums.PaymentType,
         status: PaymentStatus.CREATED as $Enums.PaymentStatus,
-        bookingId: input.bookingId,
+        orderId: input.orderId,
         clientUserId: input.clientUserId,
         proProfileId: input.proProfileId,
         currency: input.currency,
@@ -108,9 +108,9 @@ export class PaymentRepositoryImpl implements PaymentRepository {
     return payment ? this.mapPrismaToDomain(payment) : null;
   }
 
-  async findByBookingId(bookingId: string): Promise<PaymentEntity | null> {
+  async findByOrderId(orderId: string): Promise<PaymentEntity | null> {
     const payment = await prisma.payment.findUnique({
-      where: { bookingId },
+      where: { orderId },
     });
 
     return payment ? this.mapPrismaToDomain(payment) : null;
@@ -144,7 +144,7 @@ export class PaymentRepositoryImpl implements PaymentRepository {
 
     if (filters?.query) {
       where.OR = [
-        { bookingId: { contains: filters.query } },
+        { orderId: { contains: filters.query } },
         { providerReference: { contains: filters.query } },
       ];
     }
@@ -247,7 +247,7 @@ export class PaymentRepositoryImpl implements PaymentRepository {
       provider: prismaPayment.provider as PaymentProvider,
       type: prismaPayment.type as PaymentType,
       status: prismaPayment.status as PaymentStatus,
-      bookingId: prismaPayment.bookingId,
+      orderId: prismaPayment.orderId,
       clientUserId: prismaPayment.clientUserId,
       proProfileId: prismaPayment.proProfileId,
       currency: prismaPayment.currency,

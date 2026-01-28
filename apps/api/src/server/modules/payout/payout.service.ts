@@ -372,7 +372,7 @@ export class PayoutService {
     sentAt: Date | null;
     earnings: Array<{
       earningId: string;
-      bookingId: string;
+      orderId: string;
       netAmount: number;
     }>;
   }> {
@@ -399,7 +399,7 @@ export class PayoutService {
         }
         return {
           earningId: earning.id,
-          bookingId: earning.bookingId,
+          orderId: earning.orderId,
           netAmount: earning.netAmount,
         };
       })

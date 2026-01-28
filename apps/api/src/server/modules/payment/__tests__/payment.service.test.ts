@@ -5,10 +5,8 @@ import type {
   PaymentEventRepository,
   PaymentEventEntity,
 } from "../paymentEvent.repo";
-import type {
-  BookingRepository,
-  BookingEntity,
-} from "@modules/booking/booking.repo";
+
+import type { OrderRepository, OrderEntity } from "@modules/order/order.repo";
 import type { ProRepository, ProProfileEntity } from "@modules/pro/pro.repo";
 import type { EarningService } from "@modules/payout/earning.service";
 import type { AuditService } from "@modules/audit/audit.service";
@@ -17,10 +15,10 @@ import {
   PaymentProvider,
   PaymentType,
   PaymentStatus,
-  BookingStatus,
+  OrderStatus,
   Role,
 } from "@repo/domain";
-import { BookingNotFoundError } from "@modules/booking/booking.errors";
+import { OrderNotFoundError } from "@modules/order/order.errors";
 import type { Actor } from "@infra/auth/roles";
 import { getPaymentProviderClient } from "../registry";
 
@@ -34,7 +32,7 @@ describe("PaymentService", () => {
   let mockPaymentEventRepository: ReturnType<
     typeof createMockPaymentEventRepository
   >;
-  let mockBookingRepository: ReturnType<typeof createMockBookingRepository>;
+  let mockOrderRepository: ReturnType<typeof createMockOrderRepository>;
   let mockProRepository: ReturnType<typeof createMockProRepository>;
   let mockEarningService: ReturnType<typeof createMockEarningService>;
   let mockAuditService: ReturnType<typeof createMockAuditService>;
@@ -43,7 +41,7 @@ describe("PaymentService", () => {
   function createMockPaymentRepository(): {
     create: ReturnType<typeof vi.fn>;
     findById: ReturnType<typeof vi.fn>;
-    findByBookingId: ReturnType<typeof vi.fn>;
+    findByOrderId: ReturnType<typeof vi.fn>;
     findByProviderReference: ReturnType<typeof vi.fn>;
     findAll: ReturnType<typeof vi.fn>;
     updateStatusAndAmounts: ReturnType<typeof vi.fn>;
@@ -53,7 +51,7 @@ describe("PaymentService", () => {
     return {
       create: vi.fn(),
       findById: vi.fn(),
-      findByBookingId: vi.fn(),
+      findByOrderId: vi.fn(),
       findByProviderReference: vi.fn(),
       findAll: vi.fn(),
       updateStatusAndAmounts: vi.fn(),
@@ -72,7 +70,7 @@ describe("PaymentService", () => {
     };
   }
 
-  function createMockBookingRepository(): {
+  function createMockOrderRepository(): {
     findById: ReturnType<typeof vi.fn>;
     updateStatus: ReturnType<typeof vi.fn>;
   } {
@@ -91,10 +89,10 @@ describe("PaymentService", () => {
   }
 
   function createMockEarningService(): {
-    createEarningForCompletedBooking: ReturnType<typeof vi.fn>;
+    createEarningForOrder: ReturnType<typeof vi.fn>;
   } {
     return {
-      createEarningForCompletedBooking: vi.fn(),
+      createEarningForOrder: vi.fn(),
     };
   }
 
@@ -119,40 +117,30 @@ describe("PaymentService", () => {
     return { id, role };
   }
 
-  function createMockBooking(
-    overrides?: Partial<BookingEntity>
-  ): BookingEntity {
-    return {
-      id: "booking-1",
-      clientUserId: "client-1",
-      proProfileId: "pro-1",
-      category: "PLUMBING",
-      status: BookingStatus.PENDING_PAYMENT,
-      scheduledAt: new Date(),
-      hoursEstimate: 2,
-      addressText: "123 Main St",
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      ...overrides,
-    };
-  }
-
   function createMockProProfile(
     overrides?: Partial<ProProfileEntity>
   ): ProProfileEntity {
-    return {
+    const base: ProProfileEntity = {
       id: "pro-1",
       userId: "user-1",
       displayName: "Test Pro",
       email: "pro@example.com",
       phone: null,
       bio: null,
+      avatarUrl: null,
       hourlyRate: 100,
       categories: [],
       serviceArea: null,
       status: "active",
+      profileCompleted: false,
+      completedJobsCount: 0,
+      isTopPro: false,
+      responseTimeMinutes: null,
       createdAt: new Date(),
       updatedAt: new Date(),
+    };
+    return {
+      ...base,
       ...overrides,
     };
   }
@@ -165,7 +153,7 @@ describe("PaymentService", () => {
       provider: PaymentProvider.MERCADO_PAGO,
       type: PaymentType.PREAUTH,
       status: PaymentStatus.CREATED,
-      bookingId: "booking-1",
+      orderId: "order-1",
       clientUserId: "client-1",
       proProfileId: "pro-1",
       currency: "UYU",
@@ -174,7 +162,60 @@ describe("PaymentService", () => {
       amountCaptured: null,
       providerReference: null,
       checkoutUrl: null,
-      idempotencyKey: "booking-1-1234567890",
+      idempotencyKey: "order-1-1234567890",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      ...overrides,
+    };
+  }
+
+  function createMockOrder(overrides?: Partial<OrderEntity>): OrderEntity {
+    return {
+      id: "order-1",
+      displayId: "O0001",
+      clientUserId: "client-1",
+      proProfileId: "pro-1",
+      category: "PLUMBING",
+      subcategoryId: null,
+      title: null,
+      description: null,
+      addressText: "123 Main St",
+      addressLat: null,
+      addressLng: null,
+      scheduledWindowStartAt: new Date(),
+      scheduledWindowEndAt: null,
+      status: OrderStatus.ACCEPTED,
+      acceptedAt: new Date(),
+      confirmedAt: null,
+      startedAt: null,
+      arrivedAt: null,
+      completedAt: null,
+      paidAt: null,
+      canceledAt: null,
+      cancelReason: null,
+      pricingMode: "hourly",
+      hourlyRateSnapshotAmount: 100,
+      currency: "UYU",
+      minHoursSnapshot: null,
+      estimatedHours: 2,
+      finalHoursSubmitted: null,
+      approvedHours: null,
+      approvalMethod: null,
+      approvalDeadlineAt: null,
+      subtotalAmount: null,
+      platformFeeAmount: null,
+      taxAmount: null,
+      totalAmount: null,
+      totalsCalculatedAt: null,
+      taxScheme: null,
+      taxRate: null,
+      taxIncluded: false,
+      taxRegion: null,
+      taxCalculatedAt: null,
+      disputeStatus: "none",
+      disputeReason: null,
+      disputeOpenedBy: null,
+      isFirstOrder: false,
       createdAt: new Date(),
       updatedAt: new Date(),
       ...overrides,
@@ -200,7 +241,7 @@ describe("PaymentService", () => {
 
     mockPaymentRepository = createMockPaymentRepository();
     mockPaymentEventRepository = createMockPaymentEventRepository();
-    mockBookingRepository = createMockBookingRepository();
+    mockOrderRepository = createMockOrderRepository();
     mockProRepository = createMockProRepository();
     mockEarningService = createMockEarningService();
     mockAuditService = createMockAuditService();
@@ -213,7 +254,7 @@ describe("PaymentService", () => {
       PaymentProvider.MERCADO_PAGO,
       mockPaymentRepository as unknown as PaymentRepository,
       mockPaymentEventRepository as unknown as PaymentEventRepository,
-      mockBookingRepository as unknown as BookingRepository,
+      mockOrderRepository as unknown as OrderRepository,
       mockProRepository as unknown as ProRepository,
       mockEarningService as unknown as EarningService,
       mockAuditService as unknown as AuditService
@@ -227,15 +268,16 @@ describe("PaymentService", () => {
     });
   });
 
-  describe("createPreauthForBooking", () => {
-    it("should create a preauthorization for a booking", async () => {
+  describe("createPreauthForOrder", () => {
+    it("should create a preauthorization for an order", async () => {
       const actor = createMockActor(Role.CLIENT, "client-1");
-      const booking = createMockBooking({
-        id: "booking-1",
+      const order = createMockOrder({
+        id: "order-1",
         clientUserId: "client-1",
-        status: BookingStatus.PENDING_PAYMENT,
+        status: OrderStatus.ACCEPTED,
         proProfileId: "pro-1",
-        hoursEstimate: 2,
+        hourlyRateSnapshotAmount: 100,
+        estimatedHours: 2,
       });
       const proProfile = createMockProProfile({
         id: "pro-1",
@@ -243,13 +285,13 @@ describe("PaymentService", () => {
       });
       const payment = createMockPayment({
         id: "payment-1",
-        bookingId: "booking-1",
+        orderId: "order-1",
         status: PaymentStatus.REQUIRES_ACTION,
         checkoutUrl: "https://checkout.example.com",
       });
 
-      mockBookingRepository.findById.mockResolvedValue(booking);
-      mockPaymentRepository.findByBookingId.mockResolvedValue(null);
+      mockOrderRepository.findById.mockResolvedValue(order);
+      mockPaymentRepository.findByOrderId.mockResolvedValue(null);
       mockProRepository.findById.mockResolvedValue(proProfile);
       mockPaymentRepository.create.mockResolvedValue(payment);
       vi.mocked(mockProviderClient.createPreauth).mockResolvedValue({
@@ -264,17 +306,18 @@ describe("PaymentService", () => {
         checkoutUrl: "https://checkout.example.com",
       });
 
-      const result = await service.createPreauthForBooking(actor, {
-        bookingId: "booking-1",
+      const result = await service.createPreauthForOrder(actor, {
+        orderId: "order-1",
       });
 
       expect(result.paymentId).toBe("payment-1");
       expect(result.checkoutUrl).toBe("https://checkout.example.com");
-      expect(mockBookingRepository.findById).toHaveBeenCalledWith("booking-1");
-      expect(mockPaymentRepository.findByBookingId).toHaveBeenCalledWith(
-        "booking-1"
+      expect(mockOrderRepository.findById).toHaveBeenCalledWith("order-1");
+      expect(mockPaymentRepository.findByOrderId).toHaveBeenCalledWith(
+        "order-1"
       );
-      expect(mockProRepository.findById).toHaveBeenCalledWith("pro-1");
+      // Note: createPreauthForOrder uses hourlyRateSnapshotAmount from order, not pro profile
+      expect(mockProRepository.findById).not.toHaveBeenCalled();
       expect(mockPaymentRepository.create).toHaveBeenCalled();
       expect(mockProviderClient.createPreauth).toHaveBeenCalled();
       expect(mockPaymentRepository.updateStatusAndAmounts).toHaveBeenCalled();
@@ -284,58 +327,58 @@ describe("PaymentService", () => {
       const actor = createMockActor(Role.PRO);
 
       await expect(
-        service.createPreauthForBooking(actor, { bookingId: "booking-1" })
+        service.createPreauthForOrder(actor, { orderId: "order-1" })
       ).rejects.toThrow("Only clients can create payments");
     });
 
-    it("should throw error if booking not found", async () => {
+    it("should throw error if order not found", async () => {
       const actor = createMockActor(Role.CLIENT);
-      mockBookingRepository.findById.mockResolvedValue(null);
+      mockOrderRepository.findById.mockResolvedValue(null);
 
       await expect(
-        service.createPreauthForBooking(actor, { bookingId: "booking-1" })
-      ).rejects.toThrow(BookingNotFoundError);
+        service.createPreauthForOrder(actor, { orderId: "order-1" })
+      ).rejects.toThrow(OrderNotFoundError);
     });
 
-    it("should throw error if booking does not belong to client", async () => {
+    it("should throw error if order does not belong to client", async () => {
       const actor = createMockActor(Role.CLIENT, "client-2");
-      const booking = createMockBooking({
+      const order = createMockOrder({
         clientUserId: "client-1",
       });
-      mockBookingRepository.findById.mockResolvedValue(booking);
+      mockOrderRepository.findById.mockResolvedValue(order);
 
       await expect(
-        service.createPreauthForBooking(actor, { bookingId: "booking-1" })
-      ).rejects.toThrow("Booking does not belong to this client");
+        service.createPreauthForOrder(actor, { orderId: "order-1" })
+      ).rejects.toThrow("Order does not belong to this client");
     });
 
-    it("should throw error if booking is not in PENDING_PAYMENT status", async () => {
+    it("should throw error if order is not in ACCEPTED status", async () => {
       const actor = createMockActor(Role.CLIENT);
-      const booking = createMockBooking({
-        status: BookingStatus.PENDING,
+      const order = createMockOrder({
+        status: OrderStatus.PENDING_PRO_CONFIRMATION,
       });
-      mockBookingRepository.findById.mockResolvedValue(booking);
+      mockOrderRepository.findById.mockResolvedValue(order);
 
       await expect(
-        service.createPreauthForBooking(actor, { bookingId: "booking-1" })
-      ).rejects.toThrow("Booking must be in PENDING_PAYMENT status");
+        service.createPreauthForOrder(actor, { orderId: "order-1" })
+      ).rejects.toThrow("Order must be in ACCEPTED status");
     });
 
     it("should return existing payment if it is in valid state", async () => {
       const actor = createMockActor(Role.CLIENT);
-      const booking = createMockBooking({
-        status: BookingStatus.PENDING_PAYMENT,
+      const order = createMockOrder({
+        status: OrderStatus.ACCEPTED,
       });
       const existingPayment = createMockPayment({
         status: PaymentStatus.CREATED,
         checkoutUrl: "https://existing-checkout.com",
       });
 
-      mockBookingRepository.findById.mockResolvedValue(booking);
-      mockPaymentRepository.findByBookingId.mockResolvedValue(existingPayment);
+      mockOrderRepository.findById.mockResolvedValue(order);
+      mockPaymentRepository.findByOrderId.mockResolvedValue(existingPayment);
 
-      const result = await service.createPreauthForBooking(actor, {
-        bookingId: "booking-1",
+      const result = await service.createPreauthForOrder(actor, {
+        orderId: "order-1",
       });
 
       expect(result.paymentId).toBe("payment-1");
@@ -345,39 +388,37 @@ describe("PaymentService", () => {
 
     it("should throw error if existing payment is in invalid state", async () => {
       const actor = createMockActor(Role.CLIENT);
-      const booking = createMockBooking({
-        status: BookingStatus.PENDING_PAYMENT,
+      const order = createMockOrder({
+        status: OrderStatus.ACCEPTED,
       });
       const existingPayment = createMockPayment({
         status: PaymentStatus.CAPTURED,
       });
 
-      mockBookingRepository.findById.mockResolvedValue(booking);
-      mockPaymentRepository.findByBookingId.mockResolvedValue(existingPayment);
+      mockOrderRepository.findById.mockResolvedValue(order);
+      mockPaymentRepository.findByOrderId.mockResolvedValue(existingPayment);
 
       await expect(
-        service.createPreauthForBooking(actor, { bookingId: "booking-1" })
-      ).rejects.toThrow("Payment already exists for this booking");
+        service.createPreauthForOrder(actor, { orderId: "order-1" })
+      ).rejects.toThrow("Payment already exists for this order");
     });
 
     it("should handle provider client failure", async () => {
       const actor = createMockActor(Role.CLIENT);
-      const booking = createMockBooking({
-        status: BookingStatus.PENDING_PAYMENT,
+      const order = createMockOrder({
+        status: OrderStatus.ACCEPTED,
       });
-      const proProfile = createMockProProfile({ hourlyRate: 100 });
       const payment = createMockPayment();
 
-      mockBookingRepository.findById.mockResolvedValue(booking);
-      mockPaymentRepository.findByBookingId.mockResolvedValue(null);
-      mockProRepository.findById.mockResolvedValue(proProfile);
+      mockOrderRepository.findById.mockResolvedValue(order);
+      mockPaymentRepository.findByOrderId.mockResolvedValue(null);
       mockPaymentRepository.create.mockResolvedValue(payment);
       vi.mocked(mockProviderClient.createPreauth).mockRejectedValue(
         new Error("Provider error")
       );
 
       await expect(
-        service.createPreauthForBooking(actor, { bookingId: "booking-1" })
+        service.createPreauthForOrder(actor, { orderId: "order-1" })
       ).rejects.toThrow("Provider error");
 
       expect(mockPaymentRepository.updateStatusAndAmounts).toHaveBeenCalledWith(
@@ -392,9 +433,11 @@ describe("PaymentService", () => {
       const payment = createMockPayment({
         status: PaymentStatus.REQUIRES_ACTION,
         providerReference: "mp-ref-123",
+        orderId: "order-1",
       });
-      const booking = createMockBooking({
-        status: BookingStatus.PENDING_PAYMENT,
+      const order = createMockOrder({
+        id: "order-1",
+        status: OrderStatus.ACCEPTED,
       });
       const event = createMockPaymentEvent();
 
@@ -404,15 +447,15 @@ describe("PaymentService", () => {
         status: PaymentStatus.AUTHORIZED,
         authorizedAmount: 20000,
       });
-      mockBookingRepository.findById.mockResolvedValue(booking);
+      mockOrderRepository.findById.mockResolvedValue(order);
       mockPaymentRepository.updateStatusAndAmounts.mockResolvedValue({
         ...payment,
         status: PaymentStatus.AUTHORIZED,
         amountAuthorized: 20000,
       });
-      mockBookingRepository.updateStatus.mockResolvedValue({
-        ...booking,
-        status: BookingStatus.PENDING,
+      mockOrderRepository.updateStatus.mockResolvedValue({
+        ...order,
+        status: OrderStatus.CONFIRMED,
       });
 
       await service.handleProviderWebhook({
@@ -430,9 +473,9 @@ describe("PaymentService", () => {
         "mp-ref-123"
       );
       expect(mockPaymentRepository.updateStatusAndAmounts).toHaveBeenCalled();
-      expect(mockBookingRepository.updateStatus).toHaveBeenCalledWith(
-        "booking-1",
-        BookingStatus.PENDING
+      expect(mockOrderRepository.updateStatus).toHaveBeenCalledWith(
+        "order-1",
+        OrderStatus.CONFIRMED
       );
     });
 
@@ -475,13 +518,15 @@ describe("PaymentService", () => {
       ).not.toHaveBeenCalled();
     });
 
-    it("should create earning when payment is captured and booking is completed", async () => {
+    it("should not create earning when payment is captured (earning is created in OrderFinalizationService)", async () => {
       const payment = createMockPayment({
         status: PaymentStatus.AUTHORIZED,
         providerReference: "mp-ref-123",
+        orderId: "order-1",
       });
-      const booking = createMockBooking({
-        status: BookingStatus.COMPLETED,
+      const order = createMockOrder({
+        id: "order-1",
+        status: OrderStatus.COMPLETED,
       });
       const event = createMockPaymentEvent();
 
@@ -491,15 +536,12 @@ describe("PaymentService", () => {
         status: PaymentStatus.CAPTURED,
         capturedAmount: 20000,
       });
-      mockBookingRepository.findById.mockResolvedValue(booking);
+      mockOrderRepository.findById.mockResolvedValue(order);
       mockPaymentRepository.updateStatusAndAmounts.mockResolvedValue({
         ...payment,
         status: PaymentStatus.CAPTURED,
         amountCaptured: 20000,
       });
-      vi.mocked(
-        mockEarningService.createEarningForCompletedBooking
-      ).mockResolvedValue(undefined);
 
       await service.handleProviderWebhook({
         provider: PaymentProvider.MERCADO_PAGO,
@@ -508,9 +550,8 @@ describe("PaymentService", () => {
         raw: {},
       });
 
-      expect(
-        mockEarningService.createEarningForCompletedBooking
-      ).toHaveBeenCalledWith({ role: "SYSTEM" }, "booking-1");
+      // Earning creation is now handled in OrderFinalizationService, not in webhook handler
+      expect(mockEarningService.createEarningForOrder).not.toHaveBeenCalled();
     });
   });
 
@@ -613,9 +654,11 @@ describe("PaymentService", () => {
       const payment = createMockPayment({
         status: PaymentStatus.REQUIRES_ACTION,
         providerReference: "mp-ref-123",
+        orderId: "order-1",
       });
-      const booking = createMockBooking({
-        status: BookingStatus.PENDING_PAYMENT,
+      const order = createMockOrder({
+        id: "order-1",
+        status: OrderStatus.ACCEPTED,
       });
 
       mockPaymentRepository.findById.mockResolvedValue(payment);
@@ -623,15 +666,15 @@ describe("PaymentService", () => {
         status: PaymentStatus.AUTHORIZED,
         authorizedAmount: 20000,
       });
-      mockBookingRepository.findById.mockResolvedValue(booking);
+      mockOrderRepository.findById.mockResolvedValue(order);
       mockPaymentRepository.updateStatusAndAmounts.mockResolvedValue({
         ...payment,
         status: PaymentStatus.AUTHORIZED,
         amountAuthorized: 20000,
       });
-      mockBookingRepository.updateStatus.mockResolvedValue({
-        ...booking,
-        status: BookingStatus.PENDING,
+      mockOrderRepository.updateStatus.mockResolvedValue({
+        ...order,
+        status: OrderStatus.CONFIRMED,
       });
       vi.mocked(mockAuditService.logEvent).mockResolvedValue(undefined);
 
@@ -642,9 +685,9 @@ describe("PaymentService", () => {
         "mp-ref-123"
       );
       expect(mockPaymentRepository.updateStatusAndAmounts).toHaveBeenCalled();
-      expect(mockBookingRepository.updateStatus).toHaveBeenCalledWith(
-        "booking-1",
-        BookingStatus.PENDING
+      expect(mockOrderRepository.updateStatus).toHaveBeenCalledWith(
+        "order-1",
+        OrderStatus.CONFIRMED
       );
       expect(mockAuditService.logEvent).toHaveBeenCalled();
     });

@@ -1,14 +1,15 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { ReviewService } from "../review.service";
 import type { ReviewRepository } from "../review.repo";
-import type { BookingRepository } from "@modules/booking/booking.repo";
+import type { OrderRepository, OrderEntity } from "@modules/order/order.repo";
 import type { ProRepository, ProProfileEntity } from "@modules/pro/pro.repo";
+import type { ProService } from "@modules/pro/pro.service";
 import type { ReviewCreateInput } from "@repo/domain";
-import { BookingStatus, Role } from "@repo/domain";
+import { OrderStatus, Role } from "@repo/domain";
 import type { Actor } from "@infra/auth/roles";
-import { BookingNotFoundError } from "@modules/booking/booking.errors";
+import { OrderNotFoundError } from "@modules/order/order.errors";
 import {
-  BookingNotCompletedError,
+  OrderNotCompletedError,
   ReviewAlreadyExistsError,
   UnauthorizedReviewError,
 } from "../review.errors";
@@ -16,28 +17,37 @@ import {
 describe("ReviewService", () => {
   let service: ReviewService;
   let mockReviewRepository: ReturnType<typeof createMockReviewRepository>;
-  let mockBookingRepository: ReturnType<typeof createMockBookingRepository>;
+  let mockOrderRepository: ReturnType<typeof createMockOrderRepository>;
   let mockProRepository: ReturnType<typeof createMockProRepository>;
+  let mockProService: ReturnType<typeof createMockProService>;
 
   function createMockReviewRepository(): {
     create: ReturnType<typeof vi.fn>;
-    findByBookingId: ReturnType<typeof vi.fn>;
-    findByBookingIds: ReturnType<typeof vi.fn>;
+    findByOrderId: ReturnType<typeof vi.fn>;
+    findByOrderIds: ReturnType<typeof vi.fn>;
     listForPro: ReturnType<typeof vi.fn>;
   } {
     return {
       create: vi.fn(),
-      findByBookingId: vi.fn(),
-      findByBookingIds: vi.fn(),
+      findByOrderId: vi.fn(),
+      findByOrderIds: vi.fn(),
       listForPro: vi.fn(),
     };
   }
 
-  function createMockBookingRepository(): {
+  function createMockOrderRepository(): {
     findById: ReturnType<typeof vi.fn>;
   } {
     return {
       findById: vi.fn(),
+    };
+  }
+
+  function createMockProService(): {
+    onReviewCreated: ReturnType<typeof vi.fn>;
+  } {
+    return {
+      onReviewCreated: vi.fn(),
     };
   }
 
@@ -53,23 +63,53 @@ describe("ReviewService", () => {
     return { id, role };
   }
 
-  function createMockBooking(
-    overrides?: Partial<{
-      id: string;
-      clientUserId: string;
-      proProfileId: string | null;
-      status: BookingStatus;
-    }>
-  ) {
+  function createMockOrder(overrides?: Partial<OrderEntity>): OrderEntity {
     return {
-      id: "booking-1",
+      id: "order-1",
+      displayId: "O0001",
       clientUserId: "client-1",
       proProfileId: "pro-1",
       category: "PLUMBING",
-      status: BookingStatus.COMPLETED,
-      scheduledAt: new Date(),
-      hoursEstimate: 2,
+      subcategoryId: null,
+      title: null,
+      description: null,
       addressText: "123 Main St",
+      addressLat: null,
+      addressLng: null,
+      scheduledWindowStartAt: new Date(),
+      scheduledWindowEndAt: null,
+      status: OrderStatus.COMPLETED,
+      acceptedAt: new Date(),
+      confirmedAt: null,
+      startedAt: null,
+      arrivedAt: null,
+      completedAt: new Date(),
+      paidAt: null,
+      canceledAt: null,
+      cancelReason: null,
+      pricingMode: "hourly",
+      hourlyRateSnapshotAmount: 100,
+      currency: "UYU",
+      minHoursSnapshot: null,
+      estimatedHours: 2,
+      finalHoursSubmitted: null,
+      approvedHours: null,
+      approvalMethod: null,
+      approvalDeadlineAt: null,
+      subtotalAmount: null,
+      platformFeeAmount: null,
+      taxAmount: null,
+      totalAmount: null,
+      totalsCalculatedAt: null,
+      taxScheme: null,
+      taxRate: null,
+      taxIncluded: false,
+      taxRegion: null,
+      taxCalculatedAt: null,
+      disputeStatus: "none",
+      disputeReason: null,
+      disputeOpenedBy: null,
+      isFirstOrder: false,
       createdAt: new Date(),
       updatedAt: new Date(),
       ...overrides,
@@ -79,14 +119,16 @@ describe("ReviewService", () => {
   function createMockReview(
     overrides?: Partial<{
       id: string;
-      bookingId: string;
+      orderId: string;
       rating: number;
       comment: string | null;
     }>
   ) {
     return {
       id: "review-1",
-      bookingId: "booking-1",
+      orderId: "order-1",
+      proProfileId: "pro-1",
+      clientUserId: "client-1",
       rating: 4,
       comment: "Great service!",
       createdAt: new Date(),
@@ -97,78 +139,88 @@ describe("ReviewService", () => {
   function createMockProProfile(
     overrides?: Partial<ProProfileEntity>
   ): ProProfileEntity {
-    return {
+    const base: ProProfileEntity = {
       id: "pro-1",
       userId: "user-1",
       displayName: "Test Pro",
       email: "pro@example.com",
       phone: null,
       bio: null,
+      avatarUrl: null,
       hourlyRate: 100,
       categories: [],
       serviceArea: null,
       status: "active",
+      profileCompleted: false,
+      completedJobsCount: 0,
+      isTopPro: false,
+      responseTimeMinutes: null,
       createdAt: new Date(),
       updatedAt: new Date(),
+    };
+    return {
+      ...base,
       ...overrides,
     };
   }
 
   beforeEach(() => {
     mockReviewRepository = createMockReviewRepository();
-    mockBookingRepository = createMockBookingRepository();
+    mockOrderRepository = createMockOrderRepository();
     mockProRepository = createMockProRepository();
+    mockProService = createMockProService();
     service = new ReviewService(
       mockReviewRepository as unknown as ReviewRepository,
-      mockBookingRepository as unknown as BookingRepository,
-      mockProRepository as unknown as ProRepository
+      mockOrderRepository as unknown as OrderRepository,
+      mockProRepository as unknown as ProRepository,
+      mockProService as unknown as ProService
     );
   });
 
   describe("createReview", () => {
-    it("should create review for completed booking", async () => {
+    it("should create review for completed order", async () => {
       // Arrange
       const actor = createMockActor(Role.CLIENT, "client-1");
       const input: ReviewCreateInput = {
-        bookingId: "booking-1",
+        orderId: "order-1",
         rating: 4,
         comment: "Great service!",
       };
-      const booking = createMockBooking({
-        id: input.bookingId,
+      const order = createMockOrder({
+        id: input.orderId,
         clientUserId: actor.id,
-        status: BookingStatus.COMPLETED,
+        status: OrderStatus.COMPLETED,
+        proProfileId: "pro-1",
       });
       const review = createMockReview({
-        bookingId: input.bookingId,
+        orderId: input.orderId,
         rating: input.rating,
         comment: input.comment,
       });
 
-      mockBookingRepository.findById.mockResolvedValue(booking);
-      mockReviewRepository.findByBookingId.mockResolvedValue(null);
+      mockOrderRepository.findById.mockResolvedValue(order);
+      mockReviewRepository.findByOrderId.mockResolvedValue(null);
       mockReviewRepository.create.mockResolvedValue(review);
+      vi.mocked(mockProService.onReviewCreated).mockResolvedValue(undefined);
 
       // Act
       const result = await service.createReview(actor, input);
 
       // Assert
-      expect(mockBookingRepository.findById).toHaveBeenCalledWith(
-        input.bookingId
-      );
-      expect(mockReviewRepository.findByBookingId).toHaveBeenCalledWith(
-        input.bookingId
+      expect(mockOrderRepository.findById).toHaveBeenCalledWith(input.orderId);
+      expect(mockReviewRepository.findByOrderId).toHaveBeenCalledWith(
+        input.orderId
       );
       expect(mockReviewRepository.create).toHaveBeenCalledWith({
-        bookingId: input.bookingId,
-        proProfileId: booking.proProfileId,
-        clientUserId: booking.clientUserId,
+        orderId: input.orderId,
+        proProfileId: order.proProfileId,
+        clientUserId: order.clientUserId,
         rating: input.rating,
         comment: input.comment,
       });
       expect(result).toMatchObject({
         id: review.id,
-        bookingId: review.bookingId,
+        orderId: review.orderId,
         rating: review.rating,
         comment: review.comment,
         createdAt: expect.any(Date),
@@ -179,7 +231,7 @@ describe("ReviewService", () => {
       // Arrange
       const actor = createMockActor(Role.PRO, "pro-1");
       const input: ReviewCreateInput = {
-        bookingId: "booking-1",
+        orderId: "order-1",
         rating: 4,
       };
 
@@ -190,14 +242,14 @@ describe("ReviewService", () => {
       await expect(service.createReview(actor, input)).rejects.toThrow(
         "Only clients can create reviews"
       );
-      expect(mockBookingRepository.findById).not.toHaveBeenCalled();
+      expect(mockOrderRepository.findById).not.toHaveBeenCalled();
     });
 
     it("should throw error when rating is less than 1", async () => {
       // Arrange
       const actor = createMockActor(Role.CLIENT);
       const input: ReviewCreateInput = {
-        bookingId: "booking-1",
+        orderId: "order-1",
         rating: 0,
       };
 
@@ -211,7 +263,7 @@ describe("ReviewService", () => {
       // Arrange
       const actor = createMockActor(Role.CLIENT);
       const input: ReviewCreateInput = {
-        bookingId: "booking-1",
+        orderId: "order-1",
         rating: 6,
       };
 
@@ -221,82 +273,82 @@ describe("ReviewService", () => {
       );
     });
 
-    it("should throw BookingNotFoundError when booking does not exist", async () => {
+    it("should throw OrderNotFoundError when order does not exist", async () => {
       // Arrange
       const actor = createMockActor(Role.CLIENT);
       const input: ReviewCreateInput = {
-        bookingId: "non-existent",
+        orderId: "non-existent",
         rating: 4,
       };
 
-      mockBookingRepository.findById.mockResolvedValue(null);
+      mockOrderRepository.findById.mockResolvedValue(null);
 
       // Act & Assert
       await expect(service.createReview(actor, input)).rejects.toThrow(
-        BookingNotFoundError
+        OrderNotFoundError
       );
     });
 
-    it("should throw UnauthorizedReviewError when booking does not belong to client", async () => {
+    it("should throw UnauthorizedReviewError when order does not belong to client", async () => {
       // Arrange
       const actor = createMockActor(Role.CLIENT, "client-1");
       const input: ReviewCreateInput = {
-        bookingId: "booking-1",
+        orderId: "order-1",
         rating: 4,
       };
-      const booking = createMockBooking({
+      const order = createMockOrder({
         clientUserId: "different-client",
       });
 
-      mockBookingRepository.findById.mockResolvedValue(booking);
+      mockOrderRepository.findById.mockResolvedValue(order);
 
       // Act & Assert
       await expect(service.createReview(actor, input)).rejects.toThrow(
         UnauthorizedReviewError
       );
       await expect(service.createReview(actor, input)).rejects.toThrow(
-        "Booking does not belong to this client"
+        "Order does not belong to this client"
       );
     });
 
-    it("should throw BookingNotCompletedError when booking is not completed", async () => {
+    it("should throw OrderNotCompletedError when order is not completed or paid", async () => {
       // Arrange
       const actor = createMockActor(Role.CLIENT, "client-1");
       const input: ReviewCreateInput = {
-        bookingId: "booking-1",
+        orderId: "order-1",
         rating: 4,
       };
-      const booking = createMockBooking({
+      const order = createMockOrder({
         clientUserId: actor.id,
-        status: BookingStatus.PENDING,
+        status: OrderStatus.ACCEPTED,
       });
 
-      mockBookingRepository.findById.mockResolvedValue(booking);
+      mockOrderRepository.findById.mockResolvedValue(order);
 
       // Act & Assert
       await expect(service.createReview(actor, input)).rejects.toThrow(
-        BookingNotCompletedError
+        OrderNotCompletedError
       );
     });
 
-    it("should throw error when booking has no pro assigned", async () => {
+    it("should throw error when order has no pro assigned", async () => {
       // Arrange
       const actor = createMockActor(Role.CLIENT, "client-1");
       const input: ReviewCreateInput = {
-        bookingId: "booking-1",
+        orderId: "order-1",
         rating: 4,
       };
-      const booking = createMockBooking({
+      const order = createMockOrder({
         clientUserId: actor.id,
-        status: BookingStatus.COMPLETED,
+        status: OrderStatus.COMPLETED,
         proProfileId: null,
       });
 
-      mockBookingRepository.findById.mockResolvedValue(booking);
+      mockOrderRepository.findById.mockResolvedValue(order);
 
       // Act & Assert
       await expect(service.createReview(actor, input)).rejects.toThrow(
-        "Booking must have a pro assigned to be reviewed"
+        "Order must have a pro assigned to be reviewed"
       );
     });
 
@@ -304,17 +356,18 @@ describe("ReviewService", () => {
       // Arrange
       const actor = createMockActor(Role.CLIENT, "client-1");
       const input: ReviewCreateInput = {
-        bookingId: "booking-1",
+        orderId: "order-1",
         rating: 4,
       };
-      const booking = createMockBooking({
+      const order = createMockOrder({
         clientUserId: actor.id,
-        status: BookingStatus.COMPLETED,
+        status: OrderStatus.COMPLETED,
+        proProfileId: "pro-1",
       });
       const existingReview = createMockReview();
 
-      mockBookingRepository.findById.mockResolvedValue(booking);
-      mockReviewRepository.findByBookingId.mockResolvedValue(existingReview);
+      mockOrderRepository.findById.mockResolvedValue(order);
+      mockReviewRepository.findByOrderId.mockResolvedValue(existingReview);
 
       // Act & Assert
       await expect(service.createReview(actor, input)).rejects.toThrow(
@@ -327,22 +380,24 @@ describe("ReviewService", () => {
       // Arrange
       const actor = createMockActor(Role.CLIENT, "client-1");
       const input: ReviewCreateInput = {
-        bookingId: "booking-1",
+        orderId: "order-1",
         rating: 5,
         // No comment
       };
-      const booking = createMockBooking({
+      const order = createMockOrder({
         clientUserId: actor.id,
-        status: BookingStatus.COMPLETED,
+        status: OrderStatus.COMPLETED,
+        proProfileId: "pro-1",
       });
       const review = createMockReview({
         rating: 5,
         comment: null,
       });
 
-      mockBookingRepository.findById.mockResolvedValue(booking);
-      mockReviewRepository.findByBookingId.mockResolvedValue(null);
+      mockOrderRepository.findById.mockResolvedValue(order);
+      mockReviewRepository.findByOrderId.mockResolvedValue(null);
       mockReviewRepository.create.mockResolvedValue(review);
+      vi.mocked(mockProService.onReviewCreated).mockResolvedValue(undefined);
 
       // Act
       const result = await service.createReview(actor, input);
@@ -357,27 +412,27 @@ describe("ReviewService", () => {
     });
   });
 
-  describe("getByBookingId", () => {
-    it("should return review when client views their own booking review", async () => {
+  describe("getByOrderId", () => {
+    it("should return review when client views their own order review", async () => {
       // Arrange
       const actor = createMockActor(Role.CLIENT, "client-1");
-      const bookingId = "booking-1";
-      const booking = createMockBooking({
-        id: bookingId,
+      const orderId = "order-1";
+      const order = createMockOrder({
+        id: orderId,
         clientUserId: actor.id,
       });
-      const review = createMockReview({ bookingId });
+      const review = createMockReview({ orderId });
 
-      mockBookingRepository.findById.mockResolvedValue(booking);
-      mockReviewRepository.findByBookingId.mockResolvedValue(review);
+      mockOrderRepository.findById.mockResolvedValue(order);
+      mockReviewRepository.findByOrderId.mockResolvedValue(review);
 
       // Act
-      const result = await service.getByBookingId(actor, bookingId);
+      const result = await service.getByOrderId(actor, orderId);
 
       // Assert
       expect(result).toMatchObject({
         id: review.id,
-        bookingId: review.bookingId,
+        orderId: review.orderId,
         rating: review.rating,
         comment: review.comment,
         createdAt: expect.any(Date),
@@ -387,17 +442,17 @@ describe("ReviewService", () => {
     it("should return null when review does not exist yet", async () => {
       // Arrange
       const actor = createMockActor(Role.CLIENT, "client-1");
-      const bookingId = "booking-1";
-      const booking = createMockBooking({
-        id: bookingId,
+      const orderId = "order-1";
+      const order = createMockOrder({
+        id: orderId,
         clientUserId: actor.id,
       });
 
-      mockBookingRepository.findById.mockResolvedValue(booking);
-      mockReviewRepository.findByBookingId.mockResolvedValue(null);
+      mockOrderRepository.findById.mockResolvedValue(order);
+      mockReviewRepository.findByOrderId.mockResolvedValue(null);
 
       // Act
-      const result = await service.getByBookingId(actor, bookingId);
+      const result = await service.getByOrderId(actor, orderId);
 
       // Assert
       expect(result).toBeNull();
@@ -406,41 +461,41 @@ describe("ReviewService", () => {
     it("should allow admin to view any review", async () => {
       // Arrange
       const actor = createMockActor(Role.ADMIN, "admin-1");
-      const bookingId = "booking-1";
-      const booking = createMockBooking({ id: bookingId });
-      const review = createMockReview({ bookingId });
+      const orderId = "order-1";
+      const order = createMockOrder({ id: orderId });
+      const review = createMockReview({ orderId });
 
-      mockBookingRepository.findById.mockResolvedValue(booking);
-      mockReviewRepository.findByBookingId.mockResolvedValue(review);
+      mockOrderRepository.findById.mockResolvedValue(order);
+      mockReviewRepository.findByOrderId.mockResolvedValue(review);
 
       // Act
-      const result = await service.getByBookingId(actor, bookingId);
+      const result = await service.getByOrderId(actor, orderId);
 
       // Assert
       expect(result).not.toBeNull();
       expect(mockProRepository.findByUserId).not.toHaveBeenCalled();
     });
 
-    it("should allow pro to view review for their assigned booking", async () => {
+    it("should allow pro to view review for their assigned order", async () => {
       // Arrange
       const actor = createMockActor(Role.PRO, "pro-1");
-      const bookingId = "booking-1";
-      const booking = createMockBooking({
-        id: bookingId,
+      const orderId = "order-1";
+      const order = createMockOrder({
+        id: orderId,
         proProfileId: "pro-1",
       });
-      const review = createMockReview({ bookingId });
+      const review = createMockReview({ orderId });
       const proProfile = createMockProProfile({
         id: "pro-1",
         userId: actor.id,
       });
 
-      mockBookingRepository.findById.mockResolvedValue(booking);
+      mockOrderRepository.findById.mockResolvedValue(order);
       mockProRepository.findByUserId.mockResolvedValue(proProfile);
-      mockReviewRepository.findByBookingId.mockResolvedValue(review);
+      mockReviewRepository.findByOrderId.mockResolvedValue(review);
 
       // Act
-      const result = await service.getByBookingId(actor, bookingId);
+      const result = await service.getByOrderId(actor, orderId);
 
       // Assert
       expect(result).not.toBeNull();
@@ -450,26 +505,26 @@ describe("ReviewService", () => {
     it("should throw UnauthorizedReviewError when client tries to view another client's review", async () => {
       // Arrange
       const actor = createMockActor(Role.CLIENT, "client-1");
-      const bookingId = "booking-1";
-      const booking = createMockBooking({
-        id: bookingId,
+      const orderId = "order-1";
+      const order = createMockOrder({
+        id: orderId,
         clientUserId: "different-client",
       });
 
-      mockBookingRepository.findById.mockResolvedValue(booking);
+      mockOrderRepository.findById.mockResolvedValue(order);
 
       // Act & Assert
-      await expect(service.getByBookingId(actor, bookingId)).rejects.toThrow(
+      await expect(service.getByOrderId(actor, orderId)).rejects.toThrow(
         UnauthorizedReviewError
       );
     });
 
-    it("should throw UnauthorizedReviewError when pro tries to view review for unassigned booking", async () => {
+    it("should throw UnauthorizedReviewError when pro tries to view review for unassigned order", async () => {
       // Arrange
       const actor = createMockActor(Role.PRO, "pro-1");
-      const bookingId = "booking-1";
-      const booking = createMockBooking({
-        id: bookingId,
+      const orderId = "order-1";
+      const order = createMockOrder({
+        id: orderId,
         proProfileId: "different-pro",
       });
       const proProfile = createMockProProfile({
@@ -477,25 +532,25 @@ describe("ReviewService", () => {
         userId: actor.id,
       });
 
-      mockBookingRepository.findById.mockResolvedValue(booking);
+      mockOrderRepository.findById.mockResolvedValue(order);
       mockProRepository.findByUserId.mockResolvedValue(proProfile);
 
       // Act & Assert
-      await expect(service.getByBookingId(actor, bookingId)).rejects.toThrow(
+      await expect(service.getByOrderId(actor, orderId)).rejects.toThrow(
         UnauthorizedReviewError
       );
     });
 
-    it("should throw BookingNotFoundError when booking does not exist", async () => {
+    it("should throw OrderNotFoundError when order does not exist", async () => {
       // Arrange
       const actor = createMockActor(Role.CLIENT);
-      const bookingId = "non-existent";
+      const orderId = "non-existent";
 
-      mockBookingRepository.findById.mockResolvedValue(null);
+      mockOrderRepository.findById.mockResolvedValue(null);
 
       // Act & Assert
-      await expect(service.getByBookingId(actor, bookingId)).rejects.toThrow(
-        BookingNotFoundError
+      await expect(service.getByOrderId(actor, orderId)).rejects.toThrow(
+        OrderNotFoundError
       );
     });
   });
@@ -523,6 +578,7 @@ describe("ReviewService", () => {
       expect(result).toHaveLength(2);
       expect(result[0]).toMatchObject({
         id: "review-1",
+        orderId: "order-1",
         rating: 5,
         createdAt: expect.any(Date),
       });
@@ -561,56 +617,56 @@ describe("ReviewService", () => {
     });
   });
 
-  describe("getReviewStatusByBookingIds", () => {
-    it("should return status map for multiple bookings", async () => {
+  describe("getReviewStatusByOrderIds", () => {
+    it("should return status map for multiple orders", async () => {
       // Arrange
-      const bookingIds = ["booking-1", "booking-2", "booking-3"];
+      const orderIds = ["order-1", "order-2", "order-3"];
       const reviews = [
-        createMockReview({ bookingId: "booking-1" }),
-        createMockReview({ bookingId: "booking-3" }),
+        createMockReview({ orderId: "order-1" }),
+        createMockReview({ orderId: "order-3" }),
       ];
 
-      mockReviewRepository.findByBookingIds.mockResolvedValue(reviews);
+      mockReviewRepository.findByOrderIds.mockResolvedValue(reviews);
 
       // Act
-      const result = await service.getReviewStatusByBookingIds(bookingIds);
+      const result = await service.getReviewStatusByOrderIds(orderIds);
 
       // Assert
-      expect(mockReviewRepository.findByBookingIds).toHaveBeenCalledWith(
-        bookingIds
+      expect(mockReviewRepository.findByOrderIds).toHaveBeenCalledWith(
+        orderIds
       );
       expect(result).toEqual({
-        "booking-1": true,
-        "booking-2": false,
-        "booking-3": true,
+        "order-1": true,
+        "order-2": false,
+        "order-3": true,
       });
     });
 
-    it("should return empty object when no booking IDs provided", async () => {
+    it("should return empty object when no order IDs provided", async () => {
       // Arrange
-      mockReviewRepository.findByBookingIds.mockResolvedValue([]);
+      mockReviewRepository.findByOrderIds.mockResolvedValue([]);
 
       // Act
-      const result = await service.getReviewStatusByBookingIds([]);
+      const result = await service.getReviewStatusByOrderIds([]);
 
       // Assert
       expect(result).toEqual({});
-      expect(mockReviewRepository.findByBookingIds).not.toHaveBeenCalled();
+      expect(mockReviewRepository.findByOrderIds).not.toHaveBeenCalled();
     });
 
     it("should return all false when no reviews exist", async () => {
       // Arrange
-      const bookingIds = ["booking-1", "booking-2"];
+      const orderIds = ["order-1", "order-2"];
 
-      mockReviewRepository.findByBookingIds.mockResolvedValue([]);
+      mockReviewRepository.findByOrderIds.mockResolvedValue([]);
 
       // Act
-      const result = await service.getReviewStatusByBookingIds(bookingIds);
+      const result = await service.getReviewStatusByOrderIds(orderIds);
 
       // Assert
       expect(result).toEqual({
-        "booking-1": false,
-        "booking-2": false,
+        "order-1": false,
+        "order-2": false,
       });
     });
   });

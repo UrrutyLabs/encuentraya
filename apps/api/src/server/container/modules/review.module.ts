@@ -8,7 +8,7 @@ import { ReviewService } from "@modules/review/review.service";
 
 /**
  * Register Review module dependencies
- * Depends on: BookingRepository, ProRepository (injected via container)
+ * Depends on: OrderRepository, ProRepository (injected via container)
  */
 export function registerReviewModule(container: DependencyContainer): void {
   // Register repository
@@ -16,7 +16,7 @@ export function registerReviewModule(container: DependencyContainer): void {
     useClass: ReviewRepositoryImpl,
   });
 
-  // Register service (auto-resolves BookingRepository and ProRepository from container)
+  // Register service (auto-resolves OrderRepository and ProRepository from container)
   container.register<ReviewService>(TOKENS.ReviewService, {
     useClass: ReviewService,
   });

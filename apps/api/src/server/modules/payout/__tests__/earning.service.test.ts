@@ -1,71 +1,71 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { EarningService, EarningCreationError } from "../earning.service";
 import type { EarningRepository, EarningEntity } from "../earning.repo";
+import type { OrderRepository, OrderEntity } from "@modules/order/order.repo";
 import type {
-  BookingRepository,
-  BookingEntity,
-} from "@modules/booking/booking.repo";
+  OrderLineItemRepository,
+  OrderLineItemEntity,
+} from "@modules/order/orderLineItem.repo";
 import type {
   PaymentRepository,
   PaymentEntity,
 } from "@modules/payment/payment.repo";
 import type { ProRepository } from "@modules/pro/pro.repo";
 import {
-  BookingStatus,
+  OrderStatus,
   PaymentStatus,
   PaymentProvider,
   PaymentType,
+  OrderLineItemType,
 } from "@repo/domain";
-import { BookingNotFoundError } from "@modules/booking/booking.errors";
+import { OrderNotFoundError } from "@modules/order/order.errors";
 import type { Actor } from "@infra/auth/roles";
 
 describe("EarningService", () => {
   let service: EarningService;
   let mockEarningRepository: ReturnType<typeof createMockEarningRepository>;
-  let mockBookingRepository: ReturnType<typeof createMockBookingRepository>;
+  let mockOrderRepository: ReturnType<typeof createMockOrderRepository>;
+  let mockOrderLineItemRepository: ReturnType<
+    typeof createMockOrderLineItemRepository
+  >;
   let mockPaymentRepository: ReturnType<typeof createMockPaymentRepository>;
   let mockProRepository: ReturnType<typeof createMockProRepository>;
 
   function createMockEarningRepository(): {
-    findByBookingId: ReturnType<typeof vi.fn>;
-    createFromBooking: ReturnType<typeof vi.fn>;
+    findByOrderId: ReturnType<typeof vi.fn>;
+    createFromOrder: ReturnType<typeof vi.fn>;
     listPendingDue: ReturnType<typeof vi.fn>;
     markManyStatus: ReturnType<typeof vi.fn>;
   } {
     return {
-      findByBookingId: vi.fn(),
-      createFromBooking: vi.fn(),
+      findByOrderId: vi.fn(),
+      createFromOrder: vi.fn(),
       listPendingDue: vi.fn(),
       markManyStatus: vi.fn(),
     };
   }
 
-  function createMockBookingRepository(): {
+  function createMockOrderRepository(): {
     findById: ReturnType<typeof vi.fn>;
   } {
     return {
-      findById: vi.fn().mockResolvedValue({
-        id: "booking-1",
-        displayId: "A0002",
-        clientUserId: "client-1",
-        proProfileId: "pro-1",
-        category: "PLUMBING",
-        status: BookingStatus.COMPLETED,
-        scheduledAt: new Date(),
-        hoursEstimate: 2,
-        addressText: "123 Main St",
-        isFirstBooking: false,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      }),
+      findById: vi.fn(),
+    };
+  }
+
+  function createMockOrderLineItemRepository(): {
+    findByOrderId: ReturnType<typeof vi.fn>;
+  } {
+    return {
+      findByOrderId: vi.fn(),
     };
   }
 
   function createMockPaymentRepository(): {
-    findByBookingId: ReturnType<typeof vi.fn>;
+    findByOrderId: ReturnType<typeof vi.fn>;
   } {
     return {
-      findByBookingId: vi.fn(),
+      findByOrderId: vi.fn(),
     };
   }
 
@@ -87,20 +87,53 @@ describe("EarningService", () => {
     return { id, role: role as Actor["role"] };
   }
 
-  function createMockBooking(
-    overrides?: Partial<BookingEntity>
-  ): BookingEntity {
+  function createMockOrder(overrides?: Partial<OrderEntity>): OrderEntity {
     return {
-      id: "booking-1",
-      displayId: "A0002",
+      id: "order-1",
+      displayId: "O0001",
       clientUserId: "client-1",
       proProfileId: "pro-1",
       category: "PLUMBING",
-      status: BookingStatus.COMPLETED,
-      scheduledAt: new Date(),
-      hoursEstimate: 2,
+      subcategoryId: null,
+      title: null,
+      description: null,
       addressText: "123 Main St",
-      isFirstBooking: false,
+      addressLat: null,
+      addressLng: null,
+      scheduledWindowStartAt: new Date(),
+      scheduledWindowEndAt: null,
+      status: OrderStatus.COMPLETED,
+      acceptedAt: new Date(),
+      confirmedAt: null,
+      startedAt: null,
+      arrivedAt: null,
+      completedAt: new Date(),
+      paidAt: null,
+      canceledAt: null,
+      cancelReason: null,
+      pricingMode: "hourly",
+      hourlyRateSnapshotAmount: 100,
+      currency: "UYU",
+      minHoursSnapshot: null,
+      estimatedHours: 2,
+      finalHoursSubmitted: null,
+      approvedHours: null,
+      approvalMethod: null,
+      approvalDeadlineAt: null,
+      subtotalAmount: null,
+      platformFeeAmount: null,
+      taxAmount: null,
+      totalAmount: null,
+      totalsCalculatedAt: null,
+      taxScheme: null,
+      taxRate: null,
+      taxIncluded: false,
+      taxRegion: null,
+      taxCalculatedAt: null,
+      disputeStatus: "none",
+      disputeReason: null,
+      disputeOpenedBy: null,
+      isFirstOrder: false,
       createdAt: new Date(),
       updatedAt: new Date(),
       ...overrides,
@@ -115,7 +148,7 @@ describe("EarningService", () => {
       provider: PaymentProvider.MERCADO_PAGO,
       type: PaymentType.PREAUTH,
       status: PaymentStatus.CAPTURED,
-      bookingId: "booking-1",
+      orderId: "order-1",
       clientUserId: "client-1",
       proProfileId: "pro-1",
       currency: "UYU",
@@ -124,9 +157,29 @@ describe("EarningService", () => {
       amountCaptured: 20000,
       providerReference: "mp-ref-123",
       checkoutUrl: null,
-      idempotencyKey: "booking-1-1234567890",
+      idempotencyKey: "order-1-1234567890",
       createdAt: new Date(),
       updatedAt: new Date(),
+      ...overrides,
+    };
+  }
+
+  function createMockOrderLineItem(
+    overrides?: Partial<OrderLineItemEntity>
+  ): OrderLineItemEntity {
+    return {
+      id: "line-item-1",
+      orderId: "order-1",
+      type: OrderLineItemType.LABOR,
+      description: "Labor (2 horas × 100 UYU/hora)",
+      quantity: 2,
+      unitAmount: 100,
+      amount: 200, // In major units (dollars)
+      currency: "UYU",
+      taxBehavior: "taxable",
+      taxRate: null,
+      metadata: null,
+      createdAt: new Date(),
       ...overrides,
     };
   }
@@ -136,13 +189,13 @@ describe("EarningService", () => {
   ): EarningEntity {
     return {
       id: "earning-1",
-      bookingId: "booking-1",
+      orderId: "order-1",
       proProfileId: "pro-1",
       clientUserId: "client-1",
       currency: "UYU",
-      grossAmount: 20000,
-      platformFeeAmount: 2000,
-      netAmount: 18000,
+      grossAmount: 20000, // In minor units (cents)
+      platformFeeAmount: 2000, // In minor units (cents)
+      netAmount: 18000, // In minor units (cents)
       status: "PENDING",
       availableAt: new Date(),
       createdAt: new Date(),
@@ -153,55 +206,73 @@ describe("EarningService", () => {
 
   beforeEach(() => {
     mockEarningRepository = createMockEarningRepository();
-    mockBookingRepository = createMockBookingRepository();
+    mockOrderRepository = createMockOrderRepository();
+    mockOrderLineItemRepository = createMockOrderLineItemRepository();
     mockPaymentRepository = createMockPaymentRepository();
     mockProRepository = createMockProRepository();
 
     service = new EarningService(
       mockEarningRepository as unknown as EarningRepository,
-      mockBookingRepository as unknown as BookingRepository,
       mockPaymentRepository as unknown as PaymentRepository,
-      mockProRepository as unknown as ProRepository
+      mockProRepository as unknown as ProRepository,
+      mockOrderRepository as unknown as OrderRepository,
+      mockOrderLineItemRepository as unknown as OrderLineItemRepository
     );
   });
 
-  describe("createEarningForCompletedBooking", () => {
-    it("should create an earning for a completed booking", async () => {
+  describe("createEarningForOrder", () => {
+    it("should create an earning for a completed order", async () => {
       const actor = createMockActor("ADMIN");
-      const booking = createMockBooking({
-        id: "booking-1",
-        status: BookingStatus.COMPLETED,
+      const order = createMockOrder({
+        id: "order-1",
+        status: OrderStatus.COMPLETED,
         proProfileId: "pro-1",
+        currency: "UYU",
       });
       const payment = createMockPayment({
-        bookingId: "booking-1",
+        orderId: "order-1",
         status: PaymentStatus.CAPTURED,
         amountCaptured: 20000,
         currency: "UYU",
       });
+      const laborItem = createMockOrderLineItem({
+        type: OrderLineItemType.LABOR,
+        amount: 200, // $200.00 in major units
+      });
+      const platformFeeItem = createMockOrderLineItem({
+        type: OrderLineItemType.PLATFORM_FEE,
+        amount: 20, // $20.00 in major units
+      });
       const earning = createMockEarning();
 
-      mockBookingRepository.findById.mockResolvedValue(booking);
-      mockEarningRepository.findByBookingId.mockResolvedValue(null);
-      mockPaymentRepository.findByBookingId.mockResolvedValue(payment);
-      mockEarningRepository.createFromBooking.mockResolvedValue(earning);
+      mockOrderRepository.findById.mockResolvedValue(order);
+      mockEarningRepository.findByOrderId.mockResolvedValue(null);
+      mockPaymentRepository.findByOrderId.mockResolvedValue(payment);
+      mockOrderLineItemRepository.findByOrderId.mockResolvedValue([
+        laborItem,
+        platformFeeItem,
+      ]);
+      mockEarningRepository.createFromOrder.mockResolvedValue(earning);
 
-      await service.createEarningForCompletedBooking(actor, "booking-1");
+      await service.createEarningForOrder(actor, "order-1");
 
-      expect(mockBookingRepository.findById).toHaveBeenCalledWith("booking-1");
-      expect(mockEarningRepository.findByBookingId).toHaveBeenCalledWith(
-        "booking-1"
+      expect(mockOrderRepository.findById).toHaveBeenCalledWith("order-1");
+      expect(mockEarningRepository.findByOrderId).toHaveBeenCalledWith(
+        "order-1"
       );
-      expect(mockPaymentRepository.findByBookingId).toHaveBeenCalledWith(
-        "booking-1"
+      expect(mockPaymentRepository.findByOrderId).toHaveBeenCalledWith(
+        "order-1"
       );
-      expect(mockEarningRepository.createFromBooking).toHaveBeenCalledWith({
-        bookingId: "booking-1",
+      expect(mockOrderLineItemRepository.findByOrderId).toHaveBeenCalledWith(
+        "order-1"
+      );
+      expect(mockEarningRepository.createFromOrder).toHaveBeenCalledWith({
+        orderId: "order-1",
         proProfileId: "pro-1",
         clientUserId: "client-1",
         currency: "UYU",
-        grossAmount: 20000,
-        platformFeeAmount: 2000, // 10% of 20000
+        grossAmount: 20000, // $200.00 * 100 = 20000 cents
+        platformFeeAmount: 2000, // $20.00 * 100 = 2000 cents
         netAmount: 18000, // 20000 - 2000
         availableAt: expect.any(Date),
       });
@@ -209,90 +280,90 @@ describe("EarningService", () => {
 
     it("should be idempotent if earning already exists", async () => {
       const actor = createMockActor("ADMIN");
-      const booking = createMockBooking({ status: BookingStatus.COMPLETED });
+      const order = createMockOrder({ status: OrderStatus.COMPLETED });
       const existingEarning = createMockEarning();
 
-      mockBookingRepository.findById.mockResolvedValue(booking);
-      mockEarningRepository.findByBookingId.mockResolvedValue(existingEarning);
+      mockOrderRepository.findById.mockResolvedValue(order);
+      mockEarningRepository.findByOrderId.mockResolvedValue(existingEarning);
 
-      await service.createEarningForCompletedBooking(actor, "booking-1");
+      await service.createEarningForOrder(actor, "order-1");
 
-      expect(mockEarningRepository.createFromBooking).not.toHaveBeenCalled();
+      expect(mockEarningRepository.createFromOrder).not.toHaveBeenCalled();
     });
 
-    it("should throw error if booking not found", async () => {
+    it("should throw error if order not found", async () => {
       const actor = createMockActor("ADMIN");
-      mockBookingRepository.findById.mockResolvedValue(null);
+      mockOrderRepository.findById.mockResolvedValue(null);
 
       await expect(
-        service.createEarningForCompletedBooking(actor, "booking-1")
-      ).rejects.toThrow(BookingNotFoundError);
+        service.createEarningForOrder(actor, "order-1")
+      ).rejects.toThrow(OrderNotFoundError);
     });
 
-    it("should throw error if booking is not COMPLETED", async () => {
+    it("should throw error if order is not COMPLETED", async () => {
       const actor = createMockActor("ADMIN");
-      const booking = createMockBooking({
-        status: BookingStatus.PENDING,
+      const order = createMockOrder({
+        status: OrderStatus.ACCEPTED,
       });
 
-      mockBookingRepository.findById.mockResolvedValue(booking);
+      mockOrderRepository.findById.mockResolvedValue(order);
 
       await expect(
-        service.createEarningForCompletedBooking(actor, "booking-1")
+        service.createEarningForOrder(actor, "order-1")
       ).rejects.toThrow(EarningCreationError);
-      expect(mockEarningRepository.createFromBooking).not.toHaveBeenCalled();
+      expect(mockEarningRepository.createFromOrder).not.toHaveBeenCalled();
     });
 
     it("should throw error if payment not found", async () => {
       const actor = createMockActor("ADMIN");
-      const booking = createMockBooking({ status: BookingStatus.COMPLETED });
+      const order = createMockOrder({ status: OrderStatus.COMPLETED });
 
-      mockBookingRepository.findById.mockResolvedValue(booking);
-      mockEarningRepository.findByBookingId.mockResolvedValue(null);
-      mockPaymentRepository.findByBookingId.mockResolvedValue(null);
+      mockOrderRepository.findById.mockResolvedValue(order);
+      mockEarningRepository.findByOrderId.mockResolvedValue(null);
+      mockPaymentRepository.findByOrderId.mockResolvedValue(null);
 
       await expect(
-        service.createEarningForCompletedBooking(actor, "booking-1")
-      ).rejects.toThrow("No payment found for booking booking-1");
+        service.createEarningForOrder(actor, "order-1")
+      ).rejects.toThrow("No payment found for order order-1");
     });
 
     it("should throw error if payment is not CAPTURED", async () => {
       const actor = createMockActor("ADMIN");
-      const booking = createMockBooking({ status: BookingStatus.COMPLETED });
+      const order = createMockOrder({ status: OrderStatus.COMPLETED });
       const payment = createMockPayment({
         status: PaymentStatus.AUTHORIZED,
       });
 
-      mockBookingRepository.findById.mockResolvedValue(booking);
-      mockEarningRepository.findByBookingId.mockResolvedValue(null);
-      mockPaymentRepository.findByBookingId.mockResolvedValue(payment);
+      mockOrderRepository.findById.mockResolvedValue(order);
+      mockEarningRepository.findByOrderId.mockResolvedValue(null);
+      mockPaymentRepository.findByOrderId.mockResolvedValue(payment);
 
       await expect(
-        service.createEarningForCompletedBooking(actor, "booking-1")
-      ).rejects.toThrow("Payment for booking booking-1 must be CAPTURED");
+        service.createEarningForOrder(actor, "order-1")
+      ).rejects.toThrow("Payment for order order-1 must be CAPTURED");
     });
 
     it("should throw error if payment has no captured amount", async () => {
       const actor = createMockActor("ADMIN");
-      const booking = createMockBooking({ status: BookingStatus.COMPLETED });
+      const order = createMockOrder({ status: OrderStatus.COMPLETED });
       const payment = createMockPayment({
         status: PaymentStatus.CAPTURED,
         amountCaptured: null,
       });
 
-      mockBookingRepository.findById.mockResolvedValue(booking);
-      mockEarningRepository.findByBookingId.mockResolvedValue(null);
-      mockPaymentRepository.findByBookingId.mockResolvedValue(payment);
+      mockOrderRepository.findById.mockResolvedValue(order);
+      mockEarningRepository.findByOrderId.mockResolvedValue(null);
+      mockPaymentRepository.findByOrderId.mockResolvedValue(payment);
 
       await expect(
-        service.createEarningForCompletedBooking(actor, "booking-1")
-      ).rejects.toThrow("Payment for booking booking-1 has no captured amount");
+        service.createEarningForOrder(actor, "order-1")
+      ).rejects.toThrow("Payment for order order-1 has no captured amount");
     });
 
-    it("should throw error if booking has no proProfileId", async () => {
+    it("should throw error if order has no proProfileId", async () => {
       const actor = createMockActor("ADMIN");
-      const booking = createMockBooking({
-        status: BookingStatus.COMPLETED,
+      const order = createMockOrder({
+        status: OrderStatus.COMPLETED,
         proProfileId: null,
       });
       const payment = createMockPayment({
@@ -300,35 +371,100 @@ describe("EarningService", () => {
         amountCaptured: 20000,
       });
 
-      mockBookingRepository.findById.mockResolvedValue(booking);
-      mockEarningRepository.findByBookingId.mockResolvedValue(null);
-      mockPaymentRepository.findByBookingId.mockResolvedValue(payment);
+      mockOrderRepository.findById.mockResolvedValue(order);
+      mockEarningRepository.findByOrderId.mockResolvedValue(null);
+      mockPaymentRepository.findByOrderId.mockResolvedValue(payment);
 
       await expect(
-        service.createEarningForCompletedBooking(actor, "booking-1")
-      ).rejects.toThrow("Booking booking-1 has no proProfileId");
+        service.createEarningForOrder(actor, "order-1")
+      ).rejects.toThrow("Order order-1 has no proProfileId");
     });
 
-    it("should work with SYSTEM actor", async () => {
-      const systemActor = createMockActor("SYSTEM");
-      const booking = createMockBooking({
-        status: BookingStatus.COMPLETED,
+    it("should throw error if order has no labor line item", async () => {
+      const actor = createMockActor("ADMIN");
+      const order = createMockOrder({
+        status: OrderStatus.COMPLETED,
         proProfileId: "pro-1",
       });
       const payment = createMockPayment({
         status: PaymentStatus.CAPTURED,
         amountCaptured: 20000,
       });
+      const platformFeeItem = createMockOrderLineItem({
+        type: OrderLineItemType.PLATFORM_FEE,
+        amount: 20,
+      });
+
+      mockOrderRepository.findById.mockResolvedValue(order);
+      mockEarningRepository.findByOrderId.mockResolvedValue(null);
+      mockPaymentRepository.findByOrderId.mockResolvedValue(payment);
+      mockOrderLineItemRepository.findByOrderId.mockResolvedValue([
+        platformFeeItem,
+      ]);
+
+      await expect(
+        service.createEarningForOrder(actor, "order-1")
+      ).rejects.toThrow("Order order-1 has no labor line item");
+    });
+
+    it("should throw error if order has no platform_fee line item", async () => {
+      const actor = createMockActor("ADMIN");
+      const order = createMockOrder({
+        status: OrderStatus.COMPLETED,
+        proProfileId: "pro-1",
+      });
+      const payment = createMockPayment({
+        status: PaymentStatus.CAPTURED,
+        amountCaptured: 20000,
+      });
+      const laborItem = createMockOrderLineItem({
+        type: OrderLineItemType.LABOR,
+        amount: 200,
+      });
+
+      mockOrderRepository.findById.mockResolvedValue(order);
+      mockEarningRepository.findByOrderId.mockResolvedValue(null);
+      mockPaymentRepository.findByOrderId.mockResolvedValue(payment);
+      mockOrderLineItemRepository.findByOrderId.mockResolvedValue([laborItem]);
+
+      await expect(
+        service.createEarningForOrder(actor, "order-1")
+      ).rejects.toThrow("Order order-1 has no platform_fee line item");
+    });
+
+    it("should work with SYSTEM actor", async () => {
+      const systemActor = createMockActor("SYSTEM");
+      const order = createMockOrder({
+        status: OrderStatus.COMPLETED,
+        proProfileId: "pro-1",
+        currency: "UYU",
+      });
+      const payment = createMockPayment({
+        status: PaymentStatus.CAPTURED,
+        amountCaptured: 20000,
+      });
+      const laborItem = createMockOrderLineItem({
+        type: OrderLineItemType.LABOR,
+        amount: 200,
+      });
+      const platformFeeItem = createMockOrderLineItem({
+        type: OrderLineItemType.PLATFORM_FEE,
+        amount: 20,
+      });
       const earning = createMockEarning();
 
-      mockBookingRepository.findById.mockResolvedValue(booking);
-      mockEarningRepository.findByBookingId.mockResolvedValue(null);
-      mockPaymentRepository.findByBookingId.mockResolvedValue(payment);
-      mockEarningRepository.createFromBooking.mockResolvedValue(earning);
+      mockOrderRepository.findById.mockResolvedValue(order);
+      mockEarningRepository.findByOrderId.mockResolvedValue(null);
+      mockPaymentRepository.findByOrderId.mockResolvedValue(payment);
+      mockOrderLineItemRepository.findByOrderId.mockResolvedValue([
+        laborItem,
+        platformFeeItem,
+      ]);
+      mockEarningRepository.createFromOrder.mockResolvedValue(earning);
 
-      await service.createEarningForCompletedBooking(systemActor, "booking-1");
+      await service.createEarningForOrder(systemActor, "order-1");
 
-      expect(mockEarningRepository.createFromBooking).toHaveBeenCalled();
+      expect(mockEarningRepository.createFromOrder).toHaveBeenCalled();
     });
   });
 

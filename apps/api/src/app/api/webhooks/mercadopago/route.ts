@@ -17,7 +17,7 @@ import { getWebhookCorsHeaders } from "@/server/infrastructure/cors";
  * Flow:
  * 1. Parse webhook payload using MercadoPagoClient.parseWebhook
  * 2. Pass event to PaymentService.handleProviderWebhook
- * 3. PaymentService updates Payment and Booking status safely
+ * 3. PaymentService updates Payment and Order status safely
  * 4. Return 200 quickly (async processing)
  *
  * Example curl (for testing with real MP payload):

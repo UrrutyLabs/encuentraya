@@ -1,12 +1,8 @@
 import { describe, it, expect } from "vitest";
 import {
   calculateProfileCompleted,
-  calculateCompletedJobsCount,
   calculateIsTopPro,
-  calculateResponseTimeMinutes,
 } from "../pro.calculations";
-import { BookingStatus } from "@repo/domain";
-import type { BookingEntity } from "@modules/booking/booking.repo";
 
 describe("pro.calculations", () => {
   describe("calculateProfileCompleted", () => {
@@ -52,115 +48,6 @@ describe("pro.calculations", () => {
     });
   });
 
-  describe("calculateCompletedJobsCount", () => {
-    it("should return 0 for empty bookings array", () => {
-      expect(calculateCompletedJobsCount([])).toBe(0);
-    });
-
-    it("should count only completed bookings", () => {
-      const bookings: BookingEntity[] = [
-        {
-          id: "booking-1",
-          displayId: "B001",
-          clientUserId: "client-1",
-          proProfileId: "pro-1",
-          category: "PLUMBING",
-          status: BookingStatus.COMPLETED,
-          scheduledAt: new Date(),
-          hoursEstimate: 2,
-          addressText: "123 Main St",
-          isFirstBooking: false,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-        {
-          id: "booking-2",
-          displayId: "B002",
-          clientUserId: "client-1",
-          proProfileId: "pro-1",
-          category: "PLUMBING",
-          status: BookingStatus.PENDING,
-          scheduledAt: new Date(),
-          hoursEstimate: 2,
-          addressText: "123 Main St",
-          isFirstBooking: false,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-        {
-          id: "booking-3",
-          displayId: "B003",
-          clientUserId: "client-1",
-          proProfileId: "pro-1",
-          category: "PLUMBING",
-          status: BookingStatus.COMPLETED,
-          scheduledAt: new Date(),
-          hoursEstimate: 2,
-          addressText: "123 Main St",
-          isFirstBooking: false,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-      ];
-
-      expect(calculateCompletedJobsCount(bookings)).toBe(2);
-    });
-
-    it("should return 0 when no bookings are completed", () => {
-      const bookings: BookingEntity[] = [
-        {
-          id: "booking-1",
-          displayId: "B001",
-          clientUserId: "client-1",
-          proProfileId: "pro-1",
-          category: "PLUMBING",
-          status: BookingStatus.PENDING,
-          scheduledAt: new Date(),
-          hoursEstimate: 2,
-          addressText: "123 Main St",
-          isFirstBooking: false,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-        {
-          id: "booking-2",
-          displayId: "B002",
-          clientUserId: "client-1",
-          proProfileId: "pro-1",
-          category: "PLUMBING",
-          status: BookingStatus.ACCEPTED,
-          scheduledAt: new Date(),
-          hoursEstimate: 2,
-          addressText: "123 Main St",
-          isFirstBooking: false,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-      ];
-
-      expect(calculateCompletedJobsCount(bookings)).toBe(0);
-    });
-
-    it("should count all bookings when all are completed", () => {
-      const bookings: BookingEntity[] = Array.from({ length: 5 }, (_, i) => ({
-        id: `booking-${i}`,
-        displayId: `B00${i}`,
-        clientUserId: "client-1",
-        proProfileId: "pro-1",
-        category: "PLUMBING",
-        status: BookingStatus.COMPLETED,
-        scheduledAt: new Date(),
-        hoursEstimate: 2,
-        addressText: "123 Main St",
-        isFirstBooking: false,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      }));
-
-      expect(calculateCompletedJobsCount(bookings)).toBe(5);
-    });
-  });
-
   describe("calculateIsTopPro", () => {
     it("should return true when completedJobsCount is exactly 10", () => {
       expect(calculateIsTopPro(10)).toBe(true);
@@ -183,29 +70,6 @@ describe("pro.calculations", () => {
       expect(calculateIsTopPro(9)).toBe(false);
       expect(calculateIsTopPro(10)).toBe(true);
       expect(calculateIsTopPro(11)).toBe(true);
-    });
-  });
-
-  describe("calculateResponseTimeMinutes", () => {
-    it("should return null (not yet implemented)", () => {
-      const bookings: BookingEntity[] = [
-        {
-          id: "booking-1",
-          displayId: "B001",
-          clientUserId: "client-1",
-          proProfileId: "pro-1",
-          category: "PLUMBING",
-          status: BookingStatus.COMPLETED,
-          scheduledAt: new Date(),
-          hoursEstimate: 2,
-          addressText: "123 Main St",
-          isFirstBooking: false,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-      ];
-
-      expect(calculateResponseTimeMinutes(bookings)).toBeNull();
     });
   });
 });

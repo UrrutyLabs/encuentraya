@@ -38,10 +38,15 @@ export type ClientProfile = Prisma.ClientProfileModel
  */
 export type Availability = Prisma.AvailabilityModel
 /**
- * Model Booking
+ * Model Order
  * 
  */
-export type Booking = Prisma.BookingModel
+export type Order = Prisma.OrderModel
+/**
+ * Model OrderLineItem
+ * 
+ */
+export type OrderLineItem = Prisma.OrderLineItemModel
 /**
  * Model Review
  * 

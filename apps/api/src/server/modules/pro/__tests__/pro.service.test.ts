@@ -3,7 +3,7 @@ import { ProService } from "../pro.service";
 import type { ProRepository, ProProfileEntity } from "../pro.repo";
 import type { ReviewRepository } from "@modules/review/review.repo";
 import type { UserRepository, UserEntity } from "@modules/user/user.repo";
-import type { BookingRepository } from "@modules/booking/booking.repo";
+import type { OrderRepository } from "@modules/order/order.repo";
 import type {
   ProPayoutProfileRepository,
   ProPayoutProfileEntity,
@@ -17,7 +17,7 @@ import type {
   ProSetAvailabilityInput,
   Category,
 } from "@repo/domain";
-import { Role, BookingStatus } from "@repo/domain";
+import { Role } from "@repo/domain";
 import type { Actor } from "@infra/auth/roles";
 
 describe("ProService", () => {
@@ -25,7 +25,7 @@ describe("ProService", () => {
   let mockProRepository: ReturnType<typeof createMockProRepository>;
   let mockReviewRepository: ReturnType<typeof createMockReviewRepository>;
   let mockUserRepository: ReturnType<typeof createMockUserRepository>;
-  let mockBookingRepository: ReturnType<typeof createMockBookingRepository>;
+  let mockOrderRepository: ReturnType<typeof createMockOrderRepository>;
   let mockProPayoutProfileRepository: ReturnType<
     typeof createMockProPayoutProfileRepository
   >;
@@ -75,13 +75,11 @@ describe("ProService", () => {
     };
   }
 
-  function createMockBookingRepository(): {
-    findByProProfileId: ReturnType<typeof vi.fn>;
-    countCompletedBookingsByProProfileId: ReturnType<typeof vi.fn>;
+  function createMockOrderRepository(): {
+    countCompletedOrdersByProProfileId: ReturnType<typeof vi.fn>;
   } {
     return {
-      findByProProfileId: vi.fn(),
-      countCompletedBookingsByProProfileId: vi.fn(),
+      countCompletedOrdersByProProfileId: vi.fn(),
     };
   }
 
@@ -178,7 +176,7 @@ describe("ProService", () => {
   ) {
     return {
       id: "review-1",
-      bookingId: "booking-1",
+      orderId: "order-1",
       proProfileId: "pro-1",
       clientUserId: "client-1",
       rating: 4,
@@ -212,7 +210,7 @@ describe("ProService", () => {
     mockProRepository = createMockProRepository();
     mockReviewRepository = createMockReviewRepository();
     mockUserRepository = createMockUserRepository();
-    mockBookingRepository = createMockBookingRepository();
+    mockOrderRepository = createMockOrderRepository();
     mockProPayoutProfileRepository = createMockProPayoutProfileRepository();
     mockAvailabilityRepository = createMockAvailabilityRepository();
     mockAvailabilityService = createMockAvailabilityService();
@@ -225,7 +223,7 @@ describe("ProService", () => {
       mockProRepository as unknown as ProRepository,
       mockReviewRepository as unknown as ReviewRepository,
       mockUserRepository as unknown as UserRepository,
-      mockBookingRepository as unknown as BookingRepository,
+      mockOrderRepository as unknown as OrderRepository,
       mockProPayoutProfileRepository as unknown as ProPayoutProfileRepository,
       mockAvailabilityRepository as unknown as AvailabilityRepository,
       mockAvailabilityService as unknown as AvailabilityService,
@@ -936,8 +934,6 @@ describe("ProService", () => {
       expect(
         mockProPayoutProfileRepository.findByProProfileIds
       ).toHaveBeenCalledWith(["pro-1", "pro-2"]);
-      // Verify bookings are NOT fetched anymore
-      expect(mockBookingRepository.findByProProfileId).not.toHaveBeenCalled();
       expect(result).toHaveLength(2);
       expect(result[0]).toMatchObject({
         id: "pro-1",
@@ -1261,125 +1257,6 @@ describe("ProService", () => {
     });
   });
 
-  describe("updateCalculatedFieldsOnBookingCompletion", () => {
-    it("should update completedJobsCount and isTopPro based on completed bookings", async () => {
-      // Arrange
-      const proProfileId = "pro-1";
-      const proProfile = createMockProProfile({
-        id: proProfileId,
-        completedJobsCount: 0,
-        isTopPro: false,
-      });
-      const updatedProProfile = createMockProProfile({
-        id: proProfileId,
-        completedJobsCount: 3,
-        isTopPro: false,
-      });
-
-      mockProRepository.findById.mockResolvedValue(proProfile);
-      mockBookingRepository.countCompletedBookingsByProProfileId.mockResolvedValue(
-        3
-      );
-      mockProRepository.update.mockResolvedValue(updatedProProfile);
-
-      // Act
-      await service.updateCalculatedFieldsOnBookingCompletion(proProfileId);
-
-      // Assert
-      expect(mockProRepository.findById).toHaveBeenCalledWith(proProfileId);
-      expect(
-        mockBookingRepository.countCompletedBookingsByProProfileId
-      ).toHaveBeenCalledWith(proProfileId);
-      // Verify findByProProfileId is NOT called anymore
-      expect(mockBookingRepository.findByProProfileId).not.toHaveBeenCalled();
-      expect(mockProRepository.update).toHaveBeenCalledWith(proProfileId, {
-        completedJobsCount: 3,
-        isTopPro: false,
-      });
-    });
-
-    it("should set isTopPro to true when completedJobsCount >= 10", async () => {
-      // Arrange
-      const proProfileId = "pro-1";
-      const proProfile = createMockProProfile({
-        id: proProfileId,
-        completedJobsCount: 0,
-        isTopPro: false,
-      });
-      const updatedProProfile = createMockProProfile({
-        id: proProfileId,
-        completedJobsCount: 10,
-        isTopPro: true,
-      });
-
-      mockProRepository.findById.mockResolvedValue(proProfile);
-      mockBookingRepository.countCompletedBookingsByProProfileId.mockResolvedValue(
-        10
-      );
-      mockProRepository.update.mockResolvedValue(updatedProProfile);
-
-      // Act
-      await service.updateCalculatedFieldsOnBookingCompletion(proProfileId);
-
-      // Assert
-      expect(
-        mockBookingRepository.countCompletedBookingsByProProfileId
-      ).toHaveBeenCalledWith(proProfileId);
-      expect(mockProRepository.update).toHaveBeenCalledWith(proProfileId, {
-        completedJobsCount: 10,
-        isTopPro: true,
-      });
-    });
-
-    it("should set isTopPro to false when completedJobsCount < 10", async () => {
-      // Arrange
-      const proProfileId = "pro-1";
-      const proProfile = createMockProProfile({
-        id: proProfileId,
-        completedJobsCount: 10,
-        isTopPro: true, // Currently top pro
-      });
-      const updatedProProfile = createMockProProfile({
-        id: proProfileId,
-        completedJobsCount: 9,
-        isTopPro: false,
-      });
-
-      mockProRepository.findById.mockResolvedValue(proProfile);
-      mockBookingRepository.countCompletedBookingsByProProfileId.mockResolvedValue(
-        9
-      );
-      mockProRepository.update.mockResolvedValue(updatedProProfile);
-
-      // Act
-      await service.updateCalculatedFieldsOnBookingCompletion(proProfileId);
-
-      // Assert
-      expect(
-        mockBookingRepository.countCompletedBookingsByProProfileId
-      ).toHaveBeenCalledWith(proProfileId);
-      expect(mockProRepository.update).toHaveBeenCalledWith(proProfileId, {
-        completedJobsCount: 9,
-        isTopPro: false,
-      });
-    });
-
-    it("should throw error when pro profile not found", async () => {
-      // Arrange
-      const proProfileId = "pro-1";
-      mockProRepository.findById.mockResolvedValue(null);
-
-      // Act & Assert
-      await expect(
-        service.updateCalculatedFieldsOnBookingCompletion(proProfileId)
-      ).rejects.toThrow(`Pro profile not found: ${proProfileId}`);
-      expect(
-        mockBookingRepository.countCompletedBookingsByProProfileId
-      ).not.toHaveBeenCalled();
-      expect(mockProRepository.update).not.toHaveBeenCalled();
-    });
-  });
-
   describe("getProById - profileCompleted filtering", () => {
     it("should return null when pro profile is not completed", async () => {
       // Arrange
@@ -1699,173 +1576,6 @@ describe("ProService", () => {
         hourlyRate: 150,
       });
       // profileCompleted should not be included in update when avatarUrl/bio are not changed
-    });
-  });
-
-  describe("updateCalculatedFieldsOnBookingCompletion - edge cases", () => {
-    it("should handle empty bookings array", async () => {
-      // Arrange
-      const proProfileId = "pro-1";
-      const proProfile = createMockProProfile({
-        id: proProfileId,
-        completedJobsCount: 5,
-        isTopPro: false,
-      });
-      const updatedProProfile = createMockProProfile({
-        id: proProfileId,
-        completedJobsCount: 0,
-        isTopPro: false,
-      });
-
-      mockProRepository.findById.mockResolvedValue(proProfile);
-      mockBookingRepository.countCompletedBookingsByProProfileId.mockResolvedValue(
-        0
-      );
-      mockProRepository.update.mockResolvedValue(updatedProProfile);
-
-      // Act
-      await service.updateCalculatedFieldsOnBookingCompletion(proProfileId);
-
-      // Assert
-      expect(
-        mockBookingRepository.countCompletedBookingsByProProfileId
-      ).toHaveBeenCalledWith(proProfileId);
-      expect(mockProRepository.update).toHaveBeenCalledWith(proProfileId, {
-        completedJobsCount: 0,
-        isTopPro: false,
-      });
-    });
-
-    it("should handle all bookings completed", async () => {
-      // Arrange
-      const proProfileId = "pro-1";
-      const proProfile = createMockProProfile({
-        id: proProfileId,
-        completedJobsCount: 0,
-        isTopPro: false,
-      });
-      const updatedProProfile = createMockProProfile({
-        id: proProfileId,
-        completedJobsCount: 15,
-        isTopPro: true,
-      });
-
-      mockProRepository.findById.mockResolvedValue(proProfile);
-      mockBookingRepository.countCompletedBookingsByProProfileId.mockResolvedValue(
-        15
-      );
-      mockProRepository.update.mockResolvedValue(updatedProProfile);
-
-      // Act
-      await service.updateCalculatedFieldsOnBookingCompletion(proProfileId);
-
-      // Assert
-      expect(
-        mockBookingRepository.countCompletedBookingsByProProfileId
-      ).toHaveBeenCalledWith(proProfileId);
-      expect(mockProRepository.update).toHaveBeenCalledWith(proProfileId, {
-        completedJobsCount: 15,
-        isTopPro: true,
-      });
-    });
-
-    it("should handle no bookings completed", async () => {
-      // Arrange
-      const proProfileId = "pro-1";
-      const proProfile = createMockProProfile({
-        id: proProfileId,
-        completedJobsCount: 10,
-        isTopPro: true,
-      });
-      const updatedProProfile = createMockProProfile({
-        id: proProfileId,
-        completedJobsCount: 0,
-        isTopPro: false,
-      });
-
-      mockProRepository.findById.mockResolvedValue(proProfile);
-      mockBookingRepository.countCompletedBookingsByProProfileId.mockResolvedValue(
-        0
-      );
-      mockProRepository.update.mockResolvedValue(updatedProProfile);
-
-      // Act
-      await service.updateCalculatedFieldsOnBookingCompletion(proProfileId);
-
-      // Assert
-      expect(
-        mockBookingRepository.countCompletedBookingsByProProfileId
-      ).toHaveBeenCalledWith(proProfileId);
-      expect(mockProRepository.update).toHaveBeenCalledWith(proProfileId, {
-        completedJobsCount: 0,
-        isTopPro: false,
-      });
-    });
-
-    it("should handle exactly 10 completed jobs (threshold)", async () => {
-      // Arrange
-      const proProfileId = "pro-1";
-      const proProfile = createMockProProfile({
-        id: proProfileId,
-        completedJobsCount: 9,
-        isTopPro: false,
-      });
-      const updatedProProfile = createMockProProfile({
-        id: proProfileId,
-        completedJobsCount: 10,
-        isTopPro: true,
-      });
-
-      mockProRepository.findById.mockResolvedValue(proProfile);
-      mockBookingRepository.countCompletedBookingsByProProfileId.mockResolvedValue(
-        10
-      );
-      mockProRepository.update.mockResolvedValue(updatedProProfile);
-
-      // Act
-      await service.updateCalculatedFieldsOnBookingCompletion(proProfileId);
-
-      // Assert
-      expect(
-        mockBookingRepository.countCompletedBookingsByProProfileId
-      ).toHaveBeenCalledWith(proProfileId);
-      expect(mockProRepository.update).toHaveBeenCalledWith(proProfileId, {
-        completedJobsCount: 10,
-        isTopPro: true,
-      });
-    });
-
-    it("should handle exactly 9 completed jobs (below threshold)", async () => {
-      // Arrange
-      const proProfileId = "pro-1";
-      const proProfile = createMockProProfile({
-        id: proProfileId,
-        completedJobsCount: 10,
-        isTopPro: true,
-      });
-      const updatedProProfile = createMockProProfile({
-        id: proProfileId,
-        completedJobsCount: 9,
-        isTopPro: false,
-      });
-
-      mockProRepository.findById.mockResolvedValue(proProfile);
-      mockBookingRepository.countCompletedBookingsByProProfileId.mockResolvedValue(
-        9
-      );
-      mockProRepository.update.mockResolvedValue(updatedProProfile);
-
-      // Act
-      await service.updateCalculatedFieldsOnBookingCompletion(proProfileId);
-
-      // Assert
-      expect(
-        mockBookingRepository.countCompletedBookingsByProProfileId
-      ).toHaveBeenCalledWith(proProfileId);
-      expect(mockProRepository.update).toHaveBeenCalledWith(proProfileId, {
-        completedJobsCount: 9,
-        isTopPro: false,
-      });
     });
   });
 

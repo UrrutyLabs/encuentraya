@@ -388,7 +388,8 @@ export const ModelName = {
   ProProfile: 'ProProfile',
   ClientProfile: 'ClientProfile',
   Availability: 'Availability',
-  Booking: 'Booking',
+  Order: 'Order',
+  OrderLineItem: 'OrderLineItem',
   Review: 'Review',
   Payment: 'Payment',
   PaymentEvent: 'PaymentEvent',
@@ -416,7 +417,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "proProfile" | "clientProfile" | "availability" | "booking" | "review" | "payment" | "paymentEvent" | "notificationDelivery" | "devicePushToken" | "proPayoutProfile" | "earning" | "payout" | "payoutItem" | "auditLog" | "categoryMetadata" | "subcategory"
+    modelProps: "user" | "proProfile" | "clientProfile" | "availability" | "order" | "orderLineItem" | "review" | "payment" | "paymentEvent" | "notificationDelivery" | "devicePushToken" | "proPayoutProfile" | "earning" | "payout" | "payoutItem" | "auditLog" | "categoryMetadata" | "subcategory"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -716,77 +717,151 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
-    Booking: {
-      payload: Prisma.$BookingPayload<ExtArgs>
-      fields: Prisma.BookingFieldRefs
+    Order: {
+      payload: Prisma.$OrderPayload<ExtArgs>
+      fields: Prisma.OrderFieldRefs
       operations: {
         findUnique: {
-          args: Prisma.BookingFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$BookingPayload> | null
+          args: Prisma.OrderFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderPayload> | null
         }
         findUniqueOrThrow: {
-          args: Prisma.BookingFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$BookingPayload>
+          args: Prisma.OrderFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderPayload>
         }
         findFirst: {
-          args: Prisma.BookingFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$BookingPayload> | null
+          args: Prisma.OrderFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderPayload> | null
         }
         findFirstOrThrow: {
-          args: Prisma.BookingFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$BookingPayload>
+          args: Prisma.OrderFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderPayload>
         }
         findMany: {
-          args: Prisma.BookingFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$BookingPayload>[]
+          args: Prisma.OrderFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderPayload>[]
         }
         create: {
-          args: Prisma.BookingCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$BookingPayload>
+          args: Prisma.OrderCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderPayload>
         }
         createMany: {
-          args: Prisma.BookingCreateManyArgs<ExtArgs>
+          args: Prisma.OrderCreateManyArgs<ExtArgs>
           result: BatchPayload
         }
         createManyAndReturn: {
-          args: Prisma.BookingCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$BookingPayload>[]
+          args: Prisma.OrderCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderPayload>[]
         }
         delete: {
-          args: Prisma.BookingDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$BookingPayload>
+          args: Prisma.OrderDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderPayload>
         }
         update: {
-          args: Prisma.BookingUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$BookingPayload>
+          args: Prisma.OrderUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderPayload>
         }
         deleteMany: {
-          args: Prisma.BookingDeleteManyArgs<ExtArgs>
+          args: Prisma.OrderDeleteManyArgs<ExtArgs>
           result: BatchPayload
         }
         updateMany: {
-          args: Prisma.BookingUpdateManyArgs<ExtArgs>
+          args: Prisma.OrderUpdateManyArgs<ExtArgs>
           result: BatchPayload
         }
         updateManyAndReturn: {
-          args: Prisma.BookingUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$BookingPayload>[]
+          args: Prisma.OrderUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderPayload>[]
         }
         upsert: {
-          args: Prisma.BookingUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$BookingPayload>
+          args: Prisma.OrderUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderPayload>
         }
         aggregate: {
-          args: Prisma.BookingAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateBooking>
+          args: Prisma.OrderAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateOrder>
         }
         groupBy: {
-          args: Prisma.BookingGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.BookingGroupByOutputType>[]
+          args: Prisma.OrderGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.OrderGroupByOutputType>[]
         }
         count: {
-          args: Prisma.BookingCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.BookingCountAggregateOutputType> | number
+          args: Prisma.OrderCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.OrderCountAggregateOutputType> | number
+        }
+      }
+    }
+    OrderLineItem: {
+      payload: Prisma.$OrderLineItemPayload<ExtArgs>
+      fields: Prisma.OrderLineItemFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.OrderLineItemFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderLineItemPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.OrderLineItemFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderLineItemPayload>
+        }
+        findFirst: {
+          args: Prisma.OrderLineItemFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderLineItemPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.OrderLineItemFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderLineItemPayload>
+        }
+        findMany: {
+          args: Prisma.OrderLineItemFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderLineItemPayload>[]
+        }
+        create: {
+          args: Prisma.OrderLineItemCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderLineItemPayload>
+        }
+        createMany: {
+          args: Prisma.OrderLineItemCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.OrderLineItemCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderLineItemPayload>[]
+        }
+        delete: {
+          args: Prisma.OrderLineItemDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderLineItemPayload>
+        }
+        update: {
+          args: Prisma.OrderLineItemUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderLineItemPayload>
+        }
+        deleteMany: {
+          args: Prisma.OrderLineItemDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.OrderLineItemUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.OrderLineItemUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderLineItemPayload>[]
+        }
+        upsert: {
+          args: Prisma.OrderLineItemUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OrderLineItemPayload>
+        }
+        aggregate: {
+          args: Prisma.OrderLineItemAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateOrderLineItem>
+        }
+        groupBy: {
+          args: Prisma.OrderLineItemGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.OrderLineItemGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.OrderLineItemCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.OrderLineItemCountAggregateOutputType> | number
         }
       }
     }
@@ -1778,28 +1853,80 @@ export const AvailabilityScalarFieldEnum = {
 export type AvailabilityScalarFieldEnum = (typeof AvailabilityScalarFieldEnum)[keyof typeof AvailabilityScalarFieldEnum]
 
 
-export const BookingScalarFieldEnum = {
+export const OrderScalarFieldEnum = {
   id: 'id',
   displayId: 'displayId',
   clientUserId: 'clientUserId',
   proProfileId: 'proProfileId',
   category: 'category',
   subcategoryId: 'subcategoryId',
-  status: 'status',
-  scheduledAt: 'scheduledAt',
-  hoursEstimate: 'hoursEstimate',
+  title: 'title',
+  description: 'description',
   addressText: 'addressText',
-  isFirstBooking: 'isFirstBooking',
+  addressLat: 'addressLat',
+  addressLng: 'addressLng',
+  scheduledWindowStartAt: 'scheduledWindowStartAt',
+  scheduledWindowEndAt: 'scheduledWindowEndAt',
+  status: 'status',
+  acceptedAt: 'acceptedAt',
+  confirmedAt: 'confirmedAt',
+  startedAt: 'startedAt',
+  arrivedAt: 'arrivedAt',
+  completedAt: 'completedAt',
+  paidAt: 'paidAt',
+  canceledAt: 'canceledAt',
+  cancelReason: 'cancelReason',
+  pricingMode: 'pricingMode',
+  hourlyRateSnapshotAmount: 'hourlyRateSnapshotAmount',
+  currency: 'currency',
+  minHoursSnapshot: 'minHoursSnapshot',
+  estimatedHours: 'estimatedHours',
+  finalHoursSubmitted: 'finalHoursSubmitted',
+  approvedHours: 'approvedHours',
+  approvalMethod: 'approvalMethod',
+  approvalDeadlineAt: 'approvalDeadlineAt',
+  subtotalAmount: 'subtotalAmount',
+  platformFeeAmount: 'platformFeeAmount',
+  taxAmount: 'taxAmount',
+  totalAmount: 'totalAmount',
+  totalsCalculatedAt: 'totalsCalculatedAt',
+  taxScheme: 'taxScheme',
+  taxRate: 'taxRate',
+  taxIncluded: 'taxIncluded',
+  taxRegion: 'taxRegion',
+  taxCalculatedAt: 'taxCalculatedAt',
+  disputeStatus: 'disputeStatus',
+  disputeReason: 'disputeReason',
+  disputeOpenedBy: 'disputeOpenedBy',
+  isFirstOrder: 'isFirstOrder',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
-export type BookingScalarFieldEnum = (typeof BookingScalarFieldEnum)[keyof typeof BookingScalarFieldEnum]
+export type OrderScalarFieldEnum = (typeof OrderScalarFieldEnum)[keyof typeof OrderScalarFieldEnum]
+
+
+export const OrderLineItemScalarFieldEnum = {
+  id: 'id',
+  orderId: 'orderId',
+  type: 'type',
+  description: 'description',
+  quantity: 'quantity',
+  unitAmount: 'unitAmount',
+  amount: 'amount',
+  currency: 'currency',
+  taxBehavior: 'taxBehavior',
+  taxRate: 'taxRate',
+  metadata: 'metadata',
+  createdAt: 'createdAt'
+} as const
+
+export type OrderLineItemScalarFieldEnum = (typeof OrderLineItemScalarFieldEnum)[keyof typeof OrderLineItemScalarFieldEnum]
 
 
 export const ReviewScalarFieldEnum = {
   id: 'id',
-  bookingId: 'bookingId',
+  orderId: 'orderId',
   proProfileId: 'proProfileId',
   clientUserId: 'clientUserId',
   rating: 'rating',
@@ -1815,7 +1942,7 @@ export const PaymentScalarFieldEnum = {
   provider: 'provider',
   type: 'type',
   status: 'status',
-  bookingId: 'bookingId',
+  orderId: 'orderId',
   clientUserId: 'clientUserId',
   proProfileId: 'proProfileId',
   currency: 'currency',
@@ -1900,7 +2027,7 @@ export type ProPayoutProfileScalarFieldEnum = (typeof ProPayoutProfileScalarFiel
 
 export const EarningScalarFieldEnum = {
   id: 'id',
-  bookingId: 'bookingId',
+  orderId: 'orderId',
   proProfileId: 'proProfileId',
   clientUserId: 'clientUserId',
   currency: 'currency',
@@ -2001,19 +2128,19 @@ export const SortOrder = {
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
 
 
-export const JsonNullValueInput = {
-  JsonNull: JsonNull
-} as const
-
-export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
-
-
 export const NullableJsonNullValueInput = {
   DbNull: DbNull,
   JsonNull: JsonNull
 } as const
 
 export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
+
+
+export const JsonNullValueInput = {
+  JsonNull: JsonNull
+} as const
+
+export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
 
 
 export const QueryMode = {
@@ -2167,16 +2294,100 @@ export type ListEnumPreferredContactMethodFieldRefInput<$PrismaModel> = FieldRef
 
 
 /**
- * Reference to a field of type 'BookingStatus'
+ * Reference to a field of type 'OrderStatus'
  */
-export type EnumBookingStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BookingStatus'>
+export type EnumOrderStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'OrderStatus'>
     
 
 
 /**
- * Reference to a field of type 'BookingStatus[]'
+ * Reference to a field of type 'OrderStatus[]'
  */
-export type ListEnumBookingStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BookingStatus[]'>
+export type ListEnumOrderStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'OrderStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'PricingMode'
+ */
+export type EnumPricingModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PricingMode'>
+    
+
+
+/**
+ * Reference to a field of type 'PricingMode[]'
+ */
+export type ListEnumPricingModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PricingMode[]'>
+    
+
+
+/**
+ * Reference to a field of type 'ApprovalMethod'
+ */
+export type EnumApprovalMethodFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ApprovalMethod'>
+    
+
+
+/**
+ * Reference to a field of type 'ApprovalMethod[]'
+ */
+export type ListEnumApprovalMethodFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ApprovalMethod[]'>
+    
+
+
+/**
+ * Reference to a field of type 'DisputeStatus'
+ */
+export type EnumDisputeStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DisputeStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'DisputeStatus[]'
+ */
+export type ListEnumDisputeStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DisputeStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'OrderLineItemType'
+ */
+export type EnumOrderLineItemTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'OrderLineItemType'>
+    
+
+
+/**
+ * Reference to a field of type 'OrderLineItemType[]'
+ */
+export type ListEnumOrderLineItemTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'OrderLineItemType[]'>
+    
+
+
+/**
+ * Reference to a field of type 'TaxBehavior'
+ */
+export type EnumTaxBehaviorFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TaxBehavior'>
+    
+
+
+/**
+ * Reference to a field of type 'TaxBehavior[]'
+ */
+export type ListEnumTaxBehaviorFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TaxBehavior[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Json'
+ */
+export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+    
+
+
+/**
+ * Reference to a field of type 'QueryMode'
+ */
+export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
     
 
 
@@ -2219,20 +2430,6 @@ export type EnumPaymentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$Pr
  * Reference to a field of type 'PaymentStatus[]'
  */
 export type ListEnumPaymentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PaymentStatus[]'>
-    
-
-
-/**
- * Reference to a field of type 'Json'
- */
-export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
-    
-
-
-/**
- * Reference to a field of type 'QueryMode'
- */
-export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
     
 
 
@@ -2460,7 +2657,8 @@ export type GlobalOmitConfig = {
   proProfile?: Prisma.ProProfileOmit
   clientProfile?: Prisma.ClientProfileOmit
   availability?: Prisma.AvailabilityOmit
-  booking?: Prisma.BookingOmit
+  order?: Prisma.OrderOmit
+  orderLineItem?: Prisma.OrderLineItemOmit
   review?: Prisma.ReviewOmit
   payment?: Prisma.PaymentOmit
   paymentEvent?: Prisma.PaymentEventOmit

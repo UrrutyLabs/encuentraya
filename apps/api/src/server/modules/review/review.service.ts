@@ -1,6 +1,6 @@
 import { injectable, inject } from "tsyringe";
 import type { ReviewRepository } from "./review.repo";
-import type { BookingRepository } from "@modules/booking/booking.repo";
+import type { OrderRepository } from "@modules/order/order.repo";
 import type { ProRepository } from "@modules/pro/pro.repo";
 import type { ProService } from "@modules/pro/pro.service";
 import type {
@@ -9,10 +9,10 @@ import type {
   Review,
 } from "@repo/domain";
 import type { Actor } from "@infra/auth/roles";
-import { Role, BookingStatus } from "@repo/domain";
-import { BookingNotFoundError } from "@modules/booking/booking.errors";
+import { Role, OrderStatus } from "@repo/domain";
+import { OrderNotFoundError } from "@modules/order/order.errors";
 import {
-  BookingNotCompletedError,
+  OrderNotCompletedError,
   ReviewAlreadyExistsError,
   UnauthorizedReviewError,
 } from "./review.errors";
@@ -24,19 +24,19 @@ import { TOKENS } from "@/server/container/tokens";
  *
  * Manual Test Examples:
  *
- * 1. Create review on completed booking (should succeed):
- *    - Ensure booking exists with status=COMPLETED
- *    - Call review.create with { bookingId, rating: 4, comment: "Great service!" }
+ * 1. Create review on completed order (should succeed):
+ *    - Ensure order exists with status=COMPLETED or PAID
+ *    - Call review.create with { orderId, rating: 4, comment: "Great service!" }
  *    - Expected: Review created successfully
  *
- * 2. Create review on non-completed booking (should fail):
- *    - Ensure booking exists with status=PENDING or ACCEPTED
- *    - Call review.create with { bookingId, rating: 4 }
- *    - Expected: BookingNotCompletedError (BAD_REQUEST)
+ * 2. Create review on non-completed order (should fail):
+ *    - Ensure order exists with status=PENDING or ACCEPTED
+ *    - Call review.create with { orderId, rating: 4 }
+ *    - Expected: OrderNotCompletedError (BAD_REQUEST)
  *
  * 3. Create duplicate review (should fail):
- *    - Create a review for a booking
- *    - Try to create another review for the same booking
+ *    - Create a review for an order
+ *    - Try to create another review for the same order
  *    - Expected: ReviewAlreadyExistsError (CONFLICT)
  *
  * 4. Unauthorized review creation (should fail):
@@ -48,21 +48,21 @@ export class ReviewService {
   constructor(
     @inject(TOKENS.ReviewRepository)
     private readonly reviewRepository: ReviewRepository,
-    @inject(TOKENS.BookingRepository)
-    private readonly bookingRepository: BookingRepository,
+    @inject(TOKENS.OrderRepository)
+    private readonly orderRepository: OrderRepository,
     @inject(TOKENS.ProRepository)
     private readonly proRepository: ProRepository,
     @inject(TOKENS.ProService)
     private readonly proService: ProService
   ) {}
   /**
-   * Create a review for a completed booking
+   * Create a review for a completed order
    * Business rules:
    * - Actor must exist (protected)
-   * - Booking must exist
-   * - Booking.status must be COMPLETED
-   * - actor.userId must equal booking.clientUserId (only the client can review)
-   * - Only one review per booking (if exists -> return domain error)
+   * - Order must exist
+   * - Order.status must be COMPLETED or PAID
+   * - actor.userId must equal order.clientUserId (only the client can review)
+   * - Only one review per order (if exists -> return domain error)
    * - rating must be 1..5
    * Return created review
    */
@@ -83,43 +83,46 @@ export class ReviewService {
       throw new Error("Rating must be between 1 and 5");
     }
 
-    // Get booking
-    const booking = await this.bookingRepository.findById(input.bookingId);
-    if (!booking) {
-      throw new BookingNotFoundError(input.bookingId);
+    // Get order
+    const order = await this.orderRepository.findById(input.orderId);
+    if (!order) {
+      throw new OrderNotFoundError(input.orderId);
     }
 
-    // Verify booking belongs to client
-    if (booking.clientUserId !== actor.id) {
+    // Verify order belongs to client
+    if (order.clientUserId !== actor.id) {
       throw new UnauthorizedReviewError(
         "create review",
-        "Booking does not belong to this client"
+        "Order does not belong to this client"
       );
     }
 
-    // Verify booking is completed
-    if (booking.status !== BookingStatus.COMPLETED) {
-      throw new BookingNotCompletedError(input.bookingId, booking.status);
+    // Verify order is completed or paid
+    if (
+      order.status !== OrderStatus.COMPLETED &&
+      order.status !== OrderStatus.PAID
+    ) {
+      throw new OrderNotCompletedError(input.orderId, order.status);
     }
 
-    // Verify booking has a pro assigned (required for completed bookings)
-    if (!booking.proProfileId) {
-      throw new Error("Booking must have a pro assigned to be reviewed");
+    // Verify order has a pro assigned (required for completed orders)
+    if (!order.proProfileId) {
+      throw new Error("Order must have a pro assigned to be reviewed");
     }
 
     // Check if review already exists
-    const existingReview = await this.reviewRepository.findByBookingId(
-      input.bookingId
+    const existingReview = await this.reviewRepository.findByOrderId(
+      input.orderId
     );
     if (existingReview) {
-      throw new ReviewAlreadyExistsError(input.bookingId);
+      throw new ReviewAlreadyExistsError(input.orderId);
     }
 
     // Create review
     const review = await this.reviewRepository.create({
-      bookingId: input.bookingId,
-      proProfileId: booking.proProfileId,
-      clientUserId: booking.clientUserId,
+      orderId: input.orderId,
+      proProfileId: order.proProfileId,
+      clientUserId: order.clientUserId,
       rating: input.rating,
       comment: input.comment,
     });
@@ -127,13 +130,13 @@ export class ReviewService {
     // Hook: Notify ProService that a review was created
     // Note: Rating is calculated dynamically from reviews, so no stored fields need updating
     // This hook is here for consistency and potential future use (e.g., caching, analytics)
-    if (booking.proProfileId) {
+    if (order.proProfileId) {
       try {
-        await this.proService.onReviewCreated(booking.proProfileId);
+        await this.proService.onReviewCreated(order.proProfileId);
       } catch (error) {
         // Log but don't fail review creation if hook fails
         console.error(
-          `Failed to notify pro service about review creation for pro ${booking.proProfileId}:`,
+          `Failed to notify pro service about review creation for pro ${order.proProfileId}:`,
           error
         );
       }
@@ -142,7 +145,7 @@ export class ReviewService {
     // Adapt to domain type
     return {
       id: review.id,
-      bookingId: review.bookingId,
+      orderId: review.orderId,
       rating: review.rating,
       comment: review.comment,
       createdAt: review.createdAt,
@@ -150,27 +153,24 @@ export class ReviewService {
   }
 
   /**
-   * Get review by booking ID
+   * Get review by order ID
    * Authorization: Only client, assigned pro, or admin can view
    * Returns null if review doesn't exist yet
    */
-  async getByBookingId(
-    actor: Actor,
-    bookingId: string
-  ): Promise<Review | null> {
-    // Get booking to check authorization
-    const booking = await this.bookingRepository.findById(bookingId);
-    if (!booking) {
-      throw new BookingNotFoundError(bookingId);
+  async getByOrderId(actor: Actor, orderId: string): Promise<Review | null> {
+    // Get order to check authorization
+    const order = await this.orderRepository.findById(orderId);
+    if (!order) {
+      throw new OrderNotFoundError(orderId);
     }
 
     // Authorization: client, assigned pro, or admin
     if (actor.role !== Role.ADMIN) {
       if (actor.role === Role.CLIENT) {
-        if (booking.clientUserId !== actor.id) {
+        if (order.clientUserId !== actor.id) {
           throw new UnauthorizedReviewError(
             "view review",
-            "Only the client who made the booking can view this review"
+            "Only the client who made the order can view this review"
           );
         }
       } else if (actor.role === Role.PRO) {
@@ -182,11 +182,11 @@ export class ReviewService {
             "Pro profile not found"
           );
         }
-        // Check if pro is assigned to this booking
-        if (booking.proProfileId !== proProfile.id) {
+        // Check if pro is assigned to this order
+        if (order.proProfileId !== proProfile.id) {
           throw new UnauthorizedReviewError(
             "view review",
-            "Only the pro assigned to this booking can view this review"
+            "Only the pro assigned to this order can view this review"
           );
         }
       } else {
@@ -198,14 +198,14 @@ export class ReviewService {
     }
 
     // Get review (may be null if not yet created)
-    const review = await this.reviewRepository.findByBookingId(bookingId);
+    const review = await this.reviewRepository.findByOrderId(orderId);
     if (!review) {
       return null;
     }
     // Map to domain type
     return {
       id: review.id,
-      bookingId: review.bookingId,
+      orderId: review.orderId,
       rating: review.rating,
       comment: review.comment,
       createdAt: review.createdAt,
@@ -226,7 +226,7 @@ export class ReviewService {
     // Map to domain type
     return reviews.map((review) => ({
       id: review.id,
-      bookingId: review.bookingId,
+      orderId: review.orderId,
       rating: review.rating,
       comment: review.comment,
       createdAt: review.createdAt,
@@ -234,22 +234,22 @@ export class ReviewService {
   }
 
   /**
-   * Get review status map for multiple bookings
-   * Returns a map of bookingId -> hasReview (boolean)
+   * Get review status map for multiple orders
+   * Returns a map of orderId -> hasReview (boolean)
    */
-  async getReviewStatusByBookingIds(
-    bookingIds: string[]
+  async getReviewStatusByOrderIds(
+    orderIds: string[]
   ): Promise<Record<string, boolean>> {
-    if (bookingIds.length === 0) {
+    if (orderIds.length === 0) {
       return {};
     }
 
-    const reviews = await this.reviewRepository.findByBookingIds(bookingIds);
-    const reviewMap = new Set(reviews.map((r) => r.bookingId));
+    const reviews = await this.reviewRepository.findByOrderIds(orderIds);
+    const reviewMap = new Set(reviews.map((r) => r.orderId));
 
     const statusMap: Record<string, boolean> = {};
-    for (const bookingId of bookingIds) {
-      statusMap[bookingId] = reviewMap.has(bookingId);
+    for (const orderId of orderIds) {
+      statusMap[orderId] = reviewMap.has(orderId);
     }
 
     return statusMap;

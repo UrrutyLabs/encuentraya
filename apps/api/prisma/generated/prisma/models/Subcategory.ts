@@ -256,7 +256,7 @@ export type SubcategoryWhereInput = {
   isActive?: Prisma.BoolFilter<"Subcategory"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Subcategory"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Subcategory"> | Date | string
-  bookings?: Prisma.BookingListRelationFilter
+  orders?: Prisma.OrderListRelationFilter
 }
 
 export type SubcategoryOrderByWithRelationInput = {
@@ -270,7 +270,7 @@ export type SubcategoryOrderByWithRelationInput = {
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-  bookings?: Prisma.BookingOrderByRelationAggregateInput
+  orders?: Prisma.OrderOrderByRelationAggregateInput
 }
 
 export type SubcategoryWhereUniqueInput = Prisma.AtLeast<{
@@ -288,7 +288,7 @@ export type SubcategoryWhereUniqueInput = Prisma.AtLeast<{
   isActive?: Prisma.BoolFilter<"Subcategory"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Subcategory"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Subcategory"> | Date | string
-  bookings?: Prisma.BookingListRelationFilter
+  orders?: Prisma.OrderListRelationFilter
 }, "id" | "slug_category">
 
 export type SubcategoryOrderByWithAggregationInput = {
@@ -336,7 +336,7 @@ export type SubcategoryCreateInput = {
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
-  bookings?: Prisma.BookingCreateNestedManyWithoutSubcategoryInput
+  orders?: Prisma.OrderCreateNestedManyWithoutSubcategoryInput
 }
 
 export type SubcategoryUncheckedCreateInput = {
@@ -350,7 +350,7 @@ export type SubcategoryUncheckedCreateInput = {
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
-  bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutSubcategoryInput
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutSubcategoryInput
 }
 
 export type SubcategoryUpdateInput = {
@@ -364,7 +364,7 @@ export type SubcategoryUpdateInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  bookings?: Prisma.BookingUpdateManyWithoutSubcategoryNestedInput
+  orders?: Prisma.OrderUpdateManyWithoutSubcategoryNestedInput
 }
 
 export type SubcategoryUncheckedUpdateInput = {
@@ -378,7 +378,7 @@ export type SubcategoryUncheckedUpdateInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  bookings?: Prisma.BookingUncheckedUpdateManyWithoutSubcategoryNestedInput
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutSubcategoryNestedInput
 }
 
 export type SubcategoryCreateManyInput = {
@@ -477,23 +477,23 @@ export type SubcategorySumOrderByAggregateInput = {
   displayOrder?: Prisma.SortOrder
 }
 
-export type SubcategoryCreateNestedOneWithoutBookingsInput = {
-  create?: Prisma.XOR<Prisma.SubcategoryCreateWithoutBookingsInput, Prisma.SubcategoryUncheckedCreateWithoutBookingsInput>
-  connectOrCreate?: Prisma.SubcategoryCreateOrConnectWithoutBookingsInput
+export type SubcategoryCreateNestedOneWithoutOrdersInput = {
+  create?: Prisma.XOR<Prisma.SubcategoryCreateWithoutOrdersInput, Prisma.SubcategoryUncheckedCreateWithoutOrdersInput>
+  connectOrCreate?: Prisma.SubcategoryCreateOrConnectWithoutOrdersInput
   connect?: Prisma.SubcategoryWhereUniqueInput
 }
 
-export type SubcategoryUpdateOneWithoutBookingsNestedInput = {
-  create?: Prisma.XOR<Prisma.SubcategoryCreateWithoutBookingsInput, Prisma.SubcategoryUncheckedCreateWithoutBookingsInput>
-  connectOrCreate?: Prisma.SubcategoryCreateOrConnectWithoutBookingsInput
-  upsert?: Prisma.SubcategoryUpsertWithoutBookingsInput
+export type SubcategoryUpdateOneWithoutOrdersNestedInput = {
+  create?: Prisma.XOR<Prisma.SubcategoryCreateWithoutOrdersInput, Prisma.SubcategoryUncheckedCreateWithoutOrdersInput>
+  connectOrCreate?: Prisma.SubcategoryCreateOrConnectWithoutOrdersInput
+  upsert?: Prisma.SubcategoryUpsertWithoutOrdersInput
   disconnect?: Prisma.SubcategoryWhereInput | boolean
   delete?: Prisma.SubcategoryWhereInput | boolean
   connect?: Prisma.SubcategoryWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.SubcategoryUpdateToOneWithWhereWithoutBookingsInput, Prisma.SubcategoryUpdateWithoutBookingsInput>, Prisma.SubcategoryUncheckedUpdateWithoutBookingsInput>
+  update?: Prisma.XOR<Prisma.XOR<Prisma.SubcategoryUpdateToOneWithWhereWithoutOrdersInput, Prisma.SubcategoryUpdateWithoutOrdersInput>, Prisma.SubcategoryUncheckedUpdateWithoutOrdersInput>
 }
 
-export type SubcategoryCreateWithoutBookingsInput = {
+export type SubcategoryCreateWithoutOrdersInput = {
   id?: string
   name: string
   slug: string
@@ -506,7 +506,7 @@ export type SubcategoryCreateWithoutBookingsInput = {
   updatedAt?: Date | string
 }
 
-export type SubcategoryUncheckedCreateWithoutBookingsInput = {
+export type SubcategoryUncheckedCreateWithoutOrdersInput = {
   id?: string
   name: string
   slug: string
@@ -519,23 +519,23 @@ export type SubcategoryUncheckedCreateWithoutBookingsInput = {
   updatedAt?: Date | string
 }
 
-export type SubcategoryCreateOrConnectWithoutBookingsInput = {
+export type SubcategoryCreateOrConnectWithoutOrdersInput = {
   where: Prisma.SubcategoryWhereUniqueInput
-  create: Prisma.XOR<Prisma.SubcategoryCreateWithoutBookingsInput, Prisma.SubcategoryUncheckedCreateWithoutBookingsInput>
+  create: Prisma.XOR<Prisma.SubcategoryCreateWithoutOrdersInput, Prisma.SubcategoryUncheckedCreateWithoutOrdersInput>
 }
 
-export type SubcategoryUpsertWithoutBookingsInput = {
-  update: Prisma.XOR<Prisma.SubcategoryUpdateWithoutBookingsInput, Prisma.SubcategoryUncheckedUpdateWithoutBookingsInput>
-  create: Prisma.XOR<Prisma.SubcategoryCreateWithoutBookingsInput, Prisma.SubcategoryUncheckedCreateWithoutBookingsInput>
+export type SubcategoryUpsertWithoutOrdersInput = {
+  update: Prisma.XOR<Prisma.SubcategoryUpdateWithoutOrdersInput, Prisma.SubcategoryUncheckedUpdateWithoutOrdersInput>
+  create: Prisma.XOR<Prisma.SubcategoryCreateWithoutOrdersInput, Prisma.SubcategoryUncheckedCreateWithoutOrdersInput>
   where?: Prisma.SubcategoryWhereInput
 }
 
-export type SubcategoryUpdateToOneWithWhereWithoutBookingsInput = {
+export type SubcategoryUpdateToOneWithWhereWithoutOrdersInput = {
   where?: Prisma.SubcategoryWhereInput
-  data: Prisma.XOR<Prisma.SubcategoryUpdateWithoutBookingsInput, Prisma.SubcategoryUncheckedUpdateWithoutBookingsInput>
+  data: Prisma.XOR<Prisma.SubcategoryUpdateWithoutOrdersInput, Prisma.SubcategoryUncheckedUpdateWithoutOrdersInput>
 }
 
-export type SubcategoryUpdateWithoutBookingsInput = {
+export type SubcategoryUpdateWithoutOrdersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
@@ -548,7 +548,7 @@ export type SubcategoryUpdateWithoutBookingsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
-export type SubcategoryUncheckedUpdateWithoutBookingsInput = {
+export type SubcategoryUncheckedUpdateWithoutOrdersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
@@ -567,11 +567,11 @@ export type SubcategoryUncheckedUpdateWithoutBookingsInput = {
  */
 
 export type SubcategoryCountOutputType = {
-  bookings: number
+  orders: number
 }
 
 export type SubcategoryCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  bookings?: boolean | SubcategoryCountOutputTypeCountBookingsArgs
+  orders?: boolean | SubcategoryCountOutputTypeCountOrdersArgs
 }
 
 /**
@@ -587,8 +587,8 @@ export type SubcategoryCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.
 /**
  * SubcategoryCountOutputType without action
  */
-export type SubcategoryCountOutputTypeCountBookingsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.BookingWhereInput
+export type SubcategoryCountOutputTypeCountOrdersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.OrderWhereInput
 }
 
 
@@ -603,7 +603,7 @@ export type SubcategorySelect<ExtArgs extends runtime.Types.Extensions.InternalA
   isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  bookings?: boolean | Prisma.Subcategory$bookingsArgs<ExtArgs>
+  orders?: boolean | Prisma.Subcategory$ordersArgs<ExtArgs>
   _count?: boolean | Prisma.SubcategoryCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["subcategory"]>
 
@@ -648,7 +648,7 @@ export type SubcategorySelectScalar = {
 
 export type SubcategoryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "slug" | "category" | "imageUrl" | "description" | "displayOrder" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["subcategory"]>
 export type SubcategoryInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  bookings?: boolean | Prisma.Subcategory$bookingsArgs<ExtArgs>
+  orders?: boolean | Prisma.Subcategory$ordersArgs<ExtArgs>
   _count?: boolean | Prisma.SubcategoryCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type SubcategoryIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -657,7 +657,7 @@ export type SubcategoryIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.
 export type $SubcategoryPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Subcategory"
   objects: {
-    bookings: Prisma.$BookingPayload<ExtArgs>[]
+    orders: Prisma.$OrderPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1064,7 +1064,7 @@ readonly fields: SubcategoryFieldRefs;
  */
 export interface Prisma__SubcategoryClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  bookings<T extends Prisma.Subcategory$bookingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Subcategory$bookingsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BookingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  orders<T extends Prisma.Subcategory$ordersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Subcategory$ordersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1492,27 +1492,27 @@ export type SubcategoryDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.I
 }
 
 /**
- * Subcategory.bookings
+ * Subcategory.orders
  */
-export type Subcategory$bookingsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type Subcategory$ordersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the Booking
+   * Select specific fields to fetch from the Order
    */
-  select?: Prisma.BookingSelect<ExtArgs> | null
+  select?: Prisma.OrderSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the Booking
+   * Omit specific fields from the Order
    */
-  omit?: Prisma.BookingOmit<ExtArgs> | null
+  omit?: Prisma.OrderOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.BookingInclude<ExtArgs> | null
-  where?: Prisma.BookingWhereInput
-  orderBy?: Prisma.BookingOrderByWithRelationInput | Prisma.BookingOrderByWithRelationInput[]
-  cursor?: Prisma.BookingWhereUniqueInput
+  include?: Prisma.OrderInclude<ExtArgs> | null
+  where?: Prisma.OrderWhereInput
+  orderBy?: Prisma.OrderOrderByWithRelationInput | Prisma.OrderOrderByWithRelationInput[]
+  cursor?: Prisma.OrderWhereUniqueInput
   take?: number
   skip?: number
-  distinct?: Prisma.BookingScalarFieldEnum | Prisma.BookingScalarFieldEnum[]
+  distinct?: Prisma.OrderScalarFieldEnum | Prisma.OrderScalarFieldEnum[]
 }
 
 /**

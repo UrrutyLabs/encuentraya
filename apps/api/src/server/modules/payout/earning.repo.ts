@@ -6,8 +6,8 @@ import { prisma, $Enums } from "@infra/db/prisma";
  */
 export interface EarningEntity {
   id: string;
-  bookingId: string;
-  bookingDisplayId?: string; // Optional, populated when fetched with booking relation
+  orderId: string;
+  orderDisplayId?: string; // Optional, populated when fetched with order relation
   proProfileId: string;
   clientUserId: string;
   currency: string;
@@ -24,7 +24,7 @@ export interface EarningEntity {
  * Earning create input
  */
 export interface EarningCreateInput {
-  bookingId: string;
+  orderId: string;
   proProfileId: string;
   clientUserId: string;
   currency: string;
@@ -46,9 +46,9 @@ export interface EarningStatusUpdateInput {
  * Handles all data access for earnings
  */
 export interface EarningRepository {
-  createFromBooking(input: EarningCreateInput): Promise<EarningEntity>;
+  createFromOrder(input: EarningCreateInput): Promise<EarningEntity>;
   findById(id: string): Promise<EarningEntity | null>;
-  findByBookingId(bookingId: string): Promise<EarningEntity | null>;
+  findByOrderId(orderId: string): Promise<EarningEntity | null>;
   listPayableByPro(proProfileId: string, now: Date): Promise<EarningEntity[]>;
   listPendingDue(now: Date): Promise<EarningEntity[]>;
   listByProProfileId(
@@ -75,10 +75,10 @@ export interface EarningRepository {
  */
 @injectable()
 export class EarningRepositoryImpl implements EarningRepository {
-  async createFromBooking(input: EarningCreateInput): Promise<EarningEntity> {
+  async createFromOrder(input: EarningCreateInput): Promise<EarningEntity> {
     const earning = await prisma.earning.create({
       data: {
-        bookingId: input.bookingId,
+        orderId: input.orderId,
         proProfileId: input.proProfileId,
         clientUserId: input.clientUserId,
         currency: input.currency,
@@ -101,9 +101,9 @@ export class EarningRepositoryImpl implements EarningRepository {
     return earning ? this.mapPrismaToDomain(earning) : null;
   }
 
-  async findByBookingId(bookingId: string): Promise<EarningEntity | null> {
+  async findByOrderId(orderId: string): Promise<EarningEntity | null> {
     const earning = await prisma.earning.findUnique({
-      where: { bookingId },
+      where: { orderId },
     });
 
     return earning ? this.mapPrismaToDomain(earning) : null;
@@ -167,7 +167,7 @@ export class EarningRepositoryImpl implements EarningRepository {
     const earnings = await prisma.earning.findMany({
       where,
       include: {
-        booking: {
+        order: {
           select: {
             displayId: true,
           },
@@ -182,9 +182,9 @@ export class EarningRepositoryImpl implements EarningRepository {
 
     return earnings.map((e) => {
       const entity = this.mapPrismaToDomain(e);
-      // Include bookingDisplayId if booking relation is loaded
-      if (e.booking?.displayId) {
-        entity.bookingDisplayId = e.booking.displayId;
+      // Include orderDisplayId if order relation is loaded
+      if (e.order?.displayId) {
+        entity.orderDisplayId = e.order.displayId;
       }
       return entity;
     });
@@ -229,7 +229,7 @@ export class EarningRepositoryImpl implements EarningRepository {
 
   private mapPrismaToDomain(prismaEarning: {
     id: string;
-    bookingId: string;
+    orderId: string;
     proProfileId: string;
     clientUserId: string;
     currency: string;
@@ -243,7 +243,7 @@ export class EarningRepositoryImpl implements EarningRepository {
   }): EarningEntity {
     return {
       id: prismaEarning.id,
-      bookingId: prismaEarning.bookingId,
+      orderId: prismaEarning.orderId,
       proProfileId: prismaEarning.proProfileId,
       clientUserId: prismaEarning.clientUserId,
       currency: prismaEarning.currency,

@@ -6,7 +6,6 @@
 // Repository tokens
 export const TOKENS = {
   // Repositories
-  BookingRepository: "BookingRepository",
   PaymentRepository: "PaymentRepository",
   PaymentEventRepository: "PaymentEventRepository",
   ProRepository: "ProRepository",
@@ -23,15 +22,11 @@ export const TOKENS = {
   AuditLogRepository: "AuditLogRepository",
   CategoryMetadataRepository: "CategoryMetadataRepository",
   SubcategoryRepository: "SubcategoryRepository",
+  OrderRepository: "OrderRepository",
+  OrderLineItemRepository: "OrderLineItemRepository",
 
   // Services
   AuthService: "AuthService",
-  BookingService: "BookingService", // Legacy - kept for backward compatibility
-  BookingCreationService: "BookingCreationService",
-  BookingLifecycleService: "BookingLifecycleService",
-  BookingCompletionService: "BookingCompletionService",
-  BookingQueryService: "BookingQueryService",
-  BookingAdminService: "BookingAdminService",
   PaymentService: "PaymentService",
   PaymentServiceFactory: "PaymentServiceFactory",
   ProService: "ProService",
@@ -49,6 +44,11 @@ export const TOKENS = {
   ContactService: "ContactService",
   CategoryService: "CategoryService",
   SubcategoryService: "SubcategoryService",
+  OrderService: "OrderService",
+  OrderCreationService: "OrderCreationService",
+  OrderFinalizationService: "OrderFinalizationService",
+  OrderLifecycleService: "OrderLifecycleService",
+  OrderAdminService: "OrderAdminService",
 
   // Infrastructure
   Logger: "Logger",

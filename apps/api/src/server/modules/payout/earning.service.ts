@@ -1,13 +1,19 @@
 import { injectable, inject } from "tsyringe";
 import type { EarningRepository } from "./earning.repo";
-import type { BookingRepository } from "@modules/booking/booking.repo";
 import type { PaymentRepository } from "@modules/payment/payment.repo";
 import type { ProRepository } from "@modules/pro/pro.repo";
-import { BookingStatus, PaymentStatus, Role } from "@repo/domain";
+import type { OrderRepository } from "@modules/order/order.repo";
+import type { OrderLineItemRepository } from "@modules/order/orderLineItem.repo";
+import {
+  PaymentStatus,
+  Role,
+  OrderStatus,
+  OrderLineItemType,
+} from "@repo/domain";
 import type { Actor } from "@infra/auth/roles";
 import { TOKENS } from "@/server/container/tokens";
-import { PLATFORM_FEE_RATE, computeAvailableAt } from "./config";
-import { BookingNotFoundError } from "@modules/booking/booking.errors";
+import { computeAvailableAt } from "./config";
+import { OrderNotFoundError } from "@modules/order/order.errors";
 
 /**
  * Error thrown when earning cannot be created
@@ -25,8 +31,8 @@ export class EarningCreationError extends Error {
  */
 export interface ProEarning {
   id: string;
-  bookingId: string;
-  bookingDisplayId: string;
+  orderId: string;
+  orderDisplayId: string;
   grossAmount: number;
   platformFeeAmount: number;
   netAmount: number;
@@ -45,92 +51,113 @@ export class EarningService {
   constructor(
     @inject(TOKENS.EarningRepository)
     private readonly earningRepository: EarningRepository,
-    @inject(TOKENS.BookingRepository)
-    private readonly bookingRepository: BookingRepository,
     @inject(TOKENS.PaymentRepository)
     private readonly paymentRepository: PaymentRepository,
     @inject(TOKENS.ProRepository)
-    private readonly proRepository: ProRepository
+    private readonly proRepository: ProRepository,
+    @inject(TOKENS.OrderRepository)
+    private readonly orderRepository: OrderRepository,
+    @inject(TOKENS.OrderLineItemRepository)
+    private readonly orderLineItemRepository: OrderLineItemRepository
   ) {}
 
   /**
-   * Create an earning record for a completed booking with captured payment
+   * Create an earning record for a completed order with captured payment
    * Rules:
-   * - booking must exist
-   * - booking status must be COMPLETED
-   * - payment for booking must be CAPTURED
-   * - earning must not already exist for bookingId
-   * - compute amounts: grossAmount, platformFeeAmount, netAmount
+   * - order must exist
+   * - order status must be COMPLETED
+   * - payment for order must be CAPTURED
+   * - earning must not already exist for orderId
+   * - compute amounts from order line items:
+   *   - grossAmount = labor line item amount
+   *   - platformFeeAmount = platform_fee line item amount
+   *   - netAmount = grossAmount - platformFeeAmount
    * - set status=PENDING and availableAt = now + coolingOff
    */
-  async createEarningForCompletedBooking(
+  async createEarningForOrder(
     actorOrSystem: Actor | { role: "SYSTEM" },
-    bookingId: string
+    orderId: string
   ): Promise<void> {
-    // Get booking
-    const booking = await this.bookingRepository.findById(bookingId);
-    if (!booking) {
-      throw new BookingNotFoundError(bookingId);
+    // Get order
+    const order = await this.orderRepository.findById(orderId);
+    if (!order) {
+      throw new OrderNotFoundError(orderId);
     }
 
-    // Validate booking status is COMPLETED
-    if (booking.status !== BookingStatus.COMPLETED) {
+    // Validate order status is COMPLETED
+    if (order.status !== OrderStatus.COMPLETED) {
       throw new EarningCreationError(
-        `Booking ${bookingId} must be COMPLETED to create earning. Current status: ${booking.status}`
+        `Order ${orderId} must be COMPLETED to create earning. Current status: ${order.status}`
       );
     }
 
     // Check if earning already exists
-    const existingEarning =
-      await this.earningRepository.findByBookingId(bookingId);
+    const existingEarning = await this.earningRepository.findByOrderId(orderId);
     if (existingEarning) {
       // Idempotent: if earning already exists, skip creation
       return;
     }
 
-    // Get payment for booking
-    const payment = await this.paymentRepository.findByBookingId(bookingId);
+    // Get payment for order
+    const payment = await this.paymentRepository.findByOrderId(orderId);
     if (!payment) {
-      throw new EarningCreationError(
-        `No payment found for booking ${bookingId}`
-      );
+      throw new EarningCreationError(`No payment found for order ${orderId}`);
     }
 
     // Validate payment status is CAPTURED
     if (payment.status !== PaymentStatus.CAPTURED) {
       throw new EarningCreationError(
-        `Payment for booking ${bookingId} must be CAPTURED to create earning. Current status: ${payment.status}`
+        `Payment for order ${orderId} must be CAPTURED to create earning. Current status: ${payment.status}`
       );
     }
 
     // Validate payment has captured amount
     if (!payment.amountCaptured || payment.amountCaptured <= 0) {
       throw new EarningCreationError(
-        `Payment for booking ${bookingId} has no captured amount`
+        `Payment for order ${orderId} has no captured amount`
       );
     }
 
-    // Validate booking has proProfileId
-    if (!booking.proProfileId) {
+    // Validate order has proProfileId
+    if (!order.proProfileId) {
+      throw new EarningCreationError(`Order ${orderId} has no proProfileId`);
+    }
+
+    // Get order line items to extract amounts
+    const lineItems = await this.orderLineItemRepository.findByOrderId(orderId);
+
+    // Extract labor amount (grossAmount)
+    const laborItem = lineItems.find(
+      (item) => item.type === OrderLineItemType.LABOR
+    );
+    if (!laborItem) {
+      throw new EarningCreationError(`Order ${orderId} has no labor line item`);
+    }
+    const grossAmount = Math.round(laborItem.amount * 100); // Convert to minor units (cents)
+
+    // Extract platform fee amount
+    const platformFeeItem = lineItems.find(
+      (item) => item.type === OrderLineItemType.PLATFORM_FEE
+    );
+    if (!platformFeeItem) {
       throw new EarningCreationError(
-        `Booking ${bookingId} has no proProfileId`
+        `Order ${orderId} has no platform_fee line item`
       );
     }
+    const platformFeeAmount = Math.round(platformFeeItem.amount * 100); // Convert to minor units (cents)
 
-    // Compute amounts
-    const grossAmount = payment.amountCaptured;
-    const platformFeeAmount = Math.round(grossAmount * PLATFORM_FEE_RATE);
+    // Calculate net amount
     const netAmount = grossAmount - platformFeeAmount;
 
     // Compute availableAt (now + cooling-off)
     const availableAt = computeAvailableAt();
 
     // Create earning
-    await this.earningRepository.createFromBooking({
-      bookingId,
-      proProfileId: booking.proProfileId,
-      clientUserId: booking.clientUserId,
-      currency: payment.currency,
+    await this.earningRepository.createFromOrder({
+      orderId,
+      proProfileId: order.proProfileId,
+      clientUserId: order.clientUserId,
+      currency: order.currency,
       grossAmount,
       platformFeeAmount,
       netAmount,
@@ -175,8 +202,6 @@ export class EarningService {
     // Actually, let me check the earning.repo.ts again to see what methods exist
 
     // Looking at the interface, we have:
-    // - createFromBooking
-    // - findByBookingId
     // - listPayableByPro (filters by PAYABLE status)
     // - markStatus
     // - markManyStatus
@@ -228,8 +253,8 @@ export class EarningService {
 
     return earnings.map((earning) => ({
       id: earning.id,
-      bookingId: earning.bookingId,
-      bookingDisplayId: earning.bookingDisplayId || earning.bookingId.slice(-6), // Fallback to last 6 chars if no displayId
+      orderId: earning.orderId,
+      orderDisplayId: earning.orderDisplayId || earning.orderId.slice(-6), // Fallback to last 6 chars if no displayId
       grossAmount: earning.grossAmount,
       platformFeeAmount: earning.platformFeeAmount,
       netAmount: earning.netAmount,

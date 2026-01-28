@@ -6,7 +6,7 @@ import {
 } from "./pro.repo";
 import type { ReviewRepository } from "@modules/review/review.repo";
 import type { UserRepository } from "@modules/user/user.repo";
-import type { BookingRepository } from "@modules/booking/booking.repo";
+import type { OrderRepository } from "@modules/order/order.repo";
 import type { ProPayoutProfileRepository } from "@modules/payout/proPayoutProfile.repo";
 import type { AuditService } from "@modules/audit/audit.service";
 import type { AvailabilityRepository } from "./availability.repo";
@@ -39,8 +39,8 @@ export class ProService {
     private readonly reviewRepository: ReviewRepository,
     @inject(TOKENS.UserRepository)
     private readonly userRepository: UserRepository,
-    @inject(TOKENS.BookingRepository)
-    private readonly bookingRepository: BookingRepository,
+    @inject(TOKENS.OrderRepository)
+    private readonly orderRepository: OrderRepository,
     @inject(TOKENS.ProPayoutProfileRepository)
     private readonly proPayoutProfileRepository: ProPayoutProfileRepository,
     @inject(TOKENS.AvailabilityRepository)
@@ -584,12 +584,12 @@ export class ProService {
   }
 
   /**
-   * Update ProProfile calculated fields after booking completion
+   * Update ProProfile calculated fields after order completion
    * - Increments completedJobsCount
    * - Updates isTopPro based on completedJobsCount threshold (>= 10 jobs)
-   * Note: responseTimeMinutes requires acceptedAt timestamp on booking (not yet available)
+   * Note: responseTimeMinutes requires acceptedAt timestamp on order (available via acceptedAt field)
    */
-  async updateCalculatedFieldsOnBookingCompletion(
+  async updateCalculatedFieldsOnOrderCompletion(
     proProfileId: string
   ): Promise<void> {
     const proProfile = await this.proRepository.findById(proProfileId);
@@ -597,9 +597,9 @@ export class ProService {
       throw new Error(`Pro profile not found: ${proProfileId}`);
     }
 
-    // Count completed bookings using efficient COUNT query
+    // Count completed orders using efficient COUNT query
     const completedJobsCount =
-      await this.bookingRepository.countCompletedBookingsByProProfileId(
+      await this.orderRepository.countCompletedOrdersByProProfileId(
         proProfileId
       );
 

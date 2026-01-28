@@ -74,8 +74,8 @@ export class MercadoPagoClient implements PaymentProviderClient {
     const preferencePayload = {
       items: [
         {
-          title: `Reserva #${input.bookingId}`,
-          description: `Pago de reserva de servicio`,
+          title: `Orden #${input.orderId}`,
+          description: `Pago de orden de servicio`,
           quantity: 1,
           unit_price: amountInMajorUnits,
           currency_id: input.amount.currency,
@@ -87,10 +87,10 @@ export class MercadoPagoClient implements PaymentProviderClient {
         failure: failureUrl,
       },
       auto_return: "approved", // Redirect automatically when approved
-      external_reference: input.bookingId, // Store booking ID for webhook matching
+      external_reference: input.orderId, // Store order ID for webhook matching
       statement_descriptor: "ARRREGLATODO", // Appears on customer's statement
       metadata: {
-        bookingId: input.bookingId,
+        orderId: input.orderId,
         clientUserId: input.clientUserId,
         idempotencyKey: input.idempotencyKey,
         ...input.metadata,
@@ -167,7 +167,7 @@ export class MercadoPagoClient implements PaymentProviderClient {
 
       const paymentId = body.data.id;
 
-      // Fetch full payment details to get status and external_reference (bookingId)
+      // Fetch full payment details to get status and external_reference (orderId)
       const paymentDetails = await this.fetchPaymentDetails(paymentId);
       if (!paymentDetails) {
         return null;

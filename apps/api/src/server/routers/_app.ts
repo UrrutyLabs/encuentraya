@@ -1,5 +1,4 @@
 import { router, publicProcedure } from "@infra/trpc";
-import { bookingRouter } from "@modules/booking/booking.router";
 import { proRouter } from "@modules/pro/pro.router";
 import { authRouter } from "@modules/auth/auth.router";
 import { reviewRouter } from "@modules/review/review.router";
@@ -15,6 +14,7 @@ import { searchRouter } from "@modules/search/search.router";
 import { contactRouter } from "@modules/contact/contact.router";
 import { categoryRouter } from "@modules/category/category.router";
 import { subcategoryRouter } from "@modules/subcategory/subcategory.router";
+import { orderRouter } from "@modules/order/order.router";
 
 export const appRouter = router({
   health: router({
@@ -26,7 +26,6 @@ export const appRouter = router({
     }),
   }),
   auth: authRouter,
-  booking: bookingRouter,
   pro: proRouter,
   review: reviewRouter,
   payment: paymentRouter,
@@ -40,6 +39,7 @@ export const appRouter = router({
   contact: contactRouter,
   category: categoryRouter,
   subcategory: subcategoryRouter,
+  order: orderRouter,
   client: router({
     searchPros: searchRouter.searchPros,
   }),
