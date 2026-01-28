@@ -6,12 +6,24 @@ export {
   PaymentProvider,
   PaymentType,
   PaymentStatus,
+  OrderStatus,
+  OrderLineItemType,
+  TaxBehavior,
+  PricingMode,
+  ApprovalMethod,
+  DisputeStatus,
   roleSchema,
   bookingStatusSchema,
   categorySchema,
   paymentProviderSchema,
   paymentTypeSchema,
   paymentStatusSchema,
+  orderStatusSchema,
+  orderLineItemTypeSchema,
+  taxBehaviorSchema,
+  pricingModeSchema,
+  approvalMethodSchema,
+  disputeStatusSchema,
 } from "./enums";
 
 // Booking schemas
@@ -95,6 +107,20 @@ export {
   subcategoryListSchema,
   type Subcategory,
 } from "./schemas/subcategory.schema";
+
+// Order schemas
+export {
+  orderSchema,
+  orderCreateInputSchema,
+  orderUpdateInputSchema,
+  orderLineItemSchema,
+  orderLineItemCreateInputSchema,
+  type Order,
+  type OrderCreateInput,
+  type OrderUpdateInput,
+  type OrderLineItem,
+  type OrderLineItemCreateInput,
+} from "./schemas/order.schema";
 
 // Format utilities
 export { formatCurrency } from "./utils/format";

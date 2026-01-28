@@ -62,6 +62,70 @@ export enum Category {
 }
 
 /**
+ * Order status lifecycle
+ */
+export enum OrderStatus {
+  DRAFT = "draft",
+  PENDING_PRO_CONFIRMATION = "pending_pro_confirmation",
+  ACCEPTED = "accepted",
+  CONFIRMED = "confirmed",
+  IN_PROGRESS = "in_progress",
+  AWAITING_CLIENT_APPROVAL = "awaiting_client_approval",
+  DISPUTED = "disputed",
+  COMPLETED = "completed",
+  PAID = "paid",
+  CANCELED = "canceled",
+}
+
+/**
+ * Order line item types
+ */
+export enum OrderLineItemType {
+  LABOR = "labor",
+  PLATFORM_FEE = "platform_fee",
+  TAX = "tax",
+  TIP = "tip",
+  DISCOUNT = "discount",
+  ADJUSTMENT = "adjustment",
+  CANCELLATION_FEE = "cancellation_fee",
+}
+
+/**
+ * Tax behavior for line items
+ */
+export enum TaxBehavior {
+  TAXABLE = "taxable",
+  NON_TAXABLE = "non_taxable",
+  TAX_INCLUDED = "tax_included",
+}
+
+/**
+ * Pricing modes
+ */
+export enum PricingMode {
+  HOURLY = "hourly",
+}
+
+/**
+ * Approval methods for hours
+ */
+export enum ApprovalMethod {
+  CLIENT_ACCEPTED = "client_accepted",
+  AUTO_ACCEPTED = "auto_accepted",
+  ADMIN_ADJUSTED = "admin_adjusted",
+}
+
+/**
+ * Dispute status
+ */
+export enum DisputeStatus {
+  NONE = "none",
+  OPEN = "open",
+  RESOLVED = "resolved",
+  CANCELED = "canceled",
+}
+
+/**
  * Zod schemas for enums
  */
 export const roleSchema = z.nativeEnum(Role);
@@ -70,3 +134,9 @@ export const categorySchema = z.nativeEnum(Category);
 export const paymentProviderSchema = z.nativeEnum(PaymentProvider);
 export const paymentTypeSchema = z.nativeEnum(PaymentType);
 export const paymentStatusSchema = z.nativeEnum(PaymentStatus);
+export const orderStatusSchema = z.nativeEnum(OrderStatus);
+export const orderLineItemTypeSchema = z.nativeEnum(OrderLineItemType);
+export const taxBehaviorSchema = z.nativeEnum(TaxBehavior);
+export const pricingModeSchema = z.nativeEnum(PricingMode);
+export const approvalMethodSchema = z.nativeEnum(ApprovalMethod);
+export const disputeStatusSchema = z.nativeEnum(DisputeStatus);

@@ -5,7 +5,7 @@ import { z } from "zod";
  */
 export const reviewSchema = z.object({
   id: z.string(),
-  bookingId: z.string(),
+  orderId: z.string(),
   rating: z.number().int().min(1).max(5),
   comment: z.string().nullable(),
   createdAt: z.date(),
@@ -17,7 +17,7 @@ export type Review = z.infer<typeof reviewSchema>;
  * Review creation input schema
  */
 export const reviewCreateInputSchema = z.object({
-  bookingId: z.string().min(1),
+  orderId: z.string().min(1),
   rating: z.number().int().min(1).max(5),
   comment: z.string().optional(),
 });
