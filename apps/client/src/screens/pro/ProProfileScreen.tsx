@@ -69,7 +69,7 @@ export function ProProfileScreen() {
     if (!pro?.id) {
       return;
     }
-    // Authenticated, proceed to booking
+    // Authenticated, proceed to job creation
     router.push(`/book?proId=${pro.id}`);
   };
 
@@ -197,7 +197,7 @@ export function ProProfileScreen() {
                 className="w-full md:w-auto flex items-center gap-2"
               >
                 <Calendar className="w-4 h-4" />
-                Reservar
+                Contratar
               </Button>
             )}
           </Card>
@@ -279,8 +279,8 @@ export function ProProfileScreen() {
         isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}
         returnUrl={`/book?proId=${pro.id}`}
-        title="Iniciá sesión para reservar"
-        message="Necesitás iniciar sesión para reservar un servicio con este profesional."
+        title="Iniciá sesión para contratar"
+        message="Necesitás iniciar sesión para contratar un servicio con este profesional."
       />
     </div>
   );

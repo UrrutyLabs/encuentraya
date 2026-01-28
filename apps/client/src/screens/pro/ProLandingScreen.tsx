@@ -56,7 +56,7 @@ export function ProLandingScreen() {
                 className="mb-8 text-muted max-w-xl mx-auto lg:mx-0 animate-[fadeIn_0.6s_ease-out_0.3s_both]"
               >
                 Sumate a la plataforma líder en servicios para el hogar en
-                Uruguay. Trabajá de forma independiente y gestioná tus reservas
+                Uruguay. Trabajá de forma independiente y gestioná tus trabajos
                 desde tu celular.
               </Text>
               <Link
@@ -143,7 +143,7 @@ export function ProLandingScreen() {
                 </Text>
               </div>
               <Text variant="body" className="text-muted">
-                Todo en un solo lugar: reservas, pagos y comunicación con
+                Todo en un solo lugar: trabajos, pagos y comunicación con
                 clientes desde tu celular.
               </Text>
             </Card>

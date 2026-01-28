@@ -1,17 +1,18 @@
 import { Calendar, CheckCircle, Tag } from "lucide-react";
 import { Card } from "@repo/ui";
 import { Text } from "@repo/ui";
+import { JOB_LABELS } from "@/utils/jobLabels";
 
 interface SettingsStatsSectionProps {
-  totalBookings?: number;
-  completedBookings?: number;
+  totalJobs?: number;
+  completedJobs?: number;
   totalSpent?: number;
   favoriteCategory?: string;
 }
 
 export function SettingsStatsSection({
-  totalBookings,
-  completedBookings,
+  totalJobs,
+  completedJobs,
   totalSpent,
   favoriteCategory,
 }: SettingsStatsSectionProps) {
@@ -26,30 +27,30 @@ export function SettingsStatsSection({
   return (
     <Card className="p-6">
       <div className="space-y-4">
-        {totalBookings !== undefined && (
+        {totalJobs !== undefined && (
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Calendar className="w-4 h-4 text-muted" />
               <Text variant="body" className="text-text">
-                Reservas realizadas
+                {JOB_LABELS.jobsCompleted}
               </Text>
             </div>
             <Text variant="body" className="text-text font-semibold">
-              {totalBookings}
+              {totalJobs}
             </Text>
           </div>
         )}
 
-        {completedBookings !== undefined && (
+        {completedJobs !== undefined && (
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <CheckCircle className="w-4 h-4 text-muted" />
               <Text variant="body" className="text-text">
-                Completadas
+                {JOB_LABELS.jobsCompletedLabel}
               </Text>
             </div>
             <Text variant="body" className="text-text font-semibold">
-              {completedBookings}
+              {completedJobs}
             </Text>
           </div>
         )}
@@ -79,12 +80,12 @@ export function SettingsStatsSection({
           </div>
         )}
 
-        {totalBookings === undefined &&
-          completedBookings === undefined &&
+        {totalJobs === undefined &&
+          completedJobs === undefined &&
           totalSpent === undefined &&
           !favoriteCategory && (
             <Text variant="body" className="text-muted text-center py-4">
-              Las estadísticas aparecerán aquí después de realizar reservas
+              Las estadísticas aparecerán aquí después de realizar trabajos
             </Text>
           )}
       </div>

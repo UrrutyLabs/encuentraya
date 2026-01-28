@@ -9,7 +9,7 @@ export function ReviewCreateSkeleton() {
         <div className="h-8 bg-muted/30 rounded w-48 animate-pulse" />
       </div>
 
-      {/* Booking Info Card */}
+      {/* Job Info Card */}
       <Card className="p-6 mb-6 animate-pulse">
         <div className="flex items-center gap-2 mb-4">
           <div className="w-5 h-5 bg-muted/30 rounded" />

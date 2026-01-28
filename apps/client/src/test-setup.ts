@@ -41,6 +41,15 @@ const mockTrpcReviewByBooking = vi.fn();
 const mockTrpcReviewCreate = vi.fn();
 const mockTrpcPaymentGetByBooking = vi.fn();
 const mockTrpcPaymentCreatePreauthForBooking = vi.fn();
+// Order mocks
+const mockTrpcOrderListByClient = vi.fn();
+const mockTrpcOrderGetById = vi.fn();
+const mockTrpcOrderCreate = vi.fn();
+const mockTrpcOrderCancel = vi.fn();
+const mockTrpcReviewStatusByOrderIds = vi.fn();
+const mockTrpcReviewByOrder = vi.fn();
+const mockTrpcPaymentGetByOrder = vi.fn();
+const mockTrpcPaymentCreatePreauthForOrder = vi.fn();
 const mockTrpcContactSubmit = vi.fn();
 
 vi.mock("@/lib/trpc/client", () => {
@@ -104,6 +113,13 @@ vi.mock("@/lib/trpc/client", () => {
         byBooking: {
           useQuery: (...args: unknown[]) => mockTrpcReviewByBooking(...args),
         },
+        statusByOrderIds: {
+          useQuery: (...args: unknown[]) =>
+            mockTrpcReviewStatusByOrderIds(...args),
+        },
+        byOrder: {
+          useQuery: (...args: unknown[]) => mockTrpcReviewByOrder(...args),
+        },
         create: {
           useMutation: (...args: unknown[]) => mockTrpcReviewCreate(...args),
         },
@@ -116,6 +132,27 @@ vi.mock("@/lib/trpc/client", () => {
         createPreauthForBooking: {
           useMutation: (...args: unknown[]) =>
             mockTrpcPaymentCreatePreauthForBooking(...args),
+        },
+        getByOrder: {
+          useQuery: (...args: unknown[]) => mockTrpcPaymentGetByOrder(...args),
+        },
+        createPreauthForOrder: {
+          useMutation: (...args: unknown[]) =>
+            mockTrpcPaymentCreatePreauthForOrder(...args),
+        },
+      },
+      order: {
+        listByClient: {
+          useQuery: (...args: unknown[]) => mockTrpcOrderListByClient(...args),
+        },
+        getById: {
+          useQuery: (...args: unknown[]) => mockTrpcOrderGetById(...args),
+        },
+        create: {
+          useMutation: (...args: unknown[]) => mockTrpcOrderCreate(...args),
+        },
+        cancel: {
+          useMutation: (...args: unknown[]) => mockTrpcOrderCancel(...args),
         },
       },
       contact: {
@@ -146,6 +183,14 @@ export {
   mockTrpcReviewCreate,
   mockTrpcPaymentGetByBooking,
   mockTrpcPaymentCreatePreauthForBooking,
+  mockTrpcOrderListByClient,
+  mockTrpcOrderGetById,
+  mockTrpcOrderCreate,
+  mockTrpcOrderCancel,
+  mockTrpcReviewStatusByOrderIds,
+  mockTrpcReviewByOrder,
+  mockTrpcPaymentGetByOrder,
+  mockTrpcPaymentCreatePreauthForOrder,
   mockTrpcContactSubmit,
 };
 

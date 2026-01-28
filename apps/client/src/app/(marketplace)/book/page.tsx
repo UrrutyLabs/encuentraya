@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AuthenticatedGuard } from "@/components/auth/AuthenticatedGuard";
 import { Role } from "@repo/domain";
-import { BookingCreateSkeleton } from "@/components/presentational/BookingCreateSkeleton";
+import { JobCreateSkeleton } from "@/components/presentational/JobCreateSkeleton";
 
 function BookPageContent() {
   const router = useRouter();
@@ -23,7 +23,7 @@ function BookPageContent() {
 
   return (
     <div className="min-h-screen bg-bg">
-      <BookingCreateSkeleton />
+      <JobCreateSkeleton />
     </div>
   );
 }

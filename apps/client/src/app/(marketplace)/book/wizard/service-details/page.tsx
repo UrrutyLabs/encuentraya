@@ -2,7 +2,7 @@
 
 import { Suspense } from "react";
 import { ServiceDetailsStep } from "@/components/wizard/steps/ServiceDetailsStep";
-import { BookingCreateSkeleton } from "@/components/presentational/BookingCreateSkeleton";
+import { JobCreateSkeleton } from "@/components/presentational/JobCreateSkeleton";
 import { AuthenticatedGuard } from "@/components/auth/AuthenticatedGuard";
 import { Role } from "@repo/domain";
 
@@ -19,7 +19,7 @@ export const dynamic = "force-dynamic";
 export default function ServiceDetailsPage() {
   return (
     <AuthenticatedGuard requiredRole={Role.CLIENT}>
-      <Suspense fallback={<BookingCreateSkeleton />}>
+      <Suspense fallback={<JobCreateSkeleton />}>
         <ServiceDetailsContent />
       </Suspense>
     </AuthenticatedGuard>

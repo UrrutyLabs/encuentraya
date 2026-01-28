@@ -2,7 +2,7 @@
 
 import { Suspense } from "react";
 import { LocationStep } from "@/components/wizard/steps/LocationStep";
-import { BookingCreateSkeleton } from "@/components/presentational/BookingCreateSkeleton";
+import { JobCreateSkeleton } from "@/components/presentational/JobCreateSkeleton";
 import { AuthenticatedGuard } from "@/components/auth/AuthenticatedGuard";
 import { Role } from "@repo/domain";
 
@@ -23,7 +23,7 @@ export const dynamic = "force-dynamic";
 export default function LocationPage() {
   return (
     <AuthenticatedGuard requiredRole={Role.CLIENT}>
-      <Suspense fallback={<BookingCreateSkeleton />}>
+      <Suspense fallback={<JobCreateSkeleton />}>
         <LocationContent />
       </Suspense>
     </AuthenticatedGuard>

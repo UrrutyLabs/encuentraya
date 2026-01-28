@@ -61,7 +61,7 @@ describe("useSubmitContact", () => {
         email: "jane@example.com",
         subject: "Help Request",
         message:
-          "I need help with my booking. Please contact me as soon as possible.",
+          "I need help with my job. Please contact me as soon as possible.",
       };
 
       await act(async () => {
@@ -73,7 +73,7 @@ describe("useSubmitContact", () => {
         email: "jane@example.com",
         subject: "Help Request",
         message:
-          "I need help with my booking. Please contact me as soon as possible.",
+          "I need help with my job. Please contact me as soon as possible.",
       });
     });
   });

@@ -9,6 +9,7 @@ import { Text } from "@repo/ui";
 import { useAuth } from "@/hooks/auth";
 import { useUserRole } from "@/hooks/auth";
 import { Role } from "@repo/domain";
+import { JOB_LABELS } from "@/utils/jobLabels";
 import { logger } from "@/lib/logger";
 import { MobileDrawer } from "./MobileDrawer";
 
@@ -79,10 +80,10 @@ export function MobileNavigation({
                     <Search className="w-5 h-5 text-text" />
                   </button>
                 </Link>
-                <Link href="/my-bookings" onClick={handleLinkClick}>
+                <Link href="/my-jobs" onClick={handleLinkClick}>
                   <button
                     className="min-w-[44px] min-h-[44px] w-11 h-11 flex items-center justify-center rounded-lg hover:bg-surface/80 active:bg-surface/60 transition-colors touch-manipulation"
-                    aria-label="Mis reservas"
+                    aria-label={JOB_LABELS.myJobs}
                   >
                     <Calendar className="w-5 h-5 text-text" />
                   </button>
@@ -134,12 +135,12 @@ export function MobileNavigation({
                 </Link>
 
                 <Link
-                  href="/my-bookings"
+                  href="/my-jobs"
                   onClick={handleLinkClick}
                   className="flex items-center gap-3 px-4 py-4 min-h-[44px] hover:bg-surface/80 active:bg-surface/60 transition-colors touch-manipulation"
                 >
                   <Calendar className="w-5 h-5 text-muted" />
-                  <Text variant="body">Mis reservas</Text>
+                  <Text variant="body">{JOB_LABELS.myJobs}</Text>
                 </Link>
 
                 <Link

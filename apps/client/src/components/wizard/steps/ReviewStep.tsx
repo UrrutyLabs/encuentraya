@@ -15,7 +15,7 @@ import { Card } from "@repo/ui";
 import { Button } from "@repo/ui";
 import { useWizardState } from "@/lib/wizard/useWizardState";
 import { useProDetail } from "@/hooks/pro";
-import { useCreateBooking } from "@/hooks/booking";
+import { useCreateOrder } from "@/hooks/order";
 import { Category } from "@repo/domain";
 import { logger } from "@/lib/logger";
 
@@ -34,7 +34,7 @@ interface ReviewStepProps {
 export function ReviewStep({}: ReviewStepProps) {
   const { state, navigateToStep } = useWizardState();
   const { pro } = useProDetail(state.proId || undefined);
-  const { createBooking, isPending, error: createError } = useCreateBooking();
+  const { createOrder, isPending, error: createError } = useCreateOrder();
 
   const estimatedCost = useMemo(() => {
     if (!pro || !state.hours) return 0;
@@ -77,20 +77,21 @@ export function ReviewStep({}: ReviewStepProps) {
     const scheduledAt = new Date(`${state.date}T${state.time}`);
 
     try {
-      await createBooking({
-        proId: state.proId,
+      await createOrder({
+        proProfileId: state.proId,
         category: state.category as Category,
         description: `Servicio en ${state.address}`,
-        scheduledAt,
+        addressText: state.address,
+        scheduledWindowStartAt: scheduledAt,
         estimatedHours: parseFloat(state.hours),
       });
       // Success - hook's onSuccess will handle redirect
     } catch (error) {
       logger.error(
-        "Error creating booking",
+        "Error creating order",
         error instanceof Error ? error : new Error(String(error)),
         {
-          proId: state.proId,
+          proProfileId: state.proId,
           category: state.category,
         }
       );
@@ -134,7 +135,7 @@ export function ReviewStep({}: ReviewStepProps) {
           Revisar y confirmar
         </Text>
         <Text variant="body" className="text-muted">
-          Revisá los detalles antes de confirmar tu reserva
+          Revisá los detalles antes de confirmar tu trabajo
         </Text>
       </div>
 
@@ -241,7 +242,7 @@ export function ReviewStep({}: ReviewStepProps) {
       {createError && (
         <Card className="p-4 mb-6 bg-danger/10 border-danger/20">
           <Text variant="small" className="text-danger">
-            {createError.message || "Error al crear la reserva"}
+            {createError.message || "Error al crear el trabajo"}
           </Text>
         </Card>
       )}
@@ -261,7 +262,7 @@ export function ReviewStep({}: ReviewStepProps) {
           disabled={isPending}
           className="min-h-[44px] w-full md:w-auto text-base md:text-sm py-3 md:py-2"
         >
-          {isPending ? "Creando reserva..." : "Confirmar reserva"}
+          {isPending ? "Creando trabajo..." : "Confirmar trabajo"}
         </Button>
       </div>
     </div>

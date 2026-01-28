@@ -244,7 +244,7 @@ describe("useActionGuard", () => {
       expect(mockPerformAuthRedirect).toHaveBeenCalledWith("/pro/download-app");
     });
 
-    it("should redirect to /my-bookings when CLIENT user tries PRO action", () => {
+    it("should redirect to /my-jobs when CLIENT user tries PRO action", () => {
       const mockUser = { id: "user-1", email: "test@example.com" };
       const mockCallback = vi.fn();
 
@@ -265,7 +265,7 @@ describe("useActionGuard", () => {
       wrappedCallback();
 
       expect(mockCallback).not.toHaveBeenCalled();
-      expect(mockPerformAuthRedirect).toHaveBeenCalledWith("/my-bookings");
+      expect(mockPerformAuthRedirect).toHaveBeenCalledWith("/my-jobs");
     });
   });
 });

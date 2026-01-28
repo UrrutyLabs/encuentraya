@@ -63,7 +63,7 @@ export function DeleteAccountModal({
                 </Text>
                 <Text variant="body" className="text-danger text-sm">
                   Se eliminará permanentemente tu cuenta y se eliminará tu
-                  información personal. Tus reservas y transacciones se
+                  información personal. Tus trabajos y transacciones se
                   mantendrán para fines de auditoría, pero sin datos que te
                   identifiquen.
                 </Text>

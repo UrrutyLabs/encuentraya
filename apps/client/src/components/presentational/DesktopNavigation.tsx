@@ -9,6 +9,7 @@ import { Text } from "@repo/ui";
 import { useAuth } from "@/hooks/auth";
 import { useUserRole } from "@/hooks/auth";
 import { Role } from "@repo/domain";
+import { JOB_LABELS } from "@/utils/jobLabels";
 import { logger } from "@/lib/logger";
 
 interface DesktopNavigationProps {
@@ -86,10 +87,10 @@ export function DesktopNavigation({
             </Button>
           </Link>
           {isAuthenticated && (
-            <Link href="/my-bookings">
+            <Link href="/my-jobs">
               <Button variant="ghost" className="px-4 flex items-center gap-2">
                 <Calendar className="w-4 h-4" />
-                Mis reservas
+                {JOB_LABELS.myJobs}
               </Button>
             </Link>
           )}

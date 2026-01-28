@@ -99,7 +99,7 @@ describe("useResetPassword", () => {
     });
   });
 
-  it("should redirect to my-bookings for CLIENT role after success", async () => {
+  it("should redirect to my-jobs for CLIENT role after success", async () => {
     mockUpdateUser.mockResolvedValue({
       data: { user: mockUser },
       error: null,
@@ -117,7 +117,7 @@ describe("useResetPassword", () => {
 
     await waitFor(
       () => {
-        expect(mockRouter.push).toHaveBeenCalledWith("/my-bookings");
+        expect(mockRouter.push).toHaveBeenCalledWith("/my-jobs");
       },
       { timeout: 2000 }
     );

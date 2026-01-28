@@ -7,7 +7,7 @@ import { Card } from "@repo/ui";
 import { Input } from "@repo/ui";
 import { useWizardState } from "@/lib/wizard/useWizardState";
 import { useProDetail } from "@/hooks/pro";
-import { useRebookTemplate } from "@/hooks/booking";
+import { useRebookTemplate } from "@/hooks/order";
 
 interface LocationStepProps {
   onNext?: () => void;

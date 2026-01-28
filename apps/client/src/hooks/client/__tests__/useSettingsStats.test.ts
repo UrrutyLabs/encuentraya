@@ -1,14 +1,14 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { renderHook } from "@testing-library/react";
 import { useSettingsStats } from "../useSettingsStats";
-import { useMyBookings } from "../../booking";
-import { BookingStatus, Category } from "@repo/domain";
-import type { Booking } from "@repo/domain";
+import { useMyOrders } from "../../order";
+import { OrderStatus, Category } from "@repo/domain";
+import type { Order } from "@repo/domain";
 
-// Mock useMyBookings hook
-vi.mock("../../booking/useMyBookings");
+// Mock useMyOrders hook
+vi.mock("../../order/useMyOrders");
 
-const mockUseMyBookings = vi.mocked(useMyBookings);
+const mockUseMyOrders = vi.mocked(useMyOrders);
 
 describe("useSettingsStats", () => {
   beforeEach(() => {
@@ -17,8 +17,8 @@ describe("useSettingsStats", () => {
 
   describe("when bookings are empty", () => {
     it("should return zero stats when no bookings", () => {
-      mockUseMyBookings.mockReturnValue({
-        bookings: [],
+      mockUseMyOrders.mockReturnValue({
+        orders: [],
         isLoading: false,
         error: null,
         reviewStatusMap: {},
@@ -27,8 +27,8 @@ describe("useSettingsStats", () => {
       const { result } = renderHook(() => useSettingsStats());
 
       expect(result.current.stats).toEqual({
-        totalBookings: 0,
-        completedBookings: 0,
+        totalJobs: 0,
+        completedJobs: 0,
         totalSpent: undefined,
         favoriteCategory: undefined,
       });
@@ -36,8 +36,8 @@ describe("useSettingsStats", () => {
     });
 
     it("should return zero stats when bookings is empty array", () => {
-      mockUseMyBookings.mockReturnValue({
-        bookings: [],
+      mockUseMyOrders.mockReturnValue({
+        orders: [],
         isLoading: false,
         error: null,
         reviewStatusMap: {},
@@ -46,8 +46,8 @@ describe("useSettingsStats", () => {
       const { result } = renderHook(() => useSettingsStats());
 
       expect(result.current.stats).toEqual({
-        totalBookings: 0,
-        completedBookings: 0,
+        totalJobs: 0,
+        completedJobs: 0,
         totalSpent: undefined,
         favoriteCategory: undefined,
       });
@@ -56,29 +56,29 @@ describe("useSettingsStats", () => {
 
   describe("total bookings calculation", () => {
     it("should count total bookings correctly", () => {
-      const mockBookings = [
+      const mockOrders = [
         {
-          id: "booking-1",
-          status: BookingStatus.PENDING,
+          id: "order-1",
+          status: OrderStatus.PENDING_PRO_CONFIRMATION,
           category: Category.PLUMBING,
           totalAmount: null,
         },
         {
-          id: "booking-2",
-          status: BookingStatus.ACCEPTED,
+          id: "order-2",
+          status: OrderStatus.CONFIRMED,
           category: Category.ELECTRICAL,
           totalAmount: null,
         },
         {
-          id: "booking-3",
-          status: BookingStatus.COMPLETED,
+          id: "order-3",
+          status: OrderStatus.COMPLETED,
           category: Category.CLEANING,
           totalAmount: 10000,
         },
-      ] as Booking[];
+      ] as Order[];
 
-      mockUseMyBookings.mockReturnValue({
-        bookings: mockBookings,
+      mockUseMyOrders.mockReturnValue({
+        orders: mockOrders,
         isLoading: false,
         error: null,
         reviewStatusMap: {},
@@ -86,41 +86,41 @@ describe("useSettingsStats", () => {
 
       const { result } = renderHook(() => useSettingsStats());
 
-      expect(result.current.stats.totalBookings).toBe(3);
+      expect(result.current.stats.totalJobs).toBe(3);
     });
   });
 
   describe("completed bookings calculation", () => {
     it("should count only completed bookings", () => {
-      const mockBookings = [
+      const mockOrders = [
         {
-          id: "booking-1",
-          status: BookingStatus.PENDING,
+          id: "order-1",
+          status: OrderStatus.PENDING_PRO_CONFIRMATION,
           category: Category.PLUMBING,
           totalAmount: null,
         },
         {
-          id: "booking-2",
-          status: BookingStatus.COMPLETED,
+          id: "order-2",
+          status: OrderStatus.COMPLETED,
           category: Category.ELECTRICAL,
           totalAmount: 10000,
         },
         {
-          id: "booking-3",
-          status: BookingStatus.COMPLETED,
+          id: "order-3",
+          status: OrderStatus.COMPLETED,
           category: Category.CLEANING,
           totalAmount: 15000,
         },
         {
-          id: "booking-4",
-          status: BookingStatus.CANCELLED,
+          id: "order-4",
+          status: OrderStatus.CANCELED,
           category: Category.HANDYMAN,
           totalAmount: null,
         },
-      ] as Booking[];
+      ] as Order[];
 
-      mockUseMyBookings.mockReturnValue({
-        bookings: mockBookings,
+      mockUseMyOrders.mockReturnValue({
+        orders: mockOrders,
         isLoading: false,
         error: null,
         reviewStatusMap: {},
@@ -128,35 +128,35 @@ describe("useSettingsStats", () => {
 
       const { result } = renderHook(() => useSettingsStats());
 
-      expect(result.current.stats.completedBookings).toBe(2);
+      expect(result.current.stats.completedJobs).toBe(2);
     });
   });
 
   describe("total spent calculation", () => {
     it("should calculate total spent from completed bookings with totalAmount", () => {
-      const mockBookings = [
+      const mockOrders = [
         {
-          id: "booking-1",
-          status: BookingStatus.COMPLETED,
+          id: "order-1",
+          status: OrderStatus.COMPLETED,
           category: Category.PLUMBING,
           totalAmount: 10000,
         },
         {
-          id: "booking-2",
-          status: BookingStatus.COMPLETED,
+          id: "order-2",
+          status: OrderStatus.COMPLETED,
           category: Category.ELECTRICAL,
           totalAmount: 15000,
         },
         {
-          id: "booking-3",
-          status: BookingStatus.COMPLETED,
+          id: "order-3",
+          status: OrderStatus.COMPLETED,
           category: Category.CLEANING,
           totalAmount: 5000,
         },
-      ] as Booking[];
+      ] as Order[];
 
-      mockUseMyBookings.mockReturnValue({
-        bookings: mockBookings,
+      mockUseMyOrders.mockReturnValue({
+        orders: mockOrders,
         isLoading: false,
         error: null,
         reviewStatusMap: {},
@@ -168,23 +168,23 @@ describe("useSettingsStats", () => {
     });
 
     it("should exclude completed bookings without totalAmount", () => {
-      const mockBookings = [
+      const mockOrders = [
         {
-          id: "booking-1",
-          status: BookingStatus.COMPLETED,
+          id: "order-1",
+          status: OrderStatus.COMPLETED,
           category: Category.PLUMBING,
           totalAmount: 10000,
         },
         {
-          id: "booking-2",
-          status: BookingStatus.COMPLETED,
+          id: "order-2",
+          status: OrderStatus.COMPLETED,
           category: Category.ELECTRICAL,
           totalAmount: null,
         },
-      ] as Booking[];
+      ] as Order[];
 
-      mockUseMyBookings.mockReturnValue({
-        bookings: mockBookings,
+      mockUseMyOrders.mockReturnValue({
+        orders: mockOrders,
         isLoading: false,
         error: null,
         reviewStatusMap: {},
@@ -196,17 +196,17 @@ describe("useSettingsStats", () => {
     });
 
     it("should return undefined when totalSpent is zero", () => {
-      const mockBookings = [
+      const mockOrders = [
         {
-          id: "booking-1",
-          status: BookingStatus.PENDING,
+          id: "order-1",
+          status: OrderStatus.PENDING_PRO_CONFIRMATION,
           category: Category.PLUMBING,
           totalAmount: null,
         },
-      ] as unknown as Booking[];
+      ] as unknown as Order[];
 
-      mockUseMyBookings.mockReturnValue({
-        bookings: mockBookings,
+      mockUseMyOrders.mockReturnValue({
+        orders: mockOrders,
         isLoading: false,
         error: null,
         reviewStatusMap: {},
@@ -220,35 +220,35 @@ describe("useSettingsStats", () => {
 
   describe("favorite category calculation", () => {
     it("should return most booked category", () => {
-      const mockBookings = [
+      const mockOrders = [
         {
-          id: "booking-1",
-          status: BookingStatus.PENDING,
+          id: "order-1",
+          status: OrderStatus.PENDING_PRO_CONFIRMATION,
           category: Category.PLUMBING,
           totalAmount: null,
         },
         {
-          id: "booking-2",
-          status: BookingStatus.ACCEPTED,
+          id: "order-2",
+          status: OrderStatus.CONFIRMED,
           category: Category.PLUMBING,
           totalAmount: null,
         },
         {
-          id: "booking-3",
-          status: BookingStatus.COMPLETED,
+          id: "order-3",
+          status: OrderStatus.COMPLETED,
           category: Category.PLUMBING,
           totalAmount: 10000,
         },
         {
-          id: "booking-4",
-          status: BookingStatus.COMPLETED,
+          id: "order-4",
+          status: OrderStatus.COMPLETED,
           category: Category.ELECTRICAL,
           totalAmount: 15000,
         },
-      ] as Booking[];
+      ] as Order[];
 
-      mockUseMyBookings.mockReturnValue({
-        bookings: mockBookings,
+      mockUseMyOrders.mockReturnValue({
+        orders: mockOrders,
         isLoading: false,
         error: null,
         reviewStatusMap: {},
@@ -260,23 +260,23 @@ describe("useSettingsStats", () => {
     });
 
     it("should return Spanish label for favorite category", () => {
-      const mockBookings = [
+      const mockOrders = [
         {
-          id: "booking-1",
-          status: BookingStatus.PENDING,
+          id: "order-1",
+          status: OrderStatus.PENDING_PRO_CONFIRMATION,
           category: Category.ELECTRICAL,
           totalAmount: null,
         },
         {
-          id: "booking-2",
-          status: BookingStatus.COMPLETED,
+          id: "order-2",
+          status: OrderStatus.COMPLETED,
           category: Category.ELECTRICAL,
           totalAmount: 10000,
         },
-      ] as Booking[];
+      ] as Order[];
 
-      mockUseMyBookings.mockReturnValue({
-        bookings: mockBookings,
+      mockUseMyOrders.mockReturnValue({
+        orders: mockOrders,
         isLoading: false,
         error: null,
         reviewStatusMap: {},
@@ -288,23 +288,23 @@ describe("useSettingsStats", () => {
     });
 
     it("should handle tie by returning first encountered category", () => {
-      const mockBookings = [
+      const mockOrders = [
         {
-          id: "booking-1",
-          status: BookingStatus.PENDING,
+          id: "order-1",
+          status: OrderStatus.PENDING_PRO_CONFIRMATION,
           category: Category.PLUMBING,
           totalAmount: null,
         },
         {
-          id: "booking-2",
-          status: BookingStatus.COMPLETED,
+          id: "order-2",
+          status: OrderStatus.COMPLETED,
           category: Category.ELECTRICAL,
           totalAmount: 10000,
         },
-      ] as Booking[];
+      ] as Order[];
 
-      mockUseMyBookings.mockReturnValue({
-        bookings: mockBookings,
+      mockUseMyOrders.mockReturnValue({
+        orders: mockOrders,
         isLoading: false,
         error: null,
         reviewStatusMap: {},
@@ -352,17 +352,17 @@ describe("useSettingsStats", () => {
       ];
 
       categories.forEach((category, index) => {
-        const mockBookings = [
+        const mockOrders = [
           {
-            id: "booking-1",
-            status: BookingStatus.COMPLETED,
+            id: "order-1",
+            status: OrderStatus.COMPLETED,
             category,
             totalAmount: 10000,
           },
-        ] as Booking[];
+        ] as Order[];
 
-        mockUseMyBookings.mockReturnValue({
-          bookings: mockBookings,
+        mockUseMyOrders.mockReturnValue({
+          orders: mockOrders,
           isLoading: false,
           error: null,
           reviewStatusMap: {},
@@ -379,8 +379,8 @@ describe("useSettingsStats", () => {
 
   describe("loading state", () => {
     it("should return loading state from useMyBookings", () => {
-      mockUseMyBookings.mockReturnValue({
-        bookings: [],
+      mockUseMyOrders.mockReturnValue({
+        orders: [],
         isLoading: true,
         error: null,
         reviewStatusMap: {},

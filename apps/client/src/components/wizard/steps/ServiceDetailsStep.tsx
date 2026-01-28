@@ -9,8 +9,8 @@ import { Category } from "@repo/domain";
 import { useWizardState } from "@/lib/wizard/useWizardState";
 import { useProDetail } from "@/hooks/pro";
 import { useTodayDate } from "@/hooks/shared";
-import { useAvailableBookingTimes } from "@/hooks/booking/useAvailableBookingTimes";
-import { useRebookTemplate } from "@/hooks/booking";
+import { useAvailableOrderTimes } from "@/hooks/order";
+import { useRebookTemplate } from "@/hooks/order";
 
 const CATEGORY_OPTIONS: { value: Category; label: string }[] = [
   { value: Category.PLUMBING, label: "Plomería" },
@@ -74,7 +74,7 @@ export function ServiceDetailsStep({}: ServiceDetailsStepProps) {
   }, [rebookValues, category]);
 
   const { availableTimes, handleDateChange: handleDateChangeWithValidation } =
-    useAvailableBookingTimes(date, today, time, setTime, {
+    useAvailableOrderTimes(date, today, time, setTime, {
       minBufferMinutes: 60,
       startHour: 9,
       endHour: 18,

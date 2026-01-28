@@ -4,7 +4,7 @@ import { ReactNode, Suspense } from "react";
 import { usePathname } from "next/navigation";
 import { Navigation } from "@/components/presentational/Navigation";
 import { WizardLayout } from "@/components/wizard/WizardLayout";
-import { BookingCreateSkeleton } from "@/components/presentational/BookingCreateSkeleton";
+import { JobCreateSkeleton } from "@/components/presentational/JobCreateSkeleton";
 
 interface BookWizardLayoutProps {
   children: ReactNode;
@@ -31,7 +31,7 @@ export default function BookWizardLayout({ children }: BookWizardLayoutProps) {
   return (
     <div className="min-h-screen bg-bg">
       <Navigation showLogin={false} showProfile={true} />
-      <Suspense fallback={<BookingCreateSkeleton />}>
+      <Suspense fallback={<JobCreateSkeleton />}>
         <WizardLayout currentStep={currentStep} stepLabels={STEP_LABELS}>
           {children}
         </WizardLayout>
