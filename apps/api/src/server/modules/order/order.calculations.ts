@@ -6,7 +6,7 @@
 import type { OrderLineItemEntity } from "./orderLineItem.repo";
 import type { OrderLineItemCreateInput } from "./orderLineItem.repo";
 import type { OrderEntity } from "./order.repo";
-import { OrderLineItemType, TaxBehavior, ApprovalMethod } from "@repo/domain";
+import { OrderLineItemType, TaxBehavior } from "@repo/domain";
 
 /**
  * Default platform fee rate (10%)

@@ -67,14 +67,20 @@ function SearchResultsContent() {
   useEffect(() => {
     if (prevDateParamRef.current !== dateParam) {
       prevDateParamRef.current = dateParam;
-      setDate(dateParam);
+      // Defer setState to avoid synchronous state updates in effect
+      setTimeout(() => {
+        setDate(dateParam);
+      }, 0);
     }
   }, [dateParam]);
 
   useEffect(() => {
     if (prevTimeWindowParamRef.current !== timeWindowParam) {
       prevTimeWindowParamRef.current = timeWindowParam;
-      setTimeWindow((timeWindowParam as TimeWindow) || "");
+      // Defer setState to avoid synchronous state updates in effect
+      setTimeout(() => {
+        setTimeWindow((timeWindowParam as TimeWindow) || "");
+      }, 0);
     }
   }, [timeWindowParam]);
 

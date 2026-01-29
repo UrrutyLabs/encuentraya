@@ -23,7 +23,9 @@ interface ActiveFiltersProps {
   onFilterRemove: (filterType: "q" | "category" | "subcategory") => void;
 }
 
-export function ActiveFilters({ onFilterRemove }: ActiveFiltersProps) {
+export function ActiveFilters({
+  onFilterRemove: _onFilterRemove,
+}: ActiveFiltersProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
 

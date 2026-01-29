@@ -1492,9 +1492,12 @@ describe("ProService", () => {
 
       // Act - Note: Service layer doesn't support null, but repository does
       // This test verifies repository-level null handling triggers profileCompleted recalculation
-      await (mockProRepository.update as any)(existingPro.id, {
-        avatarUrl: null,
-      });
+      await (mockProRepository.update as unknown as ProRepository["update"])(
+        existingPro.id,
+        {
+          avatarUrl: null,
+        }
+      );
 
       // Assert - Repository handles null and recalculates profileCompleted
       expect(mockProRepository.update).toHaveBeenCalledWith(existingPro.id, {
@@ -1531,9 +1534,12 @@ describe("ProService", () => {
 
       // Act - Note: Service layer doesn't support null, but repository does
       // This test verifies repository-level null handling triggers profileCompleted recalculation
-      await (mockProRepository.update as any)(existingPro.id, {
-        bio: null,
-      });
+      await (mockProRepository.update as unknown as ProRepository["update"])(
+        existingPro.id,
+        {
+          bio: null,
+        }
+      );
 
       // Assert - Repository handles null and recalculates profileCompleted
       expect(mockProRepository.update).toHaveBeenCalledWith(existingPro.id, {

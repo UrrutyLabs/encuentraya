@@ -148,7 +148,7 @@ export interface OrderRepository {
   updateStatus(
     id: string,
     status: OrderStatus,
-    metadata?: Record<string, any>
+    metadata?: Record<string, unknown>
   ): Promise<OrderEntity | null>;
 }
 
@@ -328,7 +328,7 @@ export class OrderRepositoryImpl implements OrderRepository {
   async updateStatus(
     id: string,
     status: OrderStatus,
-    metadata?: Record<string, any>
+    metadata?: Record<string, unknown>
   ): Promise<OrderEntity | null> {
     const updateData: Prisma.OrderUpdateInput = {
       status: status as $Enums.OrderStatus,

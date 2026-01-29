@@ -40,17 +40,6 @@ export class OrderService {
   }
 
   /**
-   * Create a new order
-   */
-  async createOrder(input: OrderCreateInput): Promise<Order> {
-    // This method will be called by OrderCreationService
-    // which handles the full creation workflow including pro validation
-    throw new Error(
-      "Use OrderCreationService.createOrderRequest() instead of OrderService.createOrder()"
-    );
-  }
-
-  /**
    * Get order by ID
    */
   async getOrderById(id: string): Promise<Order | null> {
@@ -128,7 +117,7 @@ export class OrderService {
   async updateOrderStatus(
     id: string,
     status: OrderStatus,
-    metadata?: Record<string, any>
+    metadata?: Record<string, unknown>
   ): Promise<Order | null> {
     const orderEntity = await this.orderRepository.updateStatus(
       id,
@@ -152,7 +141,7 @@ export class OrderService {
    */
   private mapToDomain(
     entity: OrderEntity,
-    lineItems: OrderLineItemEntity[]
+    _lineItems: OrderLineItemEntity[]
   ): Order {
     return {
       id: entity.id,

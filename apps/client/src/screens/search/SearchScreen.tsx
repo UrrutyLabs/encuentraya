@@ -36,7 +36,10 @@ export function SearchScreen() {
   // Set default selected category to first category when categories load
   useEffect(() => {
     if (categories.length > 0 && !selectedCategory) {
-      setSelectedCategory(categories[0]);
+      // Defer setState to avoid synchronous state updates in effect
+      setTimeout(() => {
+        setSelectedCategory(categories[0]);
+      }, 0);
     }
   }, [categories, selectedCategory]);
 
