@@ -67,7 +67,7 @@ describe("useOnboarding", () => {
       email: "john@example.com",
       phone: "123456789",
       hourlyRate: 50,
-      categories: [Category.PLUMBING],
+      categoryIds: ["cat-1"],
       serviceArea: "Montevideo",
     };
 
@@ -91,7 +91,7 @@ describe("useOnboarding", () => {
       name: "John Doe",
       email: "john@example.com",
       hourlyRate: 50,
-      categories: [Category.PLUMBING],
+      categoryIds: ["cat-1"],
     };
 
     await act(async () => {
@@ -119,7 +119,7 @@ describe("useOnboarding", () => {
       name: "John Doe",
       email: "john@example.com",
       hourlyRate: 50,
-      categories: [Category.PLUMBING],
+      categoryIds: ["cat-1"],
     };
 
     await act(async () => {
@@ -156,7 +156,7 @@ describe("useOnboarding", () => {
       name: "John Doe",
       email: "john@example.com",
       hourlyRate: 50,
-      categories: [Category.PLUMBING],
+      categoryIds: ["cat-1"],
     };
 
     await act(async () => {
@@ -196,7 +196,7 @@ describe("useOnboarding", () => {
       name: "John Doe",
       email: "john@example.com",
       hourlyRate: 50,
-      categories: [Category.PLUMBING],
+      categoryIds: ["cat -1"],
     };
 
     await act(async () => {

@@ -83,8 +83,7 @@ jobs:
 
       - name: Check formatting
         run: |
-          pnpm prettier --check "**/*.{ts,tsx,js,jsx,json,md,yml,yaml}" \
-            --ignore-path .prettierignore
+          pnpm format --ignore-path .prettierignore
 
   type-check:
     name: Type Check

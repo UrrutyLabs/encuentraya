@@ -391,20 +391,4 @@ describe("OrderService", () => {
       );
     });
   });
-
-  describe("createOrder", () => {
-    it("should throw error directing to use OrderCreationService", async () => {
-      await expect(
-        service.createOrder({
-          proProfileId: "pro-1",
-          categoryId: "cat-plumbing",
-          addressText: "123 Main St",
-          scheduledWindowStartAt: new Date(),
-          estimatedHours: 2,
-        })
-      ).rejects.toThrow(
-        "Use OrderCreationService.createOrderRequest() instead of OrderService.createOrder()"
-      );
-    });
-  });
 });

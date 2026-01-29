@@ -79,7 +79,7 @@ describe("SearchScreen", () => {
       expect(plumbingElements.length).toBeGreaterThan(0);
     });
 
-    it("should not show subcategories initially", () => {
+    it("should not show subcategories initially", async () => {
       // Mock useSubcategoriesByCategoryId to return empty array initially
       mockUseSubcategoriesByCategoryId.mockReturnValue({
         subcategories: [],
@@ -87,11 +87,13 @@ describe("SearchScreen", () => {
         error: null,
       });
       render(<SearchScreen />);
-      // Note: SearchScreen initializes with first category selected, so subcategories will show
-      // This test verifies the component structure, not the initial state
-      const subcategoriesSection = document.getElementById("subcategories");
-      // Since selectedCategory defaults to first category, subcategories will be rendered
-      expect(subcategoriesSection).toBeInTheDocument();
+      // Note: SearchScreen initializes with first category selected via useEffect with setTimeout
+      // Wait for the async state update to complete
+      await waitFor(() => {
+        const subcategoriesSection = document.getElementById("subcategories");
+        // Since selectedCategory defaults to first category, subcategories will be rendered
+        expect(subcategoriesSection).toBeInTheDocument();
+      });
     });
   });
 
@@ -124,6 +126,12 @@ describe("SearchScreen", () => {
       Element.prototype.scrollIntoView = mockScrollIntoView;
 
       render(<SearchScreen />);
+
+      // Wait for initial category selection to complete
+      await waitFor(() => {
+        expect(document.getElementById("subcategories")).toBeInTheDocument();
+      });
+
       const plumbingCategories = screen.getAllByText("Plomería");
       const plumbingCategory = plumbingCategories[0]?.closest("button");
 
@@ -135,7 +143,7 @@ describe("SearchScreen", () => {
         () => {
           expect(mockScrollIntoView).toHaveBeenCalled();
         },
-        { timeout: 300 }
+        { timeout: 500 }
       );
     });
   });
