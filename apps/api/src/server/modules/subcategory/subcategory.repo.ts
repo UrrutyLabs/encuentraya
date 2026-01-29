@@ -1,6 +1,5 @@
 import { injectable } from "tsyringe";
 import { prisma } from "@infra/db/prisma";
-import { Category } from "@repo/domain";
 
 /**
  * Subcategory entity (plain object)
@@ -9,11 +8,14 @@ export interface SubcategoryEntity {
   id: string;
   name: string;
   slug: string;
-  category: Category;
+  categoryId: string; // FK to Category table (required)
+  key: string | null; // Stable identifier within category
   imageUrl: string | null;
   description: string | null;
   displayOrder: number;
   isActive: boolean;
+  configJson: Record<string, unknown> | null; // Subcategory-level config
+  searchKeywords: string[]; // Search keywords
   createdAt: Date;
   updatedAt: Date;
 }
@@ -24,7 +26,7 @@ export interface SubcategoryEntity {
 export interface SubcategoryCreateInput {
   name: string;
   slug: string;
-  category: Category;
+  categoryId: string; // FK to Category table (required)
   imageUrl?: string | null;
   description?: string | null;
   displayOrder?: number;
@@ -37,17 +39,18 @@ export interface SubcategoryCreateInput {
  */
 export interface SubcategoryRepository {
   findById(id: string): Promise<SubcategoryEntity | null>;
-  findBySlug(
+  findBySlugAndCategoryId(
     slug: string,
-    category: Category
+    categoryId: string
   ): Promise<SubcategoryEntity | null>;
-  findByCategory(category: Category): Promise<SubcategoryEntity[]>;
+  findByCategoryId(categoryId: string): Promise<SubcategoryEntity[]>;
   findAll(): Promise<SubcategoryEntity[]>;
   create(input: SubcategoryCreateInput): Promise<SubcategoryEntity>;
   update(
     id: string,
     data: Partial<SubcategoryCreateInput>
   ): Promise<SubcategoryEntity | null>;
+  delete(id: string): Promise<void>;
 }
 
 /**
@@ -64,21 +67,18 @@ export class SubcategoryRepositoryImpl implements SubcategoryRepository {
       return null;
     }
 
-    return this.mapPrismaToDomain(
-      subcategory as Parameters<typeof this.mapPrismaToDomain>[0]
-    );
+    return this.mapPrismaToDomain(subcategory);
   }
 
-  async findBySlug(
+  async findBySlugAndCategoryId(
     slug: string,
-    category: Category
+    categoryId: string
   ): Promise<SubcategoryEntity | null> {
-    const subcategory = await prisma.subcategory.findUnique({
+    const subcategory = await prisma.subcategory.findFirst({
       where: {
-        slug_category: {
-          slug,
-          category,
-        },
+        slug,
+        categoryId,
+        isActive: true,
       },
     });
 
@@ -86,34 +86,28 @@ export class SubcategoryRepositoryImpl implements SubcategoryRepository {
       return null;
     }
 
-    return this.mapPrismaToDomain(
-      subcategory as Parameters<typeof this.mapPrismaToDomain>[0]
-    );
+    return this.mapPrismaToDomain(subcategory);
   }
 
-  async findByCategory(category: Category): Promise<SubcategoryEntity[]> {
+  async findByCategoryId(categoryId: string): Promise<SubcategoryEntity[]> {
     const subcategories = await prisma.subcategory.findMany({
       where: {
-        category,
+        categoryId,
         isActive: true,
       },
       orderBy: { displayOrder: "asc" },
     });
 
-    return subcategories.map((s) =>
-      this.mapPrismaToDomain(s as Parameters<typeof this.mapPrismaToDomain>[0])
-    );
+    return subcategories.map((s) => this.mapPrismaToDomain(s));
   }
 
   async findAll(): Promise<SubcategoryEntity[]> {
     const subcategories = await prisma.subcategory.findMany({
       where: { isActive: true },
-      orderBy: [{ category: "asc" }, { displayOrder: "asc" }],
+      orderBy: [{ categoryId: "asc" }, { displayOrder: "asc" }],
     });
 
-    return subcategories.map((s) =>
-      this.mapPrismaToDomain(s as Parameters<typeof this.mapPrismaToDomain>[0])
-    );
+    return subcategories.map((s) => this.mapPrismaToDomain(s));
   }
 
   async create(input: SubcategoryCreateInput): Promise<SubcategoryEntity> {
@@ -121,7 +115,7 @@ export class SubcategoryRepositoryImpl implements SubcategoryRepository {
       data: {
         name: input.name,
         slug: input.slug,
-        category: input.category,
+        categoryId: input.categoryId,
         imageUrl: input.imageUrl ?? null,
         description: input.description ?? null,
         displayOrder: input.displayOrder ?? 0,
@@ -129,54 +123,86 @@ export class SubcategoryRepositoryImpl implements SubcategoryRepository {
       },
     });
 
-    return this.mapPrismaToDomain(
-      subcategory as Parameters<typeof this.mapPrismaToDomain>[0]
-    );
+    return this.mapPrismaToDomain(subcategory);
   }
 
   async update(
     id: string,
     data: Partial<SubcategoryCreateInput>
   ): Promise<SubcategoryEntity | null> {
+    const updateData: {
+      name?: string;
+      slug?: string;
+      categoryId?: string;
+      imageUrl?: string | null;
+      description?: string | null;
+      displayOrder?: number;
+      isActive?: boolean;
+    } = {};
+
+    if (data.name !== undefined) updateData.name = data.name;
+    if (data.slug !== undefined) updateData.slug = data.slug;
+    if (data.categoryId !== undefined) updateData.categoryId = data.categoryId;
+    if (data.imageUrl !== undefined)
+      updateData.imageUrl = data.imageUrl ?? null;
+    if (data.description !== undefined)
+      updateData.description = data.description ?? null;
+    if (data.displayOrder !== undefined)
+      updateData.displayOrder = data.displayOrder;
+    if (data.isActive !== undefined) updateData.isActive = data.isActive;
+
     const updated = await prisma.subcategory.update({
       where: { id },
-      data: {
-        name: data.name,
-        slug: data.slug,
-        category: data.category,
-        imageUrl: data.imageUrl ?? undefined,
-        description: data.description ?? undefined,
-        displayOrder: data.displayOrder,
-        isActive: data.isActive,
-      },
+      data: updateData,
     });
 
-    return this.mapPrismaToDomain(
-      updated as Parameters<typeof this.mapPrismaToDomain>[0]
-    );
+    return this.mapPrismaToDomain(updated);
   }
 
+  async delete(id: string): Promise<void> {
+    await prisma.subcategory.delete({
+      where: { id },
+    });
+  }
+
+  /**
+   * Map Prisma subcategory to domain entity
+   */
   private mapPrismaToDomain(prismaSubcategory: {
     id: string;
     name: string;
     slug: string;
-    category: string; // Prisma Category enum (compatible with domain Category)
+    categoryId: string;
+    key: string | null;
     imageUrl: string | null;
     description: string | null;
     displayOrder: number;
     isActive: boolean;
+    configJson: unknown;
+    searchKeywords: string[];
     createdAt: Date;
     updatedAt: Date;
   }): SubcategoryEntity {
+    if (!prismaSubcategory.categoryId) {
+      throw new Error(
+        `Subcategory ${prismaSubcategory.id} has null categoryId`
+      );
+    }
     return {
       id: prismaSubcategory.id,
       name: prismaSubcategory.name,
       slug: prismaSubcategory.slug,
-      category: prismaSubcategory.category as Category,
+      categoryId: prismaSubcategory.categoryId,
+      key: prismaSubcategory.key,
       imageUrl: prismaSubcategory.imageUrl,
       description: prismaSubcategory.description,
       displayOrder: prismaSubcategory.displayOrder,
       isActive: prismaSubcategory.isActive,
+      configJson: prismaSubcategory.configJson as Record<
+        string,
+        unknown
+      > | null,
+      searchKeywords: prismaSubcategory.searchKeywords,
       createdAt: prismaSubcategory.createdAt,
       updatedAt: prismaSubcategory.updatedAt,
     };

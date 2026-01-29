@@ -1,9 +1,9 @@
 import { trpc } from "@/lib/trpc/client";
-import { Category, type TimeWindow } from "@repo/domain";
+import type { TimeWindow } from "@repo/domain";
 
 interface SearchFilters {
-  category?: Category;
-  subcategory?: string; // For future API support, currently not used
+  categoryId?: string; // FK to Category table
+  subcategory?: string; // Subcategory slug (for future API support)
   date?: string;
   timeWindow?: TimeWindow;
   searchQuery?: string; // For future API support, currently not used
@@ -14,9 +14,9 @@ export function useSearchPros(filters: SearchFilters) {
     data: pros,
     isLoading,
     error,
-  } = trpc.client.searchPros.useQuery(
+  } = trpc.clientSearch.searchPros.useQuery(
     {
-      category: filters.category,
+      categoryId: filters.categoryId,
       subcategory: filters.subcategory,
       date: filters.date ? new Date(filters.date) : undefined,
       timeWindow: filters.timeWindow,

@@ -40,8 +40,8 @@ export function setupContainer(): DependencyContainer {
   registerPaymentModule(tsyringeContainer);
   registerPushModule(tsyringeContainer);
   registerAuditModule(tsyringeContainer); // Register audit module (can be used by any service)
-  registerCategoryModule(tsyringeContainer); // Register category module (no dependencies)
-  registerSubcategoryModule(tsyringeContainer); // Register subcategory module (no dependencies)
+  registerSubcategoryModule(tsyringeContainer); // Register subcategory module (no dependencies) - must be before CategoryModule
+  registerCategoryModule(tsyringeContainer); // Register category module (depends on SubcategoryRepository for ConfigService)
   registerSearchModule(tsyringeContainer); // Register search module (depends on ProService)
   registerContactModule(tsyringeContainer); // Register contact module (depends on NotificationService)
 

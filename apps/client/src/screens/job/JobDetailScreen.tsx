@@ -26,17 +26,10 @@ import { JobDetailSkeleton } from "@/components/presentational/JobDetailSkeleton
 import { OrderStatus, formatCurrency, type Order } from "@repo/domain";
 import { useOrderDetail } from "@/hooks/order";
 import { useCancelOrder } from "@/hooks/order";
+import { useCategory } from "@/hooks/category";
 import { getJobStatusLabel, getJobStatusVariant } from "@/utils/jobStatus";
 import { JOB_LABELS } from "@/utils/jobLabels";
 import { logger } from "@/lib/logger";
-
-const CATEGORY_LABELS: Record<string, string> = {
-  plumbing: "Plomería",
-  electrical: "Electricidad",
-  cleaning: "Limpieza",
-  handyman: "Arreglos generales",
-  painting: "Pintura",
-};
 
 function formatDate(date: Date): string {
   return new Intl.DateTimeFormat("es-UY", {
@@ -67,6 +60,9 @@ export function JobDetailScreen() {
 
   // Cancel order hook
   const { cancelOrder, isPending: isCancelling } = useCancelOrder(orderId);
+
+  // Fetch category for display
+  const { category } = useCategory(order?.categoryId);
 
   // Use job variable for display (type is Order)
   const job: Order | undefined = order ?? undefined;
@@ -137,7 +133,7 @@ export function JobDetailScreen() {
 
   const statusLabel = getJobStatusLabel(job.status);
   const statusVariant = getJobStatusVariant(job.status);
-  const categoryLabel = CATEGORY_LABELS[job.category] || job.category;
+  const categoryLabel = category?.name || "Cargando...";
 
   // Check if pro is active (approved and not suspended)
   const isProActive = pro ? pro.isApproved && !pro.isSuspended : false;

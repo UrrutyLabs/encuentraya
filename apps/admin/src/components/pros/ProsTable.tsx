@@ -1,11 +1,13 @@
 "use client";
 
+import { useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { Users } from "lucide-react";
 import { Text } from "@repo/ui";
 import { Badge } from "@repo/ui";
 import { TableSkeleton } from "@/components/ui/TableSkeleton";
 import { EmptyState } from "@repo/ui";
+import { useCategories } from "@/hooks/useCategories";
 
 interface ProRow {
   id: string;
@@ -15,6 +17,7 @@ interface ProRow {
   completedJobsCount: number;
   isPayoutProfileComplete: boolean;
   createdAt: Date;
+  categoryIds?: string[]; // Optional - not yet returned by adminList API
 }
 
 interface ProsTableProps {
@@ -24,6 +27,33 @@ interface ProsTableProps {
 
 export function ProsTable({ pros, isLoading }: ProsTableProps) {
   const router = useRouter();
+  const { data: categories } = useCategories();
+
+  // Create category map for lookup
+  const categoryMap = useMemo(() => {
+    const map = new Map<string, { name: string; isDeleted: boolean }>();
+    categories?.forEach((category) => {
+      map.set(category.id, {
+        name: category.name,
+        isDeleted: !!category.deletedAt || !category.isActive,
+      });
+    });
+    return map;
+  }, [categories]);
+
+  // Helper to get category names
+  const getCategoryNames = (categoryIds?: string[]) => {
+    if (!categoryIds || categoryIds.length === 0) return [];
+    return categoryIds
+      .map((categoryId) => {
+        const category = categoryMap.get(categoryId);
+        if (!category) return null;
+        return category.isDeleted
+          ? `${category.name} (eliminada)`
+          : category.name;
+      })
+      .filter((name): name is string => name !== null);
+  };
 
   const formatDate = (date: Date) => {
     return new Date(date).toLocaleDateString("es-UY", {
@@ -83,6 +113,9 @@ export function ProsTable({ pros, isLoading }: ProsTableProps) {
                 Email
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Categorías
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Estado
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -112,6 +145,21 @@ export function ProsTable({ pros, isLoading }: ProsTableProps) {
                   <Text variant="body" className="text-gray-600">
                     {pro.email}
                   </Text>
+                </td>
+                <td className="px-6 py-4">
+                  {pro.categoryIds && pro.categoryIds.length > 0 ? (
+                    <div className="flex flex-wrap gap-1">
+                      {getCategoryNames(pro.categoryIds).map((name, idx) => (
+                        <Badge key={idx} variant="info" className="text-xs">
+                          {name}
+                        </Badge>
+                      ))}
+                    </div>
+                  ) : (
+                    <Text variant="small" className="text-gray-400">
+                      —
+                    </Text>
+                  )}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <Badge variant={getStatusBadgeVariant(pro.status)}>

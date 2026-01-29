@@ -1,8 +1,8 @@
 "use client";
 
 import { memo } from "react";
-import { Category, type Subcategory } from "@repo/domain";
-import { useSubcategories } from "@/hooks/subcategory";
+import type { Category, Subcategory } from "@repo/domain";
+import { useSubcategoriesByCategoryId } from "@/hooks/subcategory";
 import { SubcategoryCard } from "./SubcategoryCard";
 import { Text } from "@repo/ui";
 import { getCategoryLabel } from "@/lib/search/categoryIcons";
@@ -16,7 +16,9 @@ export const SubcategoryGrid = memo(function SubcategoryGrid({
   category,
   onSubcategoryClick,
 }: SubcategoryGridProps) {
-  const { subcategories, isLoading } = useSubcategories(category);
+  const { subcategories, isLoading } = useSubcategoriesByCategoryId(
+    category.id
+  );
   const categoryLabel = getCategoryLabel(category);
 
   if (isLoading) {

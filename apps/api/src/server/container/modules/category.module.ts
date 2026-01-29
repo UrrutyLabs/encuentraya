@@ -1,26 +1,29 @@
 import { DependencyContainer } from "tsyringe";
 import { TOKENS } from "../tokens";
 import {
-  CategoryMetadataRepository,
-  CategoryMetadataRepositoryImpl,
+  CategoryRepository,
+  CategoryRepositoryImpl,
 } from "@modules/category/category.repo";
 import { CategoryService } from "@modules/category/category.service";
+import { ConfigService } from "@modules/category/config.service";
 
 /**
  * Register Category module dependencies
- * No dependencies on other modules
+ * Dependencies: SubcategoryRepository (for ConfigService)
  */
 export function registerCategoryModule(container: DependencyContainer): void {
-  // Register repository
-  container.register<CategoryMetadataRepository>(
-    TOKENS.CategoryMetadataRepository,
-    {
-      useClass: CategoryMetadataRepositoryImpl,
-    }
-  );
+  // Register Category repository
+  container.register<CategoryRepository>(TOKENS.CategoryRepository, {
+    useClass: CategoryRepositoryImpl,
+  });
 
-  // Register service (auto-resolves dependencies)
+  // Register CategoryService
   container.register<CategoryService>(TOKENS.CategoryService, {
     useClass: CategoryService,
+  });
+
+  // Register ConfigService (depends on CategoryRepository and SubcategoryRepository)
+  container.register<ConfigService>(TOKENS.ConfigService, {
+    useClass: ConfigService,
   });
 }

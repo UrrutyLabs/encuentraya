@@ -38,7 +38,8 @@ export type SubcategoryMinAggregateOutputType = {
   id: string | null
   name: string | null
   slug: string | null
-  category: $Enums.Category | null
+  categoryId: string | null
+  key: string | null
   imageUrl: string | null
   description: string | null
   displayOrder: number | null
@@ -51,7 +52,8 @@ export type SubcategoryMaxAggregateOutputType = {
   id: string | null
   name: string | null
   slug: string | null
-  category: $Enums.Category | null
+  categoryId: string | null
+  key: string | null
   imageUrl: string | null
   description: string | null
   displayOrder: number | null
@@ -64,11 +66,14 @@ export type SubcategoryCountAggregateOutputType = {
   id: number
   name: number
   slug: number
-  category: number
+  categoryId: number
+  key: number
   imageUrl: number
   description: number
   displayOrder: number
   isActive: number
+  configJson: number
+  searchKeywords: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -87,7 +92,8 @@ export type SubcategoryMinAggregateInputType = {
   id?: true
   name?: true
   slug?: true
-  category?: true
+  categoryId?: true
+  key?: true
   imageUrl?: true
   description?: true
   displayOrder?: true
@@ -100,7 +106,8 @@ export type SubcategoryMaxAggregateInputType = {
   id?: true
   name?: true
   slug?: true
-  category?: true
+  categoryId?: true
+  key?: true
   imageUrl?: true
   description?: true
   displayOrder?: true
@@ -113,11 +120,14 @@ export type SubcategoryCountAggregateInputType = {
   id?: true
   name?: true
   slug?: true
-  category?: true
+  categoryId?: true
+  key?: true
   imageUrl?: true
   description?: true
   displayOrder?: true
   isActive?: true
+  configJson?: true
+  searchKeywords?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -213,11 +223,14 @@ export type SubcategoryGroupByOutputType = {
   id: string
   name: string
   slug: string
-  category: $Enums.Category
+  categoryId: string
+  key: string | null
   imageUrl: string | null
   description: string | null
   displayOrder: number
   isActive: boolean
+  configJson: runtime.JsonValue | null
+  searchKeywords: string[]
   createdAt: Date
   updatedAt: Date
   _count: SubcategoryCountAggregateOutputType | null
@@ -249,13 +262,17 @@ export type SubcategoryWhereInput = {
   id?: Prisma.StringFilter<"Subcategory"> | string
   name?: Prisma.StringFilter<"Subcategory"> | string
   slug?: Prisma.StringFilter<"Subcategory"> | string
-  category?: Prisma.EnumCategoryFilter<"Subcategory"> | $Enums.Category
+  categoryId?: Prisma.StringFilter<"Subcategory"> | string
+  key?: Prisma.StringNullableFilter<"Subcategory"> | string | null
   imageUrl?: Prisma.StringNullableFilter<"Subcategory"> | string | null
   description?: Prisma.StringNullableFilter<"Subcategory"> | string | null
   displayOrder?: Prisma.IntFilter<"Subcategory"> | number
   isActive?: Prisma.BoolFilter<"Subcategory"> | boolean
+  configJson?: Prisma.JsonNullableFilter<"Subcategory">
+  searchKeywords?: Prisma.StringNullableListFilter<"Subcategory">
   createdAt?: Prisma.DateTimeFilter<"Subcategory"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Subcategory"> | Date | string
+  category?: Prisma.XOR<Prisma.CategoryScalarRelationFilter, Prisma.CategoryWhereInput>
   orders?: Prisma.OrderListRelationFilter
 }
 
@@ -263,43 +280,55 @@ export type SubcategoryOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   slug?: Prisma.SortOrder
-  category?: Prisma.SortOrder
+  categoryId?: Prisma.SortOrder
+  key?: Prisma.SortOrderInput | Prisma.SortOrder
   imageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   displayOrder?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  configJson?: Prisma.SortOrderInput | Prisma.SortOrder
+  searchKeywords?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  category?: Prisma.CategoryOrderByWithRelationInput
   orders?: Prisma.OrderOrderByRelationAggregateInput
 }
 
 export type SubcategoryWhereUniqueInput = Prisma.AtLeast<{
   id?: string
-  slug_category?: Prisma.SubcategorySlugCategoryCompoundUniqueInput
+  categoryId_slug?: Prisma.SubcategoryCategoryIdSlugCompoundUniqueInput
+  categoryId_key?: Prisma.SubcategoryCategoryIdKeyCompoundUniqueInput
   AND?: Prisma.SubcategoryWhereInput | Prisma.SubcategoryWhereInput[]
   OR?: Prisma.SubcategoryWhereInput[]
   NOT?: Prisma.SubcategoryWhereInput | Prisma.SubcategoryWhereInput[]
   name?: Prisma.StringFilter<"Subcategory"> | string
   slug?: Prisma.StringFilter<"Subcategory"> | string
-  category?: Prisma.EnumCategoryFilter<"Subcategory"> | $Enums.Category
+  categoryId?: Prisma.StringFilter<"Subcategory"> | string
+  key?: Prisma.StringNullableFilter<"Subcategory"> | string | null
   imageUrl?: Prisma.StringNullableFilter<"Subcategory"> | string | null
   description?: Prisma.StringNullableFilter<"Subcategory"> | string | null
   displayOrder?: Prisma.IntFilter<"Subcategory"> | number
   isActive?: Prisma.BoolFilter<"Subcategory"> | boolean
+  configJson?: Prisma.JsonNullableFilter<"Subcategory">
+  searchKeywords?: Prisma.StringNullableListFilter<"Subcategory">
   createdAt?: Prisma.DateTimeFilter<"Subcategory"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Subcategory"> | Date | string
+  category?: Prisma.XOR<Prisma.CategoryScalarRelationFilter, Prisma.CategoryWhereInput>
   orders?: Prisma.OrderListRelationFilter
-}, "id" | "slug_category">
+}, "id" | "categoryId_slug" | "categoryId_key">
 
 export type SubcategoryOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   slug?: Prisma.SortOrder
-  category?: Prisma.SortOrder
+  categoryId?: Prisma.SortOrder
+  key?: Prisma.SortOrderInput | Prisma.SortOrder
   imageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   displayOrder?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  configJson?: Prisma.SortOrderInput | Prisma.SortOrder
+  searchKeywords?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.SubcategoryCountOrderByAggregateInput
@@ -316,11 +345,14 @@ export type SubcategoryScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"Subcategory"> | string
   name?: Prisma.StringWithAggregatesFilter<"Subcategory"> | string
   slug?: Prisma.StringWithAggregatesFilter<"Subcategory"> | string
-  category?: Prisma.EnumCategoryWithAggregatesFilter<"Subcategory"> | $Enums.Category
+  categoryId?: Prisma.StringWithAggregatesFilter<"Subcategory"> | string
+  key?: Prisma.StringNullableWithAggregatesFilter<"Subcategory"> | string | null
   imageUrl?: Prisma.StringNullableWithAggregatesFilter<"Subcategory"> | string | null
   description?: Prisma.StringNullableWithAggregatesFilter<"Subcategory"> | string | null
   displayOrder?: Prisma.IntWithAggregatesFilter<"Subcategory"> | number
   isActive?: Prisma.BoolWithAggregatesFilter<"Subcategory"> | boolean
+  configJson?: Prisma.JsonNullableWithAggregatesFilter<"Subcategory">
+  searchKeywords?: Prisma.StringNullableListFilter<"Subcategory">
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Subcategory"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Subcategory"> | Date | string
 }
@@ -329,13 +361,16 @@ export type SubcategoryCreateInput = {
   id?: string
   name: string
   slug: string
-  category: $Enums.Category
+  key?: string | null
   imageUrl?: string | null
   description?: string | null
   displayOrder?: number
   isActive?: boolean
+  configJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  searchKeywords?: Prisma.SubcategoryCreatesearchKeywordsInput | string[]
   createdAt?: Date | string
   updatedAt?: Date | string
+  category: Prisma.CategoryCreateNestedOneWithoutSubcategoriesInput
   orders?: Prisma.OrderCreateNestedManyWithoutSubcategoryInput
 }
 
@@ -343,11 +378,14 @@ export type SubcategoryUncheckedCreateInput = {
   id?: string
   name: string
   slug: string
-  category: $Enums.Category
+  categoryId: string
+  key?: string | null
   imageUrl?: string | null
   description?: string | null
   displayOrder?: number
   isActive?: boolean
+  configJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  searchKeywords?: Prisma.SubcategoryCreatesearchKeywordsInput | string[]
   createdAt?: Date | string
   updatedAt?: Date | string
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutSubcategoryInput
@@ -357,13 +395,16 @@ export type SubcategoryUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
-  category?: Prisma.EnumCategoryFieldUpdateOperationsInput | $Enums.Category
+  key?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   displayOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  configJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  searchKeywords?: Prisma.SubcategoryUpdatesearchKeywordsInput | string[]
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  category?: Prisma.CategoryUpdateOneRequiredWithoutSubcategoriesNestedInput
   orders?: Prisma.OrderUpdateManyWithoutSubcategoryNestedInput
 }
 
@@ -371,11 +412,14 @@ export type SubcategoryUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
-  category?: Prisma.EnumCategoryFieldUpdateOperationsInput | $Enums.Category
+  categoryId?: Prisma.StringFieldUpdateOperationsInput | string
+  key?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   displayOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  configJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  searchKeywords?: Prisma.SubcategoryUpdatesearchKeywordsInput | string[]
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   orders?: Prisma.OrderUncheckedUpdateManyWithoutSubcategoryNestedInput
@@ -385,11 +429,14 @@ export type SubcategoryCreateManyInput = {
   id?: string
   name: string
   slug: string
-  category: $Enums.Category
+  categoryId: string
+  key?: string | null
   imageUrl?: string | null
   description?: string | null
   displayOrder?: number
   isActive?: boolean
+  configJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  searchKeywords?: Prisma.SubcategoryCreatesearchKeywordsInput | string[]
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -398,11 +445,13 @@ export type SubcategoryUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
-  category?: Prisma.EnumCategoryFieldUpdateOperationsInput | $Enums.Category
+  key?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   displayOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  configJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  searchKeywords?: Prisma.SubcategoryUpdatesearchKeywordsInput | string[]
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -411,11 +460,14 @@ export type SubcategoryUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
-  category?: Prisma.EnumCategoryFieldUpdateOperationsInput | $Enums.Category
+  categoryId?: Prisma.StringFieldUpdateOperationsInput | string
+  key?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   displayOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  configJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  searchKeywords?: Prisma.SubcategoryUpdatesearchKeywordsInput | string[]
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -425,20 +477,46 @@ export type SubcategoryNullableScalarRelationFilter = {
   isNot?: Prisma.SubcategoryWhereInput | null
 }
 
-export type SubcategorySlugCategoryCompoundUniqueInput = {
+export type SubcategoryListRelationFilter = {
+  every?: Prisma.SubcategoryWhereInput
+  some?: Prisma.SubcategoryWhereInput
+  none?: Prisma.SubcategoryWhereInput
+}
+
+export type SubcategoryOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
+}
+
+export type StringNullableListFilter<$PrismaModel = never> = {
+  equals?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel> | null
+  has?: string | Prisma.StringFieldRefInput<$PrismaModel> | null
+  hasEvery?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
+  hasSome?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
+  isEmpty?: boolean
+}
+
+export type SubcategoryCategoryIdSlugCompoundUniqueInput = {
+  categoryId: string
   slug: string
-  category: $Enums.Category
+}
+
+export type SubcategoryCategoryIdKeyCompoundUniqueInput = {
+  categoryId: string
+  key: string
 }
 
 export type SubcategoryCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   slug?: Prisma.SortOrder
-  category?: Prisma.SortOrder
+  categoryId?: Prisma.SortOrder
+  key?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   description?: Prisma.SortOrder
   displayOrder?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  configJson?: Prisma.SortOrder
+  searchKeywords?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -451,7 +529,8 @@ export type SubcategoryMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   slug?: Prisma.SortOrder
-  category?: Prisma.SortOrder
+  categoryId?: Prisma.SortOrder
+  key?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   description?: Prisma.SortOrder
   displayOrder?: Prisma.SortOrder
@@ -464,7 +543,8 @@ export type SubcategoryMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   slug?: Prisma.SortOrder
-  category?: Prisma.SortOrder
+  categoryId?: Prisma.SortOrder
+  key?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   description?: Prisma.SortOrder
   displayOrder?: Prisma.SortOrder
@@ -493,28 +573,85 @@ export type SubcategoryUpdateOneWithoutOrdersNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.SubcategoryUpdateToOneWithWhereWithoutOrdersInput, Prisma.SubcategoryUpdateWithoutOrdersInput>, Prisma.SubcategoryUncheckedUpdateWithoutOrdersInput>
 }
 
+export type SubcategoryCreateNestedManyWithoutCategoryInput = {
+  create?: Prisma.XOR<Prisma.SubcategoryCreateWithoutCategoryInput, Prisma.SubcategoryUncheckedCreateWithoutCategoryInput> | Prisma.SubcategoryCreateWithoutCategoryInput[] | Prisma.SubcategoryUncheckedCreateWithoutCategoryInput[]
+  connectOrCreate?: Prisma.SubcategoryCreateOrConnectWithoutCategoryInput | Prisma.SubcategoryCreateOrConnectWithoutCategoryInput[]
+  createMany?: Prisma.SubcategoryCreateManyCategoryInputEnvelope
+  connect?: Prisma.SubcategoryWhereUniqueInput | Prisma.SubcategoryWhereUniqueInput[]
+}
+
+export type SubcategoryUncheckedCreateNestedManyWithoutCategoryInput = {
+  create?: Prisma.XOR<Prisma.SubcategoryCreateWithoutCategoryInput, Prisma.SubcategoryUncheckedCreateWithoutCategoryInput> | Prisma.SubcategoryCreateWithoutCategoryInput[] | Prisma.SubcategoryUncheckedCreateWithoutCategoryInput[]
+  connectOrCreate?: Prisma.SubcategoryCreateOrConnectWithoutCategoryInput | Prisma.SubcategoryCreateOrConnectWithoutCategoryInput[]
+  createMany?: Prisma.SubcategoryCreateManyCategoryInputEnvelope
+  connect?: Prisma.SubcategoryWhereUniqueInput | Prisma.SubcategoryWhereUniqueInput[]
+}
+
+export type SubcategoryUpdateManyWithoutCategoryNestedInput = {
+  create?: Prisma.XOR<Prisma.SubcategoryCreateWithoutCategoryInput, Prisma.SubcategoryUncheckedCreateWithoutCategoryInput> | Prisma.SubcategoryCreateWithoutCategoryInput[] | Prisma.SubcategoryUncheckedCreateWithoutCategoryInput[]
+  connectOrCreate?: Prisma.SubcategoryCreateOrConnectWithoutCategoryInput | Prisma.SubcategoryCreateOrConnectWithoutCategoryInput[]
+  upsert?: Prisma.SubcategoryUpsertWithWhereUniqueWithoutCategoryInput | Prisma.SubcategoryUpsertWithWhereUniqueWithoutCategoryInput[]
+  createMany?: Prisma.SubcategoryCreateManyCategoryInputEnvelope
+  set?: Prisma.SubcategoryWhereUniqueInput | Prisma.SubcategoryWhereUniqueInput[]
+  disconnect?: Prisma.SubcategoryWhereUniqueInput | Prisma.SubcategoryWhereUniqueInput[]
+  delete?: Prisma.SubcategoryWhereUniqueInput | Prisma.SubcategoryWhereUniqueInput[]
+  connect?: Prisma.SubcategoryWhereUniqueInput | Prisma.SubcategoryWhereUniqueInput[]
+  update?: Prisma.SubcategoryUpdateWithWhereUniqueWithoutCategoryInput | Prisma.SubcategoryUpdateWithWhereUniqueWithoutCategoryInput[]
+  updateMany?: Prisma.SubcategoryUpdateManyWithWhereWithoutCategoryInput | Prisma.SubcategoryUpdateManyWithWhereWithoutCategoryInput[]
+  deleteMany?: Prisma.SubcategoryScalarWhereInput | Prisma.SubcategoryScalarWhereInput[]
+}
+
+export type SubcategoryUncheckedUpdateManyWithoutCategoryNestedInput = {
+  create?: Prisma.XOR<Prisma.SubcategoryCreateWithoutCategoryInput, Prisma.SubcategoryUncheckedCreateWithoutCategoryInput> | Prisma.SubcategoryCreateWithoutCategoryInput[] | Prisma.SubcategoryUncheckedCreateWithoutCategoryInput[]
+  connectOrCreate?: Prisma.SubcategoryCreateOrConnectWithoutCategoryInput | Prisma.SubcategoryCreateOrConnectWithoutCategoryInput[]
+  upsert?: Prisma.SubcategoryUpsertWithWhereUniqueWithoutCategoryInput | Prisma.SubcategoryUpsertWithWhereUniqueWithoutCategoryInput[]
+  createMany?: Prisma.SubcategoryCreateManyCategoryInputEnvelope
+  set?: Prisma.SubcategoryWhereUniqueInput | Prisma.SubcategoryWhereUniqueInput[]
+  disconnect?: Prisma.SubcategoryWhereUniqueInput | Prisma.SubcategoryWhereUniqueInput[]
+  delete?: Prisma.SubcategoryWhereUniqueInput | Prisma.SubcategoryWhereUniqueInput[]
+  connect?: Prisma.SubcategoryWhereUniqueInput | Prisma.SubcategoryWhereUniqueInput[]
+  update?: Prisma.SubcategoryUpdateWithWhereUniqueWithoutCategoryInput | Prisma.SubcategoryUpdateWithWhereUniqueWithoutCategoryInput[]
+  updateMany?: Prisma.SubcategoryUpdateManyWithWhereWithoutCategoryInput | Prisma.SubcategoryUpdateManyWithWhereWithoutCategoryInput[]
+  deleteMany?: Prisma.SubcategoryScalarWhereInput | Prisma.SubcategoryScalarWhereInput[]
+}
+
+export type SubcategoryCreatesearchKeywordsInput = {
+  set: string[]
+}
+
+export type SubcategoryUpdatesearchKeywordsInput = {
+  set?: string[]
+  push?: string | string[]
+}
+
 export type SubcategoryCreateWithoutOrdersInput = {
   id?: string
   name: string
   slug: string
-  category: $Enums.Category
+  key?: string | null
   imageUrl?: string | null
   description?: string | null
   displayOrder?: number
   isActive?: boolean
+  configJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  searchKeywords?: Prisma.SubcategoryCreatesearchKeywordsInput | string[]
   createdAt?: Date | string
   updatedAt?: Date | string
+  category: Prisma.CategoryCreateNestedOneWithoutSubcategoriesInput
 }
 
 export type SubcategoryUncheckedCreateWithoutOrdersInput = {
   id?: string
   name: string
   slug: string
-  category: $Enums.Category
+  categoryId: string
+  key?: string | null
   imageUrl?: string | null
   description?: string | null
   displayOrder?: number
   isActive?: boolean
+  configJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  searchKeywords?: Prisma.SubcategoryCreatesearchKeywordsInput | string[]
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -539,24 +676,169 @@ export type SubcategoryUpdateWithoutOrdersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
-  category?: Prisma.EnumCategoryFieldUpdateOperationsInput | $Enums.Category
+  key?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   displayOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  configJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  searchKeywords?: Prisma.SubcategoryUpdatesearchKeywordsInput | string[]
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  category?: Prisma.CategoryUpdateOneRequiredWithoutSubcategoriesNestedInput
 }
 
 export type SubcategoryUncheckedUpdateWithoutOrdersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   slug?: Prisma.StringFieldUpdateOperationsInput | string
-  category?: Prisma.EnumCategoryFieldUpdateOperationsInput | $Enums.Category
+  categoryId?: Prisma.StringFieldUpdateOperationsInput | string
+  key?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   displayOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  configJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  searchKeywords?: Prisma.SubcategoryUpdatesearchKeywordsInput | string[]
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type SubcategoryCreateWithoutCategoryInput = {
+  id?: string
+  name: string
+  slug: string
+  key?: string | null
+  imageUrl?: string | null
+  description?: string | null
+  displayOrder?: number
+  isActive?: boolean
+  configJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  searchKeywords?: Prisma.SubcategoryCreatesearchKeywordsInput | string[]
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  orders?: Prisma.OrderCreateNestedManyWithoutSubcategoryInput
+}
+
+export type SubcategoryUncheckedCreateWithoutCategoryInput = {
+  id?: string
+  name: string
+  slug: string
+  key?: string | null
+  imageUrl?: string | null
+  description?: string | null
+  displayOrder?: number
+  isActive?: boolean
+  configJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  searchKeywords?: Prisma.SubcategoryCreatesearchKeywordsInput | string[]
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutSubcategoryInput
+}
+
+export type SubcategoryCreateOrConnectWithoutCategoryInput = {
+  where: Prisma.SubcategoryWhereUniqueInput
+  create: Prisma.XOR<Prisma.SubcategoryCreateWithoutCategoryInput, Prisma.SubcategoryUncheckedCreateWithoutCategoryInput>
+}
+
+export type SubcategoryCreateManyCategoryInputEnvelope = {
+  data: Prisma.SubcategoryCreateManyCategoryInput | Prisma.SubcategoryCreateManyCategoryInput[]
+  skipDuplicates?: boolean
+}
+
+export type SubcategoryUpsertWithWhereUniqueWithoutCategoryInput = {
+  where: Prisma.SubcategoryWhereUniqueInput
+  update: Prisma.XOR<Prisma.SubcategoryUpdateWithoutCategoryInput, Prisma.SubcategoryUncheckedUpdateWithoutCategoryInput>
+  create: Prisma.XOR<Prisma.SubcategoryCreateWithoutCategoryInput, Prisma.SubcategoryUncheckedCreateWithoutCategoryInput>
+}
+
+export type SubcategoryUpdateWithWhereUniqueWithoutCategoryInput = {
+  where: Prisma.SubcategoryWhereUniqueInput
+  data: Prisma.XOR<Prisma.SubcategoryUpdateWithoutCategoryInput, Prisma.SubcategoryUncheckedUpdateWithoutCategoryInput>
+}
+
+export type SubcategoryUpdateManyWithWhereWithoutCategoryInput = {
+  where: Prisma.SubcategoryScalarWhereInput
+  data: Prisma.XOR<Prisma.SubcategoryUpdateManyMutationInput, Prisma.SubcategoryUncheckedUpdateManyWithoutCategoryInput>
+}
+
+export type SubcategoryScalarWhereInput = {
+  AND?: Prisma.SubcategoryScalarWhereInput | Prisma.SubcategoryScalarWhereInput[]
+  OR?: Prisma.SubcategoryScalarWhereInput[]
+  NOT?: Prisma.SubcategoryScalarWhereInput | Prisma.SubcategoryScalarWhereInput[]
+  id?: Prisma.StringFilter<"Subcategory"> | string
+  name?: Prisma.StringFilter<"Subcategory"> | string
+  slug?: Prisma.StringFilter<"Subcategory"> | string
+  categoryId?: Prisma.StringFilter<"Subcategory"> | string
+  key?: Prisma.StringNullableFilter<"Subcategory"> | string | null
+  imageUrl?: Prisma.StringNullableFilter<"Subcategory"> | string | null
+  description?: Prisma.StringNullableFilter<"Subcategory"> | string | null
+  displayOrder?: Prisma.IntFilter<"Subcategory"> | number
+  isActive?: Prisma.BoolFilter<"Subcategory"> | boolean
+  configJson?: Prisma.JsonNullableFilter<"Subcategory">
+  searchKeywords?: Prisma.StringNullableListFilter<"Subcategory">
+  createdAt?: Prisma.DateTimeFilter<"Subcategory"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"Subcategory"> | Date | string
+}
+
+export type SubcategoryCreateManyCategoryInput = {
+  id?: string
+  name: string
+  slug: string
+  key?: string | null
+  imageUrl?: string | null
+  description?: string | null
+  displayOrder?: number
+  isActive?: boolean
+  configJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  searchKeywords?: Prisma.SubcategoryCreatesearchKeywordsInput | string[]
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type SubcategoryUpdateWithoutCategoryInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  key?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  configJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  searchKeywords?: Prisma.SubcategoryUpdatesearchKeywordsInput | string[]
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  orders?: Prisma.OrderUpdateManyWithoutSubcategoryNestedInput
+}
+
+export type SubcategoryUncheckedUpdateWithoutCategoryInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  key?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  configJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  searchKeywords?: Prisma.SubcategoryUpdatesearchKeywordsInput | string[]
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutSubcategoryNestedInput
+}
+
+export type SubcategoryUncheckedUpdateManyWithoutCategoryInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  key?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  displayOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  configJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  searchKeywords?: Prisma.SubcategoryUpdatesearchKeywordsInput | string[]
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -596,13 +878,17 @@ export type SubcategorySelect<ExtArgs extends runtime.Types.Extensions.InternalA
   id?: boolean
   name?: boolean
   slug?: boolean
-  category?: boolean
+  categoryId?: boolean
+  key?: boolean
   imageUrl?: boolean
   description?: boolean
   displayOrder?: boolean
   isActive?: boolean
+  configJson?: boolean
+  searchKeywords?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  category?: boolean | Prisma.CategoryDefaultArgs<ExtArgs>
   orders?: boolean | Prisma.Subcategory$ordersArgs<ExtArgs>
   _count?: boolean | Prisma.SubcategoryCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["subcategory"]>
@@ -611,63 +897,83 @@ export type SubcategorySelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   id?: boolean
   name?: boolean
   slug?: boolean
-  category?: boolean
+  categoryId?: boolean
+  key?: boolean
   imageUrl?: boolean
   description?: boolean
   displayOrder?: boolean
   isActive?: boolean
+  configJson?: boolean
+  searchKeywords?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  category?: boolean | Prisma.CategoryDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["subcategory"]>
 
 export type SubcategorySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
   slug?: boolean
-  category?: boolean
+  categoryId?: boolean
+  key?: boolean
   imageUrl?: boolean
   description?: boolean
   displayOrder?: boolean
   isActive?: boolean
+  configJson?: boolean
+  searchKeywords?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  category?: boolean | Prisma.CategoryDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["subcategory"]>
 
 export type SubcategorySelectScalar = {
   id?: boolean
   name?: boolean
   slug?: boolean
-  category?: boolean
+  categoryId?: boolean
+  key?: boolean
   imageUrl?: boolean
   description?: boolean
   displayOrder?: boolean
   isActive?: boolean
+  configJson?: boolean
+  searchKeywords?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type SubcategoryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "slug" | "category" | "imageUrl" | "description" | "displayOrder" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["subcategory"]>
+export type SubcategoryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "slug" | "categoryId" | "key" | "imageUrl" | "description" | "displayOrder" | "isActive" | "configJson" | "searchKeywords" | "createdAt" | "updatedAt", ExtArgs["result"]["subcategory"]>
 export type SubcategoryInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  category?: boolean | Prisma.CategoryDefaultArgs<ExtArgs>
   orders?: boolean | Prisma.Subcategory$ordersArgs<ExtArgs>
   _count?: boolean | Prisma.SubcategoryCountOutputTypeDefaultArgs<ExtArgs>
 }
-export type SubcategoryIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
-export type SubcategoryIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type SubcategoryIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  category?: boolean | Prisma.CategoryDefaultArgs<ExtArgs>
+}
+export type SubcategoryIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  category?: boolean | Prisma.CategoryDefaultArgs<ExtArgs>
+}
 
 export type $SubcategoryPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Subcategory"
   objects: {
+    category: Prisma.$CategoryPayload<ExtArgs>
     orders: Prisma.$OrderPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     name: string
     slug: string
-    category: $Enums.Category
+    categoryId: string
+    key: string | null
     imageUrl: string | null
     description: string | null
     displayOrder: number
     isActive: boolean
+    configJson: runtime.JsonValue | null
+    searchKeywords: string[]
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["subcategory"]>
@@ -1064,6 +1370,7 @@ readonly fields: SubcategoryFieldRefs;
  */
 export interface Prisma__SubcategoryClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  category<T extends Prisma.CategoryDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CategoryDefaultArgs<ExtArgs>>): Prisma.Prisma__CategoryClient<runtime.Types.Result.GetResult<Prisma.$CategoryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   orders<T extends Prisma.Subcategory$ordersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Subcategory$ordersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1097,11 +1404,14 @@ export interface SubcategoryFieldRefs {
   readonly id: Prisma.FieldRef<"Subcategory", 'String'>
   readonly name: Prisma.FieldRef<"Subcategory", 'String'>
   readonly slug: Prisma.FieldRef<"Subcategory", 'String'>
-  readonly category: Prisma.FieldRef<"Subcategory", 'Category'>
+  readonly categoryId: Prisma.FieldRef<"Subcategory", 'String'>
+  readonly key: Prisma.FieldRef<"Subcategory", 'String'>
   readonly imageUrl: Prisma.FieldRef<"Subcategory", 'String'>
   readonly description: Prisma.FieldRef<"Subcategory", 'String'>
   readonly displayOrder: Prisma.FieldRef<"Subcategory", 'Int'>
   readonly isActive: Prisma.FieldRef<"Subcategory", 'Boolean'>
+  readonly configJson: Prisma.FieldRef<"Subcategory", 'Json'>
+  readonly searchKeywords: Prisma.FieldRef<"Subcategory", 'String[]'>
   readonly createdAt: Prisma.FieldRef<"Subcategory", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Subcategory", 'DateTime'>
 }
@@ -1353,6 +1663,10 @@ export type SubcategoryCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Ext
    */
   data: Prisma.SubcategoryCreateManyInput | Prisma.SubcategoryCreateManyInput[]
   skipDuplicates?: boolean
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SubcategoryIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1423,6 +1737,10 @@ export type SubcategoryUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Ext
    * Limit how many Subcategories to update.
    */
   limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SubcategoryIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**

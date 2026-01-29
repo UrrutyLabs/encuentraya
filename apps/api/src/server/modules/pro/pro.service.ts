@@ -16,7 +16,6 @@ import type {
   Pro,
   ProOnboardInput,
   ProSetAvailabilityInput,
-  Category,
   AvailabilitySlot,
   UpdateAvailabilitySlotsInput,
 } from "@repo/domain";
@@ -68,7 +67,7 @@ export class ProService {
       bio: input.bio,
       avatarUrl: input.avatarUrl,
       hourlyRate: input.hourlyRate,
-      categories: input.categories.map((c) => c as string),
+      categoryIds: input.categoryIds,
       serviceArea: input.serviceArea,
     });
 
@@ -116,7 +115,7 @@ export class ProService {
       bio: input.bio,
       avatarUrl: input.avatarUrl,
       hourlyRate: input.hourlyRate,
-      categories: input.categories.map((c) => c as string),
+      categoryIds: input.categoryIds,
       serviceArea: input.serviceArea,
     });
 
@@ -145,11 +144,11 @@ export class ProService {
 
   /**
    * Search pros with database filtering
-   * Filters by category and profileCompleted at database level
+   * Filters by categoryId and profileCompleted at database level
    */
-  async searchPros(filters: { category?: Category }): Promise<Pro[]> {
+  async searchPros(filters: { categoryId?: string }): Promise<Pro[]> {
     const proProfiles = await this.proRepository.searchPros({
-      category: filters.category,
+      categoryId: filters.categoryId,
       profileCompleted: true, // Only show pros with completed profiles
     });
     return Promise.all(proProfiles.map((profile) => this.mapToDomain(profile)));
@@ -297,8 +296,8 @@ export class ProService {
     if (input.hourlyRate !== undefined) {
       updateData.hourlyRate = input.hourlyRate;
     }
-    if (input.categories !== undefined) {
-      updateData.categories = input.categories.map((c) => c as string);
+    if (input.categoryIds !== undefined) {
+      updateData.categoryIds = input.categoryIds;
     }
     if (input.serviceArea !== undefined) {
       updateData.serviceArea = input.serviceArea;
@@ -369,7 +368,7 @@ export class ProService {
     bio: string | null;
     avatarUrl: string | null;
     hourlyRate: number;
-    categories: string[];
+    categoryIds: string[];
     serviceArea: string | null;
     status: "pending" | "active" | "suspended";
     profileCompleted: boolean;
@@ -407,7 +406,7 @@ export class ProService {
       bio: proProfile.bio,
       avatarUrl: proProfile.avatarUrl,
       hourlyRate: proProfile.hourlyRate,
-      categories: proProfile.categories,
+      categoryIds: proProfile.categoryIds,
       serviceArea: proProfile.serviceArea,
       status: proProfile.status,
       profileCompleted: proProfile.profileCompleted,
@@ -646,11 +645,6 @@ export class ProService {
     const availabilitySlots =
       await this.availabilityService.getAvailabilitySlots(entity.id);
 
-    // Map categories from string[] to Category[]
-    const categories = entity.categories.map(
-      (c) => c as Category
-    ) as Category[];
-
     return {
       id: entity.id,
       name: entity.displayName,
@@ -659,7 +653,7 @@ export class ProService {
       bio: entity.bio ?? undefined,
       avatarUrl: entity.avatarUrl ?? undefined,
       hourlyRate: entity.hourlyRate,
-      categories,
+      categoryIds: entity.categoryIds,
       serviceArea: entity.serviceArea ?? undefined,
       rating,
       reviewCount,

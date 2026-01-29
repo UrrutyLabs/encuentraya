@@ -40,7 +40,7 @@ export const appRouter = router({
   category: categoryRouter,
   subcategory: subcategoryRouter,
   order: orderRouter,
-  client: router({
+  clientSearch: router({
     searchPros: searchRouter.searchPros,
   }),
 });

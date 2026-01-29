@@ -3,7 +3,7 @@
 import { memo } from "react";
 import { LucideIcon } from "lucide-react";
 import { Text } from "@repo/ui";
-import { Category } from "@repo/domain";
+import type { Category } from "@repo/domain";
 
 /**
  * CategoryCard Component
@@ -14,7 +14,7 @@ import { Category } from "@repo/domain";
  * @example
  * ```tsx
  * <CategoryCard
- *   category={Category.PLUMBING}
+ *   category={categoryObject}
  *   icon={Wrench}
  *   label="Plomería"
  *   isSelected={true}
@@ -23,7 +23,7 @@ import { Category } from "@repo/domain";
  * ```
  */
 interface CategoryCardProps {
-  /** The category enum value */
+  /** The category object from API */
   category: Category;
   /** Lucide icon component */
   icon: LucideIcon;

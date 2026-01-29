@@ -53,7 +53,7 @@ export function LocationStep({}: LocationStepProps) {
     navigateToStep("service-details");
   };
 
-  if (!state.proId || !state.category || !state.date || !state.time) {
+  if (!state.proId || !state.categorySlug || !state.date || !state.time) {
     return (
       <Card className="p-4 md:p-6">
         <Text variant="h2" className="mb-2 text-text">

@@ -1,6 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { renderHook } from "@testing-library/react";
-import { Category } from "@repo/domain";
 import { useSearchPros } from "../useSearchPros";
 import { mockTrpcClientSearchPros } from "@/test-setup";
 
@@ -16,13 +15,13 @@ describe("useSearchPros", () => {
           id: "pro-1",
           name: "John Doe",
           hourlyRate: 50,
-          categories: [Category.PLUMBING],
+          categoryIds: ["cat-plumbing"],
         },
         {
           id: "pro-2",
           name: "Jane Smith",
           hourlyRate: 60,
-          categories: [Category.PLUMBING],
+          categoryIds: ["cat-plumbing"],
         },
       ];
 
@@ -33,12 +32,12 @@ describe("useSearchPros", () => {
       });
 
       const { result } = renderHook(() =>
-        useSearchPros({ category: Category.PLUMBING })
+        useSearchPros({ categoryId: "cat-plumbing" })
       );
 
       expect(mockTrpcClientSearchPros).toHaveBeenCalledWith(
         {
-          category: Category.PLUMBING,
+          categoryId: "cat-plumbing",
           date: undefined,
           timeWindow: undefined,
         },
@@ -72,7 +71,7 @@ describe("useSearchPros", () => {
 
       expect(mockTrpcClientSearchPros).toHaveBeenCalledWith(
         {
-          category: undefined,
+          categoryId: undefined,
           date: new Date(date),
           timeWindow: undefined,
         },
@@ -104,7 +103,7 @@ describe("useSearchPros", () => {
 
       expect(mockTrpcClientSearchPros).toHaveBeenCalledWith(
         {
-          category: undefined,
+          categoryId: undefined,
           date: undefined,
           timeWindow: "12:00-15:00",
         },
@@ -122,7 +121,7 @@ describe("useSearchPros", () => {
           id: "pro-1",
           name: "John Doe",
           hourlyRate: 50,
-          categories: [Category.PLUMBING],
+          categoryIds: ["cat-plumbing"],
         },
       ];
 
@@ -136,7 +135,7 @@ describe("useSearchPros", () => {
       const timeWindow = "12:00-15:00";
       const { result } = renderHook(() =>
         useSearchPros({
-          category: Category.PLUMBING,
+          categoryId: "cat-plumbing",
           date,
           timeWindow,
         })
@@ -144,7 +143,7 @@ describe("useSearchPros", () => {
 
       expect(mockTrpcClientSearchPros).toHaveBeenCalledWith(
         {
-          category: Category.PLUMBING,
+          categoryId: "cat-plumbing",
           date: new Date(date),
           timeWindow: "12:00-15:00",
         },
@@ -177,7 +176,7 @@ describe("useSearchPros", () => {
 
       expect(mockTrpcClientSearchPros).toHaveBeenCalledWith(
         {
-          category: undefined,
+          categoryId: undefined,
           date: undefined,
           timeWindow: undefined,
         },

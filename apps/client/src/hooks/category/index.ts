@@ -1,4 +1,2 @@
-export {
-  useCategoryMetadata,
-  useAllCategoriesMetadata,
-} from "./useCategoryMetadata";
+// Data-driven category hooks
+export { useCategories, useCategory, useCategoryBySlug } from "./useCategories";

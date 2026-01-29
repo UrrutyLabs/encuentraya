@@ -2,16 +2,30 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { SearchScreen } from "../SearchScreen";
 import { useRouter } from "next/navigation";
-import { Category } from "@repo/domain";
 
-const mockUseSubcategories = vi.fn();
+const mockUseSubcategoriesByCategoryId = vi.fn();
 
 vi.mock("next/navigation");
 vi.mock("@/components/presentational/Navigation", () => ({
   Navigation: () => <nav>Navigation</nav>,
 }));
+vi.mock("@/hooks/category", () => ({
+  useCategories: () => ({
+    categories: [
+      {
+        id: "cat-plumbing",
+        name: "Plomería",
+        slug: "plumbing",
+        key: "PLUMBING",
+      },
+    ],
+    isLoading: false,
+    error: null,
+  }),
+}));
 vi.mock("@/hooks/subcategory", () => ({
-  useSubcategories: (...args: unknown[]) => mockUseSubcategories(...args),
+  useSubcategoriesByCategoryId: (...args: unknown[]) =>
+    mockUseSubcategoriesByCategoryId(...args),
 }));
 
 const mockPush = vi.fn();
@@ -29,19 +43,19 @@ describe("SearchScreen", () => {
       value: 1024,
     });
     // Mock subcategories hook
-    mockUseSubcategories.mockReturnValue({
+    mockUseSubcategoriesByCategoryId.mockReturnValue({
       subcategories: [
         {
           id: "sub-1",
           name: "Fugas y goteras",
           slug: "fugas-goteras",
-          category: Category.PLUMBING,
+          categoryId: "cat-plumbing",
         },
         {
           id: "sub-2",
           name: "Instalaciones",
           slug: "instalaciones",
-          category: Category.PLUMBING,
+          categoryId: "cat-plumbing",
         },
       ],
       isLoading: false,
@@ -66,17 +80,17 @@ describe("SearchScreen", () => {
     });
 
     it("should not show subcategories initially", () => {
-      // Mock useSubcategories to return empty array initially
-      mockUseSubcategories.mockReturnValue({
+      // Mock useSubcategoriesByCategoryId to return empty array initially
+      mockUseSubcategoriesByCategoryId.mockReturnValue({
         subcategories: [],
         isLoading: false,
         error: null,
       });
       render(<SearchScreen />);
-      // Note: SearchScreen initializes with PLUMBING selected, so subcategories will show
+      // Note: SearchScreen initializes with first category selected, so subcategories will show
       // This test verifies the component structure, not the initial state
       const subcategoriesSection = document.getElementById("subcategories");
-      // Since selectedCategory defaults to PLUMBING, subcategories will be rendered
+      // Since selectedCategory defaults to first category, subcategories will be rendered
       expect(subcategoriesSection).toBeInTheDocument();
     });
   });

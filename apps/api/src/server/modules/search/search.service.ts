@@ -2,7 +2,7 @@ import { injectable, inject } from "tsyringe";
 import { TOKENS } from "@/server/container/tokens";
 import type { ProService } from "@modules/pro/pro.service";
 import type { AvailabilityService } from "@modules/pro/availability.service";
-import type { Pro, Category } from "@repo/domain";
+import type { Pro } from "@repo/domain";
 
 /**
  * Search service
@@ -28,14 +28,14 @@ export class SearchService {
    * - Only return approved and non-suspended pros
    */
   async searchPros(filters: {
-    category?: Category;
+    categoryId?: string; // FK to Category table
     subcategory?: string; // Subcategory slug (for future filtering)
     date?: Date;
     timeWindow?: string; // Format: "HH:MM-HH:MM" (e.g., "09:00-12:00")
   }): Promise<Pro[]> {
-    // Get pros filtered by database (approved, not suspended, profileCompleted, category)
+    // Get pros filtered by database (approved, not suspended, profileCompleted, categoryId)
     const basicFiltered = await this.proService.searchPros({
-      category: filters.category,
+      categoryId: filters.categoryId,
     });
 
     // Step 2: Filter by availability based on what's provided

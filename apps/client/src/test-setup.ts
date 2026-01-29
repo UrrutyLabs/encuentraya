@@ -28,6 +28,14 @@ const mockTrpcProGetById = vi.fn();
 const mockTrpcClientSearchPros = vi.fn();
 const mockTrpcClientProfileGet = vi.fn();
 const mockTrpcClientProfileUpdate = vi.fn();
+// Category mocks
+const mockTrpcCategoryGetAll = vi.fn();
+const mockTrpcCategoryGetById = vi.fn();
+const mockTrpcCategoryGetBySlug = vi.fn();
+const mockTrpcCategoryGetByKey = vi.fn();
+// Subcategory mocks
+const mockTrpcSubcategoryGetByCategoryId = vi.fn();
+const mockTrpcSubcategoryGetBySlugAndCategoryId = vi.fn();
 const mockTrpcAuthSignup = vi.fn();
 const mockTrpcAuthChangePassword = vi.fn();
 const mockTrpcAuthDeleteAccount = vi.fn();
@@ -64,9 +72,39 @@ vi.mock("@/lib/trpc/client", () => {
           useQuery: (...args: unknown[]) => mockTrpcProGetById(...args),
         },
       },
-      client: {
+      clientSearch: {
         searchPros: {
           useQuery: (...args: unknown[]) => mockTrpcClientSearchPros(...args),
+        },
+      },
+      category: {
+        getAll: {
+          useQuery: (...args: unknown[]) => mockTrpcCategoryGetAll(...args),
+        },
+        getById: {
+          useQuery: (...args: unknown[]) => mockTrpcCategoryGetById(...args),
+        },
+        getBySlug: {
+          useQuery: (...args: unknown[]) => mockTrpcCategoryGetBySlug(...args),
+        },
+        getByKey: {
+          useQuery: (...args: unknown[]) => mockTrpcCategoryGetByKey(...args),
+        },
+      },
+      subcategory: {
+        getByCategoryId: {
+          useQuery: (...args: unknown[]) =>
+            mockTrpcSubcategoryGetByCategoryId(...args),
+        },
+        getBySlugAndCategoryId: {
+          useQuery: (...args: unknown[]) =>
+            mockTrpcSubcategoryGetBySlugAndCategoryId(...args),
+        },
+        getById: {
+          useQuery: (...args: unknown[]) => mockTrpcSubcategoryGetById(...args),
+        },
+        getAll: {
+          useQuery: (...args: unknown[]) => mockTrpcSubcategoryGetAll(...args),
         },
       },
       clientProfile: {
@@ -216,6 +254,12 @@ export {
   mockTrpcSubcategoryGetBySlug,
   mockTrpcSubcategoryGetById,
   mockTrpcSubcategoryGetAll,
+  mockTrpcCategoryGetAll,
+  mockTrpcCategoryGetById,
+  mockTrpcCategoryGetBySlug,
+  mockTrpcCategoryGetByKey,
+  mockTrpcSubcategoryGetByCategoryId,
+  mockTrpcSubcategoryGetBySlugAndCategoryId,
 };
 
 // Mock logger

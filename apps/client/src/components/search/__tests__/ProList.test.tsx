@@ -1,7 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { ProList } from "../ProList";
-import { Category } from "@repo/domain";
 import type { Pro } from "@repo/domain";
 
 vi.mock("@/components/presentational/ProCard", () => ({
@@ -17,12 +16,19 @@ vi.mock("../ProCardSkeleton", () => ({
 const mockPro: Pro = {
   id: "pro-1",
   name: "John Doe",
+  email: "john@example.com",
   hourlyRate: 50,
-  categories: [Category.PLUMBING],
+  categoryIds: ["cat-plumbing"],
   isApproved: true,
   isSuspended: false,
+  isAvailable: true,
+  profileCompleted: true,
+  completedJobsCount: 5,
   rating: 4.5,
   reviewCount: 10,
+  isTopPro: false,
+  createdAt: new Date("2024-01-01"),
+  updatedAt: new Date("2024-01-01"),
 };
 
 describe("ProList", () => {

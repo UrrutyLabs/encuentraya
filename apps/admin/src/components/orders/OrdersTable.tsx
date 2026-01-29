@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { CalendarX } from "lucide-react";
 import { Badge } from "@repo/ui";
@@ -12,6 +13,7 @@ import {
 } from "@/utils/orderStatus";
 import { ORDER_LABELS } from "@/utils/orderLabels";
 import type { Order } from "@repo/domain";
+import { useCategories } from "@/hooks/useCategories";
 
 interface OrdersTableProps {
   orders: Order[];
@@ -20,6 +22,31 @@ interface OrdersTableProps {
 
 export function OrdersTable({ orders, isLoading }: OrdersTableProps) {
   const router = useRouter();
+  const { data: categories } = useCategories();
+
+  // Create a map of categoryId -> Category for quick lookup
+  const categoryMap = useMemo(() => {
+    const map = new Map<string, { name: string; isDeleted: boolean }>();
+    categories?.forEach((category) => {
+      map.set(category.id, {
+        name: category.name,
+        isDeleted: !!category.deletedAt || !category.isActive,
+      });
+    });
+    return map;
+  }, [categories]);
+
+  // Helper to get category name or fallback
+  const getCategoryName = (categoryId: string) => {
+    const category = categoryMap.get(categoryId);
+    if (!category) {
+      return "Categoría desconocida";
+    }
+    if (category.isDeleted) {
+      return `${category.name} (eliminada)`;
+    }
+    return category.name;
+  };
 
   const formatDate = (date: Date) => {
     return new Date(date).toLocaleDateString("es-UY", {
@@ -97,7 +124,7 @@ export function OrdersTable({ orders, isLoading }: OrdersTableProps) {
                   </Badge>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {order.category}
+                  {order.categoryId ? getCategoryName(order.categoryId) : "—"}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   {formatCurrency(getDisplayAmount(order), order.currency)}

@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { renderHook } from "@testing-library/react";
 import { useRebookTemplate } from "../useRebookTemplate";
 import { mockTrpcOrderGetById } from "@/test-setup";
-import { Category, OrderStatus } from "@repo/domain";
+import { OrderStatus } from "@repo/domain";
 
 describe("useRebookTemplate", () => {
   beforeEach(() => {
@@ -14,7 +14,7 @@ describe("useRebookTemplate", () => {
       const mockOrder = {
         id: "order-1",
         proProfileId: "pro-1",
-        category: Category.PLUMBING,
+        categoryId: "cat-plumbing",
         description: "Fix leak",
         estimatedHours: 2,
         status: OrderStatus.COMPLETED,

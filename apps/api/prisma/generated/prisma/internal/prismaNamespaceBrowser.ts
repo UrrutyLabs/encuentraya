@@ -67,8 +67,9 @@ export const ModelName = {
   Payout: 'Payout',
   PayoutItem: 'PayoutItem',
   AuditLog: 'AuditLog',
-  CategoryMetadata: 'CategoryMetadata',
-  Subcategory: 'Subcategory'
+  Category: 'Category',
+  Subcategory: 'Subcategory',
+  ProProfileCategory: 'ProProfileCategory'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -106,7 +107,6 @@ export const ProProfileScalarFieldEnum = {
   bio: 'bio',
   avatarUrl: 'avatarUrl',
   hourlyRate: 'hourlyRate',
-  categories: 'categories',
   serviceArea: 'serviceArea',
   status: 'status',
   profileCompleted: 'profileCompleted',
@@ -153,8 +153,9 @@ export const OrderScalarFieldEnum = {
   displayId: 'displayId',
   clientUserId: 'clientUserId',
   proProfileId: 'proProfileId',
-  category: 'category',
+  categoryId: 'categoryId',
   subcategoryId: 'subcategoryId',
+  categoryMetadataJson: 'categoryMetadataJson',
   title: 'title',
   description: 'description',
   addressText: 'addressText',
@@ -384,35 +385,52 @@ export const AuditLogScalarFieldEnum = {
 export type AuditLogScalarFieldEnum = (typeof AuditLogScalarFieldEnum)[keyof typeof AuditLogScalarFieldEnum]
 
 
-export const CategoryMetadataScalarFieldEnum = {
+export const CategoryScalarFieldEnum = {
   id: 'id',
-  category: 'category',
-  displayName: 'displayName',
+  key: 'key',
+  name: 'name',
+  slug: 'slug',
   iconName: 'iconName',
   description: 'description',
-  displayOrder: 'displayOrder',
+  sortOrder: 'sortOrder',
   isActive: 'isActive',
+  deletedAt: 'deletedAt',
+  configJson: 'configJson',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
-export type CategoryMetadataScalarFieldEnum = (typeof CategoryMetadataScalarFieldEnum)[keyof typeof CategoryMetadataScalarFieldEnum]
+export type CategoryScalarFieldEnum = (typeof CategoryScalarFieldEnum)[keyof typeof CategoryScalarFieldEnum]
 
 
 export const SubcategoryScalarFieldEnum = {
   id: 'id',
   name: 'name',
   slug: 'slug',
-  category: 'category',
+  categoryId: 'categoryId',
+  key: 'key',
   imageUrl: 'imageUrl',
   description: 'description',
   displayOrder: 'displayOrder',
   isActive: 'isActive',
+  configJson: 'configJson',
+  searchKeywords: 'searchKeywords',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
 export type SubcategoryScalarFieldEnum = (typeof SubcategoryScalarFieldEnum)[keyof typeof SubcategoryScalarFieldEnum]
+
+
+export const ProProfileCategoryScalarFieldEnum = {
+  id: 'id',
+  proProfileId: 'proProfileId',
+  categoryId: 'categoryId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ProProfileCategoryScalarFieldEnum = (typeof ProProfileCategoryScalarFieldEnum)[keyof typeof ProProfileCategoryScalarFieldEnum]
 
 
 export const SortOrder = {

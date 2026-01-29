@@ -2,14 +2,17 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { ActiveFilters } from "../ActiveFilters";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Category } from "@repo/domain";
 
-const mockUseSubcategoryBySlug = vi.fn();
+const mockUseCategoryBySlug = vi.fn();
+const mockUseSubcategoryBySlugAndCategoryId = vi.fn();
 
 vi.mock("next/navigation");
+vi.mock("@/hooks/category", () => ({
+  useCategoryBySlug: (...args: unknown[]) => mockUseCategoryBySlug(...args),
+}));
 vi.mock("@/hooks/subcategory", () => ({
-  useSubcategoryBySlug: (...args: unknown[]) =>
-    mockUseSubcategoryBySlug(...args),
+  useSubcategoryBySlugAndCategoryId: (...args: unknown[]) =>
+    mockUseSubcategoryBySlugAndCategoryId(...args),
 }));
 
 const mockPush = vi.fn();
@@ -29,8 +32,14 @@ describe("ActiveFilters", () => {
       delete: mockDelete,
     });
     mockToString.mockReturnValue("");
+    // Mock category hook to return null by default
+    mockUseCategoryBySlug.mockReturnValue({
+      category: null,
+      isLoading: false,
+      error: null,
+    });
     // Mock subcategory hook to return null by default
-    mockUseSubcategoryBySlug.mockReturnValue({
+    mockUseSubcategoryBySlugAndCategoryId.mockReturnValue({
       subcategory: null,
       isLoading: false,
       error: null,
@@ -55,8 +64,17 @@ describe("ActiveFilters", () => {
 
     it("should render category filter", () => {
       mockGet.mockImplementation((key: string) => {
-        if (key === "category") return Category.PLUMBING;
+        if (key === "category") return "plumbing";
         return null;
+      });
+      mockUseCategoryBySlug.mockReturnValue({
+        category: {
+          id: "cat-plumbing",
+          name: "Plomería",
+          slug: "plumbing",
+        },
+        isLoading: false,
+        error: null,
       });
       render(<ActiveFilters onFilterRemove={vi.fn()} />);
       expect(screen.getByText("Plomería")).toBeInTheDocument();
@@ -64,11 +82,20 @@ describe("ActiveFilters", () => {
 
     it("should render subcategory filter", () => {
       mockGet.mockImplementation((key: string) => {
-        if (key === "category") return Category.PLUMBING;
+        if (key === "category") return "plumbing";
         if (key === "subcategory") return "fugas-goteras";
         return null;
       });
-      mockUseSubcategoryBySlug.mockReturnValue({
+      mockUseCategoryBySlug.mockReturnValue({
+        category: {
+          id: "cat-plumbing",
+          name: "Plomería",
+          slug: "plumbing",
+        },
+        isLoading: false,
+        error: null,
+      });
+      mockUseSubcategoryBySlugAndCategoryId.mockReturnValue({
         subcategory: {
           id: "sub-1",
           name: "Fugas y goteras",
@@ -84,11 +111,20 @@ describe("ActiveFilters", () => {
     it("should render all active filters", () => {
       mockGet.mockImplementation((key: string) => {
         if (key === "q") return "plumber";
-        if (key === "category") return Category.PLUMBING;
+        if (key === "category") return "plumbing";
         if (key === "subcategory") return "fugas-goteras";
         return null;
       });
-      mockUseSubcategoryBySlug.mockReturnValue({
+      mockUseCategoryBySlug.mockReturnValue({
+        category: {
+          id: "cat-plumbing",
+          name: "Plomería",
+          slug: "plumbing",
+        },
+        isLoading: false,
+        error: null,
+      });
+      mockUseSubcategoryBySlugAndCategoryId.mockReturnValue({
         subcategory: {
           id: "sub-1",
           name: "Fugas y goteras",
@@ -123,14 +159,23 @@ describe("ActiveFilters", () => {
 
     it("should remove category filter and subcategory", async () => {
       mockGet.mockImplementation((key: string) => {
-        if (key === "category") return Category.PLUMBING;
+        if (key === "category") return "plumbing";
         if (key === "subcategory") return "fugas-goteras";
         return null;
       });
       mockToString.mockReturnValue(
-        "category=PLUMBING&subcategory=fugas-goteras"
+        "category=plumbing&subcategory=fugas-goteras"
       );
-      mockUseSubcategoryBySlug.mockReturnValue({
+      mockUseCategoryBySlug.mockReturnValue({
+        category: {
+          id: "cat-plumbing",
+          name: "Plomería",
+          slug: "plumbing",
+        },
+        isLoading: false,
+        error: null,
+      });
+      mockUseSubcategoryBySlugAndCategoryId.mockReturnValue({
         subcategory: {
           id: "sub-1",
           name: "Fugas y goteras",
@@ -151,14 +196,23 @@ describe("ActiveFilters", () => {
 
     it("should remove only subcategory filter", async () => {
       mockGet.mockImplementation((key: string) => {
-        if (key === "category") return Category.PLUMBING;
+        if (key === "category") return "plumbing";
         if (key === "subcategory") return "fugas-goteras";
         return null;
       });
       mockToString.mockReturnValue(
-        "category=PLUMBING&subcategory=fugas-goteras"
+        "category=plumbing&subcategory=fugas-goteras"
       );
-      mockUseSubcategoryBySlug.mockReturnValue({
+      mockUseCategoryBySlug.mockReturnValue({
+        category: {
+          id: "cat-plumbing",
+          name: "Plomería",
+          slug: "plumbing",
+        },
+        isLoading: false,
+        error: null,
+      });
+      mockUseSubcategoryBySlugAndCategoryId.mockReturnValue({
         subcategory: {
           id: "sub-1",
           name: "Fugas y goteras",
@@ -179,7 +233,7 @@ describe("ActiveFilters", () => {
           expect.stringContaining("/search/results")
         );
         expect(mockPush).toHaveBeenCalledWith(
-          expect.stringContaining("category=PLUMBING")
+          expect.stringContaining("category=plumbing")
         );
         expect(mockPush).not.toHaveBeenCalledWith(
           expect.stringContaining("subcategory=")

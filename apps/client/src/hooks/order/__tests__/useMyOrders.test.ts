@@ -5,7 +5,7 @@ import {
   mockTrpcOrderListByClient,
   mockTrpcReviewStatusByOrderIds,
 } from "@/test-setup";
-import { OrderStatus, Category } from "@repo/domain";
+import { OrderStatus } from "@repo/domain";
 import type { Order } from "@repo/domain";
 
 describe("useMyOrders", () => {
@@ -19,12 +19,12 @@ describe("useMyOrders", () => {
         {
           id: "order-1",
           status: OrderStatus.PENDING_PRO_CONFIRMATION,
-          category: Category.PLUMBING,
+          categoryId: "cat-plumbing",
         },
         {
           id: "order-2",
           status: OrderStatus.COMPLETED,
-          category: Category.ELECTRICAL,
+          categoryId: "cat-electrical",
         },
       ] as unknown as Order[];
 
@@ -73,17 +73,17 @@ describe("useMyOrders", () => {
         {
           id: "order-1",
           status: OrderStatus.COMPLETED,
-          category: Category.PLUMBING,
+          categoryId: "cat-plumbing",
         },
         {
           id: "order-2",
           status: OrderStatus.COMPLETED,
-          category: Category.ELECTRICAL,
+          categoryId: "cat-electrical",
         },
         {
           id: "order-3",
           status: OrderStatus.PENDING_PRO_CONFIRMATION,
-          category: Category.CLEANING,
+          categoryId: "cat-cleaning",
         },
       ] as unknown as Order[];
 
@@ -115,7 +115,7 @@ describe("useMyOrders", () => {
         {
           id: "order-1",
           status: OrderStatus.PENDING_PRO_CONFIRMATION,
-          category: Category.PLUMBING,
+          categoryId: "cat-plumbing",
         },
       ] as unknown as Order[];
 

@@ -20,8 +20,9 @@ export const TOKENS = {
   PayoutItemRepository: "PayoutItemRepository",
   ProPayoutProfileRepository: "ProPayoutProfileRepository",
   AuditLogRepository: "AuditLogRepository",
-  CategoryMetadataRepository: "CategoryMetadataRepository",
+  CategoryRepository: "CategoryRepository",
   SubcategoryRepository: "SubcategoryRepository",
+  ProProfileCategoryRepository: "ProProfileCategoryRepository",
   OrderRepository: "OrderRepository",
   OrderLineItemRepository: "OrderLineItemRepository",
 
@@ -43,6 +44,7 @@ export const TOKENS = {
   AvailabilityService: "AvailabilityService",
   ContactService: "ContactService",
   CategoryService: "CategoryService",
+  ConfigService: "ConfigService",
   SubcategoryService: "SubcategoryService",
   OrderService: "OrderService",
   OrderCreationService: "OrderCreationService",

@@ -15,7 +15,6 @@ import { OrderService } from "../order.service";
 import type { Order } from "@repo/domain";
 import {
   OrderStatus as OrderStatusEnum,
-  Category,
   PricingMode,
   DisputeStatus,
   Role,
@@ -65,7 +64,8 @@ describe("OrderAdminService", () => {
       displayId: "O0001",
       clientUserId: "client-1",
       proProfileId: "pro-1",
-      category: Category.PLUMBING,
+      categoryId: "cat-plumbing",
+      categoryMetadataJson: null,
       subcategoryId: null,
       title: null,
       description: null,

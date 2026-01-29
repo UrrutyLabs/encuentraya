@@ -43,6 +43,7 @@ export class OrderAdminService {
       status: OrderStatus;
       clientUserId: string;
       proProfileId: string | null;
+      categoryId: string;
       totalAmount: number | null;
       currency: string;
     }>

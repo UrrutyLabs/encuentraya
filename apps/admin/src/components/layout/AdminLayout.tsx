@@ -10,6 +10,8 @@ import {
   Bell,
   LogOut,
   LayoutDashboard,
+  Folder,
+  FolderTree,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@repo/ui";
@@ -37,6 +39,12 @@ export function AdminLayout({ children }: AdminLayoutProps) {
     { href: "/admin/payments", label: "Pagos", icon: CreditCard },
     { href: "/admin/payouts", label: "Cobros", icon: Wallet },
     { href: "/admin/pros", label: "Profesionales", icon: Users },
+    { href: "/admin/categories", label: "Categorías", icon: Folder },
+    {
+      href: "/admin/subcategories",
+      label: "Subcategorías",
+      icon: FolderTree,
+    },
     { href: "/admin/notifications", label: "Notificaciones", icon: Bell },
   ];
 
@@ -56,7 +64,8 @@ export function AdminLayout({ children }: AdminLayoutProps) {
           {navItems.map((item) => {
             const isActive =
               pathname === item.href ||
-              (item.href === "/admin" && pathname === "/admin");
+              (item.href === "/admin" && pathname === "/admin") ||
+              (item.href !== "/admin" && pathname.startsWith(item.href));
             const Icon = item.icon;
             return (
               <Link

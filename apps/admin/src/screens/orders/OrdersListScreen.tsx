@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { OrderStatus } from "@repo/domain";
+import { OrderStatus, type Order } from "@repo/domain";
 import { useOrders } from "@/hooks/useOrders";
 import { OrdersTable } from "@/components/orders/OrdersTable";
 import { OrdersFilters } from "@/components/orders/OrdersFilters";
@@ -11,16 +11,21 @@ import { ORDER_LABELS } from "@/utils/orderLabels";
 export function OrdersListScreen() {
   const [statusFilter, setStatusFilter] = useState<OrderStatus | undefined>();
   const [queryFilter, setQueryFilter] = useState("");
+  const [categoryIdFilter, setCategoryIdFilter] = useState<
+    string | undefined
+  >();
 
   const { data: orders, isLoading } = useOrders({
     status: statusFilter,
     query: queryFilter,
+    categoryId: categoryIdFilter,
     limit: 100,
   });
 
   const handleClearFilters = () => {
     setStatusFilter(undefined);
     setQueryFilter("");
+    setCategoryIdFilter(undefined);
   };
 
   return (
@@ -32,12 +37,17 @@ export function OrdersListScreen() {
       <OrdersFilters
         status={statusFilter}
         query={queryFilter}
+        categoryId={categoryIdFilter}
         onStatusChange={setStatusFilter}
         onQueryChange={setQueryFilter}
+        onCategoryChange={setCategoryIdFilter}
         onClear={handleClearFilters}
       />
 
-      <OrdersTable orders={orders || []} isLoading={isLoading} />
+      <OrdersTable
+        orders={(orders as unknown as Order[]) || []}
+        isLoading={isLoading}
+      />
     </div>
   );
 }

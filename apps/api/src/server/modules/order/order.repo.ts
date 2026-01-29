@@ -1,7 +1,7 @@
 import { injectable } from "tsyringe";
 import { $Enums, Prisma } from "@infra/db/prisma";
 import { prisma } from "@infra/db/prisma";
-import { OrderStatus, Category } from "@repo/domain";
+import { OrderStatus } from "@repo/domain";
 import { getNextOrderDisplayId } from "./order.display-id";
 
 /**
@@ -13,7 +13,8 @@ export interface OrderEntity {
   displayId: string;
   clientUserId: string;
   proProfileId: string | null;
-  category: string; // Category enum value
+  categoryId: string; // FK to Category table (required)
+  categoryMetadataJson: Record<string, unknown> | null; // Snapshot of category metadata at creation
   subcategoryId: string | null;
 
   // Job details
@@ -80,8 +81,9 @@ export interface OrderEntity {
 export interface OrderCreateInput {
   clientUserId: string;
   proProfileId?: string;
-  category: string; // Category enum value
+  categoryId: string; // FK to Category table (required)
   subcategoryId?: string;
+  categoryMetadataJson?: Record<string, unknown>; // Optional snapshot of category metadata
   title?: string;
   description?: string;
   addressText: string;
@@ -173,7 +175,10 @@ export class OrderRepositoryImpl implements OrderRepository {
         displayId,
         clientUserId: input.clientUserId,
         proProfileId: input.proProfileId ?? null,
-        category: input.category as $Enums.Category,
+        categoryId: input.categoryId,
+        categoryMetadataJson: input.categoryMetadataJson
+          ? (input.categoryMetadataJson as Prisma.InputJsonValue)
+          : undefined,
         subcategoryId: input.subcategoryId ?? null,
         title: input.title ?? null,
         description: input.description ?? null,
@@ -383,12 +388,17 @@ export class OrderRepositoryImpl implements OrderRepository {
     prismaOrder: NonNullable<PrismaOrder>
   ): OrderEntity {
     const p = prismaOrder;
+
     return {
       id: p.id,
       displayId: p.displayId,
       clientUserId: p.clientUserId,
       proProfileId: p.proProfileId,
-      category: String(p.category),
+      categoryId: p.categoryId,
+      categoryMetadataJson: p.categoryMetadataJson as Record<
+        string,
+        unknown
+      > | null,
       subcategoryId: p.subcategoryId,
       title: p.title,
       description: p.description,

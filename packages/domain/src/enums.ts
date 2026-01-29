@@ -10,20 +10,6 @@ export enum Role {
 }
 
 /**
- * Booking status lifecycle
- */
-export enum BookingStatus {
-  PENDING_PAYMENT = "pending_payment",
-  PENDING = "pending",
-  ACCEPTED = "accepted",
-  ON_MY_WAY = "on_my_way",
-  ARRIVED = "arrived",
-  REJECTED = "rejected",
-  COMPLETED = "completed",
-  CANCELLED = "cancelled",
-}
-
-/**
  * Payment provider types
  */
 export enum PaymentProvider {
@@ -48,17 +34,6 @@ export enum PaymentStatus {
   FAILED = "FAILED",
   CANCELLED = "CANCELLED",
   REFUNDED = "REFUNDED",
-}
-
-/**
- * Service categories available in the marketplace
- */
-export enum Category {
-  PLUMBING = "plumbing",
-  ELECTRICAL = "electrical",
-  CLEANING = "cleaning",
-  HANDYMAN = "handyman",
-  PAINTING = "painting",
 }
 
 /**
@@ -129,8 +104,8 @@ export enum DisputeStatus {
  * Zod schemas for enums
  */
 export const roleSchema = z.nativeEnum(Role);
-export const bookingStatusSchema = z.nativeEnum(BookingStatus);
-export const categorySchema = z.nativeEnum(Category);
+// bookingStatusSchema removed - bookings have been replaced by orders
+// categorySchema removed - use categorySchema from category.schema.ts instead
 export const paymentProviderSchema = z.nativeEnum(PaymentProvider);
 export const paymentTypeSchema = z.nativeEnum(PaymentType);
 export const paymentStatusSchema = z.nativeEnum(PaymentStatus);

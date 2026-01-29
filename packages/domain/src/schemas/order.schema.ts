@@ -1,6 +1,5 @@
 import { z } from "zod";
 import {
-  categorySchema,
   orderStatusSchema,
   orderLineItemTypeSchema,
   taxBehaviorSchema,
@@ -30,6 +29,21 @@ export const orderLineItemSchema = z.object({
 export type OrderLineItem = z.infer<typeof orderLineItemSchema>;
 
 /**
+ * Category metadata input schema (snapshot at order creation)
+ */
+export const categoryMetadataInputSchema = z
+  .object({
+    categoryId: z.string(),
+    categoryKey: z.string().optional(),
+    categoryName: z.string().optional(),
+    subcategoryId: z.string().optional(),
+    subcategoryName: z.string().optional(),
+  })
+  .passthrough(); // Allow additional fields
+
+export type CategoryMetadataInput = z.infer<typeof categoryMetadataInputSchema>;
+
+/**
  * Order schema
  */
 export const orderSchema = z.object({
@@ -37,7 +51,8 @@ export const orderSchema = z.object({
   displayId: z.string(),
   clientUserId: z.string(),
   proProfileId: z.string().nullable(),
-  category: categorySchema,
+  categoryId: z.string(), // FK to Category table (required)
+  categoryMetadataJson: z.record(z.unknown()).nullable(), // Snapshot of category metadata at creation
   subcategoryId: z.string().nullable(),
 
   // Job details
@@ -105,8 +120,9 @@ export type Order = z.infer<typeof orderSchema>;
  */
 export const orderCreateInputSchema = z.object({
   proProfileId: z.string().optional(),
-  category: categorySchema,
+  categoryId: z.string(), // FK to Category table (required)
   subcategoryId: z.string().optional(),
+  categoryMetadataJson: categoryMetadataInputSchema.optional(), // Optional snapshot of category metadata
   title: z.string().optional(),
   description: z.string().optional(),
   addressText: z.string().min(1),

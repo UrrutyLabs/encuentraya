@@ -11,19 +11,12 @@ import type { Order } from "@repo/domain";
 import { OrderStatus } from "@repo/domain";
 import { getJobStatusLabel, getJobStatusVariant } from "@/utils/jobStatus";
 import { JOB_LABELS } from "@/utils/jobLabels";
+import { useCategory } from "@/hooks/category";
 
 interface JobCardProps {
   job: Order;
   hasReview?: boolean;
 }
-
-const CATEGORY_LABELS: Record<string, string> = {
-  plumbing: "Plomería",
-  electrical: "Electricidad",
-  cleaning: "Limpieza",
-  handyman: "Arreglos generales",
-  painting: "Pintura",
-};
 
 function formatDate(date: Date): string {
   return new Intl.DateTimeFormat("es-UY", {
@@ -38,6 +31,7 @@ function formatDate(date: Date): string {
 export const JobCard = memo(
   function JobCard({ job, hasReview = false }: JobCardProps) {
     const router = useRouter();
+    const { category } = useCategory(job.categoryId);
 
     // Memoize computed values
     const statusLabel = useMemo(
@@ -49,8 +43,8 @@ export const JobCard = memo(
       [job.status]
     );
     const categoryLabel = useMemo(
-      () => CATEGORY_LABELS[job.category] || job.category,
-      [job.category]
+      () => category?.name || "Cargando...",
+      [category]
     );
     const formattedDate = useMemo(
       () => formatDate(job.scheduledWindowStartAt),
@@ -195,6 +189,7 @@ export const JobCard = memo(
     return (
       prevProps.job.id === nextProps.job.id &&
       prevProps.job.status === nextProps.job.status &&
+      prevProps.job.categoryId === nextProps.job.categoryId &&
       prevProps.hasReview === nextProps.hasReview
     );
   }

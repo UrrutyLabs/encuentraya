@@ -1,23 +1,22 @@
 "use client";
 
 import { useMemo, memo, useRef, useState, useEffect } from "react";
-import { Category } from "@repo/domain";
+import type { Category } from "@repo/domain";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { getCategoryIcon, getCategoryLabel } from "@/lib/search/categoryIcons";
 import { CategoryCard } from "./CategoryCard";
+import { useCategories } from "@/hooks/category";
 
 interface CategoryCarouselProps {
   selectedCategory: Category | null;
   onCategoryClick: (category: Category) => void;
 }
 
-const ALL_CATEGORIES = Object.values(Category);
-
 export const CategoryCarousel = memo(function CategoryCarousel({
   selectedCategory,
   onCategoryClick,
 }: CategoryCarouselProps) {
-  const categories = useMemo(() => ALL_CATEGORIES, []);
+  const { categories, isLoading } = useCategories();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(true);
@@ -57,6 +56,46 @@ export const CategoryCarousel = memo(function CategoryCarousel({
     });
   };
 
+  // Update scroll buttons when categories change
+  useEffect(() => {
+    if (!isLoading && categories.length > 0) {
+      checkScrollButtons();
+    }
+  }, [categories, isLoading]);
+
+  // Show loading skeleton while categories are loading
+  if (isLoading) {
+    return (
+      <div className="w-full flex justify-center">
+        <div className="md:hidden w-full overflow-x-auto pb-4 -mx-4 px-4 scrollbar-hide">
+          <div className="flex gap-3">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div
+                key={i}
+                className="w-[120px] h-[100px] bg-muted/30 rounded-lg animate-pulse shrink-0"
+              />
+            ))}
+          </div>
+        </div>
+        <div className="hidden md:block w-full">
+          <div className="flex gap-4 px-2">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div
+                key={i}
+                className="w-[140px] h-[120px] bg-muted/30 rounded-lg animate-pulse shrink-0"
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show empty state if no categories
+  if (categories.length === 0) {
+    return null;
+  }
+
   return (
     <div className="w-full flex justify-center">
       {/* Mobile: Horizontal Scroll */}
@@ -67,11 +106,11 @@ export const CategoryCarousel = memo(function CategoryCarousel({
             const label = getCategoryLabel(category);
             return (
               <CategoryCard
-                key={category}
+                key={category.id}
                 category={category}
                 icon={Icon}
                 label={label}
-                isSelected={selectedCategory === category}
+                isSelected={selectedCategory?.id === category.id}
                 onClick={onCategoryClick}
               />
             );
@@ -101,11 +140,11 @@ export const CategoryCarousel = memo(function CategoryCarousel({
               const label = getCategoryLabel(category);
               return (
                 <CategoryCard
-                  key={category}
+                  key={category.id}
                   category={category}
                   icon={Icon}
                   label={label}
-                  isSelected={selectedCategory === category}
+                  isSelected={selectedCategory?.id === category.id}
                   onClick={onCategoryClick}
                 />
               );

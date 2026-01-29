@@ -6,28 +6,32 @@ import {
   Palette,
   type LucideIcon,
 } from "lucide-react";
-import { Category } from "@repo/domain";
+import type { Category } from "@repo/domain";
 
-export const CATEGORY_ICONS: Record<Category, LucideIcon> = {
-  [Category.PLUMBING]: Wrench,
-  [Category.ELECTRICAL]: Zap,
-  [Category.CLEANING]: Sparkles,
-  [Category.HANDYMAN]: Hammer,
-  [Category.PAINTING]: Palette,
+/**
+ * Map category keys to icons
+ * Uses the stable key identifier (e.g., "PLUMBING") to map to icons
+ */
+const CATEGORY_KEY_ICONS: Record<string, LucideIcon> = {
+  PLUMBING: Wrench,
+  ELECTRICAL: Zap,
+  CLEANING: Sparkles,
+  HANDYMAN: Hammer,
+  PAINTING: Palette,
 };
 
-export const CATEGORY_LABELS: Record<Category, string> = {
-  [Category.PLUMBING]: "Plomería",
-  [Category.ELECTRICAL]: "Electricidad",
-  [Category.CLEANING]: "Limpieza",
-  [Category.HANDYMAN]: "Arreglos generales",
-  [Category.PAINTING]: "Pintura",
-};
-
+/**
+ * Get icon for a category object
+ * Uses category.key to lookup the icon
+ */
 export function getCategoryIcon(category: Category): LucideIcon {
-  return CATEGORY_ICONS[category];
+  return CATEGORY_KEY_ICONS[category.key] ?? Wrench; // Default to Wrench if not found
 }
 
+/**
+ * Get display label for a category object
+ * Returns category.name from the API
+ */
 export function getCategoryLabel(category: Category): string {
-  return CATEGORY_LABELS[category];
+  return category.name;
 }

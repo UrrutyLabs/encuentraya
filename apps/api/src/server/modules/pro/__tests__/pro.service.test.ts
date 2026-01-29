@@ -12,11 +12,7 @@ import type { AuditService } from "@modules/audit/audit.service";
 import type { AvailabilityRepository } from "../availability.repo";
 import type { AvailabilityService } from "../availability.service";
 import { AuditEventType } from "@modules/audit/audit.repo";
-import type {
-  ProOnboardInput,
-  ProSetAvailabilityInput,
-  Category,
-} from "@repo/domain";
+import type { ProOnboardInput, ProSetAvailabilityInput } from "@repo/domain";
 import { Role } from "@repo/domain";
 import type { Actor } from "@infra/auth/roles";
 
@@ -155,7 +151,7 @@ describe("ProService", () => {
       bio: "Test bio",
       avatarUrl: "https://example.com/avatar.jpg",
       hourlyRate: 100,
-      categories: ["plumbing"],
+      categoryIds: ["cat-plumbing"],
       serviceArea: "Test Area",
       status: "active",
       profileCompleted: true,
@@ -245,7 +241,7 @@ describe("ProService", () => {
         email: "pro@example.com",
         phone: "+1234567890",
         hourlyRate: 100,
-        categories: ["plumbing" as Category],
+        categoryIds: ["cat-plumbing"],
         serviceArea: "Test Area",
       };
       const user = createMockUser();
@@ -255,7 +251,7 @@ describe("ProService", () => {
         email: input.email,
         phone: input.phone,
         hourlyRate: input.hourlyRate,
-        categories: input.categories as string[],
+        categoryIds: input.categoryIds,
         serviceArea: input.serviceArea,
       });
 
@@ -276,7 +272,7 @@ describe("ProService", () => {
         phone: input.phone,
         bio: undefined,
         hourlyRate: input.hourlyRate,
-        categories: input.categories as string[],
+        categoryIds: input.categoryIds,
         serviceArea: input.serviceArea,
       });
       expect(result).toMatchObject({
@@ -285,7 +281,7 @@ describe("ProService", () => {
         email: proProfile.email,
         phone: proProfile.phone ?? undefined,
         hourlyRate: proProfile.hourlyRate,
-        categories: input.categories,
+        categoryIds: input.categoryIds,
         serviceArea: proProfile.serviceArea ?? undefined,
         rating: undefined,
         reviewCount: 0,
@@ -302,7 +298,7 @@ describe("ProService", () => {
         email: "pro@example.com",
         phone: "+1234567890",
         hourlyRate: 100,
-        categories: ["plumbing" as Category],
+        categoryIds: ["cat-plumbing"],
         serviceArea: "Test Area",
         bio: "Optional bio text",
       };
@@ -314,7 +310,7 @@ describe("ProService", () => {
         phone: input.phone,
         bio: input.bio,
         hourlyRate: input.hourlyRate,
-        categories: input.categories as string[],
+        categoryIds: input.categoryIds,
         serviceArea: input.serviceArea,
       });
 
@@ -334,7 +330,7 @@ describe("ProService", () => {
         phone: input.phone,
         bio: input.bio,
         hourlyRate: input.hourlyRate,
-        categories: input.categories as string[],
+        categoryIds: input.categoryIds,
         serviceArea: input.serviceArea,
       });
       expect(result).toMatchObject({
@@ -352,7 +348,7 @@ describe("ProService", () => {
         email: "pro@example.com",
         phone: "+1234567890",
         hourlyRate: 100,
-        categories: ["plumbing" as Category],
+        categoryIds: ["cat-plumbing"],
         serviceArea: "Test Area",
       };
       const existingPro = createMockProProfile({ userId });
@@ -383,7 +379,7 @@ describe("ProService", () => {
         email: "pro@example.com",
         phone: "+1234567890",
         hourlyRate: 100,
-        categories: ["plumbing" as Category],
+        categoryIds: ["cat-plumbing"],
         serviceArea: "Test Area",
       };
       const user = createMockUser({ id: userId, role: Role.PRO });
@@ -409,7 +405,7 @@ describe("ProService", () => {
         phone: input.phone,
         bio: input.bio ?? undefined,
         hourlyRate: input.hourlyRate,
-        categories: input.categories as string[],
+        categoryIds: input.categoryIds,
         serviceArea: input.serviceArea,
       });
       expect(result).toMatchObject({
@@ -427,7 +423,7 @@ describe("ProService", () => {
         email: "pro@example.com",
         phone: "+1234567890",
         hourlyRate: 100,
-        categories: ["plumbing" as Category],
+        categoryIds: ["cat-plumbing"],
         serviceArea: "Test Area",
       };
       const user = createMockUser({ id: userId, role: Role.CLIENT });
@@ -463,7 +459,7 @@ describe("ProService", () => {
         email: "pro@example.com",
         phone: "+1234567890",
         hourlyRate: 100,
-        categories: ["plumbing" as Category],
+        categoryIds: ["cat-plumbing"],
         serviceArea: "Test Area",
       };
 

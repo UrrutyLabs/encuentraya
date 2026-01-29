@@ -11,16 +11,22 @@ export function ProsListScreen() {
     "pending" | "active" | "suspended" | undefined
   >();
   const [queryFilter, setQueryFilter] = useState("");
+  const [categoryIdFilter, setCategoryIdFilter] = useState<
+    string | undefined
+  >();
 
   const { data: pros, isLoading } = usePros({
     status: statusFilter,
     query: queryFilter,
+    // TODO: Uncomment when backend supports categoryId filtering
+    // categoryId: categoryIdFilter,
     limit: 100,
   });
 
   const handleClearFilters = () => {
     setStatusFilter(undefined);
     setQueryFilter("");
+    setCategoryIdFilter(undefined);
   };
 
   return (
@@ -32,8 +38,10 @@ export function ProsListScreen() {
       <ProsFilters
         status={statusFilter}
         query={queryFilter}
+        categoryId={categoryIdFilter}
         onStatusChange={setStatusFilter}
         onQueryChange={setQueryFilter}
+        onCategoryChange={setCategoryIdFilter}
         onClear={handleClearFilters}
       />
 

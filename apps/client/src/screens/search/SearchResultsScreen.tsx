@@ -22,7 +22,8 @@ import { SearchError } from "@/components/search/SearchError";
 import { useSearchPros } from "@/hooks/pro";
 import { useTodayDate } from "@/hooks/shared";
 import { useAvailableTimeWindows } from "@/hooks/search";
-import { Category, type TimeWindow } from "@repo/domain";
+import { useCategoryBySlug } from "@/hooks/category";
+import type { TimeWindow } from "@repo/domain";
 
 /**
  * SearchResultsContent Component
@@ -41,11 +42,12 @@ function SearchResultsContent() {
   const [showFilters, setShowFilters] = useState(false);
 
   const searchQuery = searchParams.get("q") || "";
-  const categoryParam = searchParams.get("category");
+  const categorySlug = searchParams.get("category") || undefined;
   const dateParam = searchParams.get("date") || "";
   const timeWindowParam = searchParams.get("timeWindow") || "";
 
-  const category = categoryParam ? (categoryParam as Category) : undefined;
+  // Fetch category by slug from URL
+  const { category } = useCategoryBySlug(categorySlug);
 
   // Initialize state from URL params (only on mount/param change)
   const [date, setDate] = useState(() => dateParam);
@@ -136,7 +138,7 @@ function SearchResultsContent() {
   // Memoize filters
   const filters = useMemo(
     () => ({
-      category: category,
+      categoryId: category?.id,
       subcategory: subcategorySlug,
       date: date || undefined,
       timeWindow: (timeWindow || undefined) as TimeWindow | undefined,

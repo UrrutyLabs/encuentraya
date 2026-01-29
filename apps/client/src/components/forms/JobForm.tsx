@@ -3,7 +3,7 @@ import { Button } from "@repo/ui";
 import { Input } from "@repo/ui";
 import { Text } from "@repo/ui";
 import { Card } from "@repo/ui";
-import { Category } from "@repo/domain";
+import type { Category } from "@repo/domain";
 import { JOB_LABELS } from "@/utils/jobLabels";
 
 interface JobFormProps {
@@ -11,12 +11,12 @@ interface JobFormProps {
   time: string;
   address: string;
   hours: string;
-  category: Category | "";
+  categoryId: string | "";
   onDateChange: (value: string) => void;
   onTimeChange: (value: string) => void;
   onAddressChange: (value: string) => void;
   onHoursChange: (value: string) => void;
-  onCategoryChange: (value: Category) => void;
+  onCategoryChange: (value: string) => void;
   onSubmit: (e: React.FormEvent) => void;
   loading?: boolean;
   error?: string | null;
@@ -26,20 +26,12 @@ interface JobFormProps {
   availableTimes?: { value: string; label: string }[];
 }
 
-const ALL_CATEGORY_OPTIONS: { value: Category; label: string }[] = [
-  { value: Category.PLUMBING, label: "Plomería" },
-  { value: Category.ELECTRICAL, label: "Electricidad" },
-  { value: Category.CLEANING, label: "Limpieza" },
-  { value: Category.HANDYMAN, label: "Arreglos generales" },
-  { value: Category.PAINTING, label: "Pintura" },
-];
-
 export function JobForm({
   date,
   time,
   address,
   hours,
-  category,
+  categoryId,
   onDateChange,
   onTimeChange,
   onAddressChange,
@@ -49,19 +41,10 @@ export function JobForm({
   loading = false,
   error,
   estimatedCost,
-  availableCategories,
+  availableCategories = [],
   minDate,
   availableTimes = [],
 }: JobFormProps) {
-  // Filter category options based on available categories
-  // If availableCategories is provided, only show those categories
-  // Otherwise, show all categories (for backward compatibility)
-  const categoryOptions = availableCategories
-    ? ALL_CATEGORY_OPTIONS.filter((option) =>
-        availableCategories.includes(option.value)
-      )
-    : ALL_CATEGORY_OPTIONS;
-
   return (
     <form onSubmit={onSubmit} className="space-y-4">
       <div>
@@ -70,15 +53,15 @@ export function JobForm({
           {JOB_LABELS.category}
         </label>
         <select
-          value={category}
-          onChange={(e) => onCategoryChange(e.target.value as Category)}
+          value={categoryId}
+          onChange={(e) => onCategoryChange(e.target.value)}
           required
           className="w-full px-3 py-2 border border-border rounded-md bg-surface text-text focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
         >
           <option value="">Seleccionar categoría</option>
-          {categoryOptions.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
+          {availableCategories.map((category) => (
+            <option key={category.id} value={category.id}>
+              {category.name}
             </option>
           ))}
         </select>

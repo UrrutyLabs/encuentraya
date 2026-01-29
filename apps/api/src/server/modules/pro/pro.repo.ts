@@ -1,7 +1,9 @@
-import { injectable } from "tsyringe";
+import { injectable, inject } from "tsyringe";
 import { prisma } from "@infra/db/prisma";
-import { Category } from "@repo/domain";
 import { calculateProfileCompleted } from "./pro.calculations";
+import { TOKENS } from "@/server/container/tokens";
+import type { ProProfileCategoryRepository } from "./proProfileCategory.repo";
+import type { CategoryRepository } from "../category/category.repo";
 
 // Type representing what Prisma returns for ProProfile queries
 // Union of all possible return types from Prisma queries
@@ -23,7 +25,7 @@ export interface ProProfileEntity {
   bio: string | null;
   avatarUrl: string | null;
   hourlyRate: number;
-  categories: string[]; // Category enum values
+  categoryIds: string[]; // FK to Category table via junction table
   serviceArea: string | null;
   status: "pending" | "active" | "suspended";
   profileCompleted: boolean;
@@ -45,7 +47,7 @@ export interface ProProfileCreateInput {
   bio?: string | null;
   avatarUrl?: string | null;
   hourlyRate: number;
-  categories: string[]; // Category enum values
+  categoryIds: string[]; // FK to Category table (required)
   serviceArea?: string;
 }
 
@@ -60,7 +62,7 @@ export interface ProProfileUpdateInput {
   bio?: string | null;
   avatarUrl?: string | null;
   hourlyRate?: number;
-  categories?: string[]; // Category enum values
+  categoryIds?: string[]; // FK to Category table
   serviceArea?: string | null;
   profileCompleted?: boolean;
   completedJobsCount?: number;
@@ -84,7 +86,7 @@ export interface ProRepository {
     cursor?: string;
   }): Promise<ProProfileEntity[]>;
   searchPros(filters: {
-    category?: Category;
+    categoryId?: string; // FK to Category table
     profileCompleted?: boolean;
   }): Promise<ProProfileEntity[]>;
   updateStatus(
@@ -102,6 +104,13 @@ export interface ProRepository {
  */
 @injectable()
 export class ProRepositoryImpl implements ProRepository {
+  constructor(
+    @inject(TOKENS.ProProfileCategoryRepository)
+    private readonly proProfileCategoryRepository: ProProfileCategoryRepository,
+    @inject(TOKENS.CategoryRepository)
+    private readonly categoryRepository: CategoryRepository
+  ) {}
+
   async create(input: ProProfileCreateInput): Promise<ProProfileEntity> {
     const proProfile = await prisma.proProfile.create({
       data: {
@@ -112,7 +121,6 @@ export class ProRepositoryImpl implements ProRepository {
         bio: input.bio ?? null,
         avatarUrl: input.avatarUrl ?? null,
         hourlyRate: input.hourlyRate,
-        categories: input.categories as Category[], // Prisma expects Category[] enum, but we pass string[]
         serviceArea: input.serviceArea ?? null,
         status: "pending",
         // profileCompleted will be calculated based on avatarUrl and bio presence
@@ -120,24 +128,61 @@ export class ProRepositoryImpl implements ProRepository {
       },
     });
 
-    return this.mapPrismaToDomain(proProfile);
+    // Create junction table records for categories
+    if (input.categoryIds.length > 0) {
+      await this.proProfileCategoryRepository.bulkCreate(
+        proProfile.id,
+        input.categoryIds
+      );
+    }
+
+    // Fetch with relations to get categoryIds
+    const result = await this.findById(proProfile.id);
+    if (!result) {
+      throw new Error("Failed to create pro profile");
+    }
+    return result;
   }
 
   async findById(id: string): Promise<ProProfileEntity | null> {
     const proProfile = await prisma.proProfile.findUnique({
       where: { id },
+      include: {
+        categoryRelations: {
+          include: {
+            category: true,
+          },
+          where: {
+            category: {
+              deletedAt: null, // Filter out soft-deleted categories
+            },
+          },
+        },
+      },
     });
 
-    return proProfile ? this.mapPrismaToDomain(proProfile) : null;
+    return proProfile ? await this.mapPrismaToDomainAsync(proProfile) : null;
   }
 
   async findByUserId(userId: string): Promise<ProProfileEntity | null> {
     const proProfile = await prisma.proProfile.findUnique({
       where: { userId },
+      include: {
+        categoryRelations: {
+          include: {
+            category: true,
+          },
+          where: {
+            category: {
+              deletedAt: null,
+            },
+          },
+        },
+      },
     });
 
     if (!proProfile) return null;
-    return this.mapPrismaToDomain(proProfile);
+    return await this.mapPrismaToDomainAsync(proProfile);
   }
 
   async findAll(): Promise<ProProfileEntity[]> {
@@ -146,10 +191,22 @@ export class ProRepositoryImpl implements ProRepository {
       where: {
         profileCompleted: true,
       },
+      include: {
+        categoryRelations: {
+          include: {
+            category: true,
+          },
+          where: {
+            category: {
+              deletedAt: null,
+            },
+          },
+        },
+      },
       orderBy: { createdAt: "desc" },
     });
 
-    return proProfiles.map((p) => this.mapPrismaToDomain(p));
+    return Promise.all(proProfiles.map((p) => this.mapPrismaToDomainAsync(p)));
   }
 
   async findAllWithFilters(filters?: {
@@ -179,25 +236,44 @@ export class ProRepositoryImpl implements ProRepository {
 
     const proProfiles = await prisma.proProfile.findMany({
       where,
+      include: {
+        categoryRelations: {
+          include: {
+            category: true,
+          },
+          where: {
+            category: {
+              deletedAt: null,
+            },
+          },
+        },
+      },
       take: filters?.limit,
       cursor: filters?.cursor ? { id: filters.cursor } : undefined,
       skip: filters?.cursor ? 1 : undefined,
       orderBy: { createdAt: "desc" },
     });
 
-    return proProfiles.map((p) => this.mapPrismaToDomain(p));
+    return Promise.all(proProfiles.map((p) => this.mapPrismaToDomainAsync(p)));
   }
 
   async searchPros(filters: {
-    category?: Category;
+    categoryId?: string; // FK to Category table
     profileCompleted?: boolean;
   }): Promise<ProProfileEntity[]> {
     const where: {
-      status: "active"; // Only approved pros (isApproved = true, isSuspended = false)
+      status: "active";
       profileCompleted?: boolean;
-      categories?: { has: Category };
+      categoryRelations?: {
+        some: {
+          categoryId: string;
+          category: {
+            deletedAt: null;
+          };
+        };
+      };
     } = {
-      status: "active", // Only return active (approved and not suspended) pros
+      status: "active",
     };
 
     // Filter by profileCompleted (defaults to true for public search)
@@ -208,17 +284,36 @@ export class ProRepositoryImpl implements ProRepository {
       where.profileCompleted = true;
     }
 
-    // Filter by category if provided
-    if (filters.category) {
-      where.categories = { has: filters.category as Category };
+    // Filter by categoryId if provided
+    if (filters.categoryId) {
+      where.categoryRelations = {
+        some: {
+          categoryId: filters.categoryId,
+          category: {
+            deletedAt: null, // Filter out soft-deleted categories
+          },
+        },
+      };
     }
 
     const proProfiles = await prisma.proProfile.findMany({
       where,
+      include: {
+        categoryRelations: {
+          include: {
+            category: true,
+          },
+          where: {
+            category: {
+              deletedAt: null,
+            },
+          },
+        },
+      },
       orderBy: { createdAt: "desc" },
     });
 
-    return proProfiles.map((p) => this.mapPrismaToDomain(p));
+    return Promise.all(proProfiles.map((p) => this.mapPrismaToDomainAsync(p)));
   }
 
   async updateStatus(
@@ -228,9 +323,21 @@ export class ProRepositoryImpl implements ProRepository {
     const proProfile = await prisma.proProfile.update({
       where: { id },
       data: { status },
+      include: {
+        categoryRelations: {
+          include: {
+            category: true,
+          },
+          where: {
+            category: {
+              deletedAt: null,
+            },
+          },
+        },
+      },
     });
 
-    return this.mapPrismaToDomain(proProfile);
+    return await this.mapPrismaToDomainAsync(proProfile);
   }
 
   async update(
@@ -247,6 +354,19 @@ export class ProRepositoryImpl implements ProRepository {
       return null;
     }
 
+    // Handle categoryIds update
+    if (data.categoryIds !== undefined) {
+      // Delete all existing category relations
+      await this.proProfileCategoryRepository.deleteByProProfileId(id);
+      // Create new relations
+      if (data.categoryIds.length > 0) {
+        await this.proProfileCategoryRepository.bulkCreate(
+          id,
+          data.categoryIds
+        );
+      }
+    }
+
     // Build update data object, only including provided fields
     const updateData: {
       displayName?: string;
@@ -255,7 +375,6 @@ export class ProRepositoryImpl implements ProRepository {
       bio?: string | null;
       avatarUrl?: string | null;
       hourlyRate?: number;
-      categories?: Category[];
       serviceArea?: string | null;
       profileCompleted?: boolean;
       completedJobsCount?: number;
@@ -280,9 +399,6 @@ export class ProRepositoryImpl implements ProRepository {
     }
     if (data.hourlyRate !== undefined) {
       updateData.hourlyRate = data.hourlyRate;
-    }
-    if (data.categories !== undefined) {
-      updateData.categories = data.categories as Category[]; // Prisma expects Category[] enum
     }
     if (data.serviceArea !== undefined) {
       updateData.serviceArea = data.serviceArea ?? null;
@@ -316,19 +432,43 @@ export class ProRepositoryImpl implements ProRepository {
     const proProfile = await prisma.proProfile.update({
       where: { id },
       data: updateData,
+      include: {
+        categoryRelations: {
+          include: {
+            category: true,
+          },
+          where: {
+            category: {
+              deletedAt: null,
+            },
+          },
+        },
+      },
     });
 
-    return this.mapPrismaToDomain(proProfile);
+    return await this.mapPrismaToDomainAsync(proProfile);
   }
 
-  private mapPrismaToDomain(
-    prismaProProfile: NonNullable<PrismaProProfile>
-  ): ProProfileEntity {
+  /**
+   * Map Prisma ProProfile to domain entity (async to derive categories from categoryIds)
+   */
+  private async mapPrismaToDomainAsync(
+    prismaProProfile: NonNullable<PrismaProProfile> & {
+      categoryRelations?: Array<{
+        id: string;
+        proProfileId: string;
+        categoryId: string;
+        category?: {
+          id: string;
+          key: string;
+        } | null;
+      }>;
+    }
+  ): Promise<ProProfileEntity> {
     const p = prismaProProfile;
-    // Prisma returns Category[] enum, but we need to convert to string[] for domain
-    const categories = Array.isArray(p.categories)
-      ? (p.categories as unknown as Category[]).map((c) => String(c))
-      : [];
+
+    // Get categoryIds from junction table
+    const categoryIds = p.categoryRelations?.map((rel) => rel.categoryId) ?? [];
 
     return {
       id: p.id,
@@ -339,7 +479,7 @@ export class ProRepositoryImpl implements ProRepository {
       bio: p.bio ?? null,
       avatarUrl: p.avatarUrl ?? null,
       hourlyRate: p.hourlyRate,
-      categories,
+      categoryIds, // FK array
       serviceArea: p.serviceArea ?? null,
       status: p.status as "pending" | "active" | "suspended",
       profileCompleted: p.profileCompleted,
@@ -351,5 +491,3 @@ export class ProRepositoryImpl implements ProRepository {
     };
   }
 }
-
-export const proRepository: ProRepository = new ProRepositoryImpl();

@@ -16,16 +16,8 @@ import { Button } from "@repo/ui";
 import { useWizardState } from "@/lib/wizard/useWizardState";
 import { useProDetail } from "@/hooks/pro";
 import { useCreateOrder } from "@/hooks/order";
-import { Category } from "@repo/domain";
+import { useCategoryBySlug } from "@/hooks/category";
 import { logger } from "@/lib/logger";
-
-const CATEGORY_LABELS: Record<Category, string> = {
-  [Category.PLUMBING]: "Plomería",
-  [Category.ELECTRICAL]: "Electricidad",
-  [Category.CLEANING]: "Limpieza",
-  [Category.HANDYMAN]: "Arreglos generales",
-  [Category.PAINTING]: "Pintura",
-};
 
 interface ReviewStepProps {
   onBack?: () => void;
@@ -34,6 +26,8 @@ interface ReviewStepProps {
 export function ReviewStep({}: ReviewStepProps) {
   const { state, navigateToStep } = useWizardState();
   const { pro } = useProDetail(state.proId || undefined);
+  // Fetch category by slug from URL
+  const { category } = useCategoryBySlug(state.categorySlug || undefined);
   const { createOrder, isPending, error: createError } = useCreateOrder();
 
   const estimatedCost = useMemo(() => {
@@ -65,7 +59,7 @@ export function ReviewStep({}: ReviewStepProps) {
   const handleSubmit = async () => {
     if (
       !state.proId ||
-      !state.category ||
+      !category?.id ||
       !state.date ||
       !state.time ||
       !state.address ||
@@ -79,7 +73,7 @@ export function ReviewStep({}: ReviewStepProps) {
     try {
       await createOrder({
         proProfileId: state.proId,
-        category: state.category as Category,
+        categoryId: category.id,
         description: `Servicio en ${state.address}`,
         addressText: state.address,
         scheduledWindowStartAt: scheduledAt,
@@ -92,7 +86,7 @@ export function ReviewStep({}: ReviewStepProps) {
         error instanceof Error ? error : new Error(String(error)),
         {
           proProfileId: state.proId,
-          category: state.category,
+          categoryId: category.id,
         }
       );
     }
@@ -100,7 +94,7 @@ export function ReviewStep({}: ReviewStepProps) {
 
   if (
     !state.proId ||
-    !state.category ||
+    !category ||
     !state.date ||
     !state.time ||
     !state.address ||
@@ -162,7 +156,7 @@ export function ReviewStep({}: ReviewStepProps) {
                 Categoría
               </Text>
               <Text variant="body" className="font-medium">
-                {CATEGORY_LABELS[state.category as Category]}
+                {category?.name || "Cargando..."}
               </Text>
             </div>
           </div>

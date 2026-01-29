@@ -1,7 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { SubcategoryService } from "../subcategory.service";
 import type { SubcategoryRepository } from "../subcategory.repo";
-import { Category } from "@repo/domain";
 
 describe("SubcategoryService", () => {
   let service: SubcategoryService;
@@ -9,15 +8,21 @@ describe("SubcategoryService", () => {
 
   function createMockRepository(): {
     findById: ReturnType<typeof vi.fn>;
-    findBySlug: ReturnType<typeof vi.fn>;
-    findByCategory: ReturnType<typeof vi.fn>;
+    findBySlugAndCategoryId: ReturnType<typeof vi.fn>;
+    findByCategoryId: ReturnType<typeof vi.fn>;
     findAll: ReturnType<typeof vi.fn>;
+    create: ReturnType<typeof vi.fn>;
+    update: ReturnType<typeof vi.fn>;
+    delete: ReturnType<typeof vi.fn>;
   } {
     return {
       findById: vi.fn(),
-      findBySlug: vi.fn(),
-      findByCategory: vi.fn(),
+      findBySlugAndCategoryId: vi.fn(),
+      findByCategoryId: vi.fn(),
       findAll: vi.fn(),
+      create: vi.fn(),
+      update: vi.fn(),
+      delete: vi.fn(),
     };
   }
 
@@ -26,11 +31,14 @@ describe("SubcategoryService", () => {
       id: string;
       name: string;
       slug: string;
-      category: Category;
+      categoryId: string;
+      key: string | null;
       imageUrl: string | null;
       description: string | null;
       displayOrder: number;
       isActive: boolean;
+      configJson: Record<string, unknown> | null;
+      searchKeywords: string[];
       createdAt: Date;
       updatedAt: Date;
     }>
@@ -40,11 +48,14 @@ describe("SubcategoryService", () => {
       id: "subcat-123",
       name: "Fugas y goteras",
       slug: "fugas-goteras",
-      category: Category.PLUMBING,
+      categoryId: "cat-plumbing",
+      key: "LEAKS",
       imageUrl: "/images/subcategories/plumbing-leak.jpg",
       description: "Reparación de fugas y goteras",
       displayOrder: 0,
       isActive: true,
+      configJson: null,
+      searchKeywords: [],
       createdAt: now,
       updatedAt: now,
       ...overrides,
@@ -59,49 +70,48 @@ describe("SubcategoryService", () => {
     vi.clearAllMocks();
   });
 
-  describe("getSubcategoriesByCategory", () => {
-    it("should return subcategories for a given category", async () => {
+  describe("getSubcategoriesByCategoryId", () => {
+    it("should return subcategories for a given categoryId", async () => {
       // Arrange
       const entities = [
         createSubcategoryEntity({
           slug: "fugas-goteras",
           displayOrder: 0,
+          categoryId: "cat-plumbing",
         }),
         createSubcategoryEntity({
           slug: "instalaciones",
           displayOrder: 1,
+          categoryId: "cat-plumbing",
         }),
       ];
-      mockRepository.findByCategory.mockResolvedValue(entities);
+      mockRepository.findByCategoryId.mockResolvedValue(entities);
 
       // Act
-      const result = await service.getSubcategoriesByCategory(
-        Category.PLUMBING
-      );
+      const result = await service.getSubcategoriesByCategoryId("cat-plumbing");
 
       // Assert
       expect(result).toHaveLength(2);
       expect(result[0].slug).toBe("fugas-goteras");
       expect(result[1].slug).toBe("instalaciones");
-      expect(mockRepository.findByCategory).toHaveBeenCalledTimes(1);
-      expect(mockRepository.findByCategory).toHaveBeenCalledWith(
-        Category.PLUMBING
+      expect(mockRepository.findByCategoryId).toHaveBeenCalledTimes(1);
+      expect(mockRepository.findByCategoryId).toHaveBeenCalledWith(
+        "cat-plumbing"
       );
     });
 
-    it("should return empty array when no subcategories found for category", async () => {
+    it("should return empty array when no subcategories found for categoryId", async () => {
       // Arrange
-      mockRepository.findByCategory.mockResolvedValue([]);
+      mockRepository.findByCategoryId.mockResolvedValue([]);
 
       // Act
-      const result = await service.getSubcategoriesByCategory(
-        Category.ELECTRICAL
-      );
+      const result =
+        await service.getSubcategoriesByCategoryId("cat-electrical");
 
       // Assert
       expect(result).toEqual([]);
-      expect(mockRepository.findByCategory).toHaveBeenCalledWith(
-        Category.ELECTRICAL
+      expect(mockRepository.findByCategoryId).toHaveBeenCalledWith(
+        "cat-electrical"
       );
     });
 
@@ -110,21 +120,20 @@ describe("SubcategoryService", () => {
       const entity = createSubcategoryEntity({
         name: "Instalaciones eléctricas",
         slug: "instalaciones-electricas",
-        category: Category.ELECTRICAL,
+        categoryId: "cat-electrical",
       });
-      mockRepository.findByCategory.mockResolvedValue([entity]);
+      mockRepository.findByCategoryId.mockResolvedValue([entity]);
 
       // Act
-      const result = await service.getSubcategoriesByCategory(
-        Category.ELECTRICAL
-      );
+      const result =
+        await service.getSubcategoriesByCategoryId("cat-electrical");
 
       // Assert
       expect(result[0]).toEqual({
         id: entity.id,
         name: "Instalaciones eléctricas",
         slug: "instalaciones-electricas",
-        category: Category.ELECTRICAL,
+        categoryId: "cat-electrical",
         imageUrl: entity.imageUrl,
         description: entity.description,
         displayOrder: entity.displayOrder,
@@ -170,7 +179,7 @@ describe("SubcategoryService", () => {
         id: "test-id",
         name: "Test Subcategory",
         slug: "test-slug",
-        category: Category.CLEANING,
+        categoryId: "cat-cleaning",
         imageUrl: null,
         description: null,
         displayOrder: 10,
@@ -186,7 +195,7 @@ describe("SubcategoryService", () => {
         id: "test-id",
         name: "Test Subcategory",
         slug: "test-slug",
-        category: Category.CLEANING,
+        categoryId: "cat-cleaning",
         imageUrl: null,
         description: null,
         displayOrder: 10,
@@ -197,47 +206,47 @@ describe("SubcategoryService", () => {
     });
   });
 
-  describe("getSubcategoryBySlug", () => {
-    it("should return subcategory when found by slug and category", async () => {
+  describe("getSubcategoryBySlugAndCategoryId", () => {
+    it("should return subcategory when found by slug and categoryId", async () => {
       // Arrange
       const entity = createSubcategoryEntity({
         slug: "fugas-goteras",
-        category: Category.PLUMBING,
+        categoryId: "cat-plumbing",
       });
-      mockRepository.findBySlug.mockResolvedValue(entity);
+      mockRepository.findBySlugAndCategoryId.mockResolvedValue(entity);
 
       // Act
-      const result = await service.getSubcategoryBySlug(
+      const result = await service.getSubcategoryBySlugAndCategoryId(
         "fugas-goteras",
-        Category.PLUMBING
+        "cat-plumbing"
       );
 
       // Assert
       expect(result).not.toBeNull();
       expect(result?.slug).toBe("fugas-goteras");
-      expect(result?.category).toBe(Category.PLUMBING);
-      expect(mockRepository.findBySlug).toHaveBeenCalledTimes(1);
-      expect(mockRepository.findBySlug).toHaveBeenCalledWith(
+      expect(result?.categoryId).toBe("cat-plumbing");
+      expect(mockRepository.findBySlugAndCategoryId).toHaveBeenCalledTimes(1);
+      expect(mockRepository.findBySlugAndCategoryId).toHaveBeenCalledWith(
         "fugas-goteras",
-        Category.PLUMBING
+        "cat-plumbing"
       );
     });
 
     it("should return null when subcategory not found by slug", async () => {
       // Arrange
-      mockRepository.findBySlug.mockResolvedValue(null);
+      mockRepository.findBySlugAndCategoryId.mockResolvedValue(null);
 
       // Act
-      const result = await service.getSubcategoryBySlug(
+      const result = await service.getSubcategoryBySlugAndCategoryId(
         "non-existent",
-        Category.PLUMBING
+        "cat-plumbing"
       );
 
       // Assert
       expect(result).toBeNull();
-      expect(mockRepository.findBySlug).toHaveBeenCalledWith(
+      expect(mockRepository.findBySlugAndCategoryId).toHaveBeenCalledWith(
         "non-existent",
-        Category.PLUMBING
+        "cat-plumbing"
       );
     });
 
@@ -245,31 +254,31 @@ describe("SubcategoryService", () => {
       // Arrange
       const plumbingEntity = createSubcategoryEntity({
         slug: "instalaciones",
-        category: Category.PLUMBING,
+        categoryId: "cat-plumbing",
       });
       const electricalEntity = createSubcategoryEntity({
         slug: "instalaciones",
-        category: Category.ELECTRICAL,
+        categoryId: "cat-electrical",
         name: "Instalaciones eléctricas",
       });
 
-      mockRepository.findBySlug
+      mockRepository.findBySlugAndCategoryId
         .mockResolvedValueOnce(plumbingEntity)
         .mockResolvedValueOnce(electricalEntity);
 
       // Act
-      const plumbingResult = await service.getSubcategoryBySlug(
+      const plumbingResult = await service.getSubcategoryBySlugAndCategoryId(
         "instalaciones",
-        Category.PLUMBING
+        "cat-plumbing"
       );
-      const electricalResult = await service.getSubcategoryBySlug(
+      const electricalResult = await service.getSubcategoryBySlugAndCategoryId(
         "instalaciones",
-        Category.ELECTRICAL
+        "cat-electrical"
       );
 
       // Assert
-      expect(plumbingResult?.category).toBe(Category.PLUMBING);
-      expect(electricalResult?.category).toBe(Category.ELECTRICAL);
+      expect(plumbingResult?.categoryId).toBe("cat-plumbing");
+      expect(electricalResult?.categoryId).toBe("cat-electrical");
       expect(electricalResult?.name).toBe("Instalaciones eléctricas");
     });
   });
@@ -280,17 +289,17 @@ describe("SubcategoryService", () => {
       const entities = [
         createSubcategoryEntity({
           id: "subcat-1",
-          category: Category.PLUMBING,
+          categoryId: "cat-plumbing",
           displayOrder: 0,
         }),
         createSubcategoryEntity({
           id: "subcat-2",
-          category: Category.ELECTRICAL,
+          categoryId: "cat-electrical",
           displayOrder: 0,
         }),
         createSubcategoryEntity({
           id: "subcat-3",
-          category: Category.CLEANING,
+          categoryId: "cat-cleaning",
           displayOrder: 0,
         }),
       ];
@@ -301,9 +310,9 @@ describe("SubcategoryService", () => {
 
       // Assert
       expect(result).toHaveLength(3);
-      expect(result[0].category).toBe(Category.PLUMBING);
-      expect(result[1].category).toBe(Category.ELECTRICAL);
-      expect(result[2].category).toBe(Category.CLEANING);
+      expect(result[0].categoryId).toBe("cat-plumbing");
+      expect(result[1].categoryId).toBe("cat-electrical");
+      expect(result[2].categoryId).toBe("cat-cleaning");
       expect(mockRepository.findAll).toHaveBeenCalledTimes(1);
     });
 
@@ -353,7 +362,7 @@ describe("SubcategoryService", () => {
         id: "subcat-test",
         name: "Test Subcategory",
         slug: "test-subcategory",
-        category: Category.HANDYMAN,
+        categoryId: "cat-handyman",
         imageUrl: "/test/image.jpg",
         description: "Test description",
         displayOrder: 5,
@@ -371,7 +380,7 @@ describe("SubcategoryService", () => {
         id: "subcat-test",
         name: "Test Subcategory",
         slug: "test-subcategory",
-        category: Category.HANDYMAN,
+        categoryId: "cat-handyman",
         imageUrl: "/test/image.jpg",
         description: "Test description",
         displayOrder: 5,
@@ -379,6 +388,345 @@ describe("SubcategoryService", () => {
         createdAt: now,
         updatedAt: now,
       });
+    });
+  });
+
+  describe("validateSubcategoryBelongsToCategory", () => {
+    it("should not throw when subcategory belongs to category", async () => {
+      // Arrange
+      const entity = createSubcategoryEntity({
+        id: "subcat-123",
+        categoryId: "cat-plumbing",
+      });
+      mockRepository.findById.mockResolvedValue(entity);
+
+      // Act & Assert
+      await expect(
+        service.validateSubcategoryBelongsToCategory(
+          "subcat-123",
+          "cat-plumbing"
+        )
+      ).resolves.not.toThrow();
+      expect(mockRepository.findById).toHaveBeenCalledWith("subcat-123");
+    });
+
+    it("should throw error when subcategory does not belong to category", async () => {
+      // Arrange
+      const entity = createSubcategoryEntity({
+        id: "subcat-123",
+        categoryId: "cat-plumbing",
+      });
+      mockRepository.findById.mockResolvedValue(entity);
+
+      // Act & Assert
+      await expect(
+        service.validateSubcategoryBelongsToCategory(
+          "subcat-123",
+          "cat-electrical"
+        )
+      ).rejects.toThrow(
+        "Subcategory subcat-123 does not belong to category cat-electrical"
+      );
+      expect(mockRepository.findById).toHaveBeenCalledWith("subcat-123");
+    });
+
+    it("should throw error when subcategory not found", async () => {
+      // Arrange
+      mockRepository.findById.mockResolvedValue(null);
+
+      // Act & Assert
+      await expect(
+        service.validateSubcategoryBelongsToCategory(
+          "non-existent",
+          "cat-plumbing"
+        )
+      ).rejects.toThrow("Subcategory not found: non-existent");
+      expect(mockRepository.findById).toHaveBeenCalledWith("non-existent");
+    });
+  });
+
+  describe("createSubcategory", () => {
+    it("should create a new subcategory when slug does not exist in category", async () => {
+      // Arrange
+      const input = {
+        name: "Fugas y goteras",
+        slug: "fugas-goteras",
+        categoryId: "cat-plumbing",
+        imageUrl: "/images/fugas.jpg",
+        description: "Reparación de fugas",
+        displayOrder: 0,
+        isActive: true,
+      };
+      const createdEntity = createSubcategoryEntity(input);
+      mockRepository.findBySlugAndCategoryId.mockResolvedValue(null);
+      mockRepository.create.mockResolvedValue(createdEntity);
+
+      // Act
+      const result = await service.createSubcategory(input);
+
+      // Assert
+      expect(result).toEqual({
+        id: createdEntity.id,
+        name: input.name,
+        slug: input.slug,
+        categoryId: input.categoryId,
+        imageUrl: input.imageUrl,
+        description: input.description,
+        displayOrder: input.displayOrder,
+        isActive: input.isActive,
+        createdAt: createdEntity.createdAt,
+        updatedAt: createdEntity.updatedAt,
+      });
+      expect(mockRepository.findBySlugAndCategoryId).toHaveBeenCalledWith(
+        input.slug,
+        input.categoryId
+      );
+      expect(mockRepository.create).toHaveBeenCalledTimes(1);
+      expect(mockRepository.create).toHaveBeenCalledWith({
+        name: input.name,
+        slug: input.slug,
+        categoryId: input.categoryId,
+        imageUrl: input.imageUrl,
+        description: input.description,
+        displayOrder: input.displayOrder,
+        isActive: input.isActive,
+      });
+    });
+
+    it("should use default values for optional fields", async () => {
+      // Arrange
+      const input = {
+        name: "Instalaciones",
+        slug: "instalaciones",
+        categoryId: "cat-plumbing",
+      };
+      const createdEntity = createSubcategoryEntity({
+        ...input,
+        imageUrl: null,
+        description: null,
+        displayOrder: 0,
+        isActive: true,
+      });
+      mockRepository.findBySlugAndCategoryId.mockResolvedValue(null);
+      mockRepository.create.mockResolvedValue(createdEntity);
+
+      // Act
+      const result = await service.createSubcategory(input);
+
+      // Assert
+      expect(mockRepository.create).toHaveBeenCalledWith({
+        name: input.name,
+        slug: input.slug,
+        categoryId: input.categoryId,
+        imageUrl: undefined,
+        description: undefined,
+        displayOrder: 0,
+        isActive: true,
+      });
+      expect(result.isActive).toBe(true);
+      expect(result.displayOrder).toBe(0);
+    });
+
+    it("should throw error when subcategory with same slug already exists in category", async () => {
+      // Arrange
+      const input = {
+        name: "Fugas y goteras",
+        slug: "fugas-goteras",
+        categoryId: "cat-plumbing",
+      };
+      const existingEntity = createSubcategoryEntity({
+        slug: "fugas-goteras",
+        categoryId: "cat-plumbing",
+      });
+      mockRepository.findBySlugAndCategoryId.mockResolvedValue(existingEntity);
+
+      // Act & Assert
+      await expect(service.createSubcategory(input)).rejects.toThrow(
+        'Subcategory with slug "fugas-goteras" already exists in this category'
+      );
+      expect(mockRepository.findBySlugAndCategoryId).toHaveBeenCalledWith(
+        input.slug,
+        input.categoryId
+      );
+      expect(mockRepository.create).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("updateSubcategory", () => {
+    it("should update subcategory successfully", async () => {
+      // Arrange
+      const updateInput = {
+        name: "Fugas y goteras actualizado",
+        description: "Nueva descripción",
+      };
+      const existingEntity = createSubcategoryEntity({
+        id: "subcat-123",
+        categoryId: "cat-plumbing",
+      });
+      const updatedEntity = createSubcategoryEntity({
+        id: "subcat-123",
+        name: "Fugas y goteras actualizado",
+        description: "Nueva descripción",
+        categoryId: "cat-plumbing",
+      });
+      mockRepository.findById.mockResolvedValue(existingEntity);
+      mockRepository.update.mockResolvedValue(updatedEntity);
+
+      // Act
+      const result = await service.updateSubcategory("subcat-123", updateInput);
+
+      // Assert
+      expect(result).not.toBeNull();
+      expect(result?.name).toBe("Fugas y goteras actualizado");
+      expect(result?.description).toBe("Nueva descripción");
+      expect(mockRepository.update).toHaveBeenCalledTimes(1);
+      expect(mockRepository.update).toHaveBeenCalledWith(
+        "subcat-123",
+        updateInput
+      );
+    });
+
+    it("should return null when subcategory not found", async () => {
+      // Arrange
+      const updateInput = { name: "New Name" };
+      mockRepository.findById.mockResolvedValue(null);
+      mockRepository.update.mockResolvedValue(null);
+
+      // Act
+      const result = await service.updateSubcategory(
+        "non-existent",
+        updateInput
+      );
+
+      // Assert
+      expect(result).toBeNull();
+      expect(mockRepository.update).toHaveBeenCalledWith(
+        "non-existent",
+        updateInput
+      );
+    });
+
+    it("should check slug conflicts when slug is being updated", async () => {
+      // Arrange
+      const updateInput = {
+        slug: "new-slug",
+      };
+      const existingEntity = createSubcategoryEntity({
+        id: "subcat-123",
+        slug: "old-slug",
+        categoryId: "cat-plumbing",
+      });
+      const conflictingEntity = createSubcategoryEntity({
+        id: "subcat-456",
+        slug: "new-slug",
+        categoryId: "cat-plumbing",
+      });
+      mockRepository.findById.mockResolvedValue(existingEntity);
+      mockRepository.findBySlugAndCategoryId.mockResolvedValue(
+        conflictingEntity
+      );
+
+      // Act & Assert
+      await expect(
+        service.updateSubcategory("subcat-123", updateInput)
+      ).rejects.toThrow(
+        'Subcategory with slug "new-slug" already exists in this category'
+      );
+      expect(mockRepository.findById).toHaveBeenCalledWith("subcat-123");
+      expect(mockRepository.findBySlugAndCategoryId).toHaveBeenCalledWith(
+        "new-slug",
+        "cat-plumbing"
+      );
+      expect(mockRepository.update).not.toHaveBeenCalled();
+    });
+
+    it("should allow updating slug to same value", async () => {
+      // Arrange
+      const updateInput = {
+        slug: "existing-slug",
+      };
+      const existingEntity = createSubcategoryEntity({
+        id: "subcat-123",
+        slug: "existing-slug",
+        categoryId: "cat-plumbing",
+      });
+      const updatedEntity = createSubcategoryEntity({
+        id: "subcat-123",
+        slug: "existing-slug",
+        categoryId: "cat-plumbing",
+      });
+      mockRepository.findById.mockResolvedValue(existingEntity);
+      mockRepository.findBySlugAndCategoryId.mockResolvedValue(existingEntity);
+      mockRepository.update.mockResolvedValue(updatedEntity);
+
+      // Act
+      const result = await service.updateSubcategory("subcat-123", updateInput);
+
+      // Assert
+      expect(result).not.toBeNull();
+      expect(mockRepository.update).toHaveBeenCalled();
+    });
+
+    it("should use provided categoryId when updating slug", async () => {
+      // Arrange
+      const updateInput = {
+        slug: "new-slug",
+        categoryId: "cat-electrical",
+      };
+      const existingEntity = createSubcategoryEntity({
+        id: "subcat-123",
+        categoryId: "cat-plumbing",
+      });
+      mockRepository.findById.mockResolvedValue(existingEntity);
+      mockRepository.findBySlugAndCategoryId.mockResolvedValue(null);
+      mockRepository.update.mockResolvedValue(
+        createSubcategoryEntity({
+          id: "subcat-123",
+          slug: "new-slug",
+          categoryId: "cat-electrical",
+        })
+      );
+
+      // Act
+      await service.updateSubcategory("subcat-123", updateInput);
+
+      // Assert
+      expect(mockRepository.findBySlugAndCategoryId).toHaveBeenCalledWith(
+        "new-slug",
+        "cat-electrical"
+      );
+    });
+  });
+
+  describe("deleteSubcategory", () => {
+    it("should delete subcategory successfully", async () => {
+      // Arrange
+      const entity = createSubcategoryEntity({
+        id: "subcat-123",
+        categoryId: "cat-plumbing",
+      });
+      mockRepository.findById.mockResolvedValue(entity);
+      mockRepository.delete.mockResolvedValue(undefined);
+
+      // Act
+      await service.deleteSubcategory("subcat-123");
+
+      // Assert
+      expect(mockRepository.findById).toHaveBeenCalledWith("subcat-123");
+      expect(mockRepository.delete).toHaveBeenCalledTimes(1);
+      expect(mockRepository.delete).toHaveBeenCalledWith("subcat-123");
+    });
+
+    it("should throw error when subcategory not found", async () => {
+      // Arrange
+      mockRepository.findById.mockResolvedValue(null);
+
+      // Act & Assert
+      await expect(service.deleteSubcategory("non-existent")).rejects.toThrow(
+        "Subcategory not found with id non-existent"
+      );
+      expect(mockRepository.findById).toHaveBeenCalledWith("non-existent");
+      expect(mockRepository.delete).not.toHaveBeenCalled();
     });
   });
 });

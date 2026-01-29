@@ -3,8 +3,7 @@
 import { Card } from "@repo/ui";
 import { Text } from "@repo/ui";
 import { BarChart3 } from "lucide-react";
-import { formatCurrency } from "@repo/domain";
-import { Category } from "@repo/domain";
+import { formatCurrency, type Category } from "@repo/domain";
 
 interface CategoryPerformanceProps {
   performance: Array<{
@@ -14,14 +13,6 @@ interface CategoryPerformanceProps {
   }>;
   isLoading?: boolean;
 }
-
-const categoryLabels: Record<Category, string> = {
-  [Category.PLUMBING]: "Plomería",
-  [Category.ELECTRICAL]: "Electricidad",
-  [Category.CLEANING]: "Limpieza",
-  [Category.HANDYMAN]: "Manitas",
-  [Category.PAINTING]: "Pintura",
-};
 
 export function CategoryPerformance({
   performance,
@@ -74,10 +65,10 @@ export function CategoryPerformance({
             totalOrders > 0 ? (item.orders / totalOrders) * 100 : 0;
 
           return (
-            <div key={item.category}>
+            <div key={item.category.id}>
               <div className="flex items-center justify-between mb-2">
                 <Text variant="body" className="font-medium">
-                  {categoryLabels[item.category]}
+                  {item.category.name}
                 </Text>
                 <div className="text-right">
                   <Text variant="small" className="font-semibold">

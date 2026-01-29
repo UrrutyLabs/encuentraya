@@ -1,8 +1,16 @@
 import { injectable, inject } from "tsyringe";
-import type { OrderRepository } from "./order.repo";
-import type { OrderLineItemRepository } from "./orderLineItem.repo";
+import type { OrderRepository, OrderEntity } from "./order.repo";
+import type {
+  OrderLineItemRepository,
+  OrderLineItemEntity,
+} from "./orderLineItem.repo";
 import type { Order, OrderCreateInput } from "@repo/domain";
-import { OrderStatus } from "@repo/domain";
+import {
+  OrderStatus,
+  PricingMode,
+  ApprovalMethod,
+  DisputeStatus,
+} from "@repo/domain";
 import { TOKENS } from "@/server/container";
 import { OrderNotFoundError } from "./order.errors";
 
@@ -54,7 +62,7 @@ export class OrderService {
     // Get line items for this order
     const lineItems = await this.orderLineItemRepository.findByOrderId(id);
 
-    return this.mapToDomain(orderEntity, lineItems);
+    return await this.mapToDomain(orderEntity, lineItems);
   }
 
   /**
@@ -143,15 +151,16 @@ export class OrderService {
    * Map OrderEntity to Order domain type
    */
   private mapToDomain(
-    entity: import("./order.repo").OrderEntity,
-    lineItems: import("./orderLineItem.repo").OrderLineItemEntity[]
+    entity: OrderEntity,
+    lineItems: OrderLineItemEntity[]
   ): Order {
     return {
       id: entity.id,
       displayId: entity.displayId,
       clientUserId: entity.clientUserId,
       proProfileId: entity.proProfileId,
-      category: entity.category as import("@repo/domain").Category,
+      categoryId: entity.categoryId,
+      categoryMetadataJson: entity.categoryMetadataJson,
       subcategoryId: entity.subcategoryId,
       title: entity.title,
       description: entity.description,
@@ -169,7 +178,7 @@ export class OrderService {
       paidAt: entity.paidAt,
       canceledAt: entity.canceledAt,
       cancelReason: entity.cancelReason,
-      pricingMode: entity.pricingMode as import("@repo/domain").PricingMode,
+      pricingMode: entity.pricingMode as PricingMode,
       hourlyRateSnapshotAmount: entity.hourlyRateSnapshotAmount,
       currency: entity.currency,
       minHoursSnapshot: entity.minHoursSnapshot,
@@ -177,7 +186,7 @@ export class OrderService {
       finalHoursSubmitted: entity.finalHoursSubmitted,
       approvedHours: entity.approvedHours,
       approvalMethod: entity.approvalMethod
-        ? (entity.approvalMethod as import("@repo/domain").ApprovalMethod)
+        ? (entity.approvalMethod as ApprovalMethod)
         : null,
       approvalDeadlineAt: entity.approvalDeadlineAt,
       subtotalAmount: entity.subtotalAmount,
@@ -190,8 +199,7 @@ export class OrderService {
       taxIncluded: entity.taxIncluded,
       taxRegion: entity.taxRegion,
       taxCalculatedAt: entity.taxCalculatedAt,
-      disputeStatus:
-        entity.disputeStatus as import("@repo/domain").DisputeStatus,
+      disputeStatus: entity.disputeStatus as DisputeStatus,
       disputeReason: entity.disputeReason,
       disputeOpenedBy: entity.disputeOpenedBy,
       isFirstOrder: entity.isFirstOrder,

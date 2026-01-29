@@ -5,8 +5,9 @@ import type { OrderCreateInput, Order } from "@repo/domain";
 import type { Actor } from "@infra/auth/roles";
 import { TOKENS } from "@/server/container";
 import type { ClientProfileService } from "@modules/user/clientProfile.service";
-import { OrderStatus } from "@repo/domain";
 import { OrderService } from "./order.service";
+import type { CategoryRepository } from "../category/category.repo";
+import type { SubcategoryService } from "../subcategory/subcategory.service";
 
 /**
  * Order creation service
@@ -22,7 +23,11 @@ export class OrderCreationService {
     @inject(TOKENS.ClientProfileService)
     private readonly clientProfileService: ClientProfileService,
     @inject(TOKENS.OrderService)
-    private readonly orderService: OrderService
+    private readonly orderService: OrderService,
+    @inject(TOKENS.CategoryRepository)
+    private readonly categoryRepository: CategoryRepository,
+    @inject(TOKENS.SubcategoryService)
+    private readonly subcategoryService: SubcategoryService
   ) {}
 
   /**
@@ -65,6 +70,42 @@ export class OrderCreationService {
       throw new Error("Pro profile ID is required");
     }
 
+    if (!input.categoryId) {
+      throw new Error("categoryId is required");
+    }
+
+    // Validate subcategory belongs to category if both provided
+    if (input.subcategoryId) {
+      await this.subcategoryService.validateSubcategoryBelongsToCategory(
+        input.subcategoryId,
+        input.categoryId
+      );
+    }
+
+    // Build categoryMetadataJson if not provided
+    let categoryMetadataJson: Record<string, unknown> | undefined =
+      input.categoryMetadataJson;
+    if (!categoryMetadataJson) {
+      const category = await this.categoryRepository.findById(input.categoryId);
+      if (category) {
+        categoryMetadataJson = {
+          categoryId: category.id,
+          categoryKey: category.key,
+          categoryName: category.name,
+        };
+
+        if (input.subcategoryId) {
+          const subcategory = await this.subcategoryService.getSubcategoryById(
+            input.subcategoryId
+          );
+          if (subcategory) {
+            categoryMetadataJson.subcategoryId = subcategory.id;
+            categoryMetadataJson.subcategoryName = subcategory.name;
+          }
+        }
+      }
+    }
+
     // Check if this is the client's first order
     const existingOrders = await this.orderRepository.findByClientUserId(
       actor.id
@@ -75,7 +116,8 @@ export class OrderCreationService {
     const orderEntity = await this.orderRepository.create({
       clientUserId: actor.id,
       proProfileId: input.proProfileId,
-      category: input.category as string,
+      categoryId: input.categoryId,
+      categoryMetadataJson: categoryMetadataJson,
       subcategoryId: input.subcategoryId,
       title: input.title,
       description: input.description,

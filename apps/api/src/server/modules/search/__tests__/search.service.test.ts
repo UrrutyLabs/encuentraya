@@ -3,7 +3,6 @@ import { SearchService } from "../search.service";
 import type { ProService } from "@modules/pro/pro.service";
 import type { AvailabilityService } from "@modules/pro/availability.service";
 import type { Pro } from "@repo/domain";
-import { Category } from "@repo/domain";
 
 describe("SearchService", () => {
   let service: SearchService;
@@ -39,7 +38,7 @@ describe("SearchService", () => {
       bio: "Test bio",
       avatarUrl: "https://example.com/avatar.jpg",
       hourlyRate: 100,
-      categories: [Category.PLUMBING],
+      categoryIds: ["cat-plumbing"],
       serviceArea: "Test Area",
       rating: 4.5,
       reviewCount: 10,
@@ -72,8 +71,8 @@ describe("SearchService", () => {
     it("should return pros filtered by database when no availability filters", async () => {
       // Arrange
       const pros = [
-        createMockPro({ id: "pro-1", categories: [Category.PLUMBING] }),
-        createMockPro({ id: "pro-2", categories: [Category.ELECTRICAL] }),
+        createMockPro({ id: "pro-1", categoryIds: ["cat-plumbing"] }),
+        createMockPro({ id: "pro-2", categoryIds: ["cat-electrical"] }),
       ];
 
       mockProService.searchPros.mockResolvedValue(pros);
@@ -95,22 +94,22 @@ describe("SearchService", () => {
       expect(result).toEqual(pros);
     });
 
-    it("should filter by category when provided", async () => {
+    it("should filter by categoryId when provided", async () => {
       // Arrange
       const pros = [
-        createMockPro({ id: "pro-1", categories: [Category.PLUMBING] }),
+        createMockPro({ id: "pro-1", categoryIds: ["cat-plumbing"] }),
       ];
 
       mockProService.searchPros.mockResolvedValue(pros);
 
       // Act
       const result = await service.searchPros({
-        category: Category.PLUMBING,
+        categoryId: "cat-plumbing",
       });
 
       // Assert
       expect(mockProService.searchPros).toHaveBeenCalledWith({
-        category: Category.PLUMBING,
+        categoryId: "cat-plumbing",
       });
       expect(result).toEqual(pros);
     });
@@ -217,12 +216,12 @@ describe("SearchService", () => {
       expect(result[0].id).toBe("pro-1");
     });
 
-    it("should filter by category and date", async () => {
+    it("should filter by categoryId and date", async () => {
       // Arrange
       const date = new Date("2026-01-25T10:00:00Z");
       const pros = [
-        createMockPro({ id: "pro-1", categories: [Category.PLUMBING] }),
-        createMockPro({ id: "pro-2", categories: [Category.PLUMBING] }),
+        createMockPro({ id: "pro-1", categoryIds: ["cat-plumbing"] }),
+        createMockPro({ id: "pro-2", categoryIds: ["cat-plumbing"] }),
       ];
 
       mockProService.searchPros.mockResolvedValue(pros);
@@ -232,13 +231,13 @@ describe("SearchService", () => {
 
       // Act
       const result = await service.searchPros({
-        category: Category.PLUMBING,
+        categoryId: "cat-plumbing",
         date,
       });
 
       // Assert
       expect(mockProService.searchPros).toHaveBeenCalledWith({
-        category: Category.PLUMBING,
+        categoryId: "cat-plumbing",
       });
       expect(mockAvailabilityService.isProAvailableOnDay).toHaveBeenCalledTimes(
         2
@@ -247,13 +246,13 @@ describe("SearchService", () => {
       expect(result[0].id).toBe("pro-1");
     });
 
-    it("should filter by category, date, and timeWindow", async () => {
+    it("should filter by categoryId, date, and timeWindow", async () => {
       // Arrange
       const date = new Date("2026-01-25T10:00:00Z");
       const timeWindow = "09:00-12:00";
       const pros = [
-        createMockPro({ id: "pro-1", categories: [Category.PLUMBING] }),
-        createMockPro({ id: "pro-2", categories: [Category.PLUMBING] }),
+        createMockPro({ id: "pro-1", categoryIds: ["cat-plumbing"] }),
+        createMockPro({ id: "pro-2", categoryIds: ["cat-plumbing"] }),
       ];
 
       mockProService.searchPros.mockResolvedValue(pros);
@@ -263,14 +262,14 @@ describe("SearchService", () => {
 
       // Act
       const result = await service.searchPros({
-        category: Category.PLUMBING,
+        categoryId: "cat-plumbing",
         date,
         timeWindow,
       });
 
       // Assert
       expect(mockProService.searchPros).toHaveBeenCalledWith({
-        category: Category.PLUMBING,
+        categoryId: "cat-plumbing",
       });
       expect(
         mockAvailabilityService.isProAvailableInTimeWindow
@@ -316,20 +315,20 @@ describe("SearchService", () => {
     it("should ignore subcategory filter (for future use)", async () => {
       // Arrange
       const pros = [
-        createMockPro({ id: "pro-1", categories: [Category.PLUMBING] }),
+        createMockPro({ id: "pro-1", categoryIds: ["cat-plumbing"] }),
       ];
 
       mockProService.searchPros.mockResolvedValue(pros);
 
       // Act
       const result = await service.searchPros({
-        category: Category.PLUMBING,
+        categoryId: "cat-plumbing",
         subcategory: "drain-cleaning", // Should be ignored for now
       });
 
       // Assert
       expect(mockProService.searchPros).toHaveBeenCalledWith({
-        category: Category.PLUMBING,
+        categoryId: "cat-plumbing",
       });
       expect(result).toEqual(pros);
     });

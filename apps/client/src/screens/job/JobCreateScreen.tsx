@@ -24,7 +24,7 @@ import { useClientProfile } from "@/hooks/client";
 import { useRebookTemplate } from "@/hooks/order";
 import { useTodayDate } from "@/hooks/shared";
 import { useAvailableOrderTimes } from "@/hooks/order";
-import { Category } from "@repo/domain";
+import { useCategories } from "@/hooks/category";
 import { JOB_LABELS } from "@/utils/jobLabels";
 import { logger } from "@/lib/logger";
 
@@ -41,11 +41,14 @@ function JobCreateContent() {
     error: rebookError,
   } = useRebookTemplate(rebookFrom || undefined);
 
+  // Fetch categories for the form
+  const { categories } = useCategories();
+
   // Derive initial values from rebook template (memoized to prevent recalculation)
   const rebookValues = useMemo(() => {
     if (rebookTemplate) {
       return {
-        category: rebookTemplate.category,
+        categoryId: rebookTemplate.categoryId,
         address: rebookTemplate.addressText,
         hours: rebookTemplate.estimatedHours.toString(),
       };
@@ -58,8 +61,8 @@ function JobCreateContent() {
   const [time, setTime] = useState("");
   const [address, setAddress] = useState(rebookValues?.address || "");
   const [hours, setHours] = useState(rebookValues?.hours || "");
-  const [category, setCategory] = useState<Category | "">(
-    rebookValues?.category || ""
+  const [categoryId, setCategoryId] = useState<string | "">(
+    rebookValues?.categoryId || ""
   );
 
   // Track previous rebookValues to update state only when template first loads
@@ -105,8 +108,8 @@ function JobCreateContent() {
       prevRebookValuesRef.current = rebookValues;
       // Use startTransition to defer state updates, preventing cascading renders
       startTransition(() => {
-        if (category !== rebookValues.category) {
-          setCategory(rebookValues.category);
+        if (categoryId !== rebookValues.categoryId) {
+          setCategoryId(rebookValues.categoryId);
         }
         if (address !== rebookValues.address) {
           setAddress(rebookValues.address);
@@ -116,7 +119,7 @@ function JobCreateContent() {
         }
       });
     }
-  }, [rebookValues, category, address, hours]);
+  }, [rebookValues, categoryId, address, hours]);
 
   // Calculate estimated cost
   const estimatedCost =
@@ -125,7 +128,14 @@ function JobCreateContent() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!effectiveProId || !category || !date || !time || !address || !hours) {
+    if (
+      !effectiveProId ||
+      !categoryId ||
+      !date ||
+      !time ||
+      !address ||
+      !hours
+    ) {
       return;
     }
 
@@ -135,7 +145,7 @@ function JobCreateContent() {
     try {
       await createOrder({
         proProfileId: effectiveProId,
-        category: category as Category,
+        categoryId: categoryId,
         description: `Servicio en ${address}`,
         addressText: address,
         scheduledWindowStartAt: scheduledAt,
@@ -149,7 +159,7 @@ function JobCreateContent() {
         error instanceof Error ? error : new Error(String(error)),
         {
           proProfileId: effectiveProId,
-          category,
+          categoryId,
         }
       );
     }
@@ -312,17 +322,19 @@ function JobCreateContent() {
                   time={time}
                   address={address}
                   hours={hours}
-                  category={category}
+                  categoryId={categoryId}
                   onDateChange={handleDateChange}
                   onTimeChange={setTime}
                   onAddressChange={setAddress}
                   onHoursChange={setHours}
-                  onCategoryChange={setCategory}
+                  onCategoryChange={setCategoryId}
                   onSubmit={handleSubmit}
                   loading={isPending}
                   error={createError?.message}
                   estimatedCost={estimatedCost}
-                  availableCategories={pro.categories}
+                  availableCategories={categories.filter((cat) =>
+                    pro.categoryIds.includes(cat.id)
+                  )}
                   minDate={today}
                   availableTimes={availableTimes}
                 />

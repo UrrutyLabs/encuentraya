@@ -3,7 +3,8 @@ import { useOrders } from "./useOrders";
 import { usePayments } from "./usePayments";
 import { usePayouts } from "./usePayouts";
 import { usePros } from "./usePros";
-import { OrderStatus, PaymentStatus, Category } from "@repo/domain";
+import { useCategories } from "./useCategories";
+import { OrderStatus, PaymentStatus, type Category } from "@repo/domain";
 
 export function useDashboard() {
   // Fetch all data (we'll aggregate on the frontend for Phase 1)
@@ -16,13 +17,18 @@ export function useDashboard() {
   });
   const { data: payouts, isLoading: payoutsLoading } = usePayouts(1000);
   const { data: pros, isLoading: prosLoading } = usePros({ limit: 100 });
+  const { data: categories, isLoading: categoriesLoading } = useCategories();
 
   const isLoading =
-    ordersLoading || paymentsLoading || payoutsLoading || prosLoading;
+    ordersLoading ||
+    paymentsLoading ||
+    payoutsLoading ||
+    prosLoading ||
+    categoriesLoading;
 
   // Calculate stats
   const stats = useMemo(() => {
-    if (!orders || !payments || !payouts || !pros) {
+    if (!orders || !payments || !payouts || !pros || !categories) {
       return null;
     }
 
@@ -204,31 +210,66 @@ export function useDashboard() {
     };
 
     // Category performance
-    // TODO: Once adminListOrders returns full Order objects with category field, uncomment:
-    // const categoryMap = new Map<Category, { orders: number; revenue: number }>();
-    // orders.forEach((order) => {
-    //   const category = order.category;
-    //   const existing = categoryMap.get(category) || { orders: 0, revenue: 0 };
-    //   const orderRevenue = order.totalAmount || 0;
-    //   categoryMap.set(category, {
-    //     orders: existing.orders + 1,
-    //     revenue: existing.revenue + orderRevenue,
-    //   });
-    // });
-    // const categoryPerformance: Array<{
-    //   category: Category;
-    //   orders: number;
-    //   revenue: number;
-    // }> = Array.from(categoryMap.entries()).map(([category, data]) => ({
-    //   category,
-    //   orders: data.orders,
-    //   revenue: data.revenue,
-    // }));
+    // Create a map of categoryId -> Category for quick lookup
+    const categoryMapById = new Map<string, Category>();
+    categories.forEach((category) => {
+      // Only include active, non-deleted categories
+      if (category.isActive && !category.deletedAt) {
+        categoryMapById.set(category.id, category);
+      }
+    });
+
+    // Aggregate orders and revenue by category
+    const categoryPerformanceMap = new Map<
+      string,
+      { orders: number; revenue: number }
+    >();
+    orders.forEach((order) => {
+      const category = categoryMapById.get(order.categoryId);
+      // Skip orders with soft-deleted or inactive categories
+      if (!category) {
+        return;
+      }
+
+      const existing = categoryPerformanceMap.get(order.categoryId) || {
+        orders: 0,
+        revenue: 0,
+      };
+      const orderRevenue = order.totalAmount || 0;
+      categoryPerformanceMap.set(order.categoryId, {
+        orders: existing.orders + 1,
+        revenue: existing.revenue + orderRevenue,
+      });
+    });
+
+    // Convert map to array with Category objects
     const categoryPerformance: Array<{
       category: Category;
       orders: number;
       revenue: number;
-    }> = [];
+    }> = Array.from(categoryPerformanceMap.entries())
+      .map(([categoryId, data]) => {
+        const category = categoryMapById.get(categoryId);
+        if (!category) {
+          return null;
+        }
+        return {
+          category,
+          orders: data.orders,
+          revenue: data.revenue,
+        };
+      })
+      .filter(
+        (
+          item
+        ): item is {
+          category: Category;
+          orders: number;
+          revenue: number;
+        } => item !== null
+      )
+      // Sort by revenue descending
+      .sort((a, b) => b.revenue - a.revenue);
 
     return {
       orders: {
@@ -262,7 +303,7 @@ export function useDashboard() {
       recentPayments,
       recentPayouts,
     };
-  }, [orders, payments, payouts, pros]);
+  }, [orders, payments, payouts, pros, categories]);
 
   return {
     stats,

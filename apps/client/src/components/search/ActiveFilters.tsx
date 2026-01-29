@@ -3,9 +3,9 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { X } from "lucide-react";
 import { Text } from "@repo/ui";
-import { Category } from "@repo/domain";
 import { getCategoryLabel } from "@/lib/search/categoryIcons";
-import { useSubcategoryBySlug } from "@/hooks/subcategory";
+import { useCategoryBySlug } from "@/hooks/category";
+import { useSubcategoryBySlugAndCategoryId } from "@/hooks/subcategory";
 
 /**
  * ActiveFilters Component
@@ -28,13 +28,16 @@ export function ActiveFilters({ onFilterRemove }: ActiveFiltersProps) {
   const router = useRouter();
 
   const searchQuery = searchParams.get("q");
-  const categoryParam = searchParams.get("category");
-  const subcategorySlug = searchParams.get("subcategory");
+  const categorySlug = searchParams.get("category") || undefined;
+  const subcategorySlug = searchParams.get("subcategory") || undefined;
 
-  const category = categoryParam ? (categoryParam as Category) : null;
-  const { subcategory } = useSubcategoryBySlug(
-    subcategorySlug || undefined,
-    category || undefined
+  // Fetch category by slug from URL
+  const { category } = useCategoryBySlug(categorySlug);
+
+  // Fetch subcategory by slug and categoryId
+  const { subcategory } = useSubcategoryBySlugAndCategoryId(
+    subcategorySlug,
+    category?.id
   );
 
   const hasFilters = !!(searchQuery || category || subcategory);

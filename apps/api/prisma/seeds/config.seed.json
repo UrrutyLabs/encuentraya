@@ -1,0 +1,876 @@
+{
+  "categories": [
+    {
+      "key": "PLUMBING",
+      "name": "Plomería",
+      "slug": "plomeria",
+      "sort_order": 10,
+      "is_active": true,
+      "config_json": {
+        "default_estimated_hours": 2,
+        "min_hours": 1,
+        "max_hours": 6,
+        "hour_step": 0.5,
+        "show_arrived_step": true,
+        "allow_tips": true,
+        "disclaimer": "No incluye materiales.",
+        "suggested_photos": [
+          "Problema",
+          "Zona afectada",
+          "Llave de paso (si aplica)"
+        ],
+        "quick_questions": [
+          { "key": "urgency", "label": "¿Es urgente?", "type": "boolean" }
+        ]
+      },
+      "subcategories": [
+        {
+          "key": "UNCLOG_DRAIN",
+          "name": "Destapar cañería",
+          "slug": "destapar-canerias",
+          "sort_order": 10,
+          "is_active": true,
+          "config_json": {
+            "default_estimated_hours": 1.5,
+            "suggested_photos": [
+              "Desagüe/bacha",
+              "Zona completa",
+              "Sifón/tubería visible (si podés)"
+            ],
+            "quick_questions": [
+              {
+                "key": "which_area",
+                "label": "¿Dónde es?",
+                "type": "select",
+                "options": ["Cocina", "Baño", "Lavadero", "Otro"]
+              }
+            ]
+          }
+        },
+        {
+          "key": "LEAK_FIX",
+          "name": "Reparar pérdida de agua",
+          "slug": "reparar-perdida-agua",
+          "sort_order": 20,
+          "is_active": true,
+          "config_json": {
+            "default_estimated_hours": 2,
+            "quick_questions": [
+              {
+                "key": "leak_severity",
+                "label": "¿Qué tan fuerte es la pérdida?",
+                "type": "select",
+                "options": ["Goteo", "Chorro", "No sé"]
+              }
+            ]
+          }
+        },
+        {
+          "key": "FAUCET_REPLACE",
+          "name": "Cambiar grifería",
+          "slug": "cambiar-griferia",
+          "sort_order": 30,
+          "is_active": true,
+          "config_json": {
+            "default_estimated_hours": 2,
+            "quick_questions": [
+              {
+                "key": "have_parts",
+                "label": "¿Ya tenés la grifería para instalar?",
+                "type": "boolean"
+              }
+            ]
+          }
+        },
+        {
+          "key": "TOILET_CISTERN",
+          "name": "Reparar mochila de baño",
+          "slug": "reparar-mochila-bano",
+          "sort_order": 40,
+          "is_active": true,
+          "config_json": { "default_estimated_hours": 1.5 }
+        },
+        {
+          "key": "WATER_HEATER_INSTALL",
+          "name": "Instalar calefón",
+          "slug": "instalar-calefon",
+          "sort_order": 50,
+          "is_active": true,
+          "config_json": {
+            "default_estimated_hours": 3,
+            "quick_questions": [
+              {
+                "key": "have_heater",
+                "label": "¿Ya tenés el calefón?",
+                "type": "boolean"
+              }
+            ]
+          }
+        },
+        {
+          "key": "LOW_PRESSURE",
+          "name": "Problemas con presión de agua",
+          "slug": "problemas-presion-agua",
+          "sort_order": 60,
+          "is_active": true,
+          "config_json": { "default_estimated_hours": 2.5 }
+        },
+        {
+          "key": "PIPE_BROKEN",
+          "name": "Reparar caño roto",
+          "slug": "reparar-cano-roto",
+          "sort_order": 70,
+          "is_active": true,
+          "config_json": {
+            "default_estimated_hours": 3,
+            "quick_questions": [
+              {
+                "key": "water_shutoff",
+                "label": "¿Podés cerrar la llave de paso?",
+                "type": "boolean"
+              }
+            ]
+          }
+        },
+        {
+          "key": "BASIC_INSTALL",
+          "name": "Instalación sanitaria básica",
+          "slug": "instalacion-sanitaria-basica",
+          "sort_order": 80,
+          "is_active": true,
+          "config_json": { "default_estimated_hours": 2.5 }
+        }
+      ]
+    },
+    {
+      "key": "ELECTRICAL",
+      "name": "Electricidad",
+      "slug": "electricidad",
+      "sort_order": 20,
+      "is_active": true,
+      "config_json": {
+        "default_estimated_hours": 2,
+        "min_hours": 1,
+        "max_hours": 6,
+        "hour_step": 0.5,
+        "show_arrived_step": true,
+        "allow_tips": true,
+        "disclaimer": "No incluye materiales. Cortá la luz si hay riesgo.",
+        "suggested_photos": [
+          "Tablero (si aplica)",
+          "Zona/artefacto",
+          "Etiqueta de térmica (si aplica)"
+        ],
+        "quick_questions": [
+          { "key": "urgency", "label": "¿Es urgente?", "type": "boolean" }
+        ]
+      },
+      "subcategories": [
+        {
+          "key": "OUTLET_FIX",
+          "name": "Reparar enchufe",
+          "slug": "reparar-enchufe",
+          "sort_order": 10,
+          "is_active": true,
+          "config_json": { "default_estimated_hours": 1.5 }
+        },
+        {
+          "key": "LIGHT_INSTALL",
+          "name": "Instalar luminaria",
+          "slug": "instalar-luminaria",
+          "sort_order": 20,
+          "is_active": true,
+          "config_json": {
+            "default_estimated_hours": 2,
+            "quick_questions": [
+              {
+                "key": "have_fixture",
+                "label": "¿Ya tenés la luminaria?",
+                "type": "boolean"
+              }
+            ]
+          }
+        },
+        {
+          "key": "POWER_OUTAGE",
+          "name": "Cortes de luz",
+          "slug": "cortes-de-luz",
+          "sort_order": 30,
+          "is_active": true,
+          "config_json": { "default_estimated_hours": 2 }
+        },
+        {
+          "key": "BREAKER_WORK",
+          "name": "Cambiar térmica / disyuntor",
+          "slug": "cambiar-termica-disyuntor",
+          "sort_order": 40,
+          "is_active": true,
+          "config_json": { "default_estimated_hours": 3 }
+        },
+        {
+          "key": "SIMPLE_WIRING",
+          "name": "Cableado simple",
+          "slug": "cableado-simple",
+          "sort_order": 50,
+          "is_active": true,
+          "config_json": { "default_estimated_hours": 3 }
+        },
+        {
+          "key": "CEILING_FAN",
+          "name": "Instalación ventilador de techo",
+          "slug": "instalar-ventilador-techo",
+          "sort_order": 60,
+          "is_active": true,
+          "config_json": { "default_estimated_hours": 3.5 }
+        },
+        {
+          "key": "SWITCH_ISSUE",
+          "name": "Problemas con llaves de luz",
+          "slug": "problemas-llaves-luz",
+          "sort_order": 70,
+          "is_active": true,
+          "config_json": { "default_estimated_hours": 1.5 }
+        },
+        {
+          "key": "ELECTRICAL_EMERGENCY",
+          "name": "Electricidad de urgencia",
+          "slug": "electricidad-urgencia",
+          "sort_order": 80,
+          "is_active": true,
+          "config_json": { "default_estimated_hours": 2.5 }
+        }
+      ]
+    },
+    {
+      "key": "HOUSE_CLEANING",
+      "name": "Limpieza del hogar",
+      "slug": "limpieza-hogar",
+      "sort_order": 30,
+      "is_active": true,
+      "config_json": {
+        "default_estimated_hours": 3,
+        "min_hours": 2,
+        "max_hours": 8,
+        "hour_step": 1,
+        "show_arrived_step": true,
+        "allow_tips": true,
+        "disclaimer": "No incluye insumos salvo acuerdo con el profesional.",
+        "suggested_photos": [
+          "Ambiente principal (opcional)",
+          "Cocina/baño (si aplica)"
+        ],
+        "quick_questions": [
+          {
+            "key": "home_size",
+            "label": "Tamaño aproximado",
+            "type": "select",
+            "options": ["Mono/1 dorm", "2 dorm", "3+ dorm", "Casa grande"]
+          }
+        ]
+      },
+      "subcategories": [
+        {
+          "key": "GENERAL_CLEAN",
+          "name": "Limpieza general",
+          "slug": "limpieza-general",
+          "sort_order": 10,
+          "is_active": true,
+          "config_json": { "default_estimated_hours": 3 }
+        },
+        {
+          "key": "DEEP_CLEAN",
+          "name": "Limpieza profunda",
+          "slug": "limpieza-profunda",
+          "sort_order": 20,
+          "is_active": true,
+          "config_json": { "default_estimated_hours": 5 }
+        },
+        {
+          "key": "POST_CONSTRUCTION",
+          "name": "Limpieza post-obra",
+          "slug": "limpieza-post-obra",
+          "sort_order": 30,
+          "is_active": true,
+          "config_json": { "default_estimated_hours": 6 }
+        },
+        {
+          "key": "MOVE_OUT_IN",
+          "name": "Limpieza de mudanza",
+          "slug": "limpieza-de-mudanza",
+          "sort_order": 40,
+          "is_active": true,
+          "config_json": { "default_estimated_hours": 5 }
+        },
+        {
+          "key": "HOURLY_CLEAN",
+          "name": "Limpieza por horas",
+          "slug": "limpieza-por-horas",
+          "sort_order": 50,
+          "is_active": true,
+          "config_json": { "default_estimated_hours": 3 }
+        },
+        {
+          "key": "KITCHEN_FOCUS",
+          "name": "Limpieza de cocina",
+          "slug": "limpieza-cocina",
+          "sort_order": 60,
+          "is_active": true,
+          "config_json": { "default_estimated_hours": 2.5 }
+        },
+        {
+          "key": "BATHROOM_FOCUS",
+          "name": "Limpieza de baño",
+          "slug": "limpieza-bano",
+          "sort_order": 70,
+          "is_active": true,
+          "config_json": { "default_estimated_hours": 2 }
+        },
+        {
+          "key": "WINDOWS",
+          "name": "Limpieza de vidrios",
+          "slug": "limpieza-vidrios",
+          "sort_order": 80,
+          "is_active": true,
+          "config_json": { "default_estimated_hours": 3 }
+        }
+      ]
+    },
+    {
+      "key": "PAINTING",
+      "name": "Pintura",
+      "slug": "pintura",
+      "sort_order": 40,
+      "is_active": true,
+      "config_json": {
+        "default_estimated_hours": 4,
+        "min_hours": 2,
+        "max_hours": 10,
+        "hour_step": 0.5,
+        "show_arrived_step": true,
+        "allow_tips": true,
+        "disclaimer": "No incluye pintura ni materiales salvo acuerdo.",
+        "suggested_photos": [
+          "Pared/sector",
+          "Detalle de imperfecciones",
+          "Ambiente completo"
+        ],
+        "quick_questions": [
+          {
+            "key": "interior_exterior",
+            "label": "¿Interior o exterior?",
+            "type": "select",
+            "options": ["Interior", "Exterior"]
+          }
+        ]
+      },
+      "subcategories": [
+        {
+          "key": "INTERIOR",
+          "name": "Pintura interior",
+          "slug": "pintura-interior",
+          "sort_order": 10,
+          "is_active": true,
+          "config_json": { "default_estimated_hours": 4 }
+        },
+        {
+          "key": "EXTERIOR",
+          "name": "Pintura exterior",
+          "slug": "pintura-exterior",
+          "sort_order": 20,
+          "is_active": true,
+          "config_json": { "default_estimated_hours": 6 }
+        },
+        {
+          "key": "ONE_ROOM",
+          "name": "Pintar una habitación",
+          "slug": "pintar-habitacion",
+          "sort_order": 30,
+          "is_active": true,
+          "config_json": { "default_estimated_hours": 4 }
+        },
+        {
+          "key": "METAL_RAILINGS",
+          "name": "Pintar rejas / hierro",
+          "slug": "pintar-rejas-hierro",
+          "sort_order": 40,
+          "is_active": true,
+          "config_json": { "default_estimated_hours": 4.5 }
+        },
+        {
+          "key": "WALL_REPAIR",
+          "name": "Reparar paredes (enduido/revoque)",
+          "slug": "reparar-paredes-enduido-revoque",
+          "sort_order": 50,
+          "is_active": true,
+          "config_json": { "default_estimated_hours": 5 }
+        },
+        {
+          "key": "CEILING",
+          "name": "Pintar cielorraso",
+          "slug": "pintar-cielorraso",
+          "sort_order": 60,
+          "is_active": true,
+          "config_json": { "default_estimated_hours": 4 }
+        },
+        {
+          "key": "TOUCH_UP",
+          "name": "Retocar pintura",
+          "slug": "retocar-pintura",
+          "sort_order": 70,
+          "is_active": true,
+          "config_json": { "default_estimated_hours": 2 }
+        }
+      ]
+    },
+    {
+      "key": "CARPENTRY",
+      "name": "Carpintería",
+      "slug": "carpinteria",
+      "sort_order": 50,
+      "is_active": true,
+      "config_json": {
+        "default_estimated_hours": 2.5,
+        "min_hours": 1,
+        "max_hours": 8,
+        "hour_step": 0.5,
+        "show_arrived_step": true,
+        "allow_tips": true,
+        "disclaimer": "No incluye materiales salvo acuerdo.",
+        "suggested_photos": [
+          "Mueble/puerta",
+          "Detalle del problema",
+          "Herrajes (si aplica)"
+        ]
+      },
+      "subcategories": [
+        {
+          "key": "FURNITURE_REPAIR",
+          "name": "Reparar mueble",
+          "slug": "reparar-mueble",
+          "sort_order": 10,
+          "is_active": true,
+          "config_json": { "default_estimated_hours": 3 }
+        },
+        {
+          "key": "ASSEMBLE_FURNITURE",
+          "name": "Armar mueble",
+          "slug": "armar-mueble",
+          "sort_order": 20,
+          "is_active": true,
+          "config_json": { "default_estimated_hours": 2.5 }
+        },
+        {
+          "key": "DOOR_ADJUST",
+          "name": "Ajustar puertas",
+          "slug": "ajustar-puertas",
+          "sort_order": 30,
+          "is_active": true,
+          "config_json": { "default_estimated_hours": 2 }
+        },
+        {
+          "key": "DRAWERS",
+          "name": "Reparar cajones",
+          "slug": "reparar-cajones",
+          "sort_order": 40,
+          "is_active": true,
+          "config_json": { "default_estimated_hours": 2.5 }
+        },
+        {
+          "key": "SHELVES",
+          "name": "Instalar estantes",
+          "slug": "instalar-estantes",
+          "sort_order": 50,
+          "is_active": true,
+          "config_json": { "default_estimated_hours": 2 }
+        },
+        {
+          "key": "WOODWORK",
+          "name": "Trabajos en madera",
+          "slug": "trabajos-madera",
+          "sort_order": 60,
+          "is_active": true,
+          "config_json": { "default_estimated_hours": 4 }
+        },
+        {
+          "key": "HINGES",
+          "name": "Reparar bisagras",
+          "slug": "reparar-bisagras",
+          "sort_order": 70,
+          "is_active": true,
+          "config_json": { "default_estimated_hours": 1.5 }
+        }
+      ]
+    },
+    {
+      "key": "METALWORK",
+      "name": "Herrería",
+      "slug": "herreria",
+      "sort_order": 60,
+      "is_active": true,
+      "config_json": {
+        "default_estimated_hours": 3,
+        "min_hours": 1,
+        "max_hours": 10,
+        "hour_step": 0.5,
+        "show_arrived_step": true,
+        "allow_tips": true,
+        "disclaimer": "No incluye materiales salvo acuerdo.",
+        "suggested_photos": [
+          "Pieza/estructura",
+          "Detalle del daño",
+          "Zona completa"
+        ]
+      },
+      "subcategories": [
+        {
+          "key": "GRILL_REPAIR",
+          "name": "Reparar reja",
+          "slug": "reparar-reja",
+          "sort_order": 10,
+          "is_active": true,
+          "config_json": { "default_estimated_hours": 3 }
+        },
+        {
+          "key": "SIMPLE_WELD",
+          "name": "Soldadura simple",
+          "slug": "soldadura-simple",
+          "sort_order": 20,
+          "is_active": true,
+          "config_json": { "default_estimated_hours": 3.5 }
+        },
+        {
+          "key": "GATE_ADJUST",
+          "name": "Ajustar portón",
+          "slug": "ajustar-porton",
+          "sort_order": 30,
+          "is_active": true,
+          "config_json": { "default_estimated_hours": 3 }
+        },
+        {
+          "key": "METAL_LOCK",
+          "name": "Reparar cerradura metálica",
+          "slug": "reparar-cerradura-metalica",
+          "sort_order": 40,
+          "is_active": true,
+          "config_json": { "default_estimated_hours": 2.5 }
+        },
+        {
+          "key": "SIMPLE_FAB",
+          "name": "Fabricación simple",
+          "slug": "fabricacion-simple",
+          "sort_order": 50,
+          "is_active": true,
+          "config_json": { "default_estimated_hours": 5 }
+        },
+        {
+          "key": "STRUCTURE_REINFORCE",
+          "name": "Refuerzo de estructuras",
+          "slug": "refuerzo-estructuras",
+          "sort_order": 60,
+          "is_active": true,
+          "config_json": { "default_estimated_hours": 6 }
+        }
+      ]
+    },
+    {
+      "key": "GAS",
+      "name": "Gas",
+      "slug": "gas",
+      "sort_order": 70,
+      "is_active": true,
+      "config_json": {
+        "default_estimated_hours": 2.5,
+        "min_hours": 1,
+        "max_hours": 6,
+        "hour_step": 0.5,
+        "show_arrived_step": true,
+        "allow_tips": false,
+        "disclaimer": "Puede requerir habilitación. Si sentís olor a gas, ventilá y cortá la llave.",
+        "suggested_photos": [
+          "Artefacto",
+          "Conexión/manguera",
+          "Llave de paso (si aplica)"
+        ],
+        "quick_questions": [
+          {
+            "key": "smell_gas",
+            "label": "¿Sentís olor a gas ahora?",
+            "type": "boolean"
+          }
+        ]
+      },
+      "subcategories": [
+        {
+          "key": "GAS_LEAK",
+          "name": "Reparar pérdida de gas",
+          "slug": "reparar-perdida-gas",
+          "sort_order": 10,
+          "is_active": true,
+          "config_json": { "default_estimated_hours": 2.5 }
+        },
+        {
+          "key": "STOVE_INSTALL",
+          "name": "Instalar cocina",
+          "slug": "instalar-cocina-gas",
+          "sort_order": 20,
+          "is_active": true,
+          "config_json": { "default_estimated_hours": 3 }
+        },
+        {
+          "key": "HOSE_REPLACE",
+          "name": "Cambiar manguera de gas",
+          "slug": "cambiar-manguera-gas",
+          "sort_order": 30,
+          "is_active": true,
+          "config_json": {
+            "default_estimated_hours": 1.5,
+            "quick_questions": [
+              {
+                "key": "have_hose",
+                "label": "¿Ya tenés la manguera?",
+                "type": "boolean"
+              }
+            ]
+          }
+        },
+        {
+          "key": "INSTALL_REVIEW",
+          "name": "Revisión de instalación",
+          "slug": "revision-instalacion-gas",
+          "sort_order": 40,
+          "is_active": true,
+          "config_json": { "default_estimated_hours": 2 }
+        },
+        {
+          "key": "GAS_HEATER_INSTALL",
+          "name": "Instalación de calefón a gas",
+          "slug": "instalar-calefon-gas",
+          "sort_order": 50,
+          "is_active": true,
+          "config_json": { "default_estimated_hours": 4 }
+        }
+      ]
+    },
+    {
+      "key": "MOVING",
+      "name": "Mudanzas & traslados",
+      "slug": "mudanzas-traslados",
+      "sort_order": 80,
+      "is_active": true,
+      "config_json": {
+        "default_estimated_hours": 3,
+        "min_hours": 2,
+        "max_hours": 10,
+        "hour_step": 1,
+        "show_arrived_step": true,
+        "allow_tips": true,
+        "disclaimer": "Confirmar acceso, pisos y ascensor. Puede requerir 2 personas.",
+        "suggested_photos": [
+          "Muebles/bultos",
+          "Acceso/entrada",
+          "Ascensor/escalera (si aplica)"
+        ],
+        "quick_questions": [
+          {
+            "key": "floors",
+            "label": "¿En qué piso?",
+            "type": "select",
+            "options": ["PB", "1-2", "3-5", "6+"]
+          }
+        ]
+      },
+      "subcategories": [
+        {
+          "key": "SMALL_MOVE",
+          "name": "Mudanza chica",
+          "slug": "mudanza-chica",
+          "sort_order": 10,
+          "is_active": true,
+          "config_json": { "default_estimated_hours": 4 }
+        },
+        {
+          "key": "FURNITURE_TRANSPORT",
+          "name": "Traslado de muebles",
+          "slug": "traslado-muebles",
+          "sort_order": 20,
+          "is_active": true,
+          "config_json": { "default_estimated_hours": 3.5 }
+        },
+        {
+          "key": "LOAD_UNLOAD",
+          "name": "Ayuda para cargar/descargar",
+          "slug": "ayuda-cargar-descargar",
+          "sort_order": 30,
+          "is_active": true,
+          "config_json": { "default_estimated_hours": 3 }
+        },
+        {
+          "key": "REARRANGE",
+          "name": "Reacomodar muebles",
+          "slug": "reacomodar-muebles",
+          "sort_order": 40,
+          "is_active": true,
+          "config_json": { "default_estimated_hours": 2.5 }
+        },
+        {
+          "key": "APPLIANCE_MOVE",
+          "name": "Traslado de electrodomésticos",
+          "slug": "traslado-electrodomesticos",
+          "sort_order": 50,
+          "is_active": true,
+          "config_json": { "default_estimated_hours": 3 }
+        }
+      ]
+    },
+    {
+      "key": "GARDENING",
+      "name": "Jardinería",
+      "slug": "jardineria",
+      "sort_order": 90,
+      "is_active": true,
+      "config_json": {
+        "default_estimated_hours": 3,
+        "min_hours": 2,
+        "max_hours": 8,
+        "hour_step": 1,
+        "show_arrived_step": true,
+        "allow_tips": true,
+        "disclaimer": "No incluye retiro de residuos salvo acuerdo.",
+        "suggested_photos": [
+          "Jardín/patio",
+          "Zona a trabajar",
+          "Plantas/árboles (si aplica)"
+        ]
+      },
+      "subcategories": [
+        {
+          "key": "MOW_LAWN",
+          "name": "Corte de pasto",
+          "slug": "corte-de-pasto",
+          "sort_order": 10,
+          "is_active": true,
+          "config_json": { "default_estimated_hours": 3 }
+        },
+        {
+          "key": "GARDEN_CLEANUP",
+          "name": "Limpieza de jardín",
+          "slug": "limpieza-de-jardin",
+          "sort_order": 20,
+          "is_active": true,
+          "config_json": { "default_estimated_hours": 3.5 }
+        },
+        {
+          "key": "SIMPLE_PRUNING",
+          "name": "Poda simple",
+          "slug": "poda-simple",
+          "sort_order": 30,
+          "is_active": true,
+          "config_json": { "default_estimated_hours": 3 }
+        },
+        {
+          "key": "PLANT_MAINTENANCE",
+          "name": "Mantenimiento de plantas",
+          "slug": "mantenimiento-plantas",
+          "sort_order": 40,
+          "is_active": true,
+          "config_json": { "default_estimated_hours": 3 }
+        },
+        {
+          "key": "LEAF_CLEANUP",
+          "name": "Limpieza de hojas",
+          "slug": "limpieza-de-hojas",
+          "sort_order": 50,
+          "is_active": true,
+          "config_json": { "default_estimated_hours": 2.5 }
+        },
+        {
+          "key": "GENERAL_GARDENING",
+          "name": "Jardinería general",
+          "slug": "jardineria-general",
+          "sort_order": 60,
+          "is_active": true,
+          "config_json": { "default_estimated_hours": 3 }
+        }
+      ]
+    },
+    {
+      "key": "HANDYMAN",
+      "name": "Reparaciones generales",
+      "slug": "reparaciones-generales",
+      "sort_order": 100,
+      "is_active": true,
+      "config_json": {
+        "default_estimated_hours": 2,
+        "min_hours": 1,
+        "max_hours": 6,
+        "hour_step": 0.5,
+        "show_arrived_step": true,
+        "allow_tips": true,
+        "disclaimer": "Ideal para arreglos chicos o varias tareas.",
+        "suggested_photos": [
+          "Objeto/área",
+          "Detalle del problema",
+          "Ambiente completo (opcional)"
+        ]
+      },
+      "subcategories": [
+        {
+          "key": "HANG_PICTURES",
+          "name": "Colgar cuadros",
+          "slug": "colgar-cuadros",
+          "sort_order": 10,
+          "is_active": true,
+          "config_json": { "default_estimated_hours": 1.5 }
+        },
+        {
+          "key": "CURTAINS",
+          "name": "Instalar cortinas",
+          "slug": "instalar-cortinas",
+          "sort_order": 20,
+          "is_active": true,
+          "config_json": { "default_estimated_hours": 2 }
+        },
+        {
+          "key": "GENERAL_ADJUSTMENTS",
+          "name": "Ajustes generales",
+          "slug": "ajustes-generales",
+          "sort_order": 30,
+          "is_active": true,
+          "config_json": { "default_estimated_hours": 2 }
+        },
+        {
+          "key": "MINOR_REPAIRS",
+          "name": "Reparaciones menores",
+          "slug": "reparaciones-menores",
+          "sort_order": 40,
+          "is_active": true,
+          "config_json": { "default_estimated_hours": 2 }
+        },
+        {
+          "key": "SEALING",
+          "name": "Sellados (silicona)",
+          "slug": "sellados-silicona",
+          "sort_order": 50,
+          "is_active": true,
+          "config_json": { "default_estimated_hours": 1.5 }
+        },
+        {
+          "key": "MISC_FIXES",
+          "name": "Arreglos varios",
+          "slug": "arreglos-varios",
+          "sort_order": 60,
+          "is_active": true,
+          "config_json": { "default_estimated_hours": 2.5 }
+        },
+        {
+          "key": "MULTI_SMALL_TASKS",
+          "name": "Tengo varias cosas chicas",
+          "slug": "varias-cosas-chicas",
+          "sort_order": 70,
+          "is_active": true,
+          "config_json": { "default_estimated_hours": 3 }
+        }
+      ]
+    }
+  ]
+}

@@ -41,13 +41,7 @@ enum ProStatus {
   suspended
 }
 
-enum Category {
-  plumbing
-  electrical
-  cleaning
-  handyman
-  painting
-}
+// Category enum removed - now using data-driven Category model
 
 enum PreferredContactMethod {
   EMAIL
@@ -184,7 +178,6 @@ model ProProfile {
   bio         String?
   avatarUrl   String?
   hourlyRate  Float
-  categories  Category[]
   serviceArea String?
   status      ProStatus  @default(pending)
   profileCompleted Boolean @default(false)
@@ -203,6 +196,7 @@ model ProProfile {
   payoutProfile ProPayoutProfile?
   earnings    Earning[]
   payouts     Payout[]
+  categoryRelations ProProfileCategory[] // New junction table relation
 
   @@index([userId])
   @@index([status])
@@ -251,8 +245,9 @@ model Order {
   displayId                 String        @unique
   clientUserId              String
   proProfileId              String?
-  category                  Category
+  categoryId                String        // FK to Category table (required)
   subcategoryId             String?
+  categoryMetadataJson      Json?         // Answers to dynamic questions from config
   
   // Job details
   title                     String?
@@ -315,6 +310,7 @@ model Order {
   client                    User         @relation("ClientOrders", fields: [clientUserId], references: [id], onDelete: Cascade)
   proProfile                ProProfile?  @relation("ProOrders", fields: [proProfileId], references: [id], onDelete: SetNull)
   subcategory               Subcategory? @relation("OrderSubcategory", fields: [subcategoryId], references: [id], onDelete: SetNull)
+  category                  Category     @relation(fields: [categoryId], references: [id], onDelete: Restrict)
   lineItems                 OrderLineItem[]
   review                    Review?
   payment                   Payment?
@@ -324,8 +320,9 @@ model Order {
   @@index([proProfileId])
   @@index([status])
   @@index([scheduledWindowStartAt])
-  @@index([category])
+  @@index([categoryId])
   @@index([subcategoryId])
+  @@index([categoryId, subcategoryId])
   @@index([displayId])
   @@map("orders")
 }
@@ -563,40 +560,76 @@ model AuditLog {
   @@map("audit_logs")
 }
 
-model CategoryMetadata {
-  id          String   @id @default(cuid())
-  category    Category  @unique
-  displayName String
-  iconName    String?  // e.g., "Wrench" (for Lucide icons)
-  description String?
-  displayOrder Int     @default(0)
-  isActive    Boolean  @default(true)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
 
-  @@index([category])
-  @@index([isActive])
-  @@map("category_metadata")
+// Category table - data-driven categories with soft delete
+model Category {
+  id         String    @id @default(cuid())
+  key        String    // Stable identifier like "PLUMBING"
+  name       String    // Display name (migrated from CategoryMetadata.displayName)
+  slug       String
+  iconName   String?   // e.g., "Wrench" (for Lucide icons) - migrated from CategoryMetadata.iconName
+  description String?  // Migrated from CategoryMetadata.description
+  sortOrder  Int       @default(0) // Migrated from CategoryMetadata.displayOrder
+  isActive   Boolean   @default(true)
+  deletedAt  DateTime? // Soft delete timestamp
+  configJson Json?     // Category-level UI defaults
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  // Relations
+  subcategories Subcategory[]
+  orders        Order[]
+  proProfiles   ProProfileCategory[]
+
+  @@index([isActive, sortOrder])
+  @@index([deletedAt])
+  @@map("categories")
 }
 
 model Subcategory {
   id          String   @id @default(cuid())
   name        String
   slug        String
-  category    Category
+  categoryId  String   // FK to Category table (required)
+  key         String?  // Stable identifier within category (e.g. "UNCLOG_DRAIN")
   imageUrl    String?
   description String?
   displayOrder Int     @default(0)
   isActive    Boolean  @default(true)
+  configJson  Json?    // Subcategory-level UI config (overrides category config)
+  searchKeywords String[] @default([]) // Search keywords for this subcategory
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   // Relations
-  orders     Order[]      @relation("OrderSubcategory")
+  category    Category  @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  orders      Order[]   @relation("OrderSubcategory")
 
-  @@unique([slug, category])
-  @@index([category])
+  @@unique([categoryId, slug]) // Unique slug within category
+  @@unique([categoryId, key]) // Unique key within category
+  @@index([categoryId])
   @@index([slug])
   @@index([isActive])
+  @@index([categoryId, isActive, displayOrder])
   @@map("subcategories")
+}
+
+model ProProfileCategory {
+  id          String     @id @default(cuid())
+  proProfileId String
+  categoryId   String
+  // Optional future metadata fields:
+  // certifiedAt     DateTime?
+  // yearsExperience Int?
+  // isPrimary       Boolean   @default(false)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  proProfile  ProProfile @relation(fields: [proProfileId], references: [id], onDelete: Cascade)
+  category    Category   @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
+  @@unique([proProfileId, categoryId])
+  @@index([categoryId])
+  @@index([proProfileId])
+  @@map("pro_profile_categories")
 }

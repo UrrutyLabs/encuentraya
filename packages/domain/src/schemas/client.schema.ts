@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { categorySchema } from "../enums";
 
 /**
  * Time window enum for search filters
@@ -17,7 +16,7 @@ export type TimeWindow = z.infer<typeof timeWindowSchema>;
  * Client search pros input schema
  */
 export const clientSearchProsInputSchema = z.object({
-  category: categorySchema.optional(),
+  categoryId: z.string().optional(), // FK to Category table
   subcategory: z.string().optional(), // Subcategory slug
   date: z.date().optional(),
   timeWindow: timeWindowSchema.optional(), // 3-hour time window

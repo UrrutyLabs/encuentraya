@@ -6,6 +6,8 @@ vi.mock("@/server/container", () => ({
     ProRepository: "ProRepository",
     ClientProfileService: "ClientProfileService",
     OrderService: "OrderService",
+    CategoryRepository: "CategoryRepository",
+    SubcategoryService: "SubcategoryService",
   },
 }));
 
@@ -14,6 +16,8 @@ import type { OrderRepository, OrderEntity } from "../order.repo";
 import type { ProRepository, ProProfileEntity } from "@modules/pro/pro.repo";
 import type { ClientProfileService } from "@modules/user/clientProfile.service";
 import { OrderService } from "../order.service";
+import type { CategoryRepository } from "@modules/category/category.repo";
+import type { SubcategoryService } from "@modules/subcategory/subcategory.service";
 import type {
   ApprovalMethod,
   DisputeStatus,
@@ -21,7 +25,7 @@ import type {
   OrderCreateInput,
   PricingMode,
 } from "@repo/domain";
-import { Category, OrderStatus, Role } from "@repo/domain";
+import { OrderStatus, Role } from "@repo/domain";
 import type { Actor } from "@infra/auth/roles";
 
 describe("OrderCreationService", () => {
@@ -32,6 +36,8 @@ describe("OrderCreationService", () => {
     typeof createMockClientProfileService
   >;
   let mockOrderService: ReturnType<typeof createMockOrderService>;
+  let mockCategoryRepository: ReturnType<typeof createMockCategoryRepository>;
+  let mockSubcategoryService: ReturnType<typeof createMockSubcategoryService>;
 
   function createMockOrderRepository(): {
     create: ReturnType<typeof vi.fn>;
@@ -67,6 +73,24 @@ describe("OrderCreationService", () => {
     };
   }
 
+  function createMockCategoryRepository(): {
+    findById: ReturnType<typeof vi.fn>;
+  } {
+    return {
+      findById: vi.fn(),
+    };
+  }
+
+  function createMockSubcategoryService(): {
+    validateSubcategoryBelongsToCategory: ReturnType<typeof vi.fn>;
+    getSubcategoryById: ReturnType<typeof vi.fn>;
+  } {
+    return {
+      validateSubcategoryBelongsToCategory: vi.fn(),
+      getSubcategoryById: vi.fn(),
+    };
+  }
+
   function createMockActor(id = "client-1"): Actor {
     return { id, role: Role.CLIENT };
   }
@@ -83,7 +107,7 @@ describe("OrderCreationService", () => {
       bio: null,
       avatarUrl: null,
       hourlyRate: 100,
-      categories: [],
+      categoryIds: [],
       serviceArea: null,
       status: "active",
       profileCompleted: false,
@@ -104,7 +128,8 @@ describe("OrderCreationService", () => {
       displayId: "O0001",
       clientUserId: "client-1",
       proProfileId: "pro-1",
-      category: Category.PLUMBING,
+      categoryId: "cat-plumbing",
+      categoryMetadataJson: null,
       subcategoryId: null,
       title: null,
       description: null,
@@ -155,7 +180,6 @@ describe("OrderCreationService", () => {
     const orderEntity = createMockOrderEntity(overrides);
     return {
       ...orderEntity,
-      category: orderEntity.category as Category,
       pricingMode: orderEntity.pricingMode as PricingMode,
       approvalMethod: orderEntity.approvalMethod as ApprovalMethod | null,
       disputeStatus: orderEntity.disputeStatus as DisputeStatus,
@@ -169,19 +193,23 @@ describe("OrderCreationService", () => {
     mockProRepository = createMockProRepository();
     mockClientProfileService = createMockClientProfileService();
     mockOrderService = createMockOrderService();
+    mockCategoryRepository = createMockCategoryRepository();
+    mockSubcategoryService = createMockSubcategoryService();
 
     service = new OrderCreationService(
       mockOrderRepository as unknown as OrderRepository,
       mockProRepository as unknown as ProRepository,
       mockClientProfileService as unknown as ClientProfileService,
-      mockOrderService as unknown as OrderService
+      mockOrderService as unknown as OrderService,
+      mockCategoryRepository as unknown as CategoryRepository,
+      mockSubcategoryService as unknown as SubcategoryService
     );
   });
 
   describe("createOrderRequest", () => {
     const createValidInput = (): OrderCreateInput => ({
       proProfileId: "pro-1",
-      category: Category.PLUMBING,
+      categoryId: "cat-plumbing",
       addressText: "123 Main St",
       scheduledWindowStartAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // Tomorrow
       estimatedHours: 2,
@@ -198,6 +226,20 @@ describe("OrderCreationService", () => {
         undefined
       );
       mockProRepository.findById.mockResolvedValue(proProfile);
+      mockCategoryRepository.findById.mockResolvedValue({
+        id: "cat-plumbing",
+        key: "PLUMBING",
+        name: "Plomería",
+        slug: "plomeria",
+        iconName: null,
+        description: null,
+        sortOrder: 0,
+        isActive: true,
+        deletedAt: null,
+        configJson: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
       mockOrderRepository.findByClientUserId.mockResolvedValue([]);
       mockOrderRepository.create.mockResolvedValue(orderEntity);
       mockOrderService.getOrderById.mockResolvedValue(order);
@@ -232,6 +274,20 @@ describe("OrderCreationService", () => {
         undefined
       );
       mockProRepository.findById.mockResolvedValue(proProfile);
+      mockCategoryRepository.findById.mockResolvedValue({
+        id: "cat-plumbing",
+        key: "PLUMBING",
+        name: "Plomería",
+        slug: "plomeria",
+        iconName: null,
+        description: null,
+        sortOrder: 0,
+        isActive: true,
+        deletedAt: null,
+        configJson: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
       mockOrderRepository.findByClientUserId.mockResolvedValue([]);
       mockOrderRepository.create.mockResolvedValue(orderEntity);
       mockOrderService.getOrderById.mockResolvedValue(order);
@@ -258,6 +314,20 @@ describe("OrderCreationService", () => {
         undefined
       );
       mockProRepository.findById.mockResolvedValue(proProfile);
+      mockCategoryRepository.findById.mockResolvedValue({
+        id: "cat-plumbing",
+        key: "PLUMBING",
+        name: "Plomería",
+        slug: "plomeria",
+        iconName: null,
+        description: null,
+        sortOrder: 0,
+        isActive: true,
+        deletedAt: null,
+        configJson: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
       mockOrderRepository.findByClientUserId.mockResolvedValue([existingOrder]);
       mockOrderRepository.create.mockResolvedValue(orderEntity);
       mockOrderService.getOrderById.mockResolvedValue(order);
@@ -285,6 +355,20 @@ describe("OrderCreationService", () => {
         undefined
       );
       mockProRepository.findById.mockResolvedValue(proProfile);
+      mockCategoryRepository.findById.mockResolvedValue({
+        id: "cat-plumbing",
+        key: "PLUMBING",
+        name: "Plomería",
+        slug: "plomeria",
+        iconName: null,
+        description: null,
+        sortOrder: 0,
+        isActive: true,
+        deletedAt: null,
+        configJson: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
       mockOrderRepository.findByClientUserId.mockResolvedValue([]);
       mockOrderRepository.create.mockResolvedValue(orderEntity);
       mockOrderService.getOrderById.mockResolvedValue(order);
@@ -363,6 +447,20 @@ describe("OrderCreationService", () => {
         undefined
       );
       mockProRepository.findById.mockResolvedValue(proProfile);
+      mockCategoryRepository.findById.mockResolvedValue({
+        id: "cat-plumbing",
+        key: "PLUMBING",
+        name: "Plomería",
+        slug: "plomeria",
+        iconName: null,
+        description: null,
+        sortOrder: 0,
+        isActive: true,
+        deletedAt: null,
+        configJson: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
       mockOrderRepository.findByClientUserId.mockResolvedValue([]);
       mockOrderRepository.create.mockResolvedValue(orderEntity);
       mockOrderService.getOrderById.mockResolvedValue(order);

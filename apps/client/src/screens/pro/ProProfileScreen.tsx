@@ -22,17 +22,9 @@ import { ProProfileSkeleton } from "@/components/presentational/ProProfileSkelet
 import { AuthPromptModal } from "@/components/auth/AuthPromptModal";
 import { useProDetail } from "@/hooks/pro";
 import { useAuth } from "@/hooks/auth";
-import { Category } from "@repo/domain";
 import { useTodayDate } from "@/hooks/shared/useTodayDate";
 import { getAvailabilityHint } from "@/utils/proAvailability";
-
-const CATEGORY_LABELS: Record<string, string> = {
-  plumbing: "Plomería",
-  electrical: "Electricidad",
-  cleaning: "Limpieza",
-  handyman: "Arreglos generales",
-  painting: "Pintura",
-};
+import { useCategories } from "@/hooks/category";
 
 export function ProProfileScreen() {
   const params = useParams();
@@ -42,7 +34,13 @@ export function ProProfileScreen() {
 
   const { pro, isLoading, error } = useProDetail(proId);
   const { user, loading: authLoading } = useAuth();
+  const { categories } = useCategories();
   const today = useTodayDate();
+
+  // Map categoryIds to Category objects for display
+  const proCategories = pro?.categoryIds
+    ? categories.filter((cat) => pro.categoryIds.includes(cat.id))
+    : [];
 
   // Calculate derived states
   const isActive = useMemo(
@@ -161,9 +159,9 @@ export function ProProfileScreen() {
                   </div>
                 )}
                 <div className="flex flex-wrap gap-2 mb-3">
-                  {pro.categories.map((category: Category | string) => (
-                    <Badge key={category} variant="info">
-                      {CATEGORY_LABELS[category] || category}
+                  {proCategories.map((category) => (
+                    <Badge key={category.id} variant="info">
+                      {category.name}
                     </Badge>
                   ))}
                 </div>
@@ -219,22 +217,12 @@ export function ProProfileScreen() {
                 {pro.serviceArea ? (
                   <Text variant="body" className="text-muted">
                     Profesional en {pro.serviceArea} con experiencia en{" "}
-                    {pro.categories
-                      .map(
-                        (cat: Category | string) => CATEGORY_LABELS[cat] || cat
-                      )
-                      .join(", ")}
-                    .
+                    {proCategories.map((cat) => cat.name).join(", ")}.
                   </Text>
                 ) : (
                   <Text variant="body" className="text-muted">
                     Profesional con experiencia en{" "}
-                    {pro.categories
-                      .map(
-                        (cat: Category | string) => CATEGORY_LABELS[cat] || cat
-                      )
-                      .join(", ")}
-                    .
+                    {proCategories.map((cat) => cat.name).join(", ")}.
                   </Text>
                 )}
               </>

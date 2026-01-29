@@ -1,13 +1,13 @@
 import { useRouter } from "next/navigation";
 import { trpc } from "@/lib/trpc/client";
-import { OrderStatus, Category } from "@repo/domain";
+import { OrderStatus } from "@repo/domain";
 import { logger } from "@/lib/logger";
 import { useQueryClient } from "../shared";
 import { invalidateRelatedQueries } from "@/lib/react-query/utils";
 
 export interface CreateOrderInput {
   proProfileId?: string;
-  category: Category;
+  categoryId: string; // FK to Category table
   subcategoryId?: string;
   title?: string;
   description?: string;

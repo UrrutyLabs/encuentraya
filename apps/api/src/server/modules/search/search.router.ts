@@ -79,7 +79,7 @@ export const searchRouter = router({
         }
 
         return await searchService.searchPros({
-          category: input.category,
+          categoryId: input.categoryId,
           subcategory: input.subcategory,
           date: input.date,
           timeWindow: input.timeWindow,

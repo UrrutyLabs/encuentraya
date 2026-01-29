@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { renderHook, act, waitFor } from "@testing-library/react";
 import { useCreateOrder } from "../useCreateOrder";
 import { mockTrpcOrderCreate } from "@/test-setup";
-import { OrderStatus, Category } from "@repo/domain";
+import { OrderStatus } from "@repo/domain";
 
 // Mock useRouter
 const mockRouter = {
@@ -54,7 +54,7 @@ describe("useCreateOrder", () => {
 
       await act(async () => {
         await result.current.createOrder({
-          category: Category.PLUMBING,
+          categoryId: "cat-plumbing",
           addressText: "123 Main St",
           scheduledWindowStartAt: new Date(),
           estimatedHours: 2,
@@ -62,7 +62,7 @@ describe("useCreateOrder", () => {
       });
 
       expect(mockMutateAsync).toHaveBeenCalledWith({
-        category: Category.PLUMBING,
+        categoryId: "cat-plumbing",
         addressText: "123 Main St",
         scheduledWindowStartAt: expect.any(Date),
         estimatedHours: 2,
@@ -109,7 +109,7 @@ describe("useCreateOrder", () => {
 
       await act(async () => {
         await result.current.createOrder({
-          category: Category.PLUMBING,
+          categoryId: "cat-plumbing",
           addressText: "123 Main St",
           scheduledWindowStartAt: new Date(),
           estimatedHours: 2,
@@ -142,7 +142,7 @@ describe("useCreateOrder", () => {
       await act(async () => {
         await expect(
           result.current.createOrder({
-            category: Category.PLUMBING,
+            categoryId: "cat-plumbing",
             addressText: "123 Main St",
             scheduledWindowStartAt: new Date(),
             estimatedHours: 2,

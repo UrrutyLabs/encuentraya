@@ -1,102 +1,188 @@
 import { injectable } from "tsyringe";
 import { prisma } from "@infra/db/prisma";
-import { Category } from "@repo/domain";
+import type {
+  Category,
+  CategoryCreateInput,
+  CategoryUpdateInput,
+} from "@repo/domain";
+import { Prisma } from "@infra/db/prisma";
 
 /**
- * CategoryMetadata entity (plain object)
+ * Category repository interface
+ * Handles all data access for Category table (data-driven categories)
  */
-export interface CategoryMetadataEntity {
-  id: string;
-  category: Category;
-  displayName: string;
-  iconName: string | null;
-  description: string | null;
-  displayOrder: number;
-  isActive: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+export interface CategoryRepository {
+  findById(id: string, includeDeleted?: boolean): Promise<Category | null>;
+  findByKey(key: string, includeDeleted?: boolean): Promise<Category | null>;
+  findBySlug(slug: string, includeDeleted?: boolean): Promise<Category | null>;
+  findAll(includeDeleted?: boolean): Promise<Category[]>;
+  create(input: CategoryCreateInput): Promise<Category>;
+  update(id: string, input: CategoryUpdateInput): Promise<Category | null>;
+  softDelete(id: string): Promise<Category | null>;
+  restore(id: string): Promise<Category | null>;
 }
 
 /**
- * CategoryMetadata repository interface
- * Handles all data access for category metadata
- */
-export interface CategoryMetadataRepository {
-  findByCategory(category: Category): Promise<CategoryMetadataEntity | null>;
-  findAll(): Promise<CategoryMetadataEntity[]>;
-  update(
-    category: Category,
-    data: Partial<Omit<CategoryMetadataEntity, "id" | "category" | "createdAt">>
-  ): Promise<CategoryMetadataEntity | null>;
-}
-
-/**
- * CategoryMetadata repository implementation using Prisma
+ * Category repository implementation using Prisma
  */
 @injectable()
-export class CategoryMetadataRepositoryImpl implements CategoryMetadataRepository {
-  async findByCategory(
-    category: Category
-  ): Promise<CategoryMetadataEntity | null> {
-    const metadata = await prisma.categoryMetadata.findUnique({
-      where: { category },
+export class CategoryRepositoryImpl implements CategoryRepository {
+  async findById(id: string, includeDeleted = false): Promise<Category | null> {
+    const category = await prisma.category.findUnique({
+      where: { id },
     });
 
-    if (!metadata) {
+    if (!category) {
       return null;
     }
 
-    return this.mapPrismaToDomain(metadata);
+    // Filter out soft-deleted unless explicitly included
+    if (!includeDeleted && category.deletedAt) {
+      return null;
+    }
+
+    return this.mapPrismaToDomain(category);
   }
 
-  async findAll(): Promise<CategoryMetadataEntity[]> {
-    const metadataList = await prisma.categoryMetadata.findMany({
-      where: { isActive: true },
-      orderBy: { displayOrder: "asc" },
+  async findByKey(
+    key: string,
+    includeDeleted = false
+  ): Promise<Category | null> {
+    // For active categories, use the partial unique index
+    // For soft-deleted, we need to query differently
+    const category = await prisma.category.findFirst({
+      where: {
+        key,
+        ...(includeDeleted ? {} : { deletedAt: null }),
+      },
+      orderBy: { createdAt: "desc" }, // Get most recent if multiple soft-deleted exist
     });
 
-    return metadataList.map(this.mapPrismaToDomain);
+    if (!category) {
+      return null;
+    }
+
+    return this.mapPrismaToDomain(category);
   }
 
-  async update(
-    category: Category,
-    data: Partial<Omit<CategoryMetadataEntity, "id" | "category" | "createdAt">>
-  ): Promise<CategoryMetadataEntity | null> {
-    const updated = await prisma.categoryMetadata.update({
-      where: { category },
+  async findBySlug(
+    slug: string,
+    includeDeleted = false
+  ): Promise<Category | null> {
+    const category = await prisma.category.findFirst({
+      where: {
+        slug,
+        ...(includeDeleted ? {} : { deletedAt: null }),
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    if (!category) {
+      return null;
+    }
+
+    return this.mapPrismaToDomain(category);
+  }
+
+  async findAll(includeDeleted = false): Promise<Category[]> {
+    const categories = await prisma.category.findMany({
+      where: includeDeleted ? {} : { deletedAt: null },
+      orderBy: [{ isActive: "desc" }, { sortOrder: "asc" }],
+    });
+
+    return categories.map(this.mapPrismaToDomain);
+  }
+
+  async create(input: CategoryCreateInput): Promise<Category> {
+    const category = await prisma.category.create({
       data: {
-        displayName: data.displayName,
-        iconName: data.iconName ?? undefined,
-        description: data.description ?? undefined,
-        displayOrder: data.displayOrder,
-        isActive: data.isActive ?? undefined,
+        key: input.key,
+        name: input.name,
+        slug: input.slug,
+        iconName: input.iconName ?? null,
+        description: input.description ?? null,
+        sortOrder: input.sortOrder ?? 0,
+        isActive: input.isActive ?? true,
+        configJson: input.configJson
+          ? (input.configJson as Prisma.InputJsonValue)
+          : undefined,
       },
     });
 
-    return this.mapPrismaToDomain(updated);
+    return this.mapPrismaToDomain(category);
   }
 
-  private mapPrismaToDomain(prismaMetadata: {
+  async update(
+    id: string,
+    input: CategoryUpdateInput
+  ): Promise<Category | null> {
+    const category = await prisma.category.update({
+      where: { id },
+      data: {
+        name: input.name,
+        slug: input.slug,
+        iconName: input.iconName ?? undefined,
+        description: input.description ?? undefined,
+        sortOrder: input.sortOrder,
+        isActive: input.isActive,
+        configJson: input.configJson
+          ? (input.configJson as Prisma.InputJsonValue)
+          : undefined,
+      },
+    });
+
+    return this.mapPrismaToDomain(category);
+  }
+
+  async softDelete(id: string): Promise<Category | null> {
+    const category = await prisma.category.update({
+      where: { id },
+      data: {
+        deletedAt: new Date(),
+      },
+    });
+
+    return this.mapPrismaToDomain(category);
+  }
+
+  async restore(id: string): Promise<Category | null> {
+    const category = await prisma.category.update({
+      where: { id },
+      data: {
+        deletedAt: null,
+      },
+    });
+
+    return this.mapPrismaToDomain(category);
+  }
+
+  private mapPrismaToDomain(prismaCategory: {
     id: string;
-    category: Category;
-    displayName: string;
+    key: string;
+    name: string;
+    slug: string;
     iconName: string | null;
     description: string | null;
-    displayOrder: number;
+    sortOrder: number;
     isActive: boolean;
+    deletedAt: Date | null;
+    configJson: unknown;
     createdAt: Date;
     updatedAt: Date;
-  }): CategoryMetadataEntity {
+  }): Category {
     return {
-      id: prismaMetadata.id,
-      category: prismaMetadata.category as Category,
-      displayName: prismaMetadata.displayName,
-      iconName: prismaMetadata.iconName,
-      description: prismaMetadata.description,
-      displayOrder: prismaMetadata.displayOrder,
-      isActive: prismaMetadata.isActive,
-      createdAt: prismaMetadata.createdAt,
-      updatedAt: prismaMetadata.updatedAt,
+      id: prismaCategory.id,
+      key: prismaCategory.key,
+      name: prismaCategory.name,
+      slug: prismaCategory.slug,
+      iconName: prismaCategory.iconName,
+      description: prismaCategory.description,
+      sortOrder: prismaCategory.sortOrder,
+      isActive: prismaCategory.isActive,
+      deletedAt: prismaCategory.deletedAt,
+      configJson: prismaCategory.configJson as Record<string, unknown> | null,
+      createdAt: prismaCategory.createdAt,
+      updatedAt: prismaCategory.updatedAt,
     };
   }
 }

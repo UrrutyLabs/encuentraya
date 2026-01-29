@@ -13,7 +13,7 @@ import type {
   OrderLineItemRepository,
   OrderLineItemEntity,
 } from "../orderLineItem.repo";
-import { OrderStatus, Category, OrderLineItemType } from "@repo/domain";
+import { OrderStatus, OrderLineItemType } from "@repo/domain";
 import { OrderNotFoundError } from "../order.errors";
 
 describe("OrderService", () => {
@@ -53,7 +53,8 @@ describe("OrderService", () => {
       displayId: "O0001",
       clientUserId: "client-1",
       proProfileId: "pro-1",
-      category: Category.PLUMBING,
+      categoryId: "cat-plumbing",
+      categoryMetadataJson: null,
       subcategoryId: null,
       title: null,
       description: null,
@@ -176,7 +177,7 @@ describe("OrderService", () => {
       expect(result).toBeDefined();
       expect(result?.status).toBe(OrderStatus.COMPLETED);
       expect(result?.proProfileId).toBe("pro-1");
-      expect(result?.category).toBe(Category.PLUMBING);
+      expect(result?.categoryId).toBe("cat-plumbing");
     });
   });
 
@@ -396,7 +397,7 @@ describe("OrderService", () => {
       await expect(
         service.createOrder({
           proProfileId: "pro-1",
-          category: Category.PLUMBING,
+          categoryId: "cat-plumbing",
           addressText: "123 Main St",
           scheduledWindowStartAt: new Date(),
           estimatedHours: 2,

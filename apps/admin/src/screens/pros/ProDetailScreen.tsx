@@ -6,9 +6,11 @@ import { Card } from "@repo/ui";
 import { Button } from "@repo/ui";
 import { Text } from "@repo/ui";
 import { Badge } from "@repo/ui";
+import { useMemo } from "react";
 import { ProAuditHistory } from "@/components/pros/ProAuditHistory";
 import { ProDetailSkeleton } from "@/components/presentational/ProDetailSkeleton";
 import { useProDetail } from "@/hooks/useProDetail";
+import { useCategories } from "@/hooks/useCategories";
 
 interface ProDetailScreenProps {
   proProfileId: string;
@@ -42,6 +44,35 @@ export function ProDetailScreen({ proProfileId }: ProDetailScreenProps) {
       setShowApproveModal(false);
     },
   });
+
+  // Fetch categories to display names
+  const { data: categories } = useCategories();
+
+  // Create category map for lookup
+  const categoryMap = useMemo(() => {
+    const map = new Map<string, { name: string; isDeleted: boolean }>();
+    categories?.forEach((category) => {
+      map.set(category.id, {
+        name: category.name,
+        isDeleted: !!category.deletedAt || !category.isActive,
+      });
+    });
+    return map;
+  }, [categories]);
+
+  // Get category names for display
+  const categoryNames = useMemo(() => {
+    if (!pro?.categoryIds || !categories) return [];
+    return pro.categoryIds
+      .map((categoryId) => {
+        const category = categoryMap.get(categoryId);
+        if (!category) return null;
+        return category.isDeleted
+          ? `${category.name} (eliminada)`
+          : category.name;
+      })
+      .filter((name): name is string => name !== null);
+  }, [pro, categories, categoryMap]);
 
   const formatDate = (date: Date) => {
     return new Date(date).toLocaleDateString("es-UY", {
@@ -172,11 +203,21 @@ export function ProDetailScreen({ proProfileId }: ProDetailScreenProps) {
             </Text>
             <Text variant="body">{pro.serviceArea || "-"}</Text>
           </div>
-          <div>
+          <div className="md:col-span-2">
             <Text variant="small" className="text-gray-600">
               Categorías
             </Text>
-            <Text variant="body">{pro.categories.join(", ") || "-"}</Text>
+            {categoryNames.length > 0 ? (
+              <div className="flex flex-wrap gap-2 mt-1">
+                {categoryNames.map((categoryName, index) => (
+                  <Badge key={index} variant="info" showIcon>
+                    {categoryName}
+                  </Badge>
+                ))}
+              </div>
+            ) : (
+              <Text variant="body">—</Text>
+            )}
           </div>
           <div>
             <Text variant="small" className="text-gray-600">

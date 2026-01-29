@@ -85,7 +85,6 @@ export type ProProfileCountAggregateOutputType = {
   bio: number
   avatarUrl: number
   hourlyRate: number
-  categories: number
   serviceArea: number
   status: number
   profileCompleted: number
@@ -157,7 +156,6 @@ export type ProProfileCountAggregateInputType = {
   bio?: true
   avatarUrl?: true
   hourlyRate?: true
-  categories?: true
   serviceArea?: true
   status?: true
   profileCompleted?: true
@@ -264,7 +262,6 @@ export type ProProfileGroupByOutputType = {
   bio: string | null
   avatarUrl: string | null
   hourlyRate: number
-  categories: $Enums.Category[]
   serviceArea: string | null
   status: $Enums.ProStatus
   profileCompleted: boolean
@@ -307,7 +304,6 @@ export type ProProfileWhereInput = {
   bio?: Prisma.StringNullableFilter<"ProProfile"> | string | null
   avatarUrl?: Prisma.StringNullableFilter<"ProProfile"> | string | null
   hourlyRate?: Prisma.FloatFilter<"ProProfile"> | number
-  categories?: Prisma.EnumCategoryNullableListFilter<"ProProfile">
   serviceArea?: Prisma.StringNullableFilter<"ProProfile"> | string | null
   status?: Prisma.EnumProStatusFilter<"ProProfile"> | $Enums.ProStatus
   profileCompleted?: Prisma.BoolFilter<"ProProfile"> | boolean
@@ -324,6 +320,7 @@ export type ProProfileWhereInput = {
   payoutProfile?: Prisma.XOR<Prisma.ProPayoutProfileNullableScalarRelationFilter, Prisma.ProPayoutProfileWhereInput> | null
   earnings?: Prisma.EarningListRelationFilter
   payouts?: Prisma.PayoutListRelationFilter
+  categoryRelations?: Prisma.ProProfileCategoryListRelationFilter
 }
 
 export type ProProfileOrderByWithRelationInput = {
@@ -335,7 +332,6 @@ export type ProProfileOrderByWithRelationInput = {
   bio?: Prisma.SortOrderInput | Prisma.SortOrder
   avatarUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   hourlyRate?: Prisma.SortOrder
-  categories?: Prisma.SortOrder
   serviceArea?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   profileCompleted?: Prisma.SortOrder
@@ -352,6 +348,7 @@ export type ProProfileOrderByWithRelationInput = {
   payoutProfile?: Prisma.ProPayoutProfileOrderByWithRelationInput
   earnings?: Prisma.EarningOrderByRelationAggregateInput
   payouts?: Prisma.PayoutOrderByRelationAggregateInput
+  categoryRelations?: Prisma.ProProfileCategoryOrderByRelationAggregateInput
 }
 
 export type ProProfileWhereUniqueInput = Prisma.AtLeast<{
@@ -366,7 +363,6 @@ export type ProProfileWhereUniqueInput = Prisma.AtLeast<{
   bio?: Prisma.StringNullableFilter<"ProProfile"> | string | null
   avatarUrl?: Prisma.StringNullableFilter<"ProProfile"> | string | null
   hourlyRate?: Prisma.FloatFilter<"ProProfile"> | number
-  categories?: Prisma.EnumCategoryNullableListFilter<"ProProfile">
   serviceArea?: Prisma.StringNullableFilter<"ProProfile"> | string | null
   status?: Prisma.EnumProStatusFilter<"ProProfile"> | $Enums.ProStatus
   profileCompleted?: Prisma.BoolFilter<"ProProfile"> | boolean
@@ -383,6 +379,7 @@ export type ProProfileWhereUniqueInput = Prisma.AtLeast<{
   payoutProfile?: Prisma.XOR<Prisma.ProPayoutProfileNullableScalarRelationFilter, Prisma.ProPayoutProfileWhereInput> | null
   earnings?: Prisma.EarningListRelationFilter
   payouts?: Prisma.PayoutListRelationFilter
+  categoryRelations?: Prisma.ProProfileCategoryListRelationFilter
 }, "id" | "userId">
 
 export type ProProfileOrderByWithAggregationInput = {
@@ -394,7 +391,6 @@ export type ProProfileOrderByWithAggregationInput = {
   bio?: Prisma.SortOrderInput | Prisma.SortOrder
   avatarUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   hourlyRate?: Prisma.SortOrder
-  categories?: Prisma.SortOrder
   serviceArea?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   profileCompleted?: Prisma.SortOrder
@@ -422,7 +418,6 @@ export type ProProfileScalarWhereWithAggregatesInput = {
   bio?: Prisma.StringNullableWithAggregatesFilter<"ProProfile"> | string | null
   avatarUrl?: Prisma.StringNullableWithAggregatesFilter<"ProProfile"> | string | null
   hourlyRate?: Prisma.FloatWithAggregatesFilter<"ProProfile"> | number
-  categories?: Prisma.EnumCategoryNullableListFilter<"ProProfile">
   serviceArea?: Prisma.StringNullableWithAggregatesFilter<"ProProfile"> | string | null
   status?: Prisma.EnumProStatusWithAggregatesFilter<"ProProfile"> | $Enums.ProStatus
   profileCompleted?: Prisma.BoolWithAggregatesFilter<"ProProfile"> | boolean
@@ -441,7 +436,6 @@ export type ProProfileCreateInput = {
   bio?: string | null
   avatarUrl?: string | null
   hourlyRate: number
-  categories?: Prisma.ProProfileCreatecategoriesInput | $Enums.Category[]
   serviceArea?: string | null
   status?: $Enums.ProStatus
   profileCompleted?: boolean
@@ -458,6 +452,7 @@ export type ProProfileCreateInput = {
   payoutProfile?: Prisma.ProPayoutProfileCreateNestedOneWithoutProProfileInput
   earnings?: Prisma.EarningCreateNestedManyWithoutProProfileInput
   payouts?: Prisma.PayoutCreateNestedManyWithoutProProfileInput
+  categoryRelations?: Prisma.ProProfileCategoryCreateNestedManyWithoutProProfileInput
 }
 
 export type ProProfileUncheckedCreateInput = {
@@ -469,7 +464,6 @@ export type ProProfileUncheckedCreateInput = {
   bio?: string | null
   avatarUrl?: string | null
   hourlyRate: number
-  categories?: Prisma.ProProfileCreatecategoriesInput | $Enums.Category[]
   serviceArea?: string | null
   status?: $Enums.ProStatus
   profileCompleted?: boolean
@@ -485,6 +479,7 @@ export type ProProfileUncheckedCreateInput = {
   payoutProfile?: Prisma.ProPayoutProfileUncheckedCreateNestedOneWithoutProProfileInput
   earnings?: Prisma.EarningUncheckedCreateNestedManyWithoutProProfileInput
   payouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutProProfileInput
+  categoryRelations?: Prisma.ProProfileCategoryUncheckedCreateNestedManyWithoutProProfileInput
 }
 
 export type ProProfileUpdateInput = {
@@ -495,7 +490,6 @@ export type ProProfileUpdateInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hourlyRate?: Prisma.FloatFieldUpdateOperationsInput | number
-  categories?: Prisma.ProProfileUpdatecategoriesInput | $Enums.Category[]
   serviceArea?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProStatusFieldUpdateOperationsInput | $Enums.ProStatus
   profileCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -512,6 +506,7 @@ export type ProProfileUpdateInput = {
   payoutProfile?: Prisma.ProPayoutProfileUpdateOneWithoutProProfileNestedInput
   earnings?: Prisma.EarningUpdateManyWithoutProProfileNestedInput
   payouts?: Prisma.PayoutUpdateManyWithoutProProfileNestedInput
+  categoryRelations?: Prisma.ProProfileCategoryUpdateManyWithoutProProfileNestedInput
 }
 
 export type ProProfileUncheckedUpdateInput = {
@@ -523,7 +518,6 @@ export type ProProfileUncheckedUpdateInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hourlyRate?: Prisma.FloatFieldUpdateOperationsInput | number
-  categories?: Prisma.ProProfileUpdatecategoriesInput | $Enums.Category[]
   serviceArea?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProStatusFieldUpdateOperationsInput | $Enums.ProStatus
   profileCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -539,6 +533,7 @@ export type ProProfileUncheckedUpdateInput = {
   payoutProfile?: Prisma.ProPayoutProfileUncheckedUpdateOneWithoutProProfileNestedInput
   earnings?: Prisma.EarningUncheckedUpdateManyWithoutProProfileNestedInput
   payouts?: Prisma.PayoutUncheckedUpdateManyWithoutProProfileNestedInput
+  categoryRelations?: Prisma.ProProfileCategoryUncheckedUpdateManyWithoutProProfileNestedInput
 }
 
 export type ProProfileCreateManyInput = {
@@ -550,7 +545,6 @@ export type ProProfileCreateManyInput = {
   bio?: string | null
   avatarUrl?: string | null
   hourlyRate: number
-  categories?: Prisma.ProProfileCreatecategoriesInput | $Enums.Category[]
   serviceArea?: string | null
   status?: $Enums.ProStatus
   profileCompleted?: boolean
@@ -569,7 +563,6 @@ export type ProProfileUpdateManyMutationInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hourlyRate?: Prisma.FloatFieldUpdateOperationsInput | number
-  categories?: Prisma.ProProfileUpdatecategoriesInput | $Enums.Category[]
   serviceArea?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProStatusFieldUpdateOperationsInput | $Enums.ProStatus
   profileCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -589,7 +582,6 @@ export type ProProfileUncheckedUpdateManyInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hourlyRate?: Prisma.FloatFieldUpdateOperationsInput | number
-  categories?: Prisma.ProProfileUpdatecategoriesInput | $Enums.Category[]
   serviceArea?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProStatusFieldUpdateOperationsInput | $Enums.ProStatus
   profileCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -605,14 +597,6 @@ export type ProProfileNullableScalarRelationFilter = {
   isNot?: Prisma.ProProfileWhereInput | null
 }
 
-export type EnumCategoryNullableListFilter<$PrismaModel = never> = {
-  equals?: $Enums.Category[] | Prisma.ListEnumCategoryFieldRefInput<$PrismaModel> | null
-  has?: $Enums.Category | Prisma.EnumCategoryFieldRefInput<$PrismaModel> | null
-  hasEvery?: $Enums.Category[] | Prisma.ListEnumCategoryFieldRefInput<$PrismaModel>
-  hasSome?: $Enums.Category[] | Prisma.ListEnumCategoryFieldRefInput<$PrismaModel>
-  isEmpty?: boolean
-}
-
 export type ProProfileCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
@@ -622,7 +606,6 @@ export type ProProfileCountOrderByAggregateInput = {
   bio?: Prisma.SortOrder
   avatarUrl?: Prisma.SortOrder
   hourlyRate?: Prisma.SortOrder
-  categories?: Prisma.SortOrder
   serviceArea?: Prisma.SortOrder
   status?: Prisma.SortOrder
   profileCompleted?: Prisma.SortOrder
@@ -720,10 +703,6 @@ export type ProProfileUncheckedUpdateOneWithoutUserNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ProProfileUpdateToOneWithWhereWithoutUserInput, Prisma.ProProfileUpdateWithoutUserInput>, Prisma.ProProfileUncheckedUpdateWithoutUserInput>
 }
 
-export type ProProfileCreatecategoriesInput = {
-  set: $Enums.Category[]
-}
-
 export type NullableStringFieldUpdateOperationsInput = {
   set?: string | null
 }
@@ -734,11 +713,6 @@ export type FloatFieldUpdateOperationsInput = {
   decrement?: number
   multiply?: number
   divide?: number
-}
-
-export type ProProfileUpdatecategoriesInput = {
-  set?: $Enums.Category[]
-  push?: $Enums.Category | $Enums.Category[]
 }
 
 export type EnumProStatusFieldUpdateOperationsInput = {
@@ -867,6 +841,20 @@ export type ProProfileUpdateOneRequiredWithoutPayoutsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ProProfileUpdateToOneWithWhereWithoutPayoutsInput, Prisma.ProProfileUpdateWithoutPayoutsInput>, Prisma.ProProfileUncheckedUpdateWithoutPayoutsInput>
 }
 
+export type ProProfileCreateNestedOneWithoutCategoryRelationsInput = {
+  create?: Prisma.XOR<Prisma.ProProfileCreateWithoutCategoryRelationsInput, Prisma.ProProfileUncheckedCreateWithoutCategoryRelationsInput>
+  connectOrCreate?: Prisma.ProProfileCreateOrConnectWithoutCategoryRelationsInput
+  connect?: Prisma.ProProfileWhereUniqueInput
+}
+
+export type ProProfileUpdateOneRequiredWithoutCategoryRelationsNestedInput = {
+  create?: Prisma.XOR<Prisma.ProProfileCreateWithoutCategoryRelationsInput, Prisma.ProProfileUncheckedCreateWithoutCategoryRelationsInput>
+  connectOrCreate?: Prisma.ProProfileCreateOrConnectWithoutCategoryRelationsInput
+  upsert?: Prisma.ProProfileUpsertWithoutCategoryRelationsInput
+  connect?: Prisma.ProProfileWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProProfileUpdateToOneWithWhereWithoutCategoryRelationsInput, Prisma.ProProfileUpdateWithoutCategoryRelationsInput>, Prisma.ProProfileUncheckedUpdateWithoutCategoryRelationsInput>
+}
+
 export type ProProfileCreateWithoutUserInput = {
   id?: string
   displayName: string
@@ -875,7 +863,6 @@ export type ProProfileCreateWithoutUserInput = {
   bio?: string | null
   avatarUrl?: string | null
   hourlyRate: number
-  categories?: Prisma.ProProfileCreatecategoriesInput | $Enums.Category[]
   serviceArea?: string | null
   status?: $Enums.ProStatus
   profileCompleted?: boolean
@@ -891,6 +878,7 @@ export type ProProfileCreateWithoutUserInput = {
   payoutProfile?: Prisma.ProPayoutProfileCreateNestedOneWithoutProProfileInput
   earnings?: Prisma.EarningCreateNestedManyWithoutProProfileInput
   payouts?: Prisma.PayoutCreateNestedManyWithoutProProfileInput
+  categoryRelations?: Prisma.ProProfileCategoryCreateNestedManyWithoutProProfileInput
 }
 
 export type ProProfileUncheckedCreateWithoutUserInput = {
@@ -901,7 +889,6 @@ export type ProProfileUncheckedCreateWithoutUserInput = {
   bio?: string | null
   avatarUrl?: string | null
   hourlyRate: number
-  categories?: Prisma.ProProfileCreatecategoriesInput | $Enums.Category[]
   serviceArea?: string | null
   status?: $Enums.ProStatus
   profileCompleted?: boolean
@@ -917,6 +904,7 @@ export type ProProfileUncheckedCreateWithoutUserInput = {
   payoutProfile?: Prisma.ProPayoutProfileUncheckedCreateNestedOneWithoutProProfileInput
   earnings?: Prisma.EarningUncheckedCreateNestedManyWithoutProProfileInput
   payouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutProProfileInput
+  categoryRelations?: Prisma.ProProfileCategoryUncheckedCreateNestedManyWithoutProProfileInput
 }
 
 export type ProProfileCreateOrConnectWithoutUserInput = {
@@ -943,7 +931,6 @@ export type ProProfileUpdateWithoutUserInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hourlyRate?: Prisma.FloatFieldUpdateOperationsInput | number
-  categories?: Prisma.ProProfileUpdatecategoriesInput | $Enums.Category[]
   serviceArea?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProStatusFieldUpdateOperationsInput | $Enums.ProStatus
   profileCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -959,6 +946,7 @@ export type ProProfileUpdateWithoutUserInput = {
   payoutProfile?: Prisma.ProPayoutProfileUpdateOneWithoutProProfileNestedInput
   earnings?: Prisma.EarningUpdateManyWithoutProProfileNestedInput
   payouts?: Prisma.PayoutUpdateManyWithoutProProfileNestedInput
+  categoryRelations?: Prisma.ProProfileCategoryUpdateManyWithoutProProfileNestedInput
 }
 
 export type ProProfileUncheckedUpdateWithoutUserInput = {
@@ -969,7 +957,6 @@ export type ProProfileUncheckedUpdateWithoutUserInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hourlyRate?: Prisma.FloatFieldUpdateOperationsInput | number
-  categories?: Prisma.ProProfileUpdatecategoriesInput | $Enums.Category[]
   serviceArea?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProStatusFieldUpdateOperationsInput | $Enums.ProStatus
   profileCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -985,6 +972,7 @@ export type ProProfileUncheckedUpdateWithoutUserInput = {
   payoutProfile?: Prisma.ProPayoutProfileUncheckedUpdateOneWithoutProProfileNestedInput
   earnings?: Prisma.EarningUncheckedUpdateManyWithoutProProfileNestedInput
   payouts?: Prisma.PayoutUncheckedUpdateManyWithoutProProfileNestedInput
+  categoryRelations?: Prisma.ProProfileCategoryUncheckedUpdateManyWithoutProProfileNestedInput
 }
 
 export type ProProfileCreateWithoutAvailabilityInput = {
@@ -995,7 +983,6 @@ export type ProProfileCreateWithoutAvailabilityInput = {
   bio?: string | null
   avatarUrl?: string | null
   hourlyRate: number
-  categories?: Prisma.ProProfileCreatecategoriesInput | $Enums.Category[]
   serviceArea?: string | null
   status?: $Enums.ProStatus
   profileCompleted?: boolean
@@ -1011,6 +998,7 @@ export type ProProfileCreateWithoutAvailabilityInput = {
   payoutProfile?: Prisma.ProPayoutProfileCreateNestedOneWithoutProProfileInput
   earnings?: Prisma.EarningCreateNestedManyWithoutProProfileInput
   payouts?: Prisma.PayoutCreateNestedManyWithoutProProfileInput
+  categoryRelations?: Prisma.ProProfileCategoryCreateNestedManyWithoutProProfileInput
 }
 
 export type ProProfileUncheckedCreateWithoutAvailabilityInput = {
@@ -1022,7 +1010,6 @@ export type ProProfileUncheckedCreateWithoutAvailabilityInput = {
   bio?: string | null
   avatarUrl?: string | null
   hourlyRate: number
-  categories?: Prisma.ProProfileCreatecategoriesInput | $Enums.Category[]
   serviceArea?: string | null
   status?: $Enums.ProStatus
   profileCompleted?: boolean
@@ -1037,6 +1024,7 @@ export type ProProfileUncheckedCreateWithoutAvailabilityInput = {
   payoutProfile?: Prisma.ProPayoutProfileUncheckedCreateNestedOneWithoutProProfileInput
   earnings?: Prisma.EarningUncheckedCreateNestedManyWithoutProProfileInput
   payouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutProProfileInput
+  categoryRelations?: Prisma.ProProfileCategoryUncheckedCreateNestedManyWithoutProProfileInput
 }
 
 export type ProProfileCreateOrConnectWithoutAvailabilityInput = {
@@ -1063,7 +1051,6 @@ export type ProProfileUpdateWithoutAvailabilityInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hourlyRate?: Prisma.FloatFieldUpdateOperationsInput | number
-  categories?: Prisma.ProProfileUpdatecategoriesInput | $Enums.Category[]
   serviceArea?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProStatusFieldUpdateOperationsInput | $Enums.ProStatus
   profileCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1079,6 +1066,7 @@ export type ProProfileUpdateWithoutAvailabilityInput = {
   payoutProfile?: Prisma.ProPayoutProfileUpdateOneWithoutProProfileNestedInput
   earnings?: Prisma.EarningUpdateManyWithoutProProfileNestedInput
   payouts?: Prisma.PayoutUpdateManyWithoutProProfileNestedInput
+  categoryRelations?: Prisma.ProProfileCategoryUpdateManyWithoutProProfileNestedInput
 }
 
 export type ProProfileUncheckedUpdateWithoutAvailabilityInput = {
@@ -1090,7 +1078,6 @@ export type ProProfileUncheckedUpdateWithoutAvailabilityInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hourlyRate?: Prisma.FloatFieldUpdateOperationsInput | number
-  categories?: Prisma.ProProfileUpdatecategoriesInput | $Enums.Category[]
   serviceArea?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProStatusFieldUpdateOperationsInput | $Enums.ProStatus
   profileCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1105,6 +1092,7 @@ export type ProProfileUncheckedUpdateWithoutAvailabilityInput = {
   payoutProfile?: Prisma.ProPayoutProfileUncheckedUpdateOneWithoutProProfileNestedInput
   earnings?: Prisma.EarningUncheckedUpdateManyWithoutProProfileNestedInput
   payouts?: Prisma.PayoutUncheckedUpdateManyWithoutProProfileNestedInput
+  categoryRelations?: Prisma.ProProfileCategoryUncheckedUpdateManyWithoutProProfileNestedInput
 }
 
 export type ProProfileCreateWithoutOrdersInput = {
@@ -1115,7 +1103,6 @@ export type ProProfileCreateWithoutOrdersInput = {
   bio?: string | null
   avatarUrl?: string | null
   hourlyRate: number
-  categories?: Prisma.ProProfileCreatecategoriesInput | $Enums.Category[]
   serviceArea?: string | null
   status?: $Enums.ProStatus
   profileCompleted?: boolean
@@ -1131,6 +1118,7 @@ export type ProProfileCreateWithoutOrdersInput = {
   payoutProfile?: Prisma.ProPayoutProfileCreateNestedOneWithoutProProfileInput
   earnings?: Prisma.EarningCreateNestedManyWithoutProProfileInput
   payouts?: Prisma.PayoutCreateNestedManyWithoutProProfileInput
+  categoryRelations?: Prisma.ProProfileCategoryCreateNestedManyWithoutProProfileInput
 }
 
 export type ProProfileUncheckedCreateWithoutOrdersInput = {
@@ -1142,7 +1130,6 @@ export type ProProfileUncheckedCreateWithoutOrdersInput = {
   bio?: string | null
   avatarUrl?: string | null
   hourlyRate: number
-  categories?: Prisma.ProProfileCreatecategoriesInput | $Enums.Category[]
   serviceArea?: string | null
   status?: $Enums.ProStatus
   profileCompleted?: boolean
@@ -1157,6 +1144,7 @@ export type ProProfileUncheckedCreateWithoutOrdersInput = {
   payoutProfile?: Prisma.ProPayoutProfileUncheckedCreateNestedOneWithoutProProfileInput
   earnings?: Prisma.EarningUncheckedCreateNestedManyWithoutProProfileInput
   payouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutProProfileInput
+  categoryRelations?: Prisma.ProProfileCategoryUncheckedCreateNestedManyWithoutProProfileInput
 }
 
 export type ProProfileCreateOrConnectWithoutOrdersInput = {
@@ -1183,7 +1171,6 @@ export type ProProfileUpdateWithoutOrdersInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hourlyRate?: Prisma.FloatFieldUpdateOperationsInput | number
-  categories?: Prisma.ProProfileUpdatecategoriesInput | $Enums.Category[]
   serviceArea?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProStatusFieldUpdateOperationsInput | $Enums.ProStatus
   profileCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1199,6 +1186,7 @@ export type ProProfileUpdateWithoutOrdersInput = {
   payoutProfile?: Prisma.ProPayoutProfileUpdateOneWithoutProProfileNestedInput
   earnings?: Prisma.EarningUpdateManyWithoutProProfileNestedInput
   payouts?: Prisma.PayoutUpdateManyWithoutProProfileNestedInput
+  categoryRelations?: Prisma.ProProfileCategoryUpdateManyWithoutProProfileNestedInput
 }
 
 export type ProProfileUncheckedUpdateWithoutOrdersInput = {
@@ -1210,7 +1198,6 @@ export type ProProfileUncheckedUpdateWithoutOrdersInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hourlyRate?: Prisma.FloatFieldUpdateOperationsInput | number
-  categories?: Prisma.ProProfileUpdatecategoriesInput | $Enums.Category[]
   serviceArea?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProStatusFieldUpdateOperationsInput | $Enums.ProStatus
   profileCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1225,6 +1212,7 @@ export type ProProfileUncheckedUpdateWithoutOrdersInput = {
   payoutProfile?: Prisma.ProPayoutProfileUncheckedUpdateOneWithoutProProfileNestedInput
   earnings?: Prisma.EarningUncheckedUpdateManyWithoutProProfileNestedInput
   payouts?: Prisma.PayoutUncheckedUpdateManyWithoutProProfileNestedInput
+  categoryRelations?: Prisma.ProProfileCategoryUncheckedUpdateManyWithoutProProfileNestedInput
 }
 
 export type ProProfileCreateWithoutReviewsInput = {
@@ -1235,7 +1223,6 @@ export type ProProfileCreateWithoutReviewsInput = {
   bio?: string | null
   avatarUrl?: string | null
   hourlyRate: number
-  categories?: Prisma.ProProfileCreatecategoriesInput | $Enums.Category[]
   serviceArea?: string | null
   status?: $Enums.ProStatus
   profileCompleted?: boolean
@@ -1251,6 +1238,7 @@ export type ProProfileCreateWithoutReviewsInput = {
   payoutProfile?: Prisma.ProPayoutProfileCreateNestedOneWithoutProProfileInput
   earnings?: Prisma.EarningCreateNestedManyWithoutProProfileInput
   payouts?: Prisma.PayoutCreateNestedManyWithoutProProfileInput
+  categoryRelations?: Prisma.ProProfileCategoryCreateNestedManyWithoutProProfileInput
 }
 
 export type ProProfileUncheckedCreateWithoutReviewsInput = {
@@ -1262,7 +1250,6 @@ export type ProProfileUncheckedCreateWithoutReviewsInput = {
   bio?: string | null
   avatarUrl?: string | null
   hourlyRate: number
-  categories?: Prisma.ProProfileCreatecategoriesInput | $Enums.Category[]
   serviceArea?: string | null
   status?: $Enums.ProStatus
   profileCompleted?: boolean
@@ -1277,6 +1264,7 @@ export type ProProfileUncheckedCreateWithoutReviewsInput = {
   payoutProfile?: Prisma.ProPayoutProfileUncheckedCreateNestedOneWithoutProProfileInput
   earnings?: Prisma.EarningUncheckedCreateNestedManyWithoutProProfileInput
   payouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutProProfileInput
+  categoryRelations?: Prisma.ProProfileCategoryUncheckedCreateNestedManyWithoutProProfileInput
 }
 
 export type ProProfileCreateOrConnectWithoutReviewsInput = {
@@ -1303,7 +1291,6 @@ export type ProProfileUpdateWithoutReviewsInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hourlyRate?: Prisma.FloatFieldUpdateOperationsInput | number
-  categories?: Prisma.ProProfileUpdatecategoriesInput | $Enums.Category[]
   serviceArea?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProStatusFieldUpdateOperationsInput | $Enums.ProStatus
   profileCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1319,6 +1306,7 @@ export type ProProfileUpdateWithoutReviewsInput = {
   payoutProfile?: Prisma.ProPayoutProfileUpdateOneWithoutProProfileNestedInput
   earnings?: Prisma.EarningUpdateManyWithoutProProfileNestedInput
   payouts?: Prisma.PayoutUpdateManyWithoutProProfileNestedInput
+  categoryRelations?: Prisma.ProProfileCategoryUpdateManyWithoutProProfileNestedInput
 }
 
 export type ProProfileUncheckedUpdateWithoutReviewsInput = {
@@ -1330,7 +1318,6 @@ export type ProProfileUncheckedUpdateWithoutReviewsInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hourlyRate?: Prisma.FloatFieldUpdateOperationsInput | number
-  categories?: Prisma.ProProfileUpdatecategoriesInput | $Enums.Category[]
   serviceArea?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProStatusFieldUpdateOperationsInput | $Enums.ProStatus
   profileCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1345,6 +1332,7 @@ export type ProProfileUncheckedUpdateWithoutReviewsInput = {
   payoutProfile?: Prisma.ProPayoutProfileUncheckedUpdateOneWithoutProProfileNestedInput
   earnings?: Prisma.EarningUncheckedUpdateManyWithoutProProfileNestedInput
   payouts?: Prisma.PayoutUncheckedUpdateManyWithoutProProfileNestedInput
+  categoryRelations?: Prisma.ProProfileCategoryUncheckedUpdateManyWithoutProProfileNestedInput
 }
 
 export type ProProfileCreateWithoutPaymentsInput = {
@@ -1355,7 +1343,6 @@ export type ProProfileCreateWithoutPaymentsInput = {
   bio?: string | null
   avatarUrl?: string | null
   hourlyRate: number
-  categories?: Prisma.ProProfileCreatecategoriesInput | $Enums.Category[]
   serviceArea?: string | null
   status?: $Enums.ProStatus
   profileCompleted?: boolean
@@ -1371,6 +1358,7 @@ export type ProProfileCreateWithoutPaymentsInput = {
   payoutProfile?: Prisma.ProPayoutProfileCreateNestedOneWithoutProProfileInput
   earnings?: Prisma.EarningCreateNestedManyWithoutProProfileInput
   payouts?: Prisma.PayoutCreateNestedManyWithoutProProfileInput
+  categoryRelations?: Prisma.ProProfileCategoryCreateNestedManyWithoutProProfileInput
 }
 
 export type ProProfileUncheckedCreateWithoutPaymentsInput = {
@@ -1382,7 +1370,6 @@ export type ProProfileUncheckedCreateWithoutPaymentsInput = {
   bio?: string | null
   avatarUrl?: string | null
   hourlyRate: number
-  categories?: Prisma.ProProfileCreatecategoriesInput | $Enums.Category[]
   serviceArea?: string | null
   status?: $Enums.ProStatus
   profileCompleted?: boolean
@@ -1397,6 +1384,7 @@ export type ProProfileUncheckedCreateWithoutPaymentsInput = {
   payoutProfile?: Prisma.ProPayoutProfileUncheckedCreateNestedOneWithoutProProfileInput
   earnings?: Prisma.EarningUncheckedCreateNestedManyWithoutProProfileInput
   payouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutProProfileInput
+  categoryRelations?: Prisma.ProProfileCategoryUncheckedCreateNestedManyWithoutProProfileInput
 }
 
 export type ProProfileCreateOrConnectWithoutPaymentsInput = {
@@ -1423,7 +1411,6 @@ export type ProProfileUpdateWithoutPaymentsInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hourlyRate?: Prisma.FloatFieldUpdateOperationsInput | number
-  categories?: Prisma.ProProfileUpdatecategoriesInput | $Enums.Category[]
   serviceArea?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProStatusFieldUpdateOperationsInput | $Enums.ProStatus
   profileCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1439,6 +1426,7 @@ export type ProProfileUpdateWithoutPaymentsInput = {
   payoutProfile?: Prisma.ProPayoutProfileUpdateOneWithoutProProfileNestedInput
   earnings?: Prisma.EarningUpdateManyWithoutProProfileNestedInput
   payouts?: Prisma.PayoutUpdateManyWithoutProProfileNestedInput
+  categoryRelations?: Prisma.ProProfileCategoryUpdateManyWithoutProProfileNestedInput
 }
 
 export type ProProfileUncheckedUpdateWithoutPaymentsInput = {
@@ -1450,7 +1438,6 @@ export type ProProfileUncheckedUpdateWithoutPaymentsInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hourlyRate?: Prisma.FloatFieldUpdateOperationsInput | number
-  categories?: Prisma.ProProfileUpdatecategoriesInput | $Enums.Category[]
   serviceArea?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProStatusFieldUpdateOperationsInput | $Enums.ProStatus
   profileCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1465,6 +1452,7 @@ export type ProProfileUncheckedUpdateWithoutPaymentsInput = {
   payoutProfile?: Prisma.ProPayoutProfileUncheckedUpdateOneWithoutProProfileNestedInput
   earnings?: Prisma.EarningUncheckedUpdateManyWithoutProProfileNestedInput
   payouts?: Prisma.PayoutUncheckedUpdateManyWithoutProProfileNestedInput
+  categoryRelations?: Prisma.ProProfileCategoryUncheckedUpdateManyWithoutProProfileNestedInput
 }
 
 export type ProProfileCreateWithoutPayoutProfileInput = {
@@ -1475,7 +1463,6 @@ export type ProProfileCreateWithoutPayoutProfileInput = {
   bio?: string | null
   avatarUrl?: string | null
   hourlyRate: number
-  categories?: Prisma.ProProfileCreatecategoriesInput | $Enums.Category[]
   serviceArea?: string | null
   status?: $Enums.ProStatus
   profileCompleted?: boolean
@@ -1491,6 +1478,7 @@ export type ProProfileCreateWithoutPayoutProfileInput = {
   payments?: Prisma.PaymentCreateNestedManyWithoutProProfileInput
   earnings?: Prisma.EarningCreateNestedManyWithoutProProfileInput
   payouts?: Prisma.PayoutCreateNestedManyWithoutProProfileInput
+  categoryRelations?: Prisma.ProProfileCategoryCreateNestedManyWithoutProProfileInput
 }
 
 export type ProProfileUncheckedCreateWithoutPayoutProfileInput = {
@@ -1502,7 +1490,6 @@ export type ProProfileUncheckedCreateWithoutPayoutProfileInput = {
   bio?: string | null
   avatarUrl?: string | null
   hourlyRate: number
-  categories?: Prisma.ProProfileCreatecategoriesInput | $Enums.Category[]
   serviceArea?: string | null
   status?: $Enums.ProStatus
   profileCompleted?: boolean
@@ -1517,6 +1504,7 @@ export type ProProfileUncheckedCreateWithoutPayoutProfileInput = {
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutProProfileInput
   earnings?: Prisma.EarningUncheckedCreateNestedManyWithoutProProfileInput
   payouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutProProfileInput
+  categoryRelations?: Prisma.ProProfileCategoryUncheckedCreateNestedManyWithoutProProfileInput
 }
 
 export type ProProfileCreateOrConnectWithoutPayoutProfileInput = {
@@ -1543,7 +1531,6 @@ export type ProProfileUpdateWithoutPayoutProfileInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hourlyRate?: Prisma.FloatFieldUpdateOperationsInput | number
-  categories?: Prisma.ProProfileUpdatecategoriesInput | $Enums.Category[]
   serviceArea?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProStatusFieldUpdateOperationsInput | $Enums.ProStatus
   profileCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1559,6 +1546,7 @@ export type ProProfileUpdateWithoutPayoutProfileInput = {
   payments?: Prisma.PaymentUpdateManyWithoutProProfileNestedInput
   earnings?: Prisma.EarningUpdateManyWithoutProProfileNestedInput
   payouts?: Prisma.PayoutUpdateManyWithoutProProfileNestedInput
+  categoryRelations?: Prisma.ProProfileCategoryUpdateManyWithoutProProfileNestedInput
 }
 
 export type ProProfileUncheckedUpdateWithoutPayoutProfileInput = {
@@ -1570,7 +1558,6 @@ export type ProProfileUncheckedUpdateWithoutPayoutProfileInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hourlyRate?: Prisma.FloatFieldUpdateOperationsInput | number
-  categories?: Prisma.ProProfileUpdatecategoriesInput | $Enums.Category[]
   serviceArea?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProStatusFieldUpdateOperationsInput | $Enums.ProStatus
   profileCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1585,6 +1572,7 @@ export type ProProfileUncheckedUpdateWithoutPayoutProfileInput = {
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutProProfileNestedInput
   earnings?: Prisma.EarningUncheckedUpdateManyWithoutProProfileNestedInput
   payouts?: Prisma.PayoutUncheckedUpdateManyWithoutProProfileNestedInput
+  categoryRelations?: Prisma.ProProfileCategoryUncheckedUpdateManyWithoutProProfileNestedInput
 }
 
 export type ProProfileCreateWithoutEarningsInput = {
@@ -1595,7 +1583,6 @@ export type ProProfileCreateWithoutEarningsInput = {
   bio?: string | null
   avatarUrl?: string | null
   hourlyRate: number
-  categories?: Prisma.ProProfileCreatecategoriesInput | $Enums.Category[]
   serviceArea?: string | null
   status?: $Enums.ProStatus
   profileCompleted?: boolean
@@ -1611,6 +1598,7 @@ export type ProProfileCreateWithoutEarningsInput = {
   payments?: Prisma.PaymentCreateNestedManyWithoutProProfileInput
   payoutProfile?: Prisma.ProPayoutProfileCreateNestedOneWithoutProProfileInput
   payouts?: Prisma.PayoutCreateNestedManyWithoutProProfileInput
+  categoryRelations?: Prisma.ProProfileCategoryCreateNestedManyWithoutProProfileInput
 }
 
 export type ProProfileUncheckedCreateWithoutEarningsInput = {
@@ -1622,7 +1610,6 @@ export type ProProfileUncheckedCreateWithoutEarningsInput = {
   bio?: string | null
   avatarUrl?: string | null
   hourlyRate: number
-  categories?: Prisma.ProProfileCreatecategoriesInput | $Enums.Category[]
   serviceArea?: string | null
   status?: $Enums.ProStatus
   profileCompleted?: boolean
@@ -1637,6 +1624,7 @@ export type ProProfileUncheckedCreateWithoutEarningsInput = {
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutProProfileInput
   payoutProfile?: Prisma.ProPayoutProfileUncheckedCreateNestedOneWithoutProProfileInput
   payouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutProProfileInput
+  categoryRelations?: Prisma.ProProfileCategoryUncheckedCreateNestedManyWithoutProProfileInput
 }
 
 export type ProProfileCreateOrConnectWithoutEarningsInput = {
@@ -1663,7 +1651,6 @@ export type ProProfileUpdateWithoutEarningsInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hourlyRate?: Prisma.FloatFieldUpdateOperationsInput | number
-  categories?: Prisma.ProProfileUpdatecategoriesInput | $Enums.Category[]
   serviceArea?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProStatusFieldUpdateOperationsInput | $Enums.ProStatus
   profileCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1679,6 +1666,7 @@ export type ProProfileUpdateWithoutEarningsInput = {
   payments?: Prisma.PaymentUpdateManyWithoutProProfileNestedInput
   payoutProfile?: Prisma.ProPayoutProfileUpdateOneWithoutProProfileNestedInput
   payouts?: Prisma.PayoutUpdateManyWithoutProProfileNestedInput
+  categoryRelations?: Prisma.ProProfileCategoryUpdateManyWithoutProProfileNestedInput
 }
 
 export type ProProfileUncheckedUpdateWithoutEarningsInput = {
@@ -1690,7 +1678,6 @@ export type ProProfileUncheckedUpdateWithoutEarningsInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hourlyRate?: Prisma.FloatFieldUpdateOperationsInput | number
-  categories?: Prisma.ProProfileUpdatecategoriesInput | $Enums.Category[]
   serviceArea?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProStatusFieldUpdateOperationsInput | $Enums.ProStatus
   profileCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1705,6 +1692,7 @@ export type ProProfileUncheckedUpdateWithoutEarningsInput = {
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutProProfileNestedInput
   payoutProfile?: Prisma.ProPayoutProfileUncheckedUpdateOneWithoutProProfileNestedInput
   payouts?: Prisma.PayoutUncheckedUpdateManyWithoutProProfileNestedInput
+  categoryRelations?: Prisma.ProProfileCategoryUncheckedUpdateManyWithoutProProfileNestedInput
 }
 
 export type ProProfileCreateWithoutPayoutsInput = {
@@ -1715,7 +1703,6 @@ export type ProProfileCreateWithoutPayoutsInput = {
   bio?: string | null
   avatarUrl?: string | null
   hourlyRate: number
-  categories?: Prisma.ProProfileCreatecategoriesInput | $Enums.Category[]
   serviceArea?: string | null
   status?: $Enums.ProStatus
   profileCompleted?: boolean
@@ -1731,6 +1718,7 @@ export type ProProfileCreateWithoutPayoutsInput = {
   payments?: Prisma.PaymentCreateNestedManyWithoutProProfileInput
   payoutProfile?: Prisma.ProPayoutProfileCreateNestedOneWithoutProProfileInput
   earnings?: Prisma.EarningCreateNestedManyWithoutProProfileInput
+  categoryRelations?: Prisma.ProProfileCategoryCreateNestedManyWithoutProProfileInput
 }
 
 export type ProProfileUncheckedCreateWithoutPayoutsInput = {
@@ -1742,7 +1730,6 @@ export type ProProfileUncheckedCreateWithoutPayoutsInput = {
   bio?: string | null
   avatarUrl?: string | null
   hourlyRate: number
-  categories?: Prisma.ProProfileCreatecategoriesInput | $Enums.Category[]
   serviceArea?: string | null
   status?: $Enums.ProStatus
   profileCompleted?: boolean
@@ -1757,6 +1744,7 @@ export type ProProfileUncheckedCreateWithoutPayoutsInput = {
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutProProfileInput
   payoutProfile?: Prisma.ProPayoutProfileUncheckedCreateNestedOneWithoutProProfileInput
   earnings?: Prisma.EarningUncheckedCreateNestedManyWithoutProProfileInput
+  categoryRelations?: Prisma.ProProfileCategoryUncheckedCreateNestedManyWithoutProProfileInput
 }
 
 export type ProProfileCreateOrConnectWithoutPayoutsInput = {
@@ -1783,7 +1771,6 @@ export type ProProfileUpdateWithoutPayoutsInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hourlyRate?: Prisma.FloatFieldUpdateOperationsInput | number
-  categories?: Prisma.ProProfileUpdatecategoriesInput | $Enums.Category[]
   serviceArea?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProStatusFieldUpdateOperationsInput | $Enums.ProStatus
   profileCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1799,6 +1786,7 @@ export type ProProfileUpdateWithoutPayoutsInput = {
   payments?: Prisma.PaymentUpdateManyWithoutProProfileNestedInput
   payoutProfile?: Prisma.ProPayoutProfileUpdateOneWithoutProProfileNestedInput
   earnings?: Prisma.EarningUpdateManyWithoutProProfileNestedInput
+  categoryRelations?: Prisma.ProProfileCategoryUpdateManyWithoutProProfileNestedInput
 }
 
 export type ProProfileUncheckedUpdateWithoutPayoutsInput = {
@@ -1810,7 +1798,6 @@ export type ProProfileUncheckedUpdateWithoutPayoutsInput = {
   bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hourlyRate?: Prisma.FloatFieldUpdateOperationsInput | number
-  categories?: Prisma.ProProfileUpdatecategoriesInput | $Enums.Category[]
   serviceArea?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProStatusFieldUpdateOperationsInput | $Enums.ProStatus
   profileCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1825,6 +1812,127 @@ export type ProProfileUncheckedUpdateWithoutPayoutsInput = {
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutProProfileNestedInput
   payoutProfile?: Prisma.ProPayoutProfileUncheckedUpdateOneWithoutProProfileNestedInput
   earnings?: Prisma.EarningUncheckedUpdateManyWithoutProProfileNestedInput
+  categoryRelations?: Prisma.ProProfileCategoryUncheckedUpdateManyWithoutProProfileNestedInput
+}
+
+export type ProProfileCreateWithoutCategoryRelationsInput = {
+  id?: string
+  displayName: string
+  email: string
+  phone?: string | null
+  bio?: string | null
+  avatarUrl?: string | null
+  hourlyRate: number
+  serviceArea?: string | null
+  status?: $Enums.ProStatus
+  profileCompleted?: boolean
+  completedJobsCount?: number
+  isTopPro?: boolean
+  responseTimeMinutes?: number | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutProProfileInput
+  availability?: Prisma.AvailabilityCreateNestedManyWithoutProProfileInput
+  orders?: Prisma.OrderCreateNestedManyWithoutProProfileInput
+  reviews?: Prisma.ReviewCreateNestedManyWithoutProProfileInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutProProfileInput
+  payoutProfile?: Prisma.ProPayoutProfileCreateNestedOneWithoutProProfileInput
+  earnings?: Prisma.EarningCreateNestedManyWithoutProProfileInput
+  payouts?: Prisma.PayoutCreateNestedManyWithoutProProfileInput
+}
+
+export type ProProfileUncheckedCreateWithoutCategoryRelationsInput = {
+  id?: string
+  userId: string
+  displayName: string
+  email: string
+  phone?: string | null
+  bio?: string | null
+  avatarUrl?: string | null
+  hourlyRate: number
+  serviceArea?: string | null
+  status?: $Enums.ProStatus
+  profileCompleted?: boolean
+  completedJobsCount?: number
+  isTopPro?: boolean
+  responseTimeMinutes?: number | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  availability?: Prisma.AvailabilityUncheckedCreateNestedManyWithoutProProfileInput
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutProProfileInput
+  reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutProProfileInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutProProfileInput
+  payoutProfile?: Prisma.ProPayoutProfileUncheckedCreateNestedOneWithoutProProfileInput
+  earnings?: Prisma.EarningUncheckedCreateNestedManyWithoutProProfileInput
+  payouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutProProfileInput
+}
+
+export type ProProfileCreateOrConnectWithoutCategoryRelationsInput = {
+  where: Prisma.ProProfileWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProProfileCreateWithoutCategoryRelationsInput, Prisma.ProProfileUncheckedCreateWithoutCategoryRelationsInput>
+}
+
+export type ProProfileUpsertWithoutCategoryRelationsInput = {
+  update: Prisma.XOR<Prisma.ProProfileUpdateWithoutCategoryRelationsInput, Prisma.ProProfileUncheckedUpdateWithoutCategoryRelationsInput>
+  create: Prisma.XOR<Prisma.ProProfileCreateWithoutCategoryRelationsInput, Prisma.ProProfileUncheckedCreateWithoutCategoryRelationsInput>
+  where?: Prisma.ProProfileWhereInput
+}
+
+export type ProProfileUpdateToOneWithWhereWithoutCategoryRelationsInput = {
+  where?: Prisma.ProProfileWhereInput
+  data: Prisma.XOR<Prisma.ProProfileUpdateWithoutCategoryRelationsInput, Prisma.ProProfileUncheckedUpdateWithoutCategoryRelationsInput>
+}
+
+export type ProProfileUpdateWithoutCategoryRelationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hourlyRate?: Prisma.FloatFieldUpdateOperationsInput | number
+  serviceArea?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumProStatusFieldUpdateOperationsInput | $Enums.ProStatus
+  profileCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  completedJobsCount?: Prisma.IntFieldUpdateOperationsInput | number
+  isTopPro?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  responseTimeMinutes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutProProfileNestedInput
+  availability?: Prisma.AvailabilityUpdateManyWithoutProProfileNestedInput
+  orders?: Prisma.OrderUpdateManyWithoutProProfileNestedInput
+  reviews?: Prisma.ReviewUpdateManyWithoutProProfileNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutProProfileNestedInput
+  payoutProfile?: Prisma.ProPayoutProfileUpdateOneWithoutProProfileNestedInput
+  earnings?: Prisma.EarningUpdateManyWithoutProProfileNestedInput
+  payouts?: Prisma.PayoutUpdateManyWithoutProProfileNestedInput
+}
+
+export type ProProfileUncheckedUpdateWithoutCategoryRelationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  hourlyRate?: Prisma.FloatFieldUpdateOperationsInput | number
+  serviceArea?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumProStatusFieldUpdateOperationsInput | $Enums.ProStatus
+  profileCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  completedJobsCount?: Prisma.IntFieldUpdateOperationsInput | number
+  isTopPro?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  responseTimeMinutes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  availability?: Prisma.AvailabilityUncheckedUpdateManyWithoutProProfileNestedInput
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutProProfileNestedInput
+  reviews?: Prisma.ReviewUncheckedUpdateManyWithoutProProfileNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutProProfileNestedInput
+  payoutProfile?: Prisma.ProPayoutProfileUncheckedUpdateOneWithoutProProfileNestedInput
+  earnings?: Prisma.EarningUncheckedUpdateManyWithoutProProfileNestedInput
+  payouts?: Prisma.PayoutUncheckedUpdateManyWithoutProProfileNestedInput
 }
 
 
@@ -1839,6 +1947,7 @@ export type ProProfileCountOutputType = {
   payments: number
   earnings: number
   payouts: number
+  categoryRelations: number
 }
 
 export type ProProfileCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1848,6 +1957,7 @@ export type ProProfileCountOutputTypeSelect<ExtArgs extends runtime.Types.Extens
   payments?: boolean | ProProfileCountOutputTypeCountPaymentsArgs
   earnings?: boolean | ProProfileCountOutputTypeCountEarningsArgs
   payouts?: boolean | ProProfileCountOutputTypeCountPayoutsArgs
+  categoryRelations?: boolean | ProProfileCountOutputTypeCountCategoryRelationsArgs
 }
 
 /**
@@ -1902,6 +2012,13 @@ export type ProProfileCountOutputTypeCountPayoutsArgs<ExtArgs extends runtime.Ty
   where?: Prisma.PayoutWhereInput
 }
 
+/**
+ * ProProfileCountOutputType without action
+ */
+export type ProProfileCountOutputTypeCountCategoryRelationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ProProfileCategoryWhereInput
+}
+
 
 export type ProProfileSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1912,7 +2029,6 @@ export type ProProfileSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   bio?: boolean
   avatarUrl?: boolean
   hourlyRate?: boolean
-  categories?: boolean
   serviceArea?: boolean
   status?: boolean
   profileCompleted?: boolean
@@ -1929,6 +2045,7 @@ export type ProProfileSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   payoutProfile?: boolean | Prisma.ProProfile$payoutProfileArgs<ExtArgs>
   earnings?: boolean | Prisma.ProProfile$earningsArgs<ExtArgs>
   payouts?: boolean | Prisma.ProProfile$payoutsArgs<ExtArgs>
+  categoryRelations?: boolean | Prisma.ProProfile$categoryRelationsArgs<ExtArgs>
   _count?: boolean | Prisma.ProProfileCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["proProfile"]>
 
@@ -1941,7 +2058,6 @@ export type ProProfileSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   bio?: boolean
   avatarUrl?: boolean
   hourlyRate?: boolean
-  categories?: boolean
   serviceArea?: boolean
   status?: boolean
   profileCompleted?: boolean
@@ -1962,7 +2078,6 @@ export type ProProfileSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
   bio?: boolean
   avatarUrl?: boolean
   hourlyRate?: boolean
-  categories?: boolean
   serviceArea?: boolean
   status?: boolean
   profileCompleted?: boolean
@@ -1983,7 +2098,6 @@ export type ProProfileSelectScalar = {
   bio?: boolean
   avatarUrl?: boolean
   hourlyRate?: boolean
-  categories?: boolean
   serviceArea?: boolean
   status?: boolean
   profileCompleted?: boolean
@@ -1994,7 +2108,7 @@ export type ProProfileSelectScalar = {
   updatedAt?: boolean
 }
 
-export type ProProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "displayName" | "email" | "phone" | "bio" | "avatarUrl" | "hourlyRate" | "categories" | "serviceArea" | "status" | "profileCompleted" | "completedJobsCount" | "isTopPro" | "responseTimeMinutes" | "createdAt" | "updatedAt", ExtArgs["result"]["proProfile"]>
+export type ProProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "displayName" | "email" | "phone" | "bio" | "avatarUrl" | "hourlyRate" | "serviceArea" | "status" | "profileCompleted" | "completedJobsCount" | "isTopPro" | "responseTimeMinutes" | "createdAt" | "updatedAt", ExtArgs["result"]["proProfile"]>
 export type ProProfileInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   availability?: boolean | Prisma.ProProfile$availabilityArgs<ExtArgs>
@@ -2004,6 +2118,7 @@ export type ProProfileInclude<ExtArgs extends runtime.Types.Extensions.InternalA
   payoutProfile?: boolean | Prisma.ProProfile$payoutProfileArgs<ExtArgs>
   earnings?: boolean | Prisma.ProProfile$earningsArgs<ExtArgs>
   payouts?: boolean | Prisma.ProProfile$payoutsArgs<ExtArgs>
+  categoryRelations?: boolean | Prisma.ProProfile$categoryRelationsArgs<ExtArgs>
   _count?: boolean | Prisma.ProProfileCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ProProfileIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2024,6 +2139,7 @@ export type $ProProfilePayload<ExtArgs extends runtime.Types.Extensions.Internal
     payoutProfile: Prisma.$ProPayoutProfilePayload<ExtArgs> | null
     earnings: Prisma.$EarningPayload<ExtArgs>[]
     payouts: Prisma.$PayoutPayload<ExtArgs>[]
+    categoryRelations: Prisma.$ProProfileCategoryPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2034,7 +2150,6 @@ export type $ProProfilePayload<ExtArgs extends runtime.Types.Extensions.Internal
     bio: string | null
     avatarUrl: string | null
     hourlyRate: number
-    categories: $Enums.Category[]
     serviceArea: string | null
     status: $Enums.ProStatus
     profileCompleted: boolean
@@ -2445,6 +2560,7 @@ export interface Prisma__ProProfileClient<T, Null = never, ExtArgs extends runti
   payoutProfile<T extends Prisma.ProProfile$payoutProfileArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ProProfile$payoutProfileArgs<ExtArgs>>): Prisma.Prisma__ProPayoutProfileClient<runtime.Types.Result.GetResult<Prisma.$ProPayoutProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   earnings<T extends Prisma.ProProfile$earningsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ProProfile$earningsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EarningPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   payouts<T extends Prisma.ProProfile$payoutsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ProProfile$payoutsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PayoutPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  categoryRelations<T extends Prisma.ProProfile$categoryRelationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ProProfile$categoryRelationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProProfileCategoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2482,7 +2598,6 @@ export interface ProProfileFieldRefs {
   readonly bio: Prisma.FieldRef<"ProProfile", 'String'>
   readonly avatarUrl: Prisma.FieldRef<"ProProfile", 'String'>
   readonly hourlyRate: Prisma.FieldRef<"ProProfile", 'Float'>
-  readonly categories: Prisma.FieldRef<"ProProfile", 'Category[]'>
   readonly serviceArea: Prisma.FieldRef<"ProProfile", 'String'>
   readonly status: Prisma.FieldRef<"ProProfile", 'ProStatus'>
   readonly profileCompleted: Prisma.FieldRef<"ProProfile", 'Boolean'>
@@ -3047,6 +3162,30 @@ export type ProProfile$payoutsArgs<ExtArgs extends runtime.Types.Extensions.Inte
   take?: number
   skip?: number
   distinct?: Prisma.PayoutScalarFieldEnum | Prisma.PayoutScalarFieldEnum[]
+}
+
+/**
+ * ProProfile.categoryRelations
+ */
+export type ProProfile$categoryRelationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ProProfileCategory
+   */
+  select?: Prisma.ProProfileCategorySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ProProfileCategory
+   */
+  omit?: Prisma.ProProfileCategoryOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProProfileCategoryInclude<ExtArgs> | null
+  where?: Prisma.ProProfileCategoryWhereInput
+  orderBy?: Prisma.ProProfileCategoryOrderByWithRelationInput | Prisma.ProProfileCategoryOrderByWithRelationInput[]
+  cursor?: Prisma.ProProfileCategoryWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ProProfileCategoryScalarFieldEnum | Prisma.ProProfileCategoryScalarFieldEnum[]
 }
 
 /**

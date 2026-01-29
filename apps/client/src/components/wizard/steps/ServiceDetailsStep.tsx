@@ -5,20 +5,14 @@ import { Filter, Calendar, Clock } from "lucide-react";
 import { Text } from "@repo/ui";
 import { Card } from "@repo/ui";
 import { Input } from "@repo/ui";
-import { Category } from "@repo/domain";
 import { useWizardState } from "@/lib/wizard/useWizardState";
 import { useProDetail } from "@/hooks/pro";
 import { useTodayDate } from "@/hooks/shared";
 import { useAvailableOrderTimes } from "@/hooks/order";
 import { useRebookTemplate } from "@/hooks/order";
-
-const CATEGORY_OPTIONS: { value: Category; label: string }[] = [
-  { value: Category.PLUMBING, label: "Plomería" },
-  { value: Category.ELECTRICAL, label: "Electricidad" },
-  { value: Category.CLEANING, label: "Limpieza" },
-  { value: Category.HANDYMAN, label: "Arreglos generales" },
-  { value: Category.PAINTING, label: "Pintura" },
-];
+import { useCategories } from "@/hooks/category";
+import { useCategoryBySlug } from "@/hooks/category";
+import { useCategory } from "@/hooks/category";
 
 interface ServiceDetailsStepProps {
   onNext?: () => void;
@@ -27,28 +21,41 @@ interface ServiceDetailsStepProps {
 export function ServiceDetailsStep({}: ServiceDetailsStepProps) {
   const { state, updateState, navigateToStep } = useWizardState();
   const today = useTodayDate();
+  const { categories } = useCategories();
 
   // Fetch rebook template if rebookFrom is present
   const { data: rebookTemplate, isLoading: isLoadingRebook } =
     useRebookTemplate(state.rebookFrom || undefined);
 
+  // Fetch category from rebook template to get slug
+  const { category: rebookCategory } = useCategory(
+    rebookTemplate?.categoryId || undefined
+  );
+
   // Derive initial values from rebook template
   const rebookValues = useMemo(() => {
-    if (rebookTemplate) {
+    if (rebookTemplate && rebookCategory) {
       return {
-        category: rebookTemplate.category,
+        categorySlug: rebookCategory.slug,
         address: rebookTemplate.addressText,
         hours: rebookTemplate.estimatedHours.toString(),
       };
     }
     return null;
-  }, [rebookTemplate]);
+  }, [rebookTemplate, rebookCategory]);
+
+  // Fetch category by slug from URL
+  const { category: urlCategory } = useCategoryBySlug(
+    state.categorySlug || undefined
+  );
 
   // Determine proId: from rebook template or query param
   const effectiveProId = rebookTemplate?.proProfileId || state.proId;
 
-  const [category, setCategory] = useState<Category | "">(
-    state.category || rebookValues?.category || ""
+  // Use category from URL or rebook template
+  const selectedCategory = urlCategory || rebookCategory;
+  const [categoryId, setCategoryId] = useState<string | "">(
+    selectedCategory?.id || ""
   );
   const [date, setDate] = useState(state.date || "");
   const [time, setTime] = useState(state.time || "");
@@ -60,18 +67,22 @@ export function ServiceDetailsStep({}: ServiceDetailsStepProps) {
   // Track previous rebookValues to update state only when template first loads
   const prevRebookValuesRef = useRef(rebookValues);
 
-  // Update form fields when rebook template first becomes available
+  // Update form fields when rebook template or URL category first becomes available
   useEffect(() => {
     const prevValues = prevRebookValuesRef.current;
     if (rebookValues && prevValues !== rebookValues) {
       prevRebookValuesRef.current = rebookValues;
       startTransition(() => {
-        if (category !== rebookValues.category) {
-          setCategory(rebookValues.category);
+        if (selectedCategory && categoryId !== selectedCategory.id) {
+          setCategoryId(selectedCategory.id);
         }
       });
+    } else if (selectedCategory && categoryId !== selectedCategory.id) {
+      startTransition(() => {
+        setCategoryId(selectedCategory.id);
+      });
     }
-  }, [rebookValues, category]);
+  }, [rebookValues, selectedCategory, categoryId]);
 
   const { availableTimes, handleDateChange: handleDateChangeWithValidation } =
     useAvailableOrderTimes(date, today, time, setTime, {
@@ -88,22 +99,25 @@ export function ServiceDetailsStep({}: ServiceDetailsStepProps) {
 
   const canProceed = useMemo(() => {
     return !!(
-      category &&
+      categoryId &&
       date &&
       time &&
       effectiveProId &&
       pro &&
-      pro.categories.includes(category as Category)
+      pro.categoryIds.includes(categoryId)
     );
-  }, [category, date, time, effectiveProId, pro]);
+  }, [categoryId, date, time, effectiveProId, pro]);
 
   const handleNext = () => {
     if (!canProceed) return;
 
+    // Find selected category object to get slug
+    const selectedCategoryObj = categories.find((c) => c.id === categoryId);
+
     // Navigate to next step with updated state values
     const updatedParams: Record<string, string> = {
       proId: effectiveProId!,
-      category: category as Category,
+      categorySlug: selectedCategoryObj?.slug || "",
       date,
       time,
     };
@@ -117,13 +131,13 @@ export function ServiceDetailsStep({}: ServiceDetailsStepProps) {
     navigateToStep("location", updatedParams);
   };
 
-  // Filter categories based on pro's available categories
+  // Filter categories based on pro's available categoryIds
   const availableCategories = useMemo(() => {
-    if (!pro?.categories) return CATEGORY_OPTIONS;
-    return CATEGORY_OPTIONS.filter((option) =>
-      pro.categories.includes(option.value)
+    if (!pro?.categoryIds || categories.length === 0) return [];
+    return categories.filter((category) =>
+      pro.categoryIds.includes(category.id)
     );
-  }, [pro]);
+  }, [pro, categories]);
 
   if (isLoadingRebook || isLoadingPro) {
     return (
@@ -181,15 +195,15 @@ export function ServiceDetailsStep({}: ServiceDetailsStepProps) {
               Categoría
             </label>
             <select
-              value={category}
-              onChange={(e) => setCategory(e.target.value as Category | "")}
+              value={categoryId}
+              onChange={(e) => setCategoryId(e.target.value)}
               required
               className="w-full px-4 py-3 md:px-3 md:py-2 border border-border rounded-lg md:rounded-md bg-surface text-text text-base md:text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent touch-manipulation"
             >
               <option value="">Seleccionar categoría</option>
-              {availableCategories.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
+              {availableCategories.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
                 </option>
               ))}
             </select>

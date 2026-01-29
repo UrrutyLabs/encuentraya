@@ -8,6 +8,8 @@ import {
   useCancelOrder,
   useForceOrderStatus,
 } from "@/hooks/useOrders";
+import { useCategory } from "@/hooks/useCategories";
+import { useSubcategory } from "@/hooks/useSubcategories";
 import {
   getOrderStatusLabel,
   getOrderStatusVariant,
@@ -35,6 +37,12 @@ export function OrderDetailScreen({ orderId }: OrderDetailScreenProps) {
   const { data: order, isLoading, refetch } = useOrder(orderId);
   const cancelMutation = useCancelOrder();
   const forceStatusMutation = useForceOrderStatus();
+
+  // Fetch category and subcategory data
+  const { data: category } = useCategory(order?.categoryId || "", {
+    includeDeleted: true, // Include deleted to show if category was deleted
+  });
+  const { data: subcategory } = useSubcategory(order?.subcategoryId || "");
 
   const formatDate = (date: Date) => {
     return new Date(date).toLocaleDateString("es-UY", {
@@ -142,8 +150,26 @@ export function OrderDetailScreen({ orderId }: OrderDetailScreenProps) {
             <Text variant="small" className="text-gray-600">
               Categoría
             </Text>
-            <Text variant="body">{order.category}</Text>
+            <Text variant="body">
+              {category
+                ? category.deletedAt || !category.isActive
+                  ? `${category.name} (eliminada)`
+                  : category.name
+                : order.categoryId
+                  ? "Cargando..."
+                  : "—"}
+            </Text>
           </div>
+          {order.subcategoryId && (
+            <div>
+              <Text variant="small" className="text-gray-600">
+                Subcategoría
+              </Text>
+              <Text variant="body">
+                {subcategory ? subcategory.name : "Cargando..."}
+              </Text>
+            </div>
+          )}
           <div>
             <Text variant="small" className="text-gray-600">
               Fecha programada
@@ -221,6 +247,32 @@ export function OrderDetailScreen({ orderId }: OrderDetailScreenProps) {
         </Text>
         <Text variant="body">{order.addressText}</Text>
       </Card>
+
+      {/* Category Metadata */}
+      {order.categoryMetadataJson &&
+        Object.keys(order.categoryMetadataJson).length > 0 && (
+          <Card className="p-6">
+            <Text variant="h2" className="mb-4">
+              Metadatos de Categoría
+            </Text>
+            <div className="space-y-2">
+              {Object.entries(order.categoryMetadataJson).map(
+                ([key, value]) => (
+                  <div key={key}>
+                    <Text variant="small" className="text-gray-600 capitalize">
+                      {key.replace(/_/g, " ")}
+                    </Text>
+                    <Text variant="body">
+                      {typeof value === "object"
+                        ? JSON.stringify(value, null, 2)
+                        : String(value)}
+                    </Text>
+                  </div>
+                )
+              )}
+            </div>
+          </Card>
+        )}
 
       {/* Dispute Info */}
       {order.status === OrderStatus.DISPUTED && (

@@ -1,8 +1,6 @@
 // Enums and enum schemas
 export {
   Role,
-  BookingStatus,
-  Category,
   PaymentProvider,
   PaymentType,
   PaymentStatus,
@@ -13,8 +11,6 @@ export {
   ApprovalMethod,
   DisputeStatus,
   roleSchema,
-  bookingStatusSchema,
-  categorySchema,
   paymentProviderSchema,
   paymentTypeSchema,
   paymentStatusSchema,
@@ -26,15 +22,7 @@ export {
   disputeStatusSchema,
 } from "./enums";
 
-// Booking schemas
-export {
-  bookingSchema,
-  bookingCreateInputSchema,
-  bookingCreateOutputSchema,
-  type Booking,
-  type BookingCreateInput,
-  type BookingCreateOutput,
-} from "./schemas/booking.schema";
+// Booking schemas removed - bookings have been replaced by orders
 
 // Pro schemas
 export {
@@ -96,16 +84,24 @@ export {
 
 // Category schemas
 export {
-  categoryMetadataSchema,
-  categoryMetadataListSchema,
-  type CategoryMetadata,
+  categorySchema,
+  categoryListSchema,
+  categoryCreateInputSchema,
+  categoryUpdateInputSchema,
+  type Category,
+  type CategoryCreateInput,
+  type CategoryUpdateInput,
 } from "./schemas/category.schema";
 
 // Subcategory schemas
 export {
   subcategorySchema,
   subcategoryListSchema,
+  subcategoryCreateInputSchema,
+  subcategoryUpdateInputSchema,
   type Subcategory,
+  type SubcategoryCreateInput,
+  type SubcategoryUpdateInput,
 } from "./schemas/subcategory.schema";
 
 // Order schemas
@@ -115,18 +111,16 @@ export {
   orderUpdateInputSchema,
   orderLineItemSchema,
   orderLineItemCreateInputSchema,
+  categoryMetadataInputSchema,
   type Order,
   type OrderCreateInput,
   type OrderUpdateInput,
   type OrderLineItem,
   type OrderLineItemCreateInput,
+  type CategoryMetadataInput,
 } from "./schemas/order.schema";
 
 // Format utilities
 export { formatCurrency } from "./utils/format";
 
-// Booking status utilities
-export {
-  getBookingStatusLabel,
-  getBookingStatusVariant,
-} from "./utils/booking-status";
+// Booking status utilities removed - bookings have been replaced by orders

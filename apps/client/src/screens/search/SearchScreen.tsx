@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Navigation } from "@/components/presentational/Navigation";
 import { SearchHero } from "@/components/search/SearchHero";
 import { CategoryCarousel } from "@/components/search/CategoryCarousel";
 import { SubcategoryGrid } from "@/components/search/SubcategoryGrid";
-import { Category, type Subcategory } from "@repo/domain";
+import type { Category, Subcategory } from "@repo/domain";
+import { useCategories } from "@/hooks/category";
 
 /**
  * SearchScreen Component
@@ -27,9 +28,17 @@ import { Category, type Subcategory } from "@repo/domain";
  */
 export function SearchScreen() {
   const router = useRouter();
+  const { categories } = useCategories();
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(
-    Category.PLUMBING
+    null
   );
+
+  // Set default selected category to first category when categories load
+  useEffect(() => {
+    if (categories.length > 0 && !selectedCategory) {
+      setSelectedCategory(categories[0]);
+    }
+  }, [categories, selectedCategory]);
 
   const handleCategoryClick = useCallback((category: Category) => {
     setSelectedCategory(category);
@@ -46,13 +55,15 @@ export function SearchScreen() {
 
   const handleSubcategoryClick = useCallback(
     (subcategory: Subcategory) => {
-      // Navigate to results page with category and subcategory
+      // Navigate to results page with category slug and subcategory slug
       const params = new URLSearchParams();
-      params.set("category", subcategory.category);
+      if (selectedCategory) {
+        params.set("category", selectedCategory.slug);
+      }
       params.set("subcategory", subcategory.slug);
       router.push(`/search/results?${params.toString()}`);
     },
-    [router]
+    [router, selectedCategory]
   );
 
   return (

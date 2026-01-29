@@ -1,13 +1,15 @@
 import { useMemo } from "react";
 import { useMyOrders } from "../order";
-import { OrderStatus, Category } from "@repo/domain";
+import { useCategories } from "../category";
+import { OrderStatus } from "@repo/domain";
 
 /**
  * Hook to compute account statistics from orders
  * Encapsulates statistics calculation logic
  */
 export function useSettingsStats() {
-  const { orders, isLoading } = useMyOrders();
+  const { orders, isLoading: ordersLoading } = useMyOrders();
+  const { categories, isLoading: categoriesLoading } = useCategories();
 
   const stats = useMemo(() => {
     if (!orders || orders.length === 0) {
@@ -29,35 +31,26 @@ export function useSettingsStats() {
       .filter((o) => o.status === OrderStatus.COMPLETED && o.totalAmount)
       .reduce((sum, o) => sum + (o.totalAmount || 0), 0);
 
-    // Find favorite category (most ordered)
-    const categoryCounts: Record<Category, number> = {} as Record<
-      Category,
-      number
-    >;
+    // Find favorite category (most ordered) by categoryId
+    const categoryCounts: Record<string, number> = {};
     orders.forEach((o) => {
-      categoryCounts[o.category] = (categoryCounts[o.category] || 0) + 1;
+      if (o.categoryId) {
+        categoryCounts[o.categoryId] = (categoryCounts[o.categoryId] || 0) + 1;
+      }
     });
 
-    const favoriteCategoryEntry = (
-      Object.entries(categoryCounts) as [Category, number][]
-    ).reduce<[Category | undefined, number]>(
-      (max, [category, count]) => {
-        return count > max[1] ? [category, count] : max;
+    const favoriteCategoryEntry = Object.entries(categoryCounts).reduce<
+      [string | undefined, number]
+    >(
+      (max, [categoryId, count]) => {
+        return count > max[1] ? [categoryId, count] : max;
       },
       [undefined, 0]
     );
 
-    // Map category enum to Spanish label
-    const categoryLabels: Record<Category, string> = {
-      [Category.PLUMBING]: "Plomería",
-      [Category.ELECTRICAL]: "Electricidad",
-      [Category.CLEANING]: "Limpieza",
-      [Category.HANDYMAN]: "Arreglos generales",
-      [Category.PAINTING]: "Pintura",
-    };
-
+    // Map categoryId to category name
     const favoriteCategory = favoriteCategoryEntry[0]
-      ? categoryLabels[favoriteCategoryEntry[0] as Category]
+      ? categories.find((c) => c.id === favoriteCategoryEntry[0])?.name
       : undefined;
 
     return {
@@ -66,10 +59,10 @@ export function useSettingsStats() {
       totalSpent: totalSpent > 0 ? totalSpent : undefined,
       favoriteCategory,
     };
-  }, [orders]);
+  }, [orders, categories]);
 
   return {
     stats,
-    isLoading,
+    isLoading: ordersLoading || categoriesLoading,
   };
 }

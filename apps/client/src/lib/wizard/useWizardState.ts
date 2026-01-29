@@ -2,11 +2,10 @@
 
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { useCallback, useMemo } from "react";
-import { Category } from "@repo/domain";
 
 export interface WizardState {
   proId: string | null;
-  category: Category | null;
+  categorySlug: string | null; // Category slug for URL (user-friendly)
   date: string | null;
   time: string | null;
   address: string | null;
@@ -22,7 +21,7 @@ export function useWizardState() {
   const state: WizardState = useMemo(
     () => ({
       proId: searchParams.get("proId"),
-      category: (searchParams.get("category") as Category) || null,
+      categorySlug: searchParams.get("category") || null, // Use "category" param name for slug
       date: searchParams.get("date"),
       time: searchParams.get("time"),
       address: searchParams.get("address"),
@@ -38,9 +37,19 @@ export function useWizardState() {
 
       Object.entries(updates).forEach(([key, value]) => {
         if (value === null || value === "") {
-          params.delete(key);
+          // Map categorySlug to "category" param name in URL
+          if (key === "categorySlug") {
+            params.delete("category");
+          } else {
+            params.delete(key);
+          }
         } else {
-          params.set(key, String(value));
+          // Map categorySlug to "category" param name in URL
+          if (key === "categorySlug") {
+            params.set("category", String(value));
+          } else {
+            params.set(key, String(value));
+          }
         }
       });
 
@@ -58,7 +67,12 @@ export function useWizardState() {
       if (additionalParams) {
         Object.entries(additionalParams).forEach(([key, value]) => {
           if (value) {
-            params.set(key, value);
+            // Map categorySlug to "category" param name in URL
+            if (key === "categorySlug") {
+              params.set("category", value);
+            } else {
+              params.set(key, value);
+            }
           }
         });
       }

@@ -2,11 +2,25 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { renderHook } from "@testing-library/react";
 import { useSettingsStats } from "../useSettingsStats";
 import { useMyOrders } from "../../order";
-import { OrderStatus, Category } from "@repo/domain";
+import { OrderStatus } from "@repo/domain";
 import type { Order } from "@repo/domain";
 
 // Mock useMyOrders hook
 vi.mock("../../order/useMyOrders");
+// Mock useCategories hook
+vi.mock("../../category/useCategories", () => ({
+  useCategories: () => ({
+    categories: [
+      { id: "cat-plumbing", name: "Plomería", key: "PLUMBING" },
+      { id: "cat-electrical", name: "Electricidad", key: "ELECTRICAL" },
+      { id: "cat-cleaning", name: "Limpieza", key: "CLEANING" },
+      { id: "cat-handyman", name: "Arreglos generales", key: "HANDYMAN" },
+      { id: "cat-painting", name: "Pintura", key: "PAINTING" },
+    ],
+    isLoading: false,
+    error: null,
+  }),
+}));
 
 const mockUseMyOrders = vi.mocked(useMyOrders);
 
@@ -60,19 +74,19 @@ describe("useSettingsStats", () => {
         {
           id: "order-1",
           status: OrderStatus.PENDING_PRO_CONFIRMATION,
-          category: Category.PLUMBING,
+          categoryId: "cat-plumbing",
           totalAmount: null,
         },
         {
           id: "order-2",
           status: OrderStatus.CONFIRMED,
-          category: Category.ELECTRICAL,
+          categoryId: "cat-electrical",
           totalAmount: null,
         },
         {
           id: "order-3",
           status: OrderStatus.COMPLETED,
-          category: Category.CLEANING,
+          categoryId: "cat-cleaning",
           totalAmount: 10000,
         },
       ] as Order[];
@@ -96,25 +110,25 @@ describe("useSettingsStats", () => {
         {
           id: "order-1",
           status: OrderStatus.PENDING_PRO_CONFIRMATION,
-          category: Category.PLUMBING,
+          categoryId: "cat-plumbing",
           totalAmount: null,
         },
         {
           id: "order-2",
           status: OrderStatus.COMPLETED,
-          category: Category.ELECTRICAL,
+          categoryId: "cat-electrical",
           totalAmount: 10000,
         },
         {
           id: "order-3",
           status: OrderStatus.COMPLETED,
-          category: Category.CLEANING,
+          categoryId: "cat-cleaning",
           totalAmount: 15000,
         },
         {
           id: "order-4",
           status: OrderStatus.CANCELED,
-          category: Category.HANDYMAN,
+          categoryId: "cat-handyman",
           totalAmount: null,
         },
       ] as Order[];
@@ -138,19 +152,19 @@ describe("useSettingsStats", () => {
         {
           id: "order-1",
           status: OrderStatus.COMPLETED,
-          category: Category.PLUMBING,
+          categoryId: "cat-plumbing",
           totalAmount: 10000,
         },
         {
           id: "order-2",
           status: OrderStatus.COMPLETED,
-          category: Category.ELECTRICAL,
+          categoryId: "cat-electrical",
           totalAmount: 15000,
         },
         {
           id: "order-3",
           status: OrderStatus.COMPLETED,
-          category: Category.CLEANING,
+          categoryId: "cat-cleaning",
           totalAmount: 5000,
         },
       ] as Order[];
@@ -172,13 +186,13 @@ describe("useSettingsStats", () => {
         {
           id: "order-1",
           status: OrderStatus.COMPLETED,
-          category: Category.PLUMBING,
+          categoryId: "cat-plumbing",
           totalAmount: 10000,
         },
         {
           id: "order-2",
           status: OrderStatus.COMPLETED,
-          category: Category.ELECTRICAL,
+          categoryId: "cat-electrical",
           totalAmount: null,
         },
       ] as Order[];
@@ -200,7 +214,7 @@ describe("useSettingsStats", () => {
         {
           id: "order-1",
           status: OrderStatus.PENDING_PRO_CONFIRMATION,
-          category: Category.PLUMBING,
+          categoryId: "cat-plumbing",
           totalAmount: null,
         },
       ] as unknown as Order[];
@@ -224,25 +238,25 @@ describe("useSettingsStats", () => {
         {
           id: "order-1",
           status: OrderStatus.PENDING_PRO_CONFIRMATION,
-          category: Category.PLUMBING,
+          categoryId: "cat-plumbing",
           totalAmount: null,
         },
         {
           id: "order-2",
           status: OrderStatus.CONFIRMED,
-          category: Category.PLUMBING,
+          categoryId: "cat-plumbing",
           totalAmount: null,
         },
         {
           id: "order-3",
           status: OrderStatus.COMPLETED,
-          category: Category.PLUMBING,
+          categoryId: "cat-plumbing",
           totalAmount: 10000,
         },
         {
           id: "order-4",
           status: OrderStatus.COMPLETED,
-          category: Category.ELECTRICAL,
+          categoryId: "cat-electrical",
           totalAmount: 15000,
         },
       ] as Order[];
@@ -264,13 +278,13 @@ describe("useSettingsStats", () => {
         {
           id: "order-1",
           status: OrderStatus.PENDING_PRO_CONFIRMATION,
-          category: Category.ELECTRICAL,
+          categoryId: "cat-electrical",
           totalAmount: null,
         },
         {
           id: "order-2",
           status: OrderStatus.COMPLETED,
-          category: Category.ELECTRICAL,
+          categoryId: "cat-electrical",
           totalAmount: 10000,
         },
       ] as Order[];
@@ -292,13 +306,13 @@ describe("useSettingsStats", () => {
         {
           id: "order-1",
           status: OrderStatus.PENDING_PRO_CONFIRMATION,
-          category: Category.PLUMBING,
+          categoryId: "cat-plumbing",
           totalAmount: null,
         },
         {
           id: "order-2",
           status: OrderStatus.COMPLETED,
-          category: Category.ELECTRICAL,
+          categoryId: "cat-electrical",
           totalAmount: 10000,
         },
       ] as Order[];
@@ -335,12 +349,12 @@ describe("useSettingsStats", () => {
 
   describe("category labels mapping", () => {
     it("should map all categories to correct Spanish labels", () => {
-      const categories = [
-        Category.PLUMBING,
-        Category.ELECTRICAL,
-        Category.CLEANING,
-        Category.HANDYMAN,
-        Category.PAINTING,
+      const categoryIds = [
+        "cat-plumbing",
+        "cat-electrical",
+        "cat-cleaning",
+        "cat-handyman",
+        "cat-painting",
       ];
 
       const expectedLabels = [
@@ -351,12 +365,12 @@ describe("useSettingsStats", () => {
         "Pintura",
       ];
 
-      categories.forEach((category, index) => {
+      categoryIds.forEach((categoryId, index) => {
         const mockOrders = [
           {
             id: "order-1",
             status: OrderStatus.COMPLETED,
-            category,
+            categoryId,
             totalAmount: 10000,
           },
         ] as Order[];
