@@ -109,7 +109,8 @@ export function PaymentsTable({ payments, isLoading }: PaymentsTableProps) {
                       Est:{" "}
                       {formatCurrency(
                         payment.amountEstimated,
-                        payment.currency
+                        payment.currency,
+                        true
                       )}
                     </div>
                     {payment.amountAuthorized && (
@@ -117,7 +118,8 @@ export function PaymentsTable({ payments, isLoading }: PaymentsTableProps) {
                         Aut:{" "}
                         {formatCurrency(
                           payment.amountAuthorized,
-                          payment.currency
+                          payment.currency,
+                          true
                         )}
                       </div>
                     )}
@@ -126,7 +128,8 @@ export function PaymentsTable({ payments, isLoading }: PaymentsTableProps) {
                         Cap:{" "}
                         {formatCurrency(
                           payment.amountCaptured,
-                          payment.currency
+                          payment.currency,
+                          true
                         )}
                       </div>
                     )}

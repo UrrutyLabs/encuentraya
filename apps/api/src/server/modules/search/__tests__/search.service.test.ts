@@ -37,7 +37,7 @@ describe("SearchService", () => {
       phone: "+1234567890",
       bio: "Test bio",
       avatarUrl: "https://example.com/avatar.jpg",
-      hourlyRate: 100,
+      hourlyRate: 10000, // 100 UYU/hour in minor units (cents)
       categoryIds: ["cat-plumbing"],
       serviceArea: "Test Area",
       rating: 4.5,

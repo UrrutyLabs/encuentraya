@@ -178,7 +178,9 @@ describe("useSettingsStats", () => {
 
       const { result } = renderHook(() => useSettingsStats());
 
-      expect(result.current.stats.totalSpent).toBe(30000);
+      // totalSpent is converted to major units for display
+      // 10000 + 15000 + 5000 = 30000 cents = 300 UYU
+      expect(result.current.stats.totalSpent).toBe(300);
     });
 
     it("should exclude completed bookings without totalAmount", () => {
@@ -206,7 +208,9 @@ describe("useSettingsStats", () => {
 
       const { result } = renderHook(() => useSettingsStats());
 
-      expect(result.current.stats.totalSpent).toBe(10000);
+      // totalSpent is converted to major units for display
+      // 10000 cents = 100 UYU
+      expect(result.current.stats.totalSpent).toBe(100);
     });
 
     it("should return undefined when totalSpent is zero", () => {

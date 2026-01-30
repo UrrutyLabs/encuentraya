@@ -123,7 +123,7 @@ describe("OrderFinalizationService", () => {
       canceledAt: null,
       cancelReason: null,
       pricingMode: PricingMode.HOURLY,
-      hourlyRateSnapshotAmount: 100,
+      hourlyRateSnapshotAmount: 10000, // 100 UYU/hour in minor units (cents)
       currency: "UYU",
       minHoursSnapshot: null,
       estimatedHours: 2,
@@ -179,7 +179,7 @@ describe("OrderFinalizationService", () => {
       canceledAt: null,
       cancelReason: null,
       pricingMode: PricingMode.HOURLY,
-      hourlyRateSnapshotAmount: 100,
+      hourlyRateSnapshotAmount: 10000, // 100 UYU/hour in minor units (cents)
       currency: "UYU",
       minHoursSnapshot: null,
       estimatedHours: 2,
@@ -295,25 +295,25 @@ describe("OrderFinalizationService", () => {
       });
       const platformFeeItem = createMockOrderLineItem({
         type: OrderLineItemType.PLATFORM_FEE,
-        amount: 30,
+        amount: 3000, // 30 UYU in minor units (cents)
       });
       const taxItem = createMockOrderLineItem({
         type: OrderLineItemType.TAX,
-        amount: 72.6,
+        amount: 7260, // 72.6 UYU in minor units (cents)
       });
       const finalizedOrderEntity = createMockOrderEntity({
         status: OrderStatus.COMPLETED,
-        subtotalAmount: 330,
-        platformFeeAmount: 30,
-        taxAmount: 72.6,
-        totalAmount: 402.6,
+        subtotalAmount: 33000, // 330 UYU in minor units (cents)
+        platformFeeAmount: 3000, // 30 UYU in minor units (cents)
+        taxAmount: 7260, // 72.6 UYU in minor units (cents)
+        totalAmount: 40260, // 402.6 UYU in minor units (cents)
       });
       const finalizedOrder = createMockOrder({
         status: OrderStatus.COMPLETED,
-        subtotalAmount: 330,
-        platformFeeAmount: 30,
-        taxAmount: 72.6,
-        totalAmount: 402.6,
+        subtotalAmount: 33000, // 330 UYU in minor units (cents)
+        platformFeeAmount: 3000, // 30 UYU in minor units (cents)
+        taxAmount: 7260, // 72.6 UYU in minor units (cents)
+        totalAmount: 40260, // 402.6 UYU in minor units (cents)
       });
 
       mockOrderService.getOrderOrThrow.mockResolvedValue(order);
@@ -343,10 +343,10 @@ describe("OrderFinalizationService", () => {
       );
 
       expect(result.status).toBe(OrderStatus.COMPLETED);
-      expect(result.subtotalAmount).toBe(330);
-      expect(result.platformFeeAmount).toBe(30);
-      expect(result.taxAmount).toBe(72.6);
-      expect(result.totalAmount).toBe(402.6);
+      expect(result.subtotalAmount).toBe(33000); // 330 UYU in minor units (cents)
+      expect(result.platformFeeAmount).toBe(3000); // 30 UYU in minor units (cents)
+      expect(result.taxAmount).toBe(7260); // 72.6 UYU in minor units (cents)
+      expect(result.totalAmount).toBe(40260); // 402.6 UYU in minor units (cents)
       expect(mockOrderRepository.update).toHaveBeenCalledTimes(2);
       expect(mockOrderRepository.updateStatus).toHaveBeenCalledWith(
         "order-1",
@@ -358,22 +358,22 @@ describe("OrderFinalizationService", () => {
       const order = createMockOrder({
         status: OrderStatus.AWAITING_CLIENT_APPROVAL,
         finalHoursSubmitted: 3,
-        hourlyRateSnapshotAmount: 100,
+        hourlyRateSnapshotAmount: 10000, // 100 UYU/hour in minor units (cents)
       });
       const updatedOrderEntity = createMockOrderEntity({
         approvedHours: 3,
       });
       const laborItem = createMockOrderLineItem({
         type: OrderLineItemType.LABOR,
-        amount: 300,
+        amount: 30000, // 300 UYU in minor units (cents)
       });
       const platformFeeItem = createMockOrderLineItem({
         type: OrderLineItemType.PLATFORM_FEE,
-        amount: 30,
+        amount: 3000, // 30 UYU in minor units (cents)
       });
       const taxItem = createMockOrderLineItem({
         type: OrderLineItemType.TAX,
-        amount: 72.6,
+        amount: 7260, // 72.6 UYU in minor units (cents)
       });
       const finalizedOrder = createMockOrder({
         status: OrderStatus.COMPLETED,
@@ -409,14 +409,15 @@ describe("OrderFinalizationService", () => {
         expect.arrayContaining([
           expect.objectContaining({
             type: OrderLineItemType.LABOR,
-            amount: 300,
+            amount: 30000, // 300 UYU in minor units (cents)
           }),
           expect.objectContaining({
             type: OrderLineItemType.PLATFORM_FEE,
-            amount: 30,
+            amount: 3000, // 30 UYU in minor units (cents)
           }),
           expect.objectContaining({
             type: OrderLineItemType.TAX,
+            amount: 7260, // 72.6 UYU in minor units (cents)
           }),
         ])
       );

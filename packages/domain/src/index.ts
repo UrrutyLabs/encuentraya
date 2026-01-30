@@ -129,4 +129,7 @@ export {
 // Format utilities
 export { formatCurrency } from "./utils/format";
 
+// Amount conversion utilities
+export { toMinorUnits, toMajorUnits, roundMinorUnits } from "./utils/amount";
+
 // Booking status utilities removed - bookings have been replaced by orders

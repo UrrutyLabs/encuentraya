@@ -2,7 +2,7 @@
 
 import { DollarSign, Loader2 } from "lucide-react";
 import { Text } from "@repo/ui";
-import type { OrderEstimateOutput } from "@repo/domain";
+import { toMajorUnits, type OrderEstimateOutput } from "@repo/domain";
 
 interface ReviewCostBreakdownProps {
   estimation: OrderEstimateOutput | null | undefined;
@@ -65,8 +65,14 @@ export function ReviewCostBreakdown({
   }
 
   // Full breakdown with estimation data
+  // All amounts from estimation are in minor units, convert to major for display
   const { lineItems, subtotalAmount, taxAmount, totalAmount, currency } =
     estimation;
+
+  // Convert all amounts to major units for display
+  const subtotalMajor = toMajorUnits(subtotalAmount);
+  const taxMajor = toMajorUnits(taxAmount);
+  const totalMajor = toMajorUnits(totalAmount);
 
   return (
     <div className="space-y-3">
@@ -81,7 +87,7 @@ export function ReviewCostBreakdown({
               {item.description}
             </Text>
             <Text variant="body" className="font-medium md:text-right">
-              ${item.amount.toFixed(0)} {currency}
+              ${toMajorUnits(item.amount).toFixed(0)} {currency}
             </Text>
           </div>
         ))}
@@ -96,7 +102,7 @@ export function ReviewCostBreakdown({
           Subtotal
         </Text>
         <Text variant="body" className="font-medium md:text-right">
-          ${subtotalAmount.toFixed(0)} {currency}
+          ${subtotalMajor.toFixed(0)} {currency}
         </Text>
       </div>
 
@@ -106,7 +112,7 @@ export function ReviewCostBreakdown({
           IVA ({estimation.taxRate * 100}%)
         </Text>
         <Text variant="body" className="font-medium md:text-right">
-          ${taxAmount.toFixed(0)} {currency}
+          ${taxMajor.toFixed(0)} {currency}
         </Text>
       </div>
 
@@ -120,7 +126,7 @@ export function ReviewCostBreakdown({
             </Text>
           </div>
           <Text variant="h2" className="text-primary shrink-0">
-            ${totalAmount.toFixed(0)} {currency}
+            ${totalMajor.toFixed(0)} {currency}
           </Text>
         </div>
       </div>

@@ -5,10 +5,10 @@ import {
   calculatePlatformFee,
   calculateTax,
   calculateTotal,
-  roundCurrency,
   DEFAULT_PLATFORM_FEE_RATE,
   DEFAULT_TAX_RATE,
 } from "./order.calculations";
+import { toMinorUnits, toMajorUnits, roundMinorUnits } from "@repo/domain";
 import type { OrderEstimateInput, OrderEstimateOutput } from "@repo/domain";
 
 /**
@@ -24,6 +24,9 @@ export class OrderEstimationService {
   /**
    * Estimate order cost based on pro profile and estimated hours
    * Returns breakdown of labor, platform fee, tax, and totals
+   *
+   * IMPORTANT: All returned amounts are in MINOR UNITS (cents)
+   * Frontend should convert to major units for display using toMajorUnits()
    */
   async estimateOrderCost(
     input: OrderEstimateInput
@@ -34,63 +37,63 @@ export class OrderEstimationService {
       throw new Error(`Pro profile not found: ${input.proProfileId}`);
     }
 
-    const hourlyRate = proProfile.hourlyRate;
+    // hourlyRate is already in minor units (storage format)
+    const hourlyRateMinor = proProfile.hourlyRate;
+    const hourlyRateMajor = toMajorUnits(hourlyRateMinor); // Convert to major for display in description
     const estimatedHours = input.estimatedHours;
     const currency = "UYU"; // Default currency
 
-    // 1. Calculate labor amount
-    const laborAmount = roundCurrency(estimatedHours * hourlyRate);
+    // All calculations performed in minor units
+    // 1. Calculate labor amount (in minor units)
+    const laborAmount = roundMinorUnits(estimatedHours * hourlyRateMinor);
 
-    // 2. Calculate platform fee
-    const platformFeeAmount = roundCurrency(
-      calculatePlatformFee(laborAmount, DEFAULT_PLATFORM_FEE_RATE)
+    // 2. Calculate platform fee (in minor units)
+    const platformFeeAmount = calculatePlatformFee(
+      laborAmount,
+      DEFAULT_PLATFORM_FEE_RATE
     );
 
-    // 3. Calculate taxable base (labor + platform fee)
-    const taxableBase = roundCurrency(laborAmount + platformFeeAmount);
+    // 3. Calculate taxable base (labor + platform fee) in minor units
+    const taxableBase = laborAmount + platformFeeAmount;
 
-    // 4. Calculate tax (IVA)
-    const taxAmount = roundCurrency(
-      calculateTax(taxableBase, DEFAULT_TAX_RATE)
-    );
+    // 4. Calculate tax (IVA) in minor units
+    const taxAmount = calculateTax(taxableBase, DEFAULT_TAX_RATE);
 
-    // 5. Calculate subtotal (labor + platform fee)
-    const subtotalAmount = roundCurrency(laborAmount + platformFeeAmount);
+    // 5. Calculate subtotal (labor + platform fee) in minor units
+    const subtotalAmount = laborAmount + platformFeeAmount;
 
-    // 6. Calculate total (subtotal + tax)
-    const totalAmount = roundCurrency(
-      calculateTotal(subtotalAmount, taxAmount)
-    );
+    // 6. Calculate total (subtotal + tax) in minor units
+    const totalAmount = calculateTotal(subtotalAmount, taxAmount);
 
-    // 7. Build line items for display
+    // 7. Build line items for display (convert to major units for display only)
     const lineItems = [
       {
         type: "labor",
-        description: `Labor (${estimatedHours} horas × ${hourlyRate.toFixed(0)} ${currency}/hora)`,
-        amount: laborAmount,
+        description: `Labor (${estimatedHours} horas × ${hourlyRateMajor.toFixed(0)} ${currency}/hora)`,
+        amount: laborAmount, // Return in minor units
       },
       {
         type: "platform_fee",
         description: `Tarifa de plataforma (${(DEFAULT_PLATFORM_FEE_RATE * 100).toFixed(0)}%)`,
-        amount: platformFeeAmount,
+        amount: platformFeeAmount, // Return in minor units
       },
       {
         type: "tax",
         description: `IVA (${(DEFAULT_TAX_RATE * 100).toFixed(0)}%)`,
-        amount: taxAmount,
+        amount: taxAmount, // Return in minor units
       },
     ];
 
     return {
-      laborAmount,
-      platformFeeAmount,
+      laborAmount, // Minor units
+      platformFeeAmount, // Minor units
       platformFeeRate: DEFAULT_PLATFORM_FEE_RATE,
-      taxAmount,
+      taxAmount, // Minor units
       taxRate: DEFAULT_TAX_RATE,
-      subtotalAmount,
-      totalAmount,
+      subtotalAmount, // Minor units
+      totalAmount, // Minor units
       currency,
-      lineItems,
+      lineItems, // Amounts in minor units
     };
   }
 }

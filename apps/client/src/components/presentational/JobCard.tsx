@@ -8,7 +8,7 @@ import { Card } from "@repo/ui";
 import { Text } from "@repo/ui";
 import { Badge } from "@repo/ui";
 import type { Order } from "@repo/domain";
-import { OrderStatus } from "@repo/domain";
+import { OrderStatus, toMajorUnits } from "@repo/domain";
 import { getJobStatusLabel, getJobStatusVariant } from "@/utils/jobStatus";
 import { JOB_LABELS } from "@/utils/jobLabels";
 import { useCategory } from "@/hooks/category";
@@ -85,10 +85,11 @@ export const JobCard = memo(
       [router, job.id]
     );
 
-    // Calculate display amount
-    const displayAmount = job.totalAmount
+    // Calculate display amount (all amounts are in minor units, convert to major for display)
+    const displayAmountMinor = job.totalAmount
       ? job.totalAmount
       : job.hourlyRateSnapshotAmount * job.estimatedHours;
+    const displayAmount = toMajorUnits(displayAmountMinor);
 
     return (
       <Card

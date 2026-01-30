@@ -139,7 +139,7 @@ export function PaymentDetailScreen({ paymentId }: PaymentDetailScreenProps) {
               Monto estimado
             </Text>
             <Text variant="body">
-              {formatCurrency(payment.amountEstimated, payment.currency)}
+              {formatCurrency(payment.amountEstimated, payment.currency, true)}
             </Text>
           </div>
           <div>
@@ -148,7 +148,11 @@ export function PaymentDetailScreen({ paymentId }: PaymentDetailScreenProps) {
             </Text>
             <Text variant="body">
               {payment.amountAuthorized
-                ? formatCurrency(payment.amountAuthorized, payment.currency)
+                ? formatCurrency(
+                    payment.amountAuthorized,
+                    payment.currency,
+                    true
+                  )
                 : "-"}
             </Text>
           </div>
@@ -158,7 +162,7 @@ export function PaymentDetailScreen({ paymentId }: PaymentDetailScreenProps) {
             </Text>
             <Text variant="body">
               {payment.amountCaptured
-                ? formatCurrency(payment.amountCaptured, payment.currency)
+                ? formatCurrency(payment.amountCaptured, payment.currency, true)
                 : "-"}
             </Text>
           </div>

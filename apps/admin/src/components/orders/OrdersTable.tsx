@@ -6,7 +6,7 @@ import { CalendarX } from "lucide-react";
 import { Badge } from "@repo/ui";
 import { TableSkeleton } from "@/components/ui/TableSkeleton";
 import { EmptyState } from "@repo/ui";
-import { formatCurrency } from "@repo/domain";
+import { formatCurrency, toMajorUnits } from "@repo/domain";
 import {
   getOrderStatusLabel,
   getOrderStatusVariant,
@@ -73,10 +73,12 @@ export function OrdersTable({ orders, isLoading }: OrdersTableProps) {
   }
 
   // Calculate display amount for each order
+  // All amounts are in minor units, convert to major units for display
   const getDisplayAmount = (order: Order) => {
-    return order.totalAmount
+    const amountMinor = order.totalAmount
       ? order.totalAmount
       : order.hourlyRateSnapshotAmount * order.estimatedHours;
+    return toMajorUnits(amountMinor);
   };
 
   return (

@@ -108,14 +108,15 @@ export class PaymentService {
 
     // Calculate amount from order (use totalAmount if finalized, otherwise estimate)
     // For orders, we use the totalAmount if finalized, otherwise estimate from hourly rate
+    // Payment amounts must be in MINOR units (e.g., 40260 cents)
     let amountEstimated: number;
     if (order.totalAmount !== null) {
-      // Order is finalized, use total amount
-      amountEstimated = Math.round(order.totalAmount * 100); // Convert to minor units
+      // Order is finalized, use total amount (in minor units)
+      amountEstimated = Math.round(order.totalAmount);
     } else {
-      // Order not finalized yet, estimate from hourly rate snapshot
+      // Order not finalized yet, estimate from hourly rate snapshot (in minor units)
       const totalAmount = order.hourlyRateSnapshotAmount * order.estimatedHours;
-      amountEstimated = Math.round(totalAmount * 100); // Convert to minor units
+      amountEstimated = Math.round(totalAmount);
     }
 
     // Generate idempotency key

@@ -8,6 +8,7 @@ import type { Order } from "@repo/domain";
 import { OrderStatus } from "@repo/domain";
 import { getJobStatusLabel, getJobStatusVariant } from "../../utils/jobStatus";
 import { JOB_LABELS } from "../../utils/jobLabels";
+import { formatAmount } from "../../utils/format";
 import { theme } from "../../theme";
 
 interface JobCardProps {
@@ -87,7 +88,8 @@ function JobCardComponent({ job, onPress }: JobCardProps) {
               color={theme.colors.primary}
             />
             <Text variant="body" style={styles.amount}>
-              {JOB_LABELS.totalAmount}: ${job.totalAmount.toFixed(2)}
+              {JOB_LABELS.totalAmount}:{" "}
+              {formatAmount(job.totalAmount, job.currency)}
             </Text>
           </View>
         )}

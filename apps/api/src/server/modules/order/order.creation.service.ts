@@ -2,6 +2,7 @@ import { injectable, inject } from "tsyringe";
 import type { OrderRepository } from "./order.repo";
 import type { ProRepository } from "@modules/pro/pro.repo";
 import type { OrderCreateInput, Order } from "@repo/domain";
+import { toMinorUnits } from "@repo/domain";
 import type { Actor } from "@infra/auth/roles";
 import { TOKENS } from "@/server/container";
 import type { ClientProfileService } from "@modules/user/clientProfile.service";
@@ -70,6 +71,9 @@ export class OrderCreationService {
       throw new Error("Pro profile ID is required");
     }
 
+    // hourlyRateSnapshot is already in minor units (from pro.hourlyRate)
+    const hourlyRateSnapshotMinor = hourlyRateSnapshot;
+
     if (!input.categoryId) {
       throw new Error("categoryId is required");
     }
@@ -113,6 +117,7 @@ export class OrderCreationService {
     const isFirstOrder = existingOrders.length === 0;
 
     // Create order via repository
+    // Store hourlyRateSnapshotAmount in minor units
     const orderEntity = await this.orderRepository.create({
       clientUserId: actor.id,
       proProfileId: input.proProfileId,
@@ -128,7 +133,7 @@ export class OrderCreationService {
       scheduledWindowEndAt: input.scheduledWindowEndAt,
       estimatedHours: input.estimatedHours,
       pricingMode: "hourly",
-      hourlyRateSnapshotAmount: hourlyRateSnapshot,
+      hourlyRateSnapshotAmount: hourlyRateSnapshotMinor, // Store in minor units
       currency: "UYU",
       minHoursSnapshot: undefined,
       isFirstOrder,

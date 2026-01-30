@@ -13,7 +13,7 @@ import type { AvailabilityRepository } from "../availability.repo";
 import type { AvailabilityService } from "../availability.service";
 import { AuditEventType } from "@modules/audit/audit.repo";
 import type { ProOnboardInput, ProSetAvailabilityInput } from "@repo/domain";
-import { Role } from "@repo/domain";
+import { Role, toMinorUnits, toMajorUnits } from "@repo/domain";
 import type { Actor } from "@infra/auth/roles";
 
 describe("ProService", () => {
@@ -150,7 +150,7 @@ describe("ProService", () => {
       phone: "+1234567890",
       bio: "Test bio",
       avatarUrl: "https://example.com/avatar.jpg",
-      hourlyRate: 100,
+      hourlyRate: 10000, // 100 UYU/hour in minor units (cents)
       categoryIds: ["cat-plumbing"],
       serviceArea: "Test Area",
       status: "active",
@@ -240,7 +240,7 @@ describe("ProService", () => {
         name: "Test Pro",
         email: "pro@example.com",
         phone: "+1234567890",
-        hourlyRate: 100,
+        hourlyRate: 10000, // 100 UYU/hour in minor units (cents)
         categoryIds: ["cat-plumbing"],
         serviceArea: "Test Area",
       };
@@ -250,7 +250,7 @@ describe("ProService", () => {
         displayName: input.name,
         email: input.email,
         phone: input.phone,
-        hourlyRate: input.hourlyRate,
+        hourlyRate: input.hourlyRate, // Already in minor units
         categoryIds: input.categoryIds,
         serviceArea: input.serviceArea,
       });
@@ -271,7 +271,7 @@ describe("ProService", () => {
         email: input.email,
         phone: input.phone,
         bio: undefined,
-        hourlyRate: input.hourlyRate,
+        hourlyRate: input.hourlyRate, // Already in minor units
         categoryIds: input.categoryIds,
         serviceArea: input.serviceArea,
       });
@@ -280,7 +280,7 @@ describe("ProService", () => {
         name: proProfile.displayName,
         email: proProfile.email,
         phone: proProfile.phone ?? undefined,
-        hourlyRate: proProfile.hourlyRate,
+        hourlyRate: toMajorUnits(proProfile.hourlyRate), // API returns major units
         categoryIds: input.categoryIds,
         serviceArea: proProfile.serviceArea ?? undefined,
         rating: undefined,
@@ -297,7 +297,7 @@ describe("ProService", () => {
         name: "Test Pro",
         email: "pro@example.com",
         phone: "+1234567890",
-        hourlyRate: 100,
+        hourlyRate: 10000, // 100 UYU/hour in minor units (cents)
         categoryIds: ["cat-plumbing"],
         serviceArea: "Test Area",
         bio: "Optional bio text",
@@ -309,7 +309,7 @@ describe("ProService", () => {
         email: input.email,
         phone: input.phone,
         bio: input.bio,
-        hourlyRate: input.hourlyRate,
+        hourlyRate: input.hourlyRate, // Already in minor units
         categoryIds: input.categoryIds,
         serviceArea: input.serviceArea,
       });
@@ -329,7 +329,7 @@ describe("ProService", () => {
         email: input.email,
         phone: input.phone,
         bio: input.bio,
-        hourlyRate: input.hourlyRate,
+        hourlyRate: input.hourlyRate, // Already in minor units
         categoryIds: input.categoryIds,
         serviceArea: input.serviceArea,
       });
@@ -347,7 +347,7 @@ describe("ProService", () => {
         name: "Test Pro",
         email: "pro@example.com",
         phone: "+1234567890",
-        hourlyRate: 100,
+        hourlyRate: 10000, // 100 UYU/hour in minor units (cents)
         categoryIds: ["cat-plumbing"],
         serviceArea: "Test Area",
       };
@@ -378,7 +378,7 @@ describe("ProService", () => {
         name: "Test Pro",
         email: "pro@example.com",
         phone: "+1234567890",
-        hourlyRate: 100,
+        hourlyRate: 10000, // 100 UYU/hour in minor units (cents)
         categoryIds: ["cat-plumbing"],
         serviceArea: "Test Area",
       };
@@ -404,7 +404,7 @@ describe("ProService", () => {
         email: input.email,
         phone: input.phone,
         bio: input.bio ?? undefined,
-        hourlyRate: input.hourlyRate,
+        hourlyRate: input.hourlyRate, // Already in minor units
         categoryIds: input.categoryIds,
         serviceArea: input.serviceArea,
       });
@@ -422,7 +422,7 @@ describe("ProService", () => {
         name: "Test Pro",
         email: "pro@example.com",
         phone: "+1234567890",
-        hourlyRate: 100,
+        hourlyRate: 10000, // 100 UYU/hour in minor units (cents)
         categoryIds: ["cat-plumbing"],
         serviceArea: "Test Area",
       };
@@ -458,7 +458,7 @@ describe("ProService", () => {
         name: "Test Pro",
         email: "pro@example.com",
         phone: "+1234567890",
-        hourlyRate: 100,
+        hourlyRate: 10000, // 100 UYU/hour in minor units (cents)
         categoryIds: ["cat-plumbing"],
         serviceArea: "Test Area",
       };
@@ -748,13 +748,13 @@ describe("ProService", () => {
       const userId = "user-1";
       const input: Partial<ProOnboardInput> = {
         name: "Updated Name",
-        hourlyRate: 150,
+        hourlyRate: 15000, // 150 UYU/hour in minor units (cents)
       };
       const existingPro = createMockProProfile({ userId });
       const updatedPro = createMockProProfile({
         ...existingPro,
         displayName: input.name!,
-        hourlyRate: input.hourlyRate!,
+        hourlyRate: toMinorUnits(input.hourlyRate!), // Store in minor units
       });
 
       mockProRepository.findByUserId.mockResolvedValue(existingPro);
@@ -769,12 +769,12 @@ describe("ProService", () => {
       expect(mockProRepository.findByUserId).toHaveBeenCalledWith(userId);
       expect(mockProRepository.update).toHaveBeenCalledWith(existingPro.id, {
         displayName: input.name,
-        hourlyRate: input.hourlyRate,
+        hourlyRate: input.hourlyRate!, // Already in minor units
       });
       expect(result).toMatchObject({
         id: updatedPro.id,
         name: updatedPro.displayName,
-        hourlyRate: updatedPro.hourlyRate,
+        hourlyRate: toMajorUnits(updatedPro.hourlyRate), // API returns major units
         availabilitySlots: [],
       });
     });
@@ -841,14 +841,14 @@ describe("ProService", () => {
       const input: Partial<ProOnboardInput> = {
         name: "Updated Name",
         bio: "New bio",
-        hourlyRate: 150,
+        hourlyRate: 15000, // 150 UYU/hour in minor units (cents)
       };
       const existingPro = createMockProProfile({ userId });
       const updatedPro = createMockProProfile({
         ...existingPro,
         displayName: input.name!,
         bio: input.bio!,
-        hourlyRate: input.hourlyRate!,
+        hourlyRate: toMinorUnits(input.hourlyRate!), // Store in minor units
       });
 
       mockProRepository.findByUserId.mockResolvedValue(existingPro);
@@ -863,13 +863,13 @@ describe("ProService", () => {
       expect(mockProRepository.update).toHaveBeenCalledWith(existingPro.id, {
         displayName: input.name,
         bio: input.bio,
-        hourlyRate: input.hourlyRate,
+        hourlyRate: input.hourlyRate!, // Already in minor units
       });
       expect(result).toMatchObject({
         id: updatedPro.id,
         name: updatedPro.displayName,
         bio: updatedPro.bio,
-        hourlyRate: updatedPro.hourlyRate,
+        hourlyRate: toMajorUnits(updatedPro.hourlyRate), // API returns major units
       });
     });
 
@@ -1555,11 +1555,11 @@ describe("ProService", () => {
         avatarUrl: "https://example.com/avatar.jpg",
         bio: "Existing bio",
         profileCompleted: true,
-        hourlyRate: 100,
+        hourlyRate: 10000, // 100 UYU/hour in minor units (cents)
       });
       const updatedPro = createMockProProfile({
         ...existingPro,
-        hourlyRate: 150,
+        hourlyRate: toMinorUnits(150), // 150 UYU/hour = 15000 cents (stored in minor units)
         profileCompleted: true, // Should remain true
       });
 
@@ -1570,12 +1570,12 @@ describe("ProService", () => {
 
       // Act
       await service.updateProfile(userId, {
-        hourlyRate: 150,
+        hourlyRate: 15000, // 150 UYU/hour in minor units (cents)
       });
 
       // Assert
       expect(mockProRepository.update).toHaveBeenCalledWith(existingPro.id, {
-        hourlyRate: 150,
+        hourlyRate: toMinorUnits(150), // 150 UYU/hour = 15000 cents
       });
       // profileCompleted should not be included in update when avatarUrl/bio are not changed
     });
