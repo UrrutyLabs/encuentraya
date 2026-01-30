@@ -37,7 +37,7 @@ describe("OrderEstimationService", () => {
       phone: "+59812345678",
       bio: "Experienced plumber",
       avatarUrl: null,
-      hourlyRate: 100,
+      hourlyRate: 10000, // 100 UYU/hour in minor units (cents)
       categoryIds: ["cat-plumbing"],
       serviceArea: "Montevideo",
       status: "active",
@@ -67,7 +67,7 @@ describe("OrderEstimationService", () => {
 
     it("should estimate order cost successfully with correct calculations", async () => {
       const input = createValidInput();
-      const proProfile = createMockProProfile({ hourlyRate: 100 });
+      const proProfile = createMockProProfile({ hourlyRate: 10000 }); // 100 UYU/hour in minor units
 
       mockProRepository.findById.mockResolvedValue(proProfile);
 
@@ -77,12 +77,12 @@ describe("OrderEstimationService", () => {
       expect(mockProRepository.findById).toHaveBeenCalledWith("pro-1");
       expect(mockProRepository.findById).toHaveBeenCalledTimes(1);
 
-      // Verify calculations
-      const expectedLaborAmount = 200; // 2 hours × 100 UYU/hour
-      const expectedPlatformFeeAmount = 20; // 200 × 10%
-      const expectedTaxAmount = 48.4; // (200 + 20) × 22%
-      const expectedSubtotalAmount = 220; // 200 + 20
-      const expectedTotalAmount = 268.4; // 220 + 48.4
+      // Verify calculations (all amounts in minor units)
+      const expectedLaborAmount = 20000; // 2 hours × 10000 cents/hour = 20000 cents
+      const expectedPlatformFeeAmount = 2000; // 20000 × 10% = 2000 cents
+      const expectedTaxAmount = 4840; // (20000 + 2000) × 22% = 4840 cents
+      const expectedSubtotalAmount = 22000; // 20000 + 2000 = 22000 cents
+      const expectedTotalAmount = 26840; // 22000 + 4840 = 26840 cents
 
       expect(result.laborAmount).toBe(expectedLaborAmount);
       expect(result.platformFeeAmount).toBe(expectedPlatformFeeAmount);
@@ -97,7 +97,7 @@ describe("OrderEstimationService", () => {
       expect(result.lineItems).toHaveLength(3);
       expect(result.lineItems[0]).toEqual({
         type: "labor",
-        description: "Labor (2 horas × 100 UYU/hora)",
+        description: "Labor (2 horas × 100 UYU/hora)", // Description shows major units for display
         amount: expectedLaborAmount,
       });
       expect(result.lineItems[1]).toEqual({
@@ -114,16 +114,19 @@ describe("OrderEstimationService", () => {
 
     it("should handle different hourly rates correctly", async () => {
       const input = createValidInput();
-      const proProfile = createMockProProfile({ hourlyRate: 50 });
+      // Use 50 UYU/hour = 5000 cents/hour (minor units)
+      const proProfile = createMockProProfile({ hourlyRate: 5000 });
 
       mockProRepository.findById.mockResolvedValue(proProfile);
 
       const result = await service.estimateOrderCost(input);
 
-      const expectedLaborAmount = 100; // 2 hours × 50 UYU/hour
-      const expectedPlatformFeeAmount = 10; // 100 × 10%
-      const expectedTaxAmount = 24.2; // (100 + 10) × 22%
-      const expectedTotalAmount = 134.2; // 110 + 24.2
+      // Conversion: 50 UYU → 5000 cents
+      // 2 hours × 5000 cents/hour = 10000 cents
+      const expectedLaborAmount = 10000;
+      const expectedPlatformFeeAmount = 1000; // 10000 × 10% = 1000 cents
+      const expectedTaxAmount = 2420; // (10000 + 1000) × 22% = 2420 cents
+      const expectedTotalAmount = 13420; // 11000 + 2420 = 13420 cents
 
       expect(result.laborAmount).toBe(expectedLaborAmount);
       expect(result.platformFeeAmount).toBe(expectedPlatformFeeAmount);
@@ -136,16 +139,16 @@ describe("OrderEstimationService", () => {
         proProfileId: "pro-1",
         estimatedHours: 3.5,
       };
-      const proProfile = createMockProProfile({ hourlyRate: 100 });
+      const proProfile = createMockProProfile({ hourlyRate: 10000 }); // 100 UYU/hour in minor units
 
       mockProRepository.findById.mockResolvedValue(proProfile);
 
       const result = await service.estimateOrderCost(input);
 
-      const expectedLaborAmount = 350; // 3.5 hours × 100 UYU/hour
-      const expectedPlatformFeeAmount = 35; // 350 × 10%
-      const expectedTaxAmount = 84.7; // (350 + 35) × 22%
-      const expectedTotalAmount = 469.7; // 385 + 84.7
+      const expectedLaborAmount = 35000; // 3.5 hours × 10000 cents/hour = 35000 cents
+      const expectedPlatformFeeAmount = 3500; // 35000 × 10% = 3500 cents
+      const expectedTaxAmount = 8470; // (35000 + 3500) × 22% = 8470 cents
+      const expectedTotalAmount = 46970; // 38500 + 8470 = 46970 cents
 
       expect(result.laborAmount).toBe(expectedLaborAmount);
       expect(result.platformFeeAmount).toBe(expectedPlatformFeeAmount);
@@ -158,31 +161,33 @@ describe("OrderEstimationService", () => {
       );
     });
 
-    it("should round currency amounts to 2 decimal places", async () => {
+    it("should round currency amounts correctly", async () => {
       const input: OrderEstimateInput = {
         proProfileId: "pro-1",
         estimatedHours: 1.333, // Will result in non-round numbers
       };
-      const proProfile = createMockProProfile({ hourlyRate: 75.5 });
+      // Use 75.5 UYU/hour = 7550 cents/hour (minor units)
+      const proProfile = createMockProProfile({ hourlyRate: 7550 });
 
       mockProRepository.findById.mockResolvedValue(proProfile);
 
       const result = await service.estimateOrderCost(input);
 
-      // Verify all amounts are properly rounded
-      // 1.333 × 75.5 = 100.6415 → roundCurrency → 100.64
-      expect(result.laborAmount).toBe(100.64);
+      // Verify all amounts are properly rounded (in minor units)
+      // Conversion: 75.5 UYU → 7550 cents
+      // 1.333 × 7550 = 10064.15 → roundMinorUnits → 10064 cents
+      expect(result.laborAmount).toBe(10064);
 
-      // 100.64 × 0.1 = 10.064 → roundCurrency → 10.06
-      expect(result.platformFeeAmount).toBe(10.06);
+      // 10064 × 0.1 = 1006.4 → roundMinorUnits → 1006 cents
+      expect(result.platformFeeAmount).toBe(1006);
 
-      // (100.64 + 10.06) × 0.22 = 110.70 × 0.22 = 24.354 → roundCurrency → 24.35
-      expect(result.taxAmount).toBe(24.35);
+      // (10064 + 1006) × 0.22 = 11070 × 0.22 = 2435.4 → roundMinorUnits → 2435 cents
+      expect(result.taxAmount).toBe(2435);
 
-      // 100.64 + 10.06 = 110.70 (subtotal)
-      // 110.70 + 24.35 = 135.05 (total)
-      expect(result.subtotalAmount).toBe(110.7);
-      expect(result.totalAmount).toBe(135.05);
+      // 10064 + 1006 = 11070 (subtotal in cents)
+      // 11070 + 2435 = 13505 (total in cents)
+      expect(result.subtotalAmount).toBe(11070);
+      expect(result.totalAmount).toBe(13505);
     });
 
     it("should throw error when pro profile is not found", async () => {
@@ -203,14 +208,14 @@ describe("OrderEstimationService", () => {
         estimatedHours: 2,
         // categoryId is optional
       };
-      const proProfile = createMockProProfile({ hourlyRate: 100 });
+      const proProfile = createMockProProfile({ hourlyRate: 10000 }); // 100 UYU/hour in minor units
 
       mockProRepository.findById.mockResolvedValue(proProfile);
 
       const result = await service.estimateOrderCost(input);
 
       expect(result).toBeDefined();
-      expect(result.laborAmount).toBe(200);
+      expect(result.laborAmount).toBe(20000); // 2 hours × 10000 cents/hour = 20000 cents
       expect(mockProRepository.findById).toHaveBeenCalledWith("pro-1");
     });
 
@@ -219,16 +224,16 @@ describe("OrderEstimationService", () => {
         proProfileId: "pro-1",
         estimatedHours: 0.5,
       };
-      const proProfile = createMockProProfile({ hourlyRate: 100 });
+      const proProfile = createMockProProfile({ hourlyRate: 10000 }); // 100 UYU/hour in minor units
 
       mockProRepository.findById.mockResolvedValue(proProfile);
 
       const result = await service.estimateOrderCost(input);
 
-      const expectedLaborAmount = 50; // 0.5 hours × 100 UYU/hour
-      const expectedPlatformFeeAmount = 5; // 50 × 10%
-      const expectedTaxAmount = 12.1; // (50 + 5) × 22%
-      const expectedTotalAmount = 67.1; // 55 + 12.1
+      const expectedLaborAmount = 5000; // 0.5 hours × 10000 cents/hour = 5000 cents
+      const expectedPlatformFeeAmount = 500; // 5000 × 10% = 500 cents
+      const expectedTaxAmount = 1210; // (5000 + 500) × 22% = 1210 cents
+      const expectedTotalAmount = 6710; // 5500 + 1210 = 6710 cents
 
       expect(result.laborAmount).toBe(expectedLaborAmount);
       expect(result.platformFeeAmount).toBe(expectedPlatformFeeAmount);
@@ -238,16 +243,16 @@ describe("OrderEstimationService", () => {
 
     it("should handle high hourly rates correctly", async () => {
       const input = createValidInput();
-      const proProfile = createMockProProfile({ hourlyRate: 500 });
+      const proProfile = createMockProProfile({ hourlyRate: 50000 }); // 500 UYU/hour in minor units
 
       mockProRepository.findById.mockResolvedValue(proProfile);
 
       const result = await service.estimateOrderCost(input);
 
-      const expectedLaborAmount = 1000; // 2 hours × 500 UYU/hour
-      const expectedPlatformFeeAmount = 100; // 1000 × 10%
-      const expectedTaxAmount = 242; // (1000 + 100) × 22%
-      const expectedTotalAmount = 1342; // 1100 + 242
+      const expectedLaborAmount = 100000; // 2 hours × 50000 cents/hour = 100000 cents
+      const expectedPlatformFeeAmount = 10000; // 100000 × 10% = 10000 cents
+      const expectedTaxAmount = 24200; // (100000 + 10000) × 22% = 24200 cents
+      const expectedTotalAmount = 134200; // 110000 + 24200 = 134200 cents
 
       expect(result.laborAmount).toBe(expectedLaborAmount);
       expect(result.platformFeeAmount).toBe(expectedPlatformFeeAmount);
@@ -293,21 +298,21 @@ describe("OrderEstimationService", () => {
         result.laborAmount + result.platformFeeAmount
       );
 
-      // Verify: tax = (labor + platformFee) × taxRate
+      // Verify: tax = (labor + platformFee) × taxRate (all in minor units)
       const expectedTax =
         (result.laborAmount + result.platformFeeAmount) * DEFAULT_TAX_RATE;
-      expect(result.taxAmount).toBeCloseTo(expectedTax, 2);
+      expect(result.taxAmount).toBeCloseTo(expectedTax, 0); // Round to nearest cent (minor unit)
 
-      // Verify: total = subtotal + tax
+      // Verify: total = subtotal + tax (all in minor units)
       expect(result.totalAmount).toBeCloseTo(
         result.subtotalAmount + result.taxAmount,
-        2
+        0 // Round to nearest cent (minor unit)
       );
 
-      // Verify: platformFee = labor × platformFeeRate
+      // Verify: platformFee = labor × platformFeeRate (all in minor units)
       const expectedPlatformFee =
         result.laborAmount * DEFAULT_PLATFORM_FEE_RATE;
-      expect(result.platformFeeAmount).toBeCloseTo(expectedPlatformFee, 2);
+      expect(result.platformFeeAmount).toBeCloseTo(expectedPlatformFee, 0); // Round to nearest cent (minor unit)
     });
   });
 });

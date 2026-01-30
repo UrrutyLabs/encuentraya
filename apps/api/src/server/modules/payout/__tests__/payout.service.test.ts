@@ -108,7 +108,7 @@ describe("PayoutService", () => {
       phone: null,
       bio: null,
       avatarUrl: null,
-      hourlyRate: 100,
+      hourlyRate: 10000, // 100 UYU/hour in minor units (cents)
       categoryIds: [],
       serviceArea: null,
       status: "active",

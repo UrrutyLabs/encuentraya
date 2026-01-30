@@ -127,7 +127,7 @@ export class MercadoPagoClient implements PaymentProviderClient {
       },
       auto_return: "approved" as const, // Redirect automatically when approved
       external_reference: input.orderId, // Store order ID for webhook matching
-      statement_descriptor: "ARRREGLATODO", // Appears on customer's statement
+      statement_descriptor: "EncuentraYa", // Appears on customer's statement
       notification_url: notificationUrl, // Webhook endpoint for payment notifications
       metadata: {
         orderId: input.orderId,

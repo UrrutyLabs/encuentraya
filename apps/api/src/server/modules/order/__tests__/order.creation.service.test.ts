@@ -106,7 +106,7 @@ describe("OrderCreationService", () => {
       phone: null,
       bio: null,
       avatarUrl: null,
-      hourlyRate: 100,
+      hourlyRate: 10000, // 100 UYU/hour in minor units (cents)
       categoryIds: [],
       serviceArea: null,
       status: "active",
@@ -148,7 +148,7 @@ describe("OrderCreationService", () => {
       canceledAt: null,
       cancelReason: null,
       pricingMode: "hourly",
-      hourlyRateSnapshotAmount: 100,
+      hourlyRateSnapshotAmount: 10000, // 100 UYU/hour in minor units (cents)
       currency: "UYU",
       minHoursSnapshot: null,
       estimatedHours: 2,
@@ -218,7 +218,7 @@ describe("OrderCreationService", () => {
     it("should create order request successfully", async () => {
       const actor = createMockActor();
       const input = createValidInput();
-      const proProfile = createMockProProfile({ hourlyRate: 100 });
+      const proProfile = createMockProProfile({ hourlyRate: 10000 }); // 100 UYU/hour in minor units
       const orderEntity = createMockOrderEntity();
       const order = createMockOrder();
 
@@ -258,7 +258,7 @@ describe("OrderCreationService", () => {
         expect.objectContaining({
           clientUserId: actor.id,
           proProfileId: "pro-1",
-          hourlyRateSnapshotAmount: 100,
+          hourlyRateSnapshotAmount: 10000, // 100 UYU/hour in minor units (cents)
         })
       );
     });
@@ -345,7 +345,7 @@ describe("OrderCreationService", () => {
     it("should snapshot hourly rate from pro profile", async () => {
       const actor = createMockActor();
       const input = createValidInput();
-      const proProfile = createMockProProfile({ hourlyRate: 150 });
+      const proProfile = createMockProProfile({ hourlyRate: 15000 }); // 150 UYU/hour in minor units
       const orderEntity = createMockOrderEntity({
         hourlyRateSnapshotAmount: 150,
       });
@@ -377,7 +377,7 @@ describe("OrderCreationService", () => {
 
       expect(mockOrderRepository.create).toHaveBeenCalledWith(
         expect.objectContaining({
-          hourlyRateSnapshotAmount: 150,
+          hourlyRateSnapshotAmount: 15000, // 150 UYU/hour in minor units (cents)
         })
       );
     });

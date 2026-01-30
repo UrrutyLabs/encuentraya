@@ -57,6 +57,7 @@ export function useReviewStepData(): UseReviewStepDataReturn {
   );
 
   // Fallback simple calculation (for error states)
+  // Note: pro.hourlyRate is returned in major units from the API (for compatibility)
   const estimatedCost = useMemo(() => {
     if (!pro || !state.hours) return 0;
     return parseFloat(state.hours) * pro.hourlyRate;

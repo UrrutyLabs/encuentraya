@@ -8,7 +8,7 @@ import { Text } from "@components/ui/Text";
 import { CategorySelector } from "@components/presentational/CategorySelector";
 import { theme } from "../../theme";
 import { useOnboarding, useAuth } from "@hooks/auth";
-import { Category } from "@repo/domain";
+import { Category, toMinorUnits } from "@repo/domain";
 import { supabase } from "@lib/supabase/client";
 import { trpc } from "@lib/trpc/client";
 
@@ -85,7 +85,7 @@ export function OnboardingScreen() {
         name: name.trim(),
         email: currentSession.user.email,
         phone: phone.trim() || undefined,
-        hourlyRate: parseFloat(hourlyRate),
+        hourlyRate: toMinorUnits(parseFloat(hourlyRate)), // Convert to minor units for storage
         categoryIds: selectedCategories.map((cat) => cat.id),
         serviceArea: serviceArea.trim() || undefined,
       });

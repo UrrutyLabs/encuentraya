@@ -23,7 +23,12 @@ import { Button } from "@repo/ui";
 import { Badge } from "@repo/ui";
 import { Navigation } from "@/components/presentational/Navigation";
 import { JobDetailSkeleton } from "@/components/presentational/JobDetailSkeleton";
-import { OrderStatus, formatCurrency, type Order } from "@repo/domain";
+import {
+  OrderStatus,
+  formatCurrency,
+  toMajorUnits,
+  type Order,
+} from "@repo/domain";
 import { useOrderDetail } from "@/hooks/order";
 import { useCancelOrder } from "@/hooks/order";
 import { useCategory } from "@/hooks/category";
@@ -337,7 +342,7 @@ export function JobDetailScreen() {
                   Tarifa por hora
                 </Text>
                 <Text variant="body" className="text-text">
-                  ${job.hourlyRateSnapshotAmount.toFixed(0)}
+                  ${toMajorUnits(job.hourlyRateSnapshotAmount).toFixed(0)}
                 </Text>
               </div>
               <div className="flex justify-between">
@@ -355,8 +360,10 @@ export function JobDetailScreen() {
                   </Text>
                   <Text variant="h2" className="text-primary">
                     {job.totalAmount
-                      ? `$${job.totalAmount.toFixed(0)}`
-                      : `$${(job.hourlyRateSnapshotAmount * job.estimatedHours).toFixed(0)}`}
+                      ? `$${toMajorUnits(job.totalAmount).toFixed(0)}`
+                      : `$${toMajorUnits(
+                          job.hourlyRateSnapshotAmount * job.estimatedHours
+                        ).toFixed(0)}`}
                   </Text>
                 </div>
               </div>

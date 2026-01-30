@@ -24,6 +24,7 @@ import {
   PaymentStatus,
   OrderStatus,
   formatCurrency,
+  toMajorUnits,
   type Order,
 } from "@repo/domain";
 import { JOB_LABELS } from "@/utils/jobLabels";
@@ -221,9 +222,11 @@ function CheckoutContent() {
   // Use job variable for display (type is Order)
   const job: Order | undefined = order ?? undefined;
 
-  // Calculate amount: use payment if exists (minor units), otherwise use order (major units)
-  const amountEstimated = payment?.amountEstimated ?? job?.totalAmount ?? 0;
-  const isAmountInMinorUnits = !!payment; // Payment amounts are in minor units, order.totalAmount is in major units
+  // Calculate amount: all amounts are in minor units
+  // Convert to major units for display
+  const amountEstimatedMinor =
+    payment?.amountEstimated ?? job?.totalAmount ?? 0;
+  const amountEstimated = toMajorUnits(amountEstimatedMinor); // Convert to major units for display
   const currency = payment?.currency || job?.currency || "UYU";
 
   return (
@@ -292,12 +295,7 @@ function CheckoutContent() {
           <Card className="p-6 mb-6">
             <div className="mb-4">
               <Text variant="h2" className="text-text">
-                Monto estimado:{" "}
-                {formatCurrency(
-                  amountEstimated,
-                  currency,
-                  isAmountInMinorUnits
-                )}
+                Monto estimado: {formatCurrency(amountEstimated, currency)}
               </Text>
             </div>
             <Text variant="small" className="text-muted">

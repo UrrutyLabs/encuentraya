@@ -10,10 +10,10 @@ import {
   calculateTax,
   calculateTotal,
   calculateTaxableBase,
-  roundCurrency,
   DEFAULT_PLATFORM_FEE_RATE,
   DEFAULT_TAX_RATE,
 } from "./order.calculations";
+import { roundMinorUnits } from "@repo/domain";
 import { OrderService } from "./order.service";
 import type { PaymentServiceFactory } from "@modules/payment";
 import type { PaymentRepository } from "@modules/payment/payment.repo";
@@ -101,28 +101,30 @@ export class OrderFinalizationService {
     );
 
     // Step 4: Compute totals from line items and persist
+    // All line items are already in minor units after buildLineItemsForFinalization
     const finalLineItems =
       await this.orderLineItemRepository.findByOrderId(orderId);
 
-    const subtotal = roundCurrency(calculateSubtotal(finalLineItems));
-    const taxableBase = roundCurrency(calculateTaxableBase(finalLineItems));
-    const taxAmount = roundCurrency(calculateTax(taxableBase, taxRate));
-    const total = roundCurrency(calculateTotal(subtotal, taxAmount));
+    // All calculations in minor units
+    const subtotal = roundMinorUnits(calculateSubtotal(finalLineItems));
+    const taxableBase = roundMinorUnits(calculateTaxableBase(finalLineItems));
+    const taxAmount = roundMinorUnits(calculateTax(taxableBase, taxRate));
+    const total = roundMinorUnits(calculateTotal(subtotal, taxAmount));
 
-    // Extract platform fee from line items
+    // Extract platform fee from line items (already in minor units)
     const platformFeeItem = finalLineItems.find(
       (item) => item.type === "platform_fee"
     );
     const platformFeeAmount = platformFeeItem
-      ? roundCurrency(platformFeeItem.amount)
+      ? roundMinorUnits(platformFeeItem.amount)
       : 0;
 
-    // Update order with calculated totals
+    // Update order with calculated totals (all in minor units)
     const finalizedOrder = await this.orderRepository.update(orderId, {
-      subtotalAmount: subtotal,
-      platformFeeAmount: platformFeeAmount,
-      taxAmount: taxAmount,
-      totalAmount: total,
+      subtotalAmount: subtotal, // Minor units
+      platformFeeAmount: platformFeeAmount, // Minor units
+      taxAmount: taxAmount, // Minor units
+      totalAmount: total, // Minor units
       totalsCalculatedAt: new Date(),
       taxScheme: "iva",
       taxRate: taxRate,

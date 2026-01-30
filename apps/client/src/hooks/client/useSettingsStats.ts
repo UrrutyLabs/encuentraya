@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { useMyOrders } from "../order";
 import { useCategories } from "../category";
-import { OrderStatus } from "@repo/domain";
+import { OrderStatus, toMajorUnits } from "@repo/domain";
 
 /**
  * Hook to compute account statistics from orders
@@ -27,9 +27,11 @@ export function useSettingsStats() {
     ).length;
 
     // Calculate total spent from completed orders with totalAmount
-    const totalSpent = orders
+    // All amounts are in minor units, convert to major units for display
+    const totalSpentMinor = orders
       .filter((o) => o.status === OrderStatus.COMPLETED && o.totalAmount)
       .reduce((sum, o) => sum + (o.totalAmount || 0), 0);
+    const totalSpent = totalSpentMinor > 0 ? toMajorUnits(totalSpentMinor) : 0;
 
     // Find favorite category (most ordered) by categoryId
     const categoryCounts: Record<string, number> = {};

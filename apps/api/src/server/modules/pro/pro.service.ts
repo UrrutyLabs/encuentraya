@@ -19,7 +19,7 @@ import type {
   AvailabilitySlot,
   UpdateAvailabilitySlotsInput,
 } from "@repo/domain";
-import { Role } from "@repo/domain";
+import { Role, toMinorUnits, toMajorUnits } from "@repo/domain";
 import { TOKENS } from "@/server/container/tokens";
 import type { Actor } from "@infra/auth/roles";
 import { calculateIsTopPro } from "./pro.calculations";
@@ -59,6 +59,7 @@ export class ProService {
     const user = await this.userRepository.create(Role.PRO);
 
     // Create pro profile
+    // hourlyRate is already in minor units (storage format)
     const proProfile = await this.proRepository.create({
       userId: user.id,
       displayName: input.name,
@@ -66,7 +67,7 @@ export class ProService {
       phone: input.phone,
       bio: input.bio,
       avatarUrl: input.avatarUrl,
-      hourlyRate: input.hourlyRate,
+      hourlyRate: input.hourlyRate, // Already in minor units
       categoryIds: input.categoryIds,
       serviceArea: input.serviceArea,
     });
@@ -107,6 +108,7 @@ export class ProService {
     }
 
     // Create pro profile
+    // hourlyRate is already in minor units (storage format)
     const proProfile = await this.proRepository.create({
       userId,
       displayName: input.name,
@@ -114,7 +116,7 @@ export class ProService {
       phone: input.phone,
       bio: input.bio,
       avatarUrl: input.avatarUrl,
-      hourlyRate: input.hourlyRate,
+      hourlyRate: input.hourlyRate, // Already in minor units
       categoryIds: input.categoryIds,
       serviceArea: input.serviceArea,
     });
@@ -294,6 +296,7 @@ export class ProService {
       updateData.avatarUrl = input.avatarUrl;
     }
     if (input.hourlyRate !== undefined) {
+      // hourlyRate is already in minor units (storage format)
       updateData.hourlyRate = input.hourlyRate;
     }
     if (input.categoryIds !== undefined) {
@@ -397,6 +400,9 @@ export class ProService {
     const payoutProfile =
       await this.proPayoutProfileRepository.findByProProfileId(proProfileId);
 
+    // Convert hourlyRate from minor units (storage) to major units (API response)
+    const hourlyRateMajor = toMajorUnits(proProfile.hourlyRate);
+
     return {
       id: proProfile.id,
       userId: proProfile.userId,
@@ -405,7 +411,7 @@ export class ProService {
       phone: proProfile.phone,
       bio: proProfile.bio,
       avatarUrl: proProfile.avatarUrl,
-      hourlyRate: proProfile.hourlyRate,
+      hourlyRate: hourlyRateMajor, // Return in major units for API compatibility
       categoryIds: proProfile.categoryIds,
       serviceArea: proProfile.serviceArea,
       status: proProfile.status,
@@ -645,6 +651,9 @@ export class ProService {
     const availabilitySlots =
       await this.availabilityService.getAvailabilitySlots(entity.id);
 
+    // Convert hourlyRate from minor units (storage) to major units (API response)
+    const hourlyRateMajor = toMajorUnits(entity.hourlyRate);
+
     return {
       id: entity.id,
       name: entity.displayName,
@@ -652,7 +661,7 @@ export class ProService {
       phone: entity.phone ?? undefined,
       bio: entity.bio ?? undefined,
       avatarUrl: entity.avatarUrl ?? undefined,
-      hourlyRate: entity.hourlyRate,
+      hourlyRate: hourlyRateMajor, // Return in major units for API compatibility
       categoryIds: entity.categoryIds,
       serviceArea: entity.serviceArea ?? undefined,
       rating,

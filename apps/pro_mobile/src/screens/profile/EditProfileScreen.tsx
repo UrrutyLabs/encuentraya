@@ -10,7 +10,7 @@ import { CategorySelector } from "@components/presentational/CategorySelector";
 import { trpc } from "@lib/trpc/client";
 import { useQueryClient } from "@hooks/shared";
 import { invalidateRelatedQueries } from "@lib/react-query/utils";
-import { Category } from "@repo/domain";
+import { Category, toMinorUnits } from "@repo/domain";
 import { theme } from "../../theme";
 
 export function EditProfileScreen() {
@@ -116,7 +116,7 @@ export function EditProfileScreen() {
     updateMutation.mutate({
       name: name.trim(),
       phone: phone.trim() || undefined,
-      hourlyRate: parseFloat(hourlyRate),
+      hourlyRate: toMinorUnits(parseFloat(hourlyRate)), // Convert to minor units for storage
       categoryIds: selectedCategories.map((c) => c.id),
       serviceArea: serviceArea.trim() || undefined,
       bio: bio.trim() || undefined,

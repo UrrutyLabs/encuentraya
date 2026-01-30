@@ -11,6 +11,7 @@ import { useOrderActions, useOrderDetail } from "@hooks/order";
 import { OrderStatus } from "@repo/domain";
 import { getJobStatusLabel, getJobStatusVariant } from "../../utils/jobStatus";
 import { JOB_LABELS } from "../../utils/jobLabels";
+import { formatAmount } from "../../utils/format";
 import { theme } from "../../theme";
 
 export function JobDetailScreen() {
@@ -239,7 +240,7 @@ export function JobDetailScreen() {
               </Text>
             </View>
             <Text variant="h2" style={styles.amount}>
-              ${order.totalAmount.toFixed(2)}
+              {formatAmount(order.totalAmount, order.currency)}
             </Text>
           </View>
         )}

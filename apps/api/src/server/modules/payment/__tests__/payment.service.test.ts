@@ -140,7 +140,7 @@ describe("PaymentService", () => {
       phone: null,
       bio: null,
       avatarUrl: null,
-      hourlyRate: 100,
+      hourlyRate: 10000, // 100 UYU/hour in minor units (cents)
       categoryIds: [],
       serviceArea: null,
       status: "active",
@@ -296,7 +296,7 @@ describe("PaymentService", () => {
       });
       const proProfile = createMockProProfile({
         id: "pro-1",
-        hourlyRate: 100,
+        hourlyRate: 10000, // 100 UYU/hour in minor units (cents)
       });
       const payment = createMockPayment({
         id: "payment-1",

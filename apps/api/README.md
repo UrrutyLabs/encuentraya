@@ -64,8 +64,11 @@ pnpm install
    - `SUPABASE_URL` - Supabase project URL
    - `SUPABASE_SERVICE_ROLE_KEY` - Supabase service role key
    - `SUPABASE_ANON_KEY` - Supabase anonymous key
-   - `MERCADOPAGO_ACCESS_TOKEN` - MercadoPago API token
+   - `MERCADOPAGO_ACCESS_TOKEN` - MercadoPago API token (use `TEST-...` token for development)
    - `MERCADOPAGO_WEBHOOK_SECRET` - MercadoPago webhook secret (optional, recommended for production)
+   - `MERCADOPAGO_WEBHOOK_URL` - Mercado Pago webhook URL (optional, use ngrok URL for local development)
+
+   **📖 For local Mercado Pago development with webhooks, see [MERCADOPAGO_LOCAL_DEVELOPMENT.md](./docs/MERCADOPAGO_LOCAL_DEVELOPMENT.md)**
    - `SENDGRID_API_KEY` - SendGrid API key
    - `TWILIO_ACCOUNT_SID` & `TWILIO_AUTH_TOKEN` - Twilio credentials
    - `UPSTASH_REDIS_REST_URL` & `UPSTASH_REDIS_REST_TOKEN` - Upstash Redis
@@ -231,6 +234,24 @@ The database schema is defined in `prisma/schema.prisma`. Key models:
 - `Payout` - Payout records
 - `Review` - Service reviews
 
+### Amount Units Convention
+
+**All monetary amounts are stored in MINOR UNITS (cents) to prevent JavaScript float precision issues.**
+
+- **Storage**: All amount fields (`totalAmount`, `subtotalAmount`, `platformFeeAmount`, `taxAmount`, `hourlyRate`, etc.) are stored as integers representing cents
+- **Example**: `402.60 UYU` is stored as `40260` cents
+- **Conversion**: Use `toMinorUnits()` and `toMajorUnits()` from `@repo/domain` for conversions
+- **Display**: Use `formatCurrency(amount, currency, true)` for formatting (pass `true` to indicate minor units)
+
+**Important**: When working with amounts:
+
+- ✅ Store amounts in minor units (cents)
+- ✅ Perform calculations in minor units
+- ✅ Convert to major units only for display/API responses
+- ❌ Never mix major and minor units in calculations
+
+See `packages/domain/src/utils/amount.ts` for conversion utilities.
+
 ### Migrations
 
 ```bash
@@ -294,6 +315,7 @@ pnpm check-types
 - **[Backend Best Practices](../../docs/BE_BEST_PRACTICES.md)** - Architecture and coding guidelines
 - **[Railway Deployment](./docs/RAILWAY.md)** - Complete Railway deployment guide
 - **[Authentication](../../docs/AUTH_IMPLEMENTATION.md)** - Auth implementation details
+- **[Mercado Pago Local Development](./docs/MERCADOPAGO_LOCAL_DEVELOPMENT.md)** - Guide for local Mercado Pago development with webhooks
 
 ## Related Apps
 

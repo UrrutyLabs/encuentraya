@@ -5,7 +5,12 @@ import { Text } from "@repo/ui";
 import { Badge } from "@repo/ui";
 import { Calendar, CreditCard, Wallet, ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { formatCurrency, OrderStatus, PaymentStatus } from "@repo/domain";
+import {
+  formatCurrency,
+  toMajorUnits,
+  OrderStatus,
+  PaymentStatus,
+} from "@repo/domain";
 import {
   getOrderStatusLabel,
   getOrderStatusVariant,
@@ -116,7 +121,9 @@ export function RecentActivityFeed({
   const activities = [
     ...recentOrders.map((o) => {
       // adminListOrders returns limited fields, use what's available
-      const displayAmount = o.totalAmount || 0;
+      // All amounts are in minor units, convert to major for display
+      const displayAmountMinor = o.totalAmount || 0;
+      const displayAmount = toMajorUnits(displayAmountMinor);
       return {
         type: "order" as const,
         id: o.id,

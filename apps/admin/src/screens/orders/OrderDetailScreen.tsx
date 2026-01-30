@@ -19,7 +19,7 @@ import { Card } from "@repo/ui";
 import { Button } from "@repo/ui";
 import { Text } from "@repo/ui";
 import { Badge } from "@repo/ui";
-import { formatCurrency } from "@repo/domain";
+import { formatCurrency, toMajorUnits } from "@repo/domain";
 import { OrderTimeline } from "@/components/orders/OrderTimeline";
 import { OrderDetailSkeleton } from "@/components/presentational/OrderDetailSkeleton";
 
@@ -116,9 +116,11 @@ export function OrderDetailScreen({ orderId }: OrderDetailScreenProps) {
   ];
 
   // Calculate display amount
-  const displayAmount = order.totalAmount
+  // All amounts are in minor units, convert to major units for display
+  const displayAmountMinor = order.totalAmount
     ? order.totalAmount
     : order.hourlyRateSnapshotAmount * order.estimatedHours;
+  const displayAmount = toMajorUnits(displayAmountMinor);
 
   return (
     <div className="space-y-6">
