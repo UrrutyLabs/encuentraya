@@ -49,8 +49,8 @@ export function SearchScreen() {
   const handleCategoryClick = useCallback(
     (category: Category) => {
       setSelectedCategory(category);
-      // Scroll to subcategories if on mobile
-      if (isMobile) {
+      // Scroll to subcategories if on mobile (only on client)
+      if (isMobile && typeof document !== "undefined") {
         setTimeout(() => {
           const element = document.getElementById("subcategories");
           if (element) {

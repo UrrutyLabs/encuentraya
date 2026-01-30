@@ -121,6 +121,25 @@ describe("SearchScreen", () => {
         value: 500, // Mobile width
       });
 
+      // Mock matchMedia to return matches: true for mobile query
+      const mockMatchMedia = vi.fn().mockImplementation((query: string) => {
+        return {
+          matches: query === "(max-width: 767px)", // Return true for mobile query
+          media: query,
+          onchange: null,
+          addListener: vi.fn(),
+          removeListener: vi.fn(),
+          addEventListener: vi.fn(),
+          removeEventListener: vi.fn(),
+          dispatchEvent: vi.fn(),
+        };
+      });
+      Object.defineProperty(window, "matchMedia", {
+        writable: true,
+        configurable: true,
+        value: mockMatchMedia,
+      });
+
       // Mock scrollIntoView on Element prototype
       const mockScrollIntoView = vi.fn();
       Element.prototype.scrollIntoView = mockScrollIntoView;

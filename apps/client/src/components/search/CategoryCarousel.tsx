@@ -33,6 +33,11 @@ export const CategoryCarousel = memo(function CategoryCarousel({
   };
 
   useEffect(() => {
+    // Guard: only run on client
+    if (typeof window === "undefined") {
+      return;
+    }
+
     const container = scrollContainerRef.current;
     if (!container) return;
 

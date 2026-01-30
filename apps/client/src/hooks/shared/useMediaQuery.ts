@@ -30,8 +30,10 @@ export function useMediaQuery(query: string): boolean {
 
     const mediaQuery = window.matchMedia(query);
 
-    // Set initial value
-    setMatches(mediaQuery.matches);
+    // Set initial value (defer to avoid synchronous setState in effect)
+    setTimeout(() => {
+      setMatches(mediaQuery.matches);
+    }, 0);
 
     // Create listener function
     const listener = (event: MediaQueryListEvent) => {

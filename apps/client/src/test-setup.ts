@@ -1,6 +1,23 @@
 import { vi } from "vitest";
 import "@testing-library/jest-dom";
 
+// Mock window.matchMedia for useMediaQuery hook
+Object.defineProperty(window, "matchMedia", {
+  writable: true,
+  value: vi.fn().mockImplementation((query: string) => {
+    return {
+      matches: false, // Default to desktop (non-mobile)
+      media: query,
+      onchange: null,
+      addListener: vi.fn(), // Deprecated
+      removeListener: vi.fn(), // Deprecated
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    };
+  }),
+});
+
 // Mock Next.js router
 vi.mock("next/navigation", () => ({
   useRouter: () => ({
