@@ -9,6 +9,7 @@ import { CategoryCarousel } from "@/components/search/CategoryCarousel";
 import { SubcategoryGrid } from "@/components/search/SubcategoryGrid";
 import type { Category, Subcategory } from "@repo/domain";
 import { useCategories } from "@/hooks/category";
+import { useMediaQuery } from "@/hooks/shared/useMediaQuery";
 
 /**
  * SearchScreen Component
@@ -33,6 +34,7 @@ export function SearchScreen() {
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(
     null
   );
+  const isMobile = useMediaQuery("(max-width: 767px)");
 
   // Set default selected category to first category when categories load
   useEffect(() => {
@@ -44,18 +46,21 @@ export function SearchScreen() {
     }
   }, [categories, selectedCategory]);
 
-  const handleCategoryClick = useCallback((category: Category) => {
-    setSelectedCategory(category);
-    // Scroll to subcategories if on mobile
-    if (window.innerWidth < 768) {
-      setTimeout(() => {
-        const element = document.getElementById("subcategories");
-        if (element) {
-          element.scrollIntoView({ behavior: "smooth", block: "start" });
-        }
-      }, 100);
-    }
-  }, []);
+  const handleCategoryClick = useCallback(
+    (category: Category) => {
+      setSelectedCategory(category);
+      // Scroll to subcategories if on mobile
+      if (isMobile) {
+        setTimeout(() => {
+          const element = document.getElementById("subcategories");
+          if (element) {
+            element.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
+        }, 100);
+      }
+    },
+    [isMobile]
+  );
 
   const handleSubcategoryClick = useCallback(
     (subcategory: Subcategory) => {

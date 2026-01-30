@@ -10,6 +10,7 @@
     "start": "next start",
     "start:prod": "NODE_ENV=production next start --port 3002",
     "lint": "eslint",
+    "check-types": "tsc --noEmit",
     "pretest": "pnpm db:generate",
     "test": "vitest",
     "test:watch": "vitest --watch",
