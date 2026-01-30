@@ -19,11 +19,12 @@ import { useSubcategoryBySlugAndCategoryId } from "@/hooks/subcategory";
  * ```
  */
 interface ActiveFiltersProps {
-  /** Callback when a filter is removed (for future use) */
-  onFilterRemove: (filterType: "q" | "category" | "subcategory") => void;
+  /** Reserved for future use - callback when a filter is removed */
+  onFilterRemove?: (filterType: "q" | "category" | "subcategory") => void;
 }
 
 export function ActiveFilters({
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onFilterRemove: _onFilterRemove,
 }: ActiveFiltersProps) {
   const searchParams = useSearchParams();

@@ -37,16 +37,6 @@ export function WizardAvailabilityFilter({
     return `${year}-${month}-${day}`;
   }, []);
 
-  // Calculate end of week date (7 days from today)
-  const endOfWeekDate = useMemo(() => {
-    const endOfWeek = new Date();
-    endOfWeek.setDate(endOfWeek.getDate() + 7);
-    const year = endOfWeek.getFullYear();
-    const month = String(endOfWeek.getMonth() + 1).padStart(2, "0");
-    const day = String(endOfWeek.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
-  }, []);
-
   const handleTodayClick = useCallback(() => {
     onOptionChange("today");
     // Set date to today

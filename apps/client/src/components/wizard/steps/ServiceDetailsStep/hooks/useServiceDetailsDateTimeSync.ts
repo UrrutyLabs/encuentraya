@@ -57,9 +57,12 @@ export function useServiceDetailsDateTimeSync({
       prevCategoryIdRef.current !== ""
     ) {
       // Category changed (and wasn't empty), reset answers
-      setDateState("");
-      setTimeState("");
-      onCategoryChange?.();
+      // Use setTimeout to avoid calling setState synchronously in effect
+      setTimeout(() => {
+        setDateState("");
+        setTimeState("");
+        onCategoryChange?.();
+      }, 0);
     }
     prevCategoryIdRef.current = categoryId;
   }, [categoryId, onCategoryChange]);

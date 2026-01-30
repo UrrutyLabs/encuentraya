@@ -47,15 +47,13 @@ export function WizardOptionRenderer({
     >
       {/* Label */}
       <div className="flex items-center gap-1">
-        <Text
+        <label
           id={`${fieldId}-label`}
-          variant="h1"
-          className="text-primary text-center"
-          as="label"
           htmlFor={fieldId}
+          className="text-2xl font-bold leading-8 text-primary text-center"
         >
           {option.label}
-        </Text>
+        </label>
         {option.required && (
           <Text
             variant="h1"
@@ -150,7 +148,13 @@ export function WizardOptionRenderer({
         <Input
           id={fieldId}
           type="number"
-          value={typeof value === "number" ? value : value || ""}
+          value={
+            typeof value === "number"
+              ? value
+              : typeof value === "string"
+                ? value
+                : ""
+          }
           onChange={(e) => {
             const numValue = Number(e.target.value);
             onChange(isNaN(numValue) ? null : numValue);

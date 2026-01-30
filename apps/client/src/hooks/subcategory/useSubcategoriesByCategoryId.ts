@@ -1,5 +1,4 @@
 import { trpc } from "@/lib/trpc/client";
-import type { Subcategory } from "@repo/domain";
 
 /**
  * Hook to fetch subcategories by categoryId

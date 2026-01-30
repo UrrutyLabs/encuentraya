@@ -23,7 +23,8 @@ export function Wizard({
   urlParamPrefix = "wizard_",
   header,
   footer,
-  showProgress = true,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  showProgress: _showProgress = true,
   className = "",
   children,
 }: WizardProps & { children?: ReactNode }) {

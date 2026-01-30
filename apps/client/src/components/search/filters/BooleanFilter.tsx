@@ -16,7 +16,8 @@ interface BooleanFilterProps {
  * Renders a boolean (Yes/No) filter for quick questions
  */
 export function BooleanFilter({
-  question,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  question: _question,
   value,
   onChange,
 }: BooleanFilterProps) {

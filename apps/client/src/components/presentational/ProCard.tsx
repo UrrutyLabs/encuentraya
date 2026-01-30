@@ -1,7 +1,7 @@
 import { memo, useMemo } from "react";
 import Link from "next/link";
 import { Clock, Calendar, Award, CheckCircle2, MapPin } from "lucide-react";
-import { Card, Text, Badge, Button, Avatar } from "@repo/ui";
+import { Card, Text, Badge, Avatar } from "@repo/ui";
 import { type Pro } from "@repo/domain";
 import { useTodayDate } from "@/hooks/shared/useTodayDate";
 import { getAvailabilityHint } from "@/utils/proAvailability";

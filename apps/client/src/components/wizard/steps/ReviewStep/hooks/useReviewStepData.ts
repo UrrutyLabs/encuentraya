@@ -72,7 +72,7 @@ export function useReviewStepData(): UseReviewStepDataReturn {
       estimatedHours: parseFloat(state.hours),
       categoryId: category?.id,
     };
-  }, [pro?.id, state.hours, category?.id]);
+  }, [pro, state.hours, category]);
 
   const {
     data: costEstimation,
