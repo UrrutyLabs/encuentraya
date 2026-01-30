@@ -1,3 +1,4 @@
+import { MercadoPagoConfig, Preference, Payment } from "mercadopago";
 import { PaymentProvider, PaymentStatus } from "@repo/domain";
 import type {
   PaymentProviderClient,
@@ -6,24 +7,10 @@ import type {
   ProviderWebhookEvent,
   ProviderPaymentStatus,
 } from "../provider";
+import crypto from "crypto";
 
 /**
- * Mercado Pago API response types
- * Minimal interfaces for only the fields we actually use
- */
-interface MercadoPagoPreference {
-  id: string;
-  init_point?: string;
-  sandbox_init_point?: string;
-}
-
-interface MercadoPagoPayment {
-  status: string; // MP status: "pending", "approved", "rejected", etc.
-  transaction_amount?: number; // Amount in major units (e.g., 100.00 UYU)
-}
-
-/**
- * Mercado Pago payment provider client
+ * Mercado Pago payment provider client using official SDK
  *
  * Mercado Pago Status Mapping:
  *
@@ -43,8 +30,11 @@ interface MercadoPagoPayment {
  * For preauth flow, we map "approved" to AUTHORIZED status.
  */
 export class MercadoPagoClient implements PaymentProviderClient {
+  private readonly client: MercadoPagoConfig;
+  private readonly preference: Preference;
+  private readonly payment: Payment;
+  private readonly webhookSecret: string | null;
   private readonly accessToken: string;
-  private readonly baseUrl = "https://api.mercadopago.com";
 
   constructor() {
     const accessToken = process.env.MERCADOPAGO_ACCESS_TOKEN;
@@ -53,7 +43,23 @@ export class MercadoPagoClient implements PaymentProviderClient {
         "MERCADOPAGO_ACCESS_TOKEN environment variable is required. Get it from Mercado Pago dashboard → Credentials"
       );
     }
+
     this.accessToken = accessToken;
+
+    // Webhook secret is optional but recommended for production
+    this.webhookSecret = process.env.MERCADOPAGO_WEBHOOK_SECRET || null;
+
+    // Initialize SDK client
+    this.client = new MercadoPagoConfig({
+      accessToken,
+      options: {
+        timeout: 5000,
+      },
+    });
+
+    // Initialize API objects
+    this.preference = new Preference(this.client);
+    this.payment = new Payment(this.client);
   }
 
   /**
@@ -64,16 +70,24 @@ export class MercadoPagoClient implements PaymentProviderClient {
     // Convert amount from minor units (cents) to major units (dollars/pesos)
     const amountInMajorUnits = input.amount.amount / 100;
 
-    // Build return URLs (these are the payment return pages we created)
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3002";
-    const successUrl = `${baseUrl.replace("/api", "")}/payment/success`;
-    const pendingUrl = `${baseUrl.replace("/api", "")}/payment/pending`;
-    const failureUrl = `${baseUrl.replace("/api", "")}/payment/failure`;
+    // Build return URLs (these are the payment return pages in the CLIENT app)
+    // Note: Payment pages are in the client app, not the API server
+    // CLIENT_URL should point to the client app (e.g., http://localhost:3000 in dev, https://arreglatodo.com in prod)
+    const clientBaseUrl =
+      process.env.CLIENT_URL ||
+      process.env.NEXT_PUBLIC_CLIENT_URL ||
+      (process.env.NODE_ENV === "production"
+        ? "https://arreglatodo.com" // Update with your production client URL
+        : "http://localhost:3000"); // Client app runs on port 3000 in development
+    const successUrl = `${clientBaseUrl}/payment/success`;
+    const pendingUrl = `${clientBaseUrl}/payment/pending`;
+    const failureUrl = `${clientBaseUrl}/payment/failure`;
 
-    // Create preference payload
-    const preferencePayload = {
+    // Create preference payload using SDK types
+    const preferenceBody = {
       items: [
         {
+          id: input.orderId, // Required by SDK
           title: `Orden #${input.orderId}`,
           description: `Pago de orden de servicio`,
           quantity: 1,
@@ -86,7 +100,7 @@ export class MercadoPagoClient implements PaymentProviderClient {
         pending: pendingUrl,
         failure: failureUrl,
       },
-      auto_return: "approved", // Redirect automatically when approved
+      auto_return: "approved" as const, // Redirect automatically when approved
       external_reference: input.orderId, // Store order ID for webhook matching
       statement_descriptor: "ARRREGLATODO", // Appears on customer's statement
       metadata: {
@@ -95,59 +109,141 @@ export class MercadoPagoClient implements PaymentProviderClient {
         idempotencyKey: input.idempotencyKey,
         ...input.metadata,
       },
-      // For preauth, we want to authorize but not capture immediately
-      // MP doesn't have explicit preauth, but we can use "pending" status
-      // and capture later when work is completed
     };
 
     try {
-      const response = await fetch(`${this.baseUrl}/checkout/preferences`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${this.accessToken}`,
-        },
-        body: JSON.stringify(preferencePayload),
+      // Use SDK to create preference
+      const preference = await this.preference.create({
+        body: preferenceBody,
       });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(
-          `Mercado Pago API error: ${response.status} ${response.statusText} - ${errorText}`
-        );
-      }
-
-      const preference = (await response.json()) as MercadoPagoPreference;
 
       // Map MP preference status to our PaymentStatus
       // Preferences are created in "pending" state until user completes payment
       const status = PaymentStatus.REQUIRES_ACTION;
 
+      // Get checkout URL (prefer init_point, fallback to sandbox_init_point)
+      const checkoutUrl =
+        preference.init_point || preference.sandbox_init_point || null;
+
+      if (!preference.id) {
+        throw new Error("Mercado Pago preference created but no ID returned");
+      }
+
       return {
         providerReference: preference.id, // Preference ID
-        checkoutUrl:
-          preference.init_point || preference.sandbox_init_point || null, // Checkout URL
+        checkoutUrl: checkoutUrl || null,
         status,
       };
     } catch (error) {
+      // Log the full error for debugging
+      console.error("Mercado Pago preference creation error:", error);
+
+      // Extract error message from various error types
+      let errorMessage = "Unknown error";
+
       if (error instanceof Error) {
-        throw new Error(
-          `Failed to create Mercado Pago preference: ${error.message}`
-        );
+        errorMessage = error.message;
+      } else if (typeof error === "string") {
+        errorMessage = error;
+      } else if (error && typeof error === "object") {
+        // SDK might throw an object with error details
+        const errorObj = error as Record<string, unknown>;
+        if (errorObj.message && typeof errorObj.message === "string") {
+          errorMessage = errorObj.message;
+        } else if (errorObj.error && typeof errorObj.error === "string") {
+          errorMessage = errorObj.error;
+        } else if (errorObj.cause && typeof errorObj.cause === "string") {
+          errorMessage = errorObj.cause;
+        } else {
+          // Try to stringify the error object
+          try {
+            errorMessage = JSON.stringify(errorObj);
+          } catch {
+            errorMessage = String(error);
+          }
+        }
+      } else {
+        errorMessage = String(error);
       }
+
       throw new Error(
-        "Failed to create Mercado Pago preference: Unknown error"
+        `Failed to create Mercado Pago preference: ${errorMessage}`
       );
+    }
+  }
+
+  /**
+   * Verify webhook signature using X-Signature header
+   * Mercado Pago signs webhooks using HMAC-SHA256 with the webhook secret
+   */
+  private verifyWebhookSignature(
+    payload: string,
+    signature: string | null
+  ): boolean {
+    // If no secret configured, skip verification (not recommended for production)
+    if (!this.webhookSecret) {
+      console.warn(
+        "MERCADOPAGO_WEBHOOK_SECRET not configured. Webhook signature verification skipped."
+      );
+      return true; // Allow in development, but log warning
+    }
+
+    if (!signature) {
+      return false; // No signature provided
+    }
+
+    try {
+      // Extract signature components
+      // Format: "ts={timestamp},v1={signature}"
+      const signatureParts = signature.split(",");
+      const signatureMap: Record<string, string> = {};
+      signatureParts.forEach((part) => {
+        const [key, value] = part.split("=");
+        if (key && value) {
+          signatureMap[key.trim()] = value.trim();
+        }
+      });
+
+      const v1Signature = signatureMap.v1;
+      if (!v1Signature) {
+        return false;
+      }
+
+      // Create expected signature: HMAC-SHA256 of payload with secret
+      const expectedSignature = crypto
+        .createHmac("sha256", this.webhookSecret)
+        .update(payload)
+        .digest("hex");
+
+      // Compare signatures using constant-time comparison to prevent timing attacks
+      return crypto.timingSafeEqual(
+        Buffer.from(v1Signature),
+        Buffer.from(expectedSignature)
+      );
+    } catch (error) {
+      console.error("Error verifying webhook signature:", error);
+      return false;
     }
   }
 
   /**
    * Parse and validate webhook payload from Mercado Pago
    * MP sends webhooks with payment updates
+   * Includes signature verification for security
    */
   async parseWebhook(request: Request): Promise<ProviderWebhookEvent | null> {
     try {
-      const body = await request.json();
+      // Get raw body for signature verification
+      const rawBody = await request.clone().text();
+      const signature = request.headers.get("x-signature");
+
+      // Verify webhook signature
+      if (!this.verifyWebhookSignature(rawBody, signature)) {
+        console.error("Invalid webhook signature");
+        return null; // Reject webhook with invalid signature
+      }
+
+      const body = JSON.parse(rawBody);
 
       // MP webhook structure:
       // {
@@ -219,9 +315,11 @@ export class MercadoPagoClient implements PaymentProviderClient {
 
   /**
    * Capture an authorized payment (charge the funds)
-   * Mercado Pago: Uses POST /v1/payments/{payment_id}/capture
-   * Note: MP doesn't have explicit capture - "approved" payments are already captured
-   * But we can use this endpoint to confirm capture or handle partial captures
+   * Mercado Pago: Uses PUT /v1/payments/{payment_id}/capture
+   * Note: In MP, "approved" payments are already captured, but we can use this
+   * endpoint for partial captures or to confirm capture
+   *
+   * Note: The SDK may not have a direct capture method, so we use the REST API directly
    */
   async capture(
     providerReference: string,
@@ -229,21 +327,23 @@ export class MercadoPagoClient implements PaymentProviderClient {
   ): Promise<{ capturedAmount: number }> {
     const captureAmount = amount ? amount / 100 : undefined; // Convert to major units
 
-    const capturePayload: Record<string, unknown> = {};
+    const captureBody: Record<string, unknown> = {};
     if (captureAmount !== undefined) {
-      capturePayload.capture_amount = captureAmount;
+      captureBody.capture_amount = captureAmount;
     }
 
     try {
+      // Use REST API directly as SDK may not have capture method
+      const baseUrl = "https://api.mercadopago.com";
       const response = await fetch(
-        `${this.baseUrl}/v1/payments/${providerReference}/capture`,
+        `${baseUrl}/v1/payments/${providerReference}/capture`,
         {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${this.accessToken}`,
           },
-          body: JSON.stringify(capturePayload),
+          body: JSON.stringify(captureBody),
         }
       );
 
@@ -254,7 +354,10 @@ export class MercadoPagoClient implements PaymentProviderClient {
         );
       }
 
-      const result = (await response.json()) as MercadoPagoPayment;
+      const result = (await response.json()) as {
+        status?: string;
+        transaction_amount?: number;
+      };
 
       // Return captured amount in minor units
       const capturedAmount = result.transaction_amount
@@ -274,25 +377,28 @@ export class MercadoPagoClient implements PaymentProviderClient {
 
   /**
    * Refund a payment (optional for MVP)
+   * Uses REST API directly as SDK may not have refund method
    */
   async refund(providerReference: string, amount?: number): Promise<void> {
     const refundAmount = amount ? amount / 100 : undefined; // Convert to major units
 
-    const refundPayload: Record<string, unknown> = {};
+    const refundBody: Record<string, unknown> = {};
     if (refundAmount !== undefined) {
-      refundPayload.amount = refundAmount;
+      refundBody.amount = refundAmount;
     }
 
     try {
+      // Use REST API directly as SDK may not have refund method
+      const baseUrl = "https://api.mercadopago.com";
       const response = await fetch(
-        `${this.baseUrl}/v1/payments/${providerReference}/refunds`,
+        `${baseUrl}/v1/payments/${providerReference}/refunds`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${this.accessToken}`,
           },
-          body: JSON.stringify(refundPayload),
+          body: JSON.stringify(refundBody),
         }
       );
 
@@ -313,30 +419,26 @@ export class MercadoPagoClient implements PaymentProviderClient {
   }
 
   /**
-   * Fetch payment details from Mercado Pago API
+   * Fetch payment details from Mercado Pago API using SDK
    */
   private async fetchPaymentDetails(
     paymentId: string
-  ): Promise<MercadoPagoPayment | null> {
+  ): Promise<{ status: string; transaction_amount?: number } | null> {
     try {
-      const response = await fetch(`${this.baseUrl}/v1/payments/${paymentId}`, {
-        headers: {
-          Authorization: `Bearer ${this.accessToken}`,
-        },
-      });
-
-      if (!response.ok) {
-        if (response.status === 404) {
-          return null;
-        }
-        const errorText = await response.text();
-        throw new Error(
-          `Mercado Pago API error: ${response.status} ${response.statusText} - ${errorText}`
-        );
-      }
-
-      return (await response.json()) as MercadoPagoPayment;
+      // Use SDK to fetch payment
+      const payment = await this.payment.get({ id: paymentId });
+      return {
+        status: payment.status || "",
+        transaction_amount: payment.transaction_amount,
+      };
     } catch (error) {
+      // Check if it's a 404 (payment not found)
+      if (
+        error instanceof Error &&
+        (error.message.includes("404") || error.message.includes("not found"))
+      ) {
+        return null;
+      }
       console.error("Error fetching payment details from Mercado Pago:", error);
       return null;
     }

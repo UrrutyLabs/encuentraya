@@ -164,9 +164,31 @@ export function JobDetailScreen() {
           </Text>
 
           {/* Pro Summary */}
-          {/* Payment Banner - Show when payment is pending */}
-          {(job.status === OrderStatus.PENDING_PRO_CONFIRMATION ||
-            job.status === OrderStatus.CONFIRMED) && (
+          {/* Waiting for pro confirmation */}
+          {job.status === OrderStatus.PENDING_PRO_CONFIRMATION && (
+            <Card className="p-4 md:p-6 mb-4 md:mb-6 bg-info/10 border-info/20">
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <AlertCircle className="w-5 h-5 text-info" />
+                    <Text variant="h2" className="text-text">
+                      Esperando confirmación del profesional
+                    </Text>
+                  </div>
+                  <Text variant="body" className="text-muted mb-2">
+                    El profesional está revisando tu solicitud. Te notificaremos
+                    cuando acepte el trabajo.
+                  </Text>
+                </div>
+                <Badge variant="info" showIcon>
+                  Pendiente
+                </Badge>
+              </div>
+            </Card>
+          )}
+
+          {/* Payment Banner - Show when payment authorization is needed (order is ACCEPTED) */}
+          {job.status === OrderStatus.ACCEPTED && (
             <Card className="p-4 md:p-6 mb-4 md:mb-6 bg-warning/10 border-warning/20">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex-1">
@@ -177,7 +199,8 @@ export function JobDetailScreen() {
                     </Text>
                   </div>
                   <Text variant="body" className="text-muted mb-2">
-                    Para continuar con tu trabajo, necesitás autorizar el pago.
+                    El profesional aceptó tu solicitud. Para continuar,
+                    necesitás autorizar el pago.
                   </Text>
                   {payment && (
                     <div className="mt-2">

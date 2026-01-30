@@ -56,9 +56,7 @@ export const JobCard = memo(
       [job.status, hasReview]
     );
     const showPaymentPrompt = useMemo(
-      () =>
-        job.status === OrderStatus.PENDING_PRO_CONFIRMATION ||
-        job.status === OrderStatus.CONFIRMED,
+      () => job.status === OrderStatus.ACCEPTED,
       [job.status]
     );
     const showRebookPrompt = useMemo(

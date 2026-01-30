@@ -26,14 +26,14 @@ describe("SearchHero", () => {
     it("should render search input with placeholder", () => {
       render(<SearchHero />);
       expect(
-        screen.getByPlaceholderText("¿Qué necesitás?")
+        screen.getByPlaceholderText("Describí lo que estás precisando")
       ).toBeInTheDocument();
     });
 
     it("should render with initial query", () => {
       render(<SearchHero initialQuery="plumber" />);
       const input = screen.getByPlaceholderText(
-        "¿Qué necesitás?"
+        "Describí lo que estás precisando"
       ) as HTMLInputElement;
       expect(input.value).toBe("plumber");
     });
@@ -49,7 +49,9 @@ describe("SearchHero", () => {
   describe("search submission", () => {
     it("should navigate to results page on submit", async () => {
       render(<SearchHero />);
-      const input = screen.getByPlaceholderText("¿Qué necesitás?");
+      const input = screen.getByPlaceholderText(
+        "Describí lo que estás precisando"
+      );
       const form = screen.getByRole("search");
 
       fireEvent.change(input, { target: { value: "electrician" } });
@@ -62,7 +64,9 @@ describe("SearchHero", () => {
 
     it("should trim whitespace from search query", async () => {
       render(<SearchHero />);
-      const input = screen.getByPlaceholderText("¿Qué necesitás?");
+      const input = screen.getByPlaceholderText(
+        "Describí lo que estás precisando"
+      );
       const form = screen.getByRole("search");
 
       fireEvent.change(input, { target: { value: "  plumber  " } });
@@ -88,7 +92,9 @@ describe("SearchHero", () => {
       mockGet.mockReturnValue("PLUMBING");
       mockToString.mockReturnValue("category=PLUMBING");
       render(<SearchHero preserveParams={true} />);
-      const input = screen.getByPlaceholderText("¿Qué necesitás?");
+      const input = screen.getByPlaceholderText(
+        "Describí lo que estás precisando"
+      );
       const form = screen.getByRole("search");
 
       fireEvent.change(input, { target: { value: "test" } });
@@ -107,7 +113,7 @@ describe("SearchHero", () => {
       mockGet.mockReturnValue("plumber");
       const { rerender } = render(<SearchHero preserveParams={true} />);
       const input = screen.getByPlaceholderText(
-        "¿Qué necesitás?"
+        "Describí lo que estás precisando"
       ) as HTMLInputElement;
 
       await waitFor(() => {
@@ -131,7 +137,7 @@ describe("SearchHero", () => {
       mockGet.mockReturnValue("plumber");
       render(<SearchHero preserveParams={false} initialQuery="initial" />);
       const input = screen.getByPlaceholderText(
-        "¿Qué necesitás?"
+        "Describí lo que estás precisando"
       ) as HTMLInputElement;
 
       expect(input.value).toBe("initial");

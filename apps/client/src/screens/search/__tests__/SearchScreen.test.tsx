@@ -67,7 +67,7 @@ describe("SearchScreen", () => {
     it("should render search hero", () => {
       render(<SearchScreen />);
       expect(
-        screen.getByPlaceholderText("¿Qué necesitás?")
+        screen.getByPlaceholderText("Describí lo que estás precisando")
       ).toBeInTheDocument();
     });
 

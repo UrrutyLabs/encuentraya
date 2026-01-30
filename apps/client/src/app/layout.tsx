@@ -4,6 +4,7 @@ import "./globals.css";
 import { TRPCProvider } from "@/lib/trpc/Provider";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { CrashReportingInit } from "@/components/CrashReportingInit";
+import { CategoriesPrefetcher } from "@/components/CategoriesPrefetcher";
 
 const inter = Inter({
   variable: "--font-sans",
@@ -27,7 +28,10 @@ export default function RootLayout({
       <body className="font-sans antialiased">
         <ErrorBoundary>
           <CrashReportingInit />
-          <TRPCProvider>{children}</TRPCProvider>
+          <TRPCProvider>
+            <CategoriesPrefetcher />
+            {children}
+          </TRPCProvider>
         </ErrorBoundary>
       </body>
     </html>

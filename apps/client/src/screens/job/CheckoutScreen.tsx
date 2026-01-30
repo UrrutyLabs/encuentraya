@@ -20,7 +20,12 @@ import { Navigation } from "@/components/presentational/Navigation";
 import { WhatsAppPromptCard } from "@/components/presentational/WhatsAppPromptCard";
 import { CheckoutSkeleton } from "@/components/presentational/CheckoutSkeleton";
 import { useClientProfile } from "@/hooks/client";
-import { PaymentStatus, formatCurrency, type Order } from "@repo/domain";
+import {
+  PaymentStatus,
+  OrderStatus,
+  formatCurrency,
+  type Order,
+} from "@repo/domain";
 import { JOB_LABELS } from "@/utils/jobLabels";
 import Link from "next/link";
 
@@ -143,6 +148,51 @@ function CheckoutContent() {
               </Text>
               <Link href={`/my-jobs/${orderId}`}>
                 <Button variant="primary">{JOB_LABELS.viewJob}</Button>
+              </Link>
+            </Card>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Validate order status - payment can only be authorized when order is ACCEPTED
+  if (order && order.status !== OrderStatus.ACCEPTED) {
+    return (
+      <div className="min-h-screen bg-bg">
+        <Navigation showLogin={false} showProfile={true} />
+        <div className="px-4 py-4 md:py-8">
+          <div className="max-w-4xl mx-auto">
+            <Card className="p-6 md:p-8">
+              <div className="flex items-center gap-2 mb-4">
+                <AlertCircle className="w-6 h-6 text-warning" />
+                <Text variant="h1" className="text-primary">
+                  Autorizar pago
+                </Text>
+              </div>
+              {order.status === OrderStatus.PENDING_PRO_CONFIRMATION ? (
+                <>
+                  <Text variant="body" className="mb-2 text-text">
+                    El profesional aún no ha aceptado tu solicitud.
+                  </Text>
+                  <Text variant="body" className="mb-6 text-muted">
+                    Podrás autorizar el pago una vez que el profesional acepte
+                    el trabajo.
+                  </Text>
+                </>
+              ) : (
+                <>
+                  <Text variant="body" className="mb-6 text-text">
+                    El estado de este trabajo no permite autorizar el pago en
+                    este momento.
+                  </Text>
+                </>
+              )}
+              <Link href={`/my-jobs/${orderId}`}>
+                <Button variant="primary" className="flex items-center gap-2">
+                  <ArrowLeft className="w-4 h-4" />
+                  Volver al trabajo
+                </Button>
               </Link>
             </Card>
           </div>
