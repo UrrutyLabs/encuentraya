@@ -83,18 +83,43 @@ export class MercadoPagoClient implements PaymentProviderClient {
     const pendingUrl = `${clientBaseUrl}/payment/pending`;
     const failureUrl = `${clientBaseUrl}/payment/failure`;
 
+    // Build webhook notification URL (API endpoint)
+    const apiBaseUrl =
+      process.env.API_URL ||
+      process.env.NEXT_PUBLIC_API_URL ||
+      (process.env.NODE_ENV === "production"
+        ? "https://api.arreglatodo.com" // Update with your production API URL
+        : "http://localhost:3002"); // API runs on port 3002 in development
+    const notificationUrl = `${apiBaseUrl}/api/webhooks/mercadopago`;
+
+    // Build payer object if information is available
+    const payer: Record<string, unknown> = {};
+    if (input.payer?.email) {
+      payer.email = input.payer.email;
+    }
+    if (input.payer?.firstName) {
+      payer.first_name = input.payer.firstName;
+    }
+    if (input.payer?.lastName) {
+      payer.last_name = input.payer.lastName;
+    }
+
+    // Build item with optional category_id
+    const item: Record<string, unknown> = {
+      id: input.orderId, // Required by SDK
+      title: `Orden #${input.orderId}`,
+      description: `Pago de orden de servicio`,
+      quantity: 1,
+      unit_price: amountInMajorUnits,
+      currency_id: input.amount.currency,
+    };
+    if (input.categoryId) {
+      item.category_id = input.categoryId;
+    }
+
     // Create preference payload using SDK types
-    const preferenceBody = {
-      items: [
-        {
-          id: input.orderId, // Required by SDK
-          title: `Orden #${input.orderId}`,
-          description: `Pago de orden de servicio`,
-          quantity: 1,
-          unit_price: amountInMajorUnits,
-          currency_id: input.amount.currency,
-        },
-      ],
+    const preferenceBody: Record<string, unknown> = {
+      items: [item],
       back_urls: {
         success: successUrl,
         pending: pendingUrl,
@@ -103,6 +128,7 @@ export class MercadoPagoClient implements PaymentProviderClient {
       auto_return: "approved" as const, // Redirect automatically when approved
       external_reference: input.orderId, // Store order ID for webhook matching
       statement_descriptor: "ARRREGLATODO", // Appears on customer's statement
+      notification_url: notificationUrl, // Webhook endpoint for payment notifications
       metadata: {
         orderId: input.orderId,
         clientUserId: input.clientUserId,
@@ -111,10 +137,41 @@ export class MercadoPagoClient implements PaymentProviderClient {
       },
     };
 
+    // Add payer information if available (improves approval rates)
+    if (Object.keys(payer).length > 0) {
+      preferenceBody.payer = payer;
+    }
+
     try {
       // Use SDK to create preference
+      // Type assertion needed because SDK expects specific types but we're building dynamically
       const preference = await this.preference.create({
-        body: preferenceBody,
+        body: preferenceBody as {
+          items: Array<{
+            id: string;
+            title: string;
+            description: string;
+            quantity: number;
+            unit_price: number;
+            currency_id: string;
+            category_id?: string;
+          }>;
+          back_urls: {
+            success: string;
+            pending: string;
+            failure: string;
+          };
+          auto_return: "approved";
+          external_reference: string;
+          statement_descriptor: string;
+          notification_url: string;
+          metadata: Record<string, string>;
+          payer?: {
+            email?: string;
+            first_name?: string;
+            last_name?: string;
+          };
+        },
       });
 
       // Map MP preference status to our PaymentStatus
@@ -175,9 +232,14 @@ export class MercadoPagoClient implements PaymentProviderClient {
   /**
    * Verify webhook signature using X-Signature header
    * Mercado Pago signs webhooks using HMAC-SHA256 with the webhook secret
+   *
+   * According to Mercado Pago documentation, the signature is calculated using a manifest string:
+   * manifest = "id:{data.id};request-id:{x-request-id};ts:{ts};"
+   * signature = HMAC-SHA256(manifest, webhook_secret)
    */
   private verifyWebhookSignature(
-    payload: string,
+    dataId: string,
+    xRequestId: string,
     signature: string | null
   ): boolean {
     // If no secret configured, skip verification (not recommended for production)
@@ -205,14 +267,20 @@ export class MercadoPagoClient implements PaymentProviderClient {
       });
 
       const v1Signature = signatureMap.v1;
-      if (!v1Signature) {
+      const ts = signatureMap.ts;
+
+      if (!v1Signature || !ts) {
         return false;
       }
 
-      // Create expected signature: HMAC-SHA256 of payload with secret
+      // Build manifest string according to Mercado Pago documentation
+      // Format: "id:{data.id};request-id:{x-request-id};ts:{ts};"
+      const manifest = `id:${dataId};request-id:${xRequestId};ts:${ts};`;
+
+      // Create expected signature: HMAC-SHA256 of manifest with secret
       const expectedSignature = crypto
         .createHmac("sha256", this.webhookSecret)
-        .update(payload)
+        .update(manifest)
         .digest("hex");
 
       // Compare signatures using constant-time comparison to prevent timing attacks
@@ -230,15 +298,31 @@ export class MercadoPagoClient implements PaymentProviderClient {
    * Parse and validate webhook payload from Mercado Pago
    * MP sends webhooks with payment updates
    * Includes signature verification for security
+   *
+   * Mercado Pago webhook format:
+   * - Query params: data.id={payment_id}&type=payment
+   * - Headers: x-signature, x-request-id
+   * - Body: JSON with payment event details
    */
   async parseWebhook(request: Request): Promise<ProviderWebhookEvent | null> {
     try {
-      // Get raw body for signature verification
+      // Get raw body (needed for parsing, but signature uses manifest string)
       const rawBody = await request.clone().text();
       const signature = request.headers.get("x-signature");
+      const xRequestId = request.headers.get("x-request-id");
 
-      // Verify webhook signature
-      if (!this.verifyWebhookSignature(rawBody, signature)) {
+      // Extract data.id from query parameters (required for signature verification)
+      const url = new URL(request.url);
+      const dataId = url.searchParams.get("data.id");
+      const type = url.searchParams.get("type");
+
+      // Verify this is a payment webhook
+      if (type !== "payment" || !dataId) {
+        return null; // Not a payment webhook or missing data.id
+      }
+
+      // Verify webhook signature using manifest string format
+      if (!this.verifyWebhookSignature(dataId, xRequestId || "", signature)) {
         console.error("Invalid webhook signature");
         return null; // Reject webhook with invalid signature
       }

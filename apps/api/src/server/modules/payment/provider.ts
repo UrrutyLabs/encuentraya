@@ -18,6 +18,14 @@ export interface CreatePreauthInput {
   amount: Money;
   idempotencyKey: string;
   metadata?: Record<string, string>; // Additional metadata for provider
+  // Optional payer information for better approval rates
+  payer?: {
+    email?: string;
+    firstName?: string;
+    lastName?: string;
+  };
+  // Optional category ID for better approval rates
+  categoryId?: string;
 }
 
 /**

@@ -10,6 +10,7 @@ import type { OrderRepository, OrderEntity } from "@modules/order/order.repo";
 import type { ProRepository, ProProfileEntity } from "@modules/pro/pro.repo";
 import type { EarningService } from "@modules/payout/earning.service";
 import type { AuditService } from "@modules/audit/audit.service";
+import type { ClientProfileService } from "@modules/user/clientProfile.service";
 import type { PaymentProviderClient } from "../provider";
 import {
   PaymentProvider,
@@ -36,6 +37,9 @@ describe("PaymentService", () => {
   let mockProRepository: ReturnType<typeof createMockProRepository>;
   let mockEarningService: ReturnType<typeof createMockEarningService>;
   let mockAuditService: ReturnType<typeof createMockAuditService>;
+  let mockClientProfileService: ReturnType<
+    typeof createMockClientProfileService
+  >;
   let mockProviderClient: ReturnType<typeof createMockProviderClient>;
 
   function createMockPaymentRepository(): {
@@ -101,6 +105,14 @@ describe("PaymentService", () => {
   } {
     return {
       logEvent: vi.fn(),
+    };
+  }
+
+  function createMockClientProfileService(): {
+    getProfile: ReturnType<typeof vi.fn>;
+  } {
+    return {
+      getProfile: vi.fn(),
     };
   }
 
@@ -246,6 +258,7 @@ describe("PaymentService", () => {
     mockProRepository = createMockProRepository();
     mockEarningService = createMockEarningService();
     mockAuditService = createMockAuditService();
+    mockClientProfileService = createMockClientProfileService();
     mockProviderClient = createMockProviderClient();
 
     vi.mocked(getPaymentProviderClient).mockResolvedValue(mockProviderClient);
@@ -258,7 +271,8 @@ describe("PaymentService", () => {
       mockOrderRepository as unknown as OrderRepository,
       mockProRepository as unknown as ProRepository,
       mockEarningService as unknown as EarningService,
-      mockAuditService as unknown as AuditService
+      mockAuditService as unknown as AuditService,
+      mockClientProfileService as unknown as ClientProfileService
     );
   });
 
@@ -295,6 +309,17 @@ describe("PaymentService", () => {
       mockPaymentRepository.findByOrderId.mockResolvedValue(null);
       mockProRepository.findById.mockResolvedValue(proProfile);
       mockPaymentRepository.create.mockResolvedValue(payment);
+      vi.mocked(mockClientProfileService.getProfile).mockResolvedValue({
+        id: "profile-1",
+        userId: "client-1",
+        firstName: null,
+        lastName: null,
+        email: null,
+        phone: null,
+        preferredContactMethod: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
       vi.mocked(mockProviderClient.createPreauth).mockResolvedValue({
         providerReference: "mp-ref-123",
         checkoutUrl: "https://checkout.example.com",
