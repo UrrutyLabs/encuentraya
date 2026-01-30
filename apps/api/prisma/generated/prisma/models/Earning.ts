@@ -40,7 +40,7 @@ export type EarningSumAggregateOutputType = {
 
 export type EarningMinAggregateOutputType = {
   id: string | null
-  bookingId: string | null
+  orderId: string | null
   proProfileId: string | null
   clientUserId: string | null
   currency: string | null
@@ -55,7 +55,7 @@ export type EarningMinAggregateOutputType = {
 
 export type EarningMaxAggregateOutputType = {
   id: string | null
-  bookingId: string | null
+  orderId: string | null
   proProfileId: string | null
   clientUserId: string | null
   currency: string | null
@@ -70,7 +70,7 @@ export type EarningMaxAggregateOutputType = {
 
 export type EarningCountAggregateOutputType = {
   id: number
-  bookingId: number
+  orderId: number
   proProfileId: number
   clientUserId: number
   currency: number
@@ -99,7 +99,7 @@ export type EarningSumAggregateInputType = {
 
 export type EarningMinAggregateInputType = {
   id?: true
-  bookingId?: true
+  orderId?: true
   proProfileId?: true
   clientUserId?: true
   currency?: true
@@ -114,7 +114,7 @@ export type EarningMinAggregateInputType = {
 
 export type EarningMaxAggregateInputType = {
   id?: true
-  bookingId?: true
+  orderId?: true
   proProfileId?: true
   clientUserId?: true
   currency?: true
@@ -129,7 +129,7 @@ export type EarningMaxAggregateInputType = {
 
 export type EarningCountAggregateInputType = {
   id?: true
-  bookingId?: true
+  orderId?: true
   proProfileId?: true
   clientUserId?: true
   currency?: true
@@ -231,7 +231,7 @@ export type EarningGroupByArgs<ExtArgs extends runtime.Types.Extensions.Internal
 
 export type EarningGroupByOutputType = {
   id: string
-  bookingId: string
+  orderId: string
   proProfileId: string
   clientUserId: string
   currency: string
@@ -269,7 +269,7 @@ export type EarningWhereInput = {
   OR?: Prisma.EarningWhereInput[]
   NOT?: Prisma.EarningWhereInput | Prisma.EarningWhereInput[]
   id?: Prisma.StringFilter<"Earning"> | string
-  bookingId?: Prisma.StringFilter<"Earning"> | string
+  orderId?: Prisma.StringFilter<"Earning"> | string
   proProfileId?: Prisma.StringFilter<"Earning"> | string
   clientUserId?: Prisma.StringFilter<"Earning"> | string
   currency?: Prisma.StringFilter<"Earning"> | string
@@ -280,14 +280,14 @@ export type EarningWhereInput = {
   availableAt?: Prisma.DateTimeNullableFilter<"Earning"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Earning"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Earning"> | Date | string
-  booking?: Prisma.XOR<Prisma.BookingScalarRelationFilter, Prisma.BookingWhereInput>
+  order?: Prisma.XOR<Prisma.OrderScalarRelationFilter, Prisma.OrderWhereInput>
   proProfile?: Prisma.XOR<Prisma.ProProfileScalarRelationFilter, Prisma.ProProfileWhereInput>
   payoutItem?: Prisma.XOR<Prisma.PayoutItemNullableScalarRelationFilter, Prisma.PayoutItemWhereInput> | null
 }
 
 export type EarningOrderByWithRelationInput = {
   id?: Prisma.SortOrder
-  bookingId?: Prisma.SortOrder
+  orderId?: Prisma.SortOrder
   proProfileId?: Prisma.SortOrder
   clientUserId?: Prisma.SortOrder
   currency?: Prisma.SortOrder
@@ -298,14 +298,14 @@ export type EarningOrderByWithRelationInput = {
   availableAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-  booking?: Prisma.BookingOrderByWithRelationInput
+  order?: Prisma.OrderOrderByWithRelationInput
   proProfile?: Prisma.ProProfileOrderByWithRelationInput
   payoutItem?: Prisma.PayoutItemOrderByWithRelationInput
 }
 
 export type EarningWhereUniqueInput = Prisma.AtLeast<{
   id?: string
-  bookingId?: string
+  orderId?: string
   AND?: Prisma.EarningWhereInput | Prisma.EarningWhereInput[]
   OR?: Prisma.EarningWhereInput[]
   NOT?: Prisma.EarningWhereInput | Prisma.EarningWhereInput[]
@@ -319,14 +319,14 @@ export type EarningWhereUniqueInput = Prisma.AtLeast<{
   availableAt?: Prisma.DateTimeNullableFilter<"Earning"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Earning"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Earning"> | Date | string
-  booking?: Prisma.XOR<Prisma.BookingScalarRelationFilter, Prisma.BookingWhereInput>
+  order?: Prisma.XOR<Prisma.OrderScalarRelationFilter, Prisma.OrderWhereInput>
   proProfile?: Prisma.XOR<Prisma.ProProfileScalarRelationFilter, Prisma.ProProfileWhereInput>
   payoutItem?: Prisma.XOR<Prisma.PayoutItemNullableScalarRelationFilter, Prisma.PayoutItemWhereInput> | null
-}, "id" | "bookingId">
+}, "id" | "orderId">
 
 export type EarningOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
-  bookingId?: Prisma.SortOrder
+  orderId?: Prisma.SortOrder
   proProfileId?: Prisma.SortOrder
   clientUserId?: Prisma.SortOrder
   currency?: Prisma.SortOrder
@@ -349,7 +349,7 @@ export type EarningScalarWhereWithAggregatesInput = {
   OR?: Prisma.EarningScalarWhereWithAggregatesInput[]
   NOT?: Prisma.EarningScalarWhereWithAggregatesInput | Prisma.EarningScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Earning"> | string
-  bookingId?: Prisma.StringWithAggregatesFilter<"Earning"> | string
+  orderId?: Prisma.StringWithAggregatesFilter<"Earning"> | string
   proProfileId?: Prisma.StringWithAggregatesFilter<"Earning"> | string
   clientUserId?: Prisma.StringWithAggregatesFilter<"Earning"> | string
   currency?: Prisma.StringWithAggregatesFilter<"Earning"> | string
@@ -373,14 +373,14 @@ export type EarningCreateInput = {
   availableAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  booking: Prisma.BookingCreateNestedOneWithoutEarningInput
+  order: Prisma.OrderCreateNestedOneWithoutEarningInput
   proProfile: Prisma.ProProfileCreateNestedOneWithoutEarningsInput
   payoutItem?: Prisma.PayoutItemCreateNestedOneWithoutEarningInput
 }
 
 export type EarningUncheckedCreateInput = {
   id?: string
-  bookingId: string
+  orderId: string
   proProfileId: string
   clientUserId: string
   currency: string
@@ -405,14 +405,14 @@ export type EarningUpdateInput = {
   availableAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  booking?: Prisma.BookingUpdateOneRequiredWithoutEarningNestedInput
+  order?: Prisma.OrderUpdateOneRequiredWithoutEarningNestedInput
   proProfile?: Prisma.ProProfileUpdateOneRequiredWithoutEarningsNestedInput
   payoutItem?: Prisma.PayoutItemUpdateOneWithoutEarningNestedInput
 }
 
 export type EarningUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  bookingId?: Prisma.StringFieldUpdateOperationsInput | string
+  orderId?: Prisma.StringFieldUpdateOperationsInput | string
   proProfileId?: Prisma.StringFieldUpdateOperationsInput | string
   clientUserId?: Prisma.StringFieldUpdateOperationsInput | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
@@ -428,7 +428,7 @@ export type EarningUncheckedUpdateInput = {
 
 export type EarningCreateManyInput = {
   id?: string
-  bookingId: string
+  orderId: string
   proProfileId: string
   clientUserId: string
   currency: string
@@ -456,7 +456,7 @@ export type EarningUpdateManyMutationInput = {
 
 export type EarningUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  bookingId?: Prisma.StringFieldUpdateOperationsInput | string
+  orderId?: Prisma.StringFieldUpdateOperationsInput | string
   proProfileId?: Prisma.StringFieldUpdateOperationsInput | string
   clientUserId?: Prisma.StringFieldUpdateOperationsInput | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
@@ -486,7 +486,7 @@ export type EarningNullableScalarRelationFilter = {
 
 export type EarningCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  bookingId?: Prisma.SortOrder
+  orderId?: Prisma.SortOrder
   proProfileId?: Prisma.SortOrder
   clientUserId?: Prisma.SortOrder
   currency?: Prisma.SortOrder
@@ -507,7 +507,7 @@ export type EarningAvgOrderByAggregateInput = {
 
 export type EarningMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  bookingId?: Prisma.SortOrder
+  orderId?: Prisma.SortOrder
   proProfileId?: Prisma.SortOrder
   clientUserId?: Prisma.SortOrder
   currency?: Prisma.SortOrder
@@ -522,7 +522,7 @@ export type EarningMaxOrderByAggregateInput = {
 
 export type EarningMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  bookingId?: Prisma.SortOrder
+  orderId?: Prisma.SortOrder
   proProfileId?: Prisma.SortOrder
   clientUserId?: Prisma.SortOrder
   currency?: Prisma.SortOrder
@@ -588,36 +588,36 @@ export type EarningUncheckedUpdateManyWithoutProProfileNestedInput = {
   deleteMany?: Prisma.EarningScalarWhereInput | Prisma.EarningScalarWhereInput[]
 }
 
-export type EarningCreateNestedOneWithoutBookingInput = {
-  create?: Prisma.XOR<Prisma.EarningCreateWithoutBookingInput, Prisma.EarningUncheckedCreateWithoutBookingInput>
-  connectOrCreate?: Prisma.EarningCreateOrConnectWithoutBookingInput
+export type EarningCreateNestedOneWithoutOrderInput = {
+  create?: Prisma.XOR<Prisma.EarningCreateWithoutOrderInput, Prisma.EarningUncheckedCreateWithoutOrderInput>
+  connectOrCreate?: Prisma.EarningCreateOrConnectWithoutOrderInput
   connect?: Prisma.EarningWhereUniqueInput
 }
 
-export type EarningUncheckedCreateNestedOneWithoutBookingInput = {
-  create?: Prisma.XOR<Prisma.EarningCreateWithoutBookingInput, Prisma.EarningUncheckedCreateWithoutBookingInput>
-  connectOrCreate?: Prisma.EarningCreateOrConnectWithoutBookingInput
+export type EarningUncheckedCreateNestedOneWithoutOrderInput = {
+  create?: Prisma.XOR<Prisma.EarningCreateWithoutOrderInput, Prisma.EarningUncheckedCreateWithoutOrderInput>
+  connectOrCreate?: Prisma.EarningCreateOrConnectWithoutOrderInput
   connect?: Prisma.EarningWhereUniqueInput
 }
 
-export type EarningUpdateOneWithoutBookingNestedInput = {
-  create?: Prisma.XOR<Prisma.EarningCreateWithoutBookingInput, Prisma.EarningUncheckedCreateWithoutBookingInput>
-  connectOrCreate?: Prisma.EarningCreateOrConnectWithoutBookingInput
-  upsert?: Prisma.EarningUpsertWithoutBookingInput
+export type EarningUpdateOneWithoutOrderNestedInput = {
+  create?: Prisma.XOR<Prisma.EarningCreateWithoutOrderInput, Prisma.EarningUncheckedCreateWithoutOrderInput>
+  connectOrCreate?: Prisma.EarningCreateOrConnectWithoutOrderInput
+  upsert?: Prisma.EarningUpsertWithoutOrderInput
   disconnect?: Prisma.EarningWhereInput | boolean
   delete?: Prisma.EarningWhereInput | boolean
   connect?: Prisma.EarningWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.EarningUpdateToOneWithWhereWithoutBookingInput, Prisma.EarningUpdateWithoutBookingInput>, Prisma.EarningUncheckedUpdateWithoutBookingInput>
+  update?: Prisma.XOR<Prisma.XOR<Prisma.EarningUpdateToOneWithWhereWithoutOrderInput, Prisma.EarningUpdateWithoutOrderInput>, Prisma.EarningUncheckedUpdateWithoutOrderInput>
 }
 
-export type EarningUncheckedUpdateOneWithoutBookingNestedInput = {
-  create?: Prisma.XOR<Prisma.EarningCreateWithoutBookingInput, Prisma.EarningUncheckedCreateWithoutBookingInput>
-  connectOrCreate?: Prisma.EarningCreateOrConnectWithoutBookingInput
-  upsert?: Prisma.EarningUpsertWithoutBookingInput
+export type EarningUncheckedUpdateOneWithoutOrderNestedInput = {
+  create?: Prisma.XOR<Prisma.EarningCreateWithoutOrderInput, Prisma.EarningUncheckedCreateWithoutOrderInput>
+  connectOrCreate?: Prisma.EarningCreateOrConnectWithoutOrderInput
+  upsert?: Prisma.EarningUpsertWithoutOrderInput
   disconnect?: Prisma.EarningWhereInput | boolean
   delete?: Prisma.EarningWhereInput | boolean
   connect?: Prisma.EarningWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.EarningUpdateToOneWithWhereWithoutBookingInput, Prisma.EarningUpdateWithoutBookingInput>, Prisma.EarningUncheckedUpdateWithoutBookingInput>
+  update?: Prisma.XOR<Prisma.XOR<Prisma.EarningUpdateToOneWithWhereWithoutOrderInput, Prisma.EarningUpdateWithoutOrderInput>, Prisma.EarningUncheckedUpdateWithoutOrderInput>
 }
 
 export type EnumEarningStatusFieldUpdateOperationsInput = {
@@ -649,13 +649,13 @@ export type EarningCreateWithoutProProfileInput = {
   availableAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  booking: Prisma.BookingCreateNestedOneWithoutEarningInput
+  order: Prisma.OrderCreateNestedOneWithoutEarningInput
   payoutItem?: Prisma.PayoutItemCreateNestedOneWithoutEarningInput
 }
 
 export type EarningUncheckedCreateWithoutProProfileInput = {
   id?: string
-  bookingId: string
+  orderId: string
   clientUserId: string
   currency: string
   grossAmount: number
@@ -699,7 +699,7 @@ export type EarningScalarWhereInput = {
   OR?: Prisma.EarningScalarWhereInput[]
   NOT?: Prisma.EarningScalarWhereInput | Prisma.EarningScalarWhereInput[]
   id?: Prisma.StringFilter<"Earning"> | string
-  bookingId?: Prisma.StringFilter<"Earning"> | string
+  orderId?: Prisma.StringFilter<"Earning"> | string
   proProfileId?: Prisma.StringFilter<"Earning"> | string
   clientUserId?: Prisma.StringFilter<"Earning"> | string
   currency?: Prisma.StringFilter<"Earning"> | string
@@ -712,7 +712,7 @@ export type EarningScalarWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"Earning"> | Date | string
 }
 
-export type EarningCreateWithoutBookingInput = {
+export type EarningCreateWithoutOrderInput = {
   id?: string
   clientUserId: string
   currency: string
@@ -727,7 +727,7 @@ export type EarningCreateWithoutBookingInput = {
   payoutItem?: Prisma.PayoutItemCreateNestedOneWithoutEarningInput
 }
 
-export type EarningUncheckedCreateWithoutBookingInput = {
+export type EarningUncheckedCreateWithoutOrderInput = {
   id?: string
   proProfileId: string
   clientUserId: string
@@ -742,23 +742,23 @@ export type EarningUncheckedCreateWithoutBookingInput = {
   payoutItem?: Prisma.PayoutItemUncheckedCreateNestedOneWithoutEarningInput
 }
 
-export type EarningCreateOrConnectWithoutBookingInput = {
+export type EarningCreateOrConnectWithoutOrderInput = {
   where: Prisma.EarningWhereUniqueInput
-  create: Prisma.XOR<Prisma.EarningCreateWithoutBookingInput, Prisma.EarningUncheckedCreateWithoutBookingInput>
+  create: Prisma.XOR<Prisma.EarningCreateWithoutOrderInput, Prisma.EarningUncheckedCreateWithoutOrderInput>
 }
 
-export type EarningUpsertWithoutBookingInput = {
-  update: Prisma.XOR<Prisma.EarningUpdateWithoutBookingInput, Prisma.EarningUncheckedUpdateWithoutBookingInput>
-  create: Prisma.XOR<Prisma.EarningCreateWithoutBookingInput, Prisma.EarningUncheckedCreateWithoutBookingInput>
+export type EarningUpsertWithoutOrderInput = {
+  update: Prisma.XOR<Prisma.EarningUpdateWithoutOrderInput, Prisma.EarningUncheckedUpdateWithoutOrderInput>
+  create: Prisma.XOR<Prisma.EarningCreateWithoutOrderInput, Prisma.EarningUncheckedCreateWithoutOrderInput>
   where?: Prisma.EarningWhereInput
 }
 
-export type EarningUpdateToOneWithWhereWithoutBookingInput = {
+export type EarningUpdateToOneWithWhereWithoutOrderInput = {
   where?: Prisma.EarningWhereInput
-  data: Prisma.XOR<Prisma.EarningUpdateWithoutBookingInput, Prisma.EarningUncheckedUpdateWithoutBookingInput>
+  data: Prisma.XOR<Prisma.EarningUpdateWithoutOrderInput, Prisma.EarningUncheckedUpdateWithoutOrderInput>
 }
 
-export type EarningUpdateWithoutBookingInput = {
+export type EarningUpdateWithoutOrderInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   clientUserId?: Prisma.StringFieldUpdateOperationsInput | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
@@ -773,7 +773,7 @@ export type EarningUpdateWithoutBookingInput = {
   payoutItem?: Prisma.PayoutItemUpdateOneWithoutEarningNestedInput
 }
 
-export type EarningUncheckedUpdateWithoutBookingInput = {
+export type EarningUncheckedUpdateWithoutOrderInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   proProfileId?: Prisma.StringFieldUpdateOperationsInput | string
   clientUserId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -799,13 +799,13 @@ export type EarningCreateWithoutPayoutItemInput = {
   availableAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  booking: Prisma.BookingCreateNestedOneWithoutEarningInput
+  order: Prisma.OrderCreateNestedOneWithoutEarningInput
   proProfile: Prisma.ProProfileCreateNestedOneWithoutEarningsInput
 }
 
 export type EarningUncheckedCreateWithoutPayoutItemInput = {
   id?: string
-  bookingId: string
+  orderId: string
   proProfileId: string
   clientUserId: string
   currency: string
@@ -845,13 +845,13 @@ export type EarningUpdateWithoutPayoutItemInput = {
   availableAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  booking?: Prisma.BookingUpdateOneRequiredWithoutEarningNestedInput
+  order?: Prisma.OrderUpdateOneRequiredWithoutEarningNestedInput
   proProfile?: Prisma.ProProfileUpdateOneRequiredWithoutEarningsNestedInput
 }
 
 export type EarningUncheckedUpdateWithoutPayoutItemInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  bookingId?: Prisma.StringFieldUpdateOperationsInput | string
+  orderId?: Prisma.StringFieldUpdateOperationsInput | string
   proProfileId?: Prisma.StringFieldUpdateOperationsInput | string
   clientUserId?: Prisma.StringFieldUpdateOperationsInput | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
@@ -866,7 +866,7 @@ export type EarningUncheckedUpdateWithoutPayoutItemInput = {
 
 export type EarningCreateManyProProfileInput = {
   id?: string
-  bookingId: string
+  orderId: string
   clientUserId: string
   currency: string
   grossAmount: number
@@ -889,13 +889,13 @@ export type EarningUpdateWithoutProProfileInput = {
   availableAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  booking?: Prisma.BookingUpdateOneRequiredWithoutEarningNestedInput
+  order?: Prisma.OrderUpdateOneRequiredWithoutEarningNestedInput
   payoutItem?: Prisma.PayoutItemUpdateOneWithoutEarningNestedInput
 }
 
 export type EarningUncheckedUpdateWithoutProProfileInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  bookingId?: Prisma.StringFieldUpdateOperationsInput | string
+  orderId?: Prisma.StringFieldUpdateOperationsInput | string
   clientUserId?: Prisma.StringFieldUpdateOperationsInput | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   grossAmount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -910,7 +910,7 @@ export type EarningUncheckedUpdateWithoutProProfileInput = {
 
 export type EarningUncheckedUpdateManyWithoutProProfileInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  bookingId?: Prisma.StringFieldUpdateOperationsInput | string
+  orderId?: Prisma.StringFieldUpdateOperationsInput | string
   clientUserId?: Prisma.StringFieldUpdateOperationsInput | string
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   grossAmount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -926,7 +926,7 @@ export type EarningUncheckedUpdateManyWithoutProProfileInput = {
 
 export type EarningSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  bookingId?: boolean
+  orderId?: boolean
   proProfileId?: boolean
   clientUserId?: boolean
   currency?: boolean
@@ -937,14 +937,14 @@ export type EarningSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   availableAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  booking?: boolean | Prisma.BookingDefaultArgs<ExtArgs>
+  order?: boolean | Prisma.OrderDefaultArgs<ExtArgs>
   proProfile?: boolean | Prisma.ProProfileDefaultArgs<ExtArgs>
   payoutItem?: boolean | Prisma.Earning$payoutItemArgs<ExtArgs>
 }, ExtArgs["result"]["earning"]>
 
 export type EarningSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  bookingId?: boolean
+  orderId?: boolean
   proProfileId?: boolean
   clientUserId?: boolean
   currency?: boolean
@@ -955,13 +955,13 @@ export type EarningSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   availableAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  booking?: boolean | Prisma.BookingDefaultArgs<ExtArgs>
+  order?: boolean | Prisma.OrderDefaultArgs<ExtArgs>
   proProfile?: boolean | Prisma.ProProfileDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["earning"]>
 
 export type EarningSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  bookingId?: boolean
+  orderId?: boolean
   proProfileId?: boolean
   clientUserId?: boolean
   currency?: boolean
@@ -972,13 +972,13 @@ export type EarningSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   availableAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  booking?: boolean | Prisma.BookingDefaultArgs<ExtArgs>
+  order?: boolean | Prisma.OrderDefaultArgs<ExtArgs>
   proProfile?: boolean | Prisma.ProProfileDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["earning"]>
 
 export type EarningSelectScalar = {
   id?: boolean
-  bookingId?: boolean
+  orderId?: boolean
   proProfileId?: boolean
   clientUserId?: boolean
   currency?: boolean
@@ -991,31 +991,31 @@ export type EarningSelectScalar = {
   updatedAt?: boolean
 }
 
-export type EarningOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "bookingId" | "proProfileId" | "clientUserId" | "currency" | "grossAmount" | "platformFeeAmount" | "netAmount" | "status" | "availableAt" | "createdAt" | "updatedAt", ExtArgs["result"]["earning"]>
+export type EarningOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "orderId" | "proProfileId" | "clientUserId" | "currency" | "grossAmount" | "platformFeeAmount" | "netAmount" | "status" | "availableAt" | "createdAt" | "updatedAt", ExtArgs["result"]["earning"]>
 export type EarningInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  booking?: boolean | Prisma.BookingDefaultArgs<ExtArgs>
+  order?: boolean | Prisma.OrderDefaultArgs<ExtArgs>
   proProfile?: boolean | Prisma.ProProfileDefaultArgs<ExtArgs>
   payoutItem?: boolean | Prisma.Earning$payoutItemArgs<ExtArgs>
 }
 export type EarningIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  booking?: boolean | Prisma.BookingDefaultArgs<ExtArgs>
+  order?: boolean | Prisma.OrderDefaultArgs<ExtArgs>
   proProfile?: boolean | Prisma.ProProfileDefaultArgs<ExtArgs>
 }
 export type EarningIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  booking?: boolean | Prisma.BookingDefaultArgs<ExtArgs>
+  order?: boolean | Prisma.OrderDefaultArgs<ExtArgs>
   proProfile?: boolean | Prisma.ProProfileDefaultArgs<ExtArgs>
 }
 
 export type $EarningPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Earning"
   objects: {
-    booking: Prisma.$BookingPayload<ExtArgs>
+    order: Prisma.$OrderPayload<ExtArgs>
     proProfile: Prisma.$ProProfilePayload<ExtArgs>
     payoutItem: Prisma.$PayoutItemPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
-    bookingId: string
+    orderId: string
     proProfileId: string
     clientUserId: string
     currency: string
@@ -1420,7 +1420,7 @@ readonly fields: EarningFieldRefs;
  */
 export interface Prisma__EarningClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  booking<T extends Prisma.BookingDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.BookingDefaultArgs<ExtArgs>>): Prisma.Prisma__BookingClient<runtime.Types.Result.GetResult<Prisma.$BookingPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  order<T extends Prisma.OrderDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.OrderDefaultArgs<ExtArgs>>): Prisma.Prisma__OrderClient<runtime.Types.Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   proProfile<T extends Prisma.ProProfileDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ProProfileDefaultArgs<ExtArgs>>): Prisma.Prisma__ProProfileClient<runtime.Types.Result.GetResult<Prisma.$ProProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   payoutItem<T extends Prisma.Earning$payoutItemArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Earning$payoutItemArgs<ExtArgs>>): Prisma.Prisma__PayoutItemClient<runtime.Types.Result.GetResult<Prisma.$PayoutItemPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
@@ -1453,7 +1453,7 @@ export interface Prisma__EarningClient<T, Null = never, ExtArgs extends runtime.
  */
 export interface EarningFieldRefs {
   readonly id: Prisma.FieldRef<"Earning", 'String'>
-  readonly bookingId: Prisma.FieldRef<"Earning", 'String'>
+  readonly orderId: Prisma.FieldRef<"Earning", 'String'>
   readonly proProfileId: Prisma.FieldRef<"Earning", 'String'>
   readonly clientUserId: Prisma.FieldRef<"Earning", 'String'>
   readonly currency: Prisma.FieldRef<"Earning", 'String'>

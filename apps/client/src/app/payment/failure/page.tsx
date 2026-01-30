@@ -3,6 +3,7 @@ import { Text } from "@repo/ui";
 import { Card } from "@repo/ui";
 import { Button } from "@repo/ui";
 import { Navigation } from "@/components/presentational/Navigation";
+import { JOB_LABELS } from "@/utils/jobLabels";
 
 export default function PaymentFailurePage() {
   return (
@@ -17,8 +18,8 @@ export default function PaymentFailurePage() {
             <Text variant="body" className="mb-6 text-text">
               No se pudo autorizar el pago. Podés intentar nuevamente.
             </Text>
-            <Link href="/my-bookings">
-              <Button variant="primary">Ir a mis reservas</Button>
+            <Link href="/my-jobs">
+              <Button variant="primary">{JOB_LABELS.myJobs}</Button>
             </Link>
           </Card>
         </div>

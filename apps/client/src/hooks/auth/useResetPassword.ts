@@ -77,7 +77,7 @@ export function useResetPassword() {
         if (role === Role.PRO) {
           router.push("/pro/download-app");
         } else {
-          router.push("/my-bookings");
+          router.push("/my-jobs");
         }
       }, 500);
     } catch (err) {

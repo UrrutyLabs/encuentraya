@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { AuthService } from "../auth.service";
 import type { UserRepository } from "@modules/user/user.repo";
 import type { ClientProfileService } from "@modules/user/clientProfile.service";
-import type { BookingRepository } from "@modules/booking/booking.repo";
+import type { OrderRepository } from "@modules/order/order.repo";
 import type { PaymentRepository } from "@modules/payment/payment.repo";
 import { Role } from "@repo/domain";
 
@@ -72,7 +72,7 @@ describe("AuthService", () => {
   let mockClientProfileService: ReturnType<
     typeof createMockClientProfileService
   >;
-  let mockBookingRepository: ReturnType<typeof createMockBookingRepository>;
+  let mockOrderRepository: ReturnType<typeof createMockOrderRepository>;
   let mockPaymentRepository: ReturnType<typeof createMockPaymentRepository>;
   let mockSupabaseAdminClient: MockSupabaseAdminClient;
   let mockSupabasePublicClient: MockSupabasePublicClient;
@@ -95,7 +95,7 @@ describe("AuthService", () => {
     };
   }
 
-  function createMockBookingRepository(): {
+  function createMockOrderRepository(): {
     findActiveByClientUserId: ReturnType<typeof vi.fn>;
   } {
     return {
@@ -120,7 +120,7 @@ describe("AuthService", () => {
 
     mockUserRepository = createMockUserRepository();
     mockClientProfileService = createMockClientProfileService();
-    mockBookingRepository = createMockBookingRepository();
+    mockOrderRepository = createMockOrderRepository();
     mockPaymentRepository = createMockPaymentRepository();
 
     // Get mocked Supabase clients
@@ -136,7 +136,7 @@ describe("AuthService", () => {
     service = new AuthService(
       mockUserRepository as unknown as UserRepository,
       mockClientProfileService as unknown as ClientProfileService,
-      mockBookingRepository as unknown as BookingRepository,
+      mockOrderRepository as unknown as OrderRepository,
       mockPaymentRepository as unknown as PaymentRepository
     );
 

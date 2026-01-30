@@ -12,7 +12,7 @@ export function Button({
   ...props
 }: ButtonProps) {
   const baseClasses =
-    "px-4 py-2 rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 cursor-pointer disabled:cursor-not-allowed";
+    "min-h-[44px] md:min-h-0 px-4 py-3 md:px-4 md:py-2 rounded-lg font-medium text-base md:text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 cursor-pointer disabled:cursor-not-allowed touch-manipulation active:opacity-75";
   const variantClasses = {
     primary:
       "bg-primary text-white hover:opacity-90 focus:ring-primary disabled:hover:opacity-50",

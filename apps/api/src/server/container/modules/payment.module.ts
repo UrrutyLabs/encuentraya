@@ -8,7 +8,7 @@ import {
   PaymentEventRepository,
   PaymentEventRepositoryImpl,
 } from "@modules/payment/paymentEvent.repo";
-import { BookingRepository } from "@modules/booking/booking.repo";
+import { OrderRepository } from "@modules/order/order.repo";
 import { ProRepository } from "@modules/pro/pro.repo";
 import { PaymentService } from "@modules/payment/payment.service";
 import { PaymentProvider } from "@repo/domain";
@@ -26,7 +26,7 @@ export type PaymentServiceFactory = (
 
 /**
  * Register Payment module dependencies
- * Depends on: BookingRepository (injected via container)
+ * Depends on: OrderRepository (injected via container)
  */
 export function registerPaymentModule(container: DependencyContainer): void {
   // Register repositories
@@ -55,8 +55,8 @@ export function registerPaymentModule(container: DependencyContainer): void {
     const paymentEventRepo = container.resolve<PaymentEventRepository>(
       TOKENS.PaymentEventRepository
     );
-    const bookingRepo = container.resolve<BookingRepository>(
-      TOKENS.BookingRepository
+    const orderRepo = container.resolve<OrderRepository>(
+      TOKENS.OrderRepository
     );
     const proRepo = container.resolve<ProRepository>(TOKENS.ProRepository);
     const earningService = container.resolve<EarningService>(
@@ -70,7 +70,7 @@ export function registerPaymentModule(container: DependencyContainer): void {
       provider,
       paymentRepo,
       paymentEventRepo,
-      bookingRepo,
+      orderRepo,
       proRepo,
       earningService,
       auditService

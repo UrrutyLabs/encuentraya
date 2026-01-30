@@ -236,10 +236,10 @@ export function SettingsScreen() {
   return (
     <div className="min-h-screen bg-bg">
       <Navigation showLogin={false} showProfile={true} />
-      <div className="px-4 py-8">
+      <div className="px-4 py-4 md:py-8">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
-          <div className="flex items-center gap-2 mb-6">
+          <div className="flex items-center gap-2 mb-4 md:mb-6">
             <Settings className="w-6 h-6 text-primary" />
             <Text variant="h1" className="text-primary">
               Configuración

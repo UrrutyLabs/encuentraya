@@ -2,11 +2,11 @@ import { injectable, inject } from "tsyringe";
 import {
   type ProRepository,
   type ProProfileEntity,
-  type ProProfileCreateInput,
+  type ProProfileUpdateInput,
 } from "./pro.repo";
 import type { ReviewRepository } from "@modules/review/review.repo";
 import type { UserRepository } from "@modules/user/user.repo";
-import type { BookingRepository } from "@modules/booking/booking.repo";
+import type { OrderRepository } from "@modules/order/order.repo";
 import type { ProPayoutProfileRepository } from "@modules/payout/proPayoutProfile.repo";
 import type { AuditService } from "@modules/audit/audit.service";
 import type { AvailabilityRepository } from "./availability.repo";
@@ -16,13 +16,13 @@ import type {
   Pro,
   ProOnboardInput,
   ProSetAvailabilityInput,
-  Category,
   AvailabilitySlot,
   UpdateAvailabilitySlotsInput,
 } from "@repo/domain";
-import { Role, BookingStatus } from "@repo/domain";
+import { Role } from "@repo/domain";
 import { TOKENS } from "@/server/container/tokens";
 import type { Actor } from "@infra/auth/roles";
+import { calculateIsTopPro } from "./pro.calculations";
 
 /**
  * Pro service
@@ -38,8 +38,8 @@ export class ProService {
     private readonly reviewRepository: ReviewRepository,
     @inject(TOKENS.UserRepository)
     private readonly userRepository: UserRepository,
-    @inject(TOKENS.BookingRepository)
-    private readonly bookingRepository: BookingRepository,
+    @inject(TOKENS.OrderRepository)
+    private readonly orderRepository: OrderRepository,
     @inject(TOKENS.ProPayoutProfileRepository)
     private readonly proPayoutProfileRepository: ProPayoutProfileRepository,
     @inject(TOKENS.AvailabilityRepository)
@@ -65,8 +65,9 @@ export class ProService {
       email: input.email,
       phone: input.phone,
       bio: input.bio,
+      avatarUrl: input.avatarUrl,
       hourlyRate: input.hourlyRate,
-      categories: input.categories.map((c) => c as string),
+      categoryIds: input.categoryIds,
       serviceArea: input.serviceArea,
     });
 
@@ -112,8 +113,9 @@ export class ProService {
       email: input.email,
       phone: input.phone,
       bio: input.bio,
+      avatarUrl: input.avatarUrl,
       hourlyRate: input.hourlyRate,
-      categories: input.categories.map((c) => c as string),
+      categoryIds: input.categoryIds,
       serviceArea: input.serviceArea,
     });
 
@@ -122,11 +124,13 @@ export class ProService {
   }
 
   /**
-   * Get pro by ID
+   * Get pro by ID (for public access)
+   * Only returns pros with completed profiles (avatarUrl + bio)
    */
   async getProById(id: string): Promise<Pro | null> {
     const proProfile = await this.proRepository.findById(id);
     if (!proProfile) return null;
+    if (!proProfile.profileCompleted) return null;
     return this.mapToDomain(proProfile);
   }
 
@@ -135,6 +139,18 @@ export class ProService {
    */
   async getAllPros(): Promise<Pro[]> {
     const proProfiles = await this.proRepository.findAll();
+    return Promise.all(proProfiles.map((profile) => this.mapToDomain(profile)));
+  }
+
+  /**
+   * Search pros with database filtering
+   * Filters by categoryId and profileCompleted at database level
+   */
+  async searchPros(filters: { categoryId?: string }): Promise<Pro[]> {
+    const proProfiles = await this.proRepository.searchPros({
+      categoryId: filters.categoryId,
+      profileCompleted: true, // Only show pros with completed profiles
+    });
     return Promise.all(proProfiles.map((profile) => this.mapToDomain(profile)));
   }
 
@@ -259,8 +275,8 @@ export class ProService {
       throw new Error("Pro profile not found");
     }
 
-    // Map ProOnboardInput fields to ProProfileCreateInput fields
-    const updateData: Partial<ProProfileCreateInput> = {};
+    // Map ProOnboardInput fields to ProProfileUpdateInput fields
+    const updateData: Partial<ProProfileUpdateInput> = {};
 
     if (input.name !== undefined) {
       updateData.displayName = input.name;
@@ -274,11 +290,14 @@ export class ProService {
     if (input.bio !== undefined) {
       updateData.bio = input.bio;
     }
+    if (input.avatarUrl !== undefined) {
+      updateData.avatarUrl = input.avatarUrl;
+    }
     if (input.hourlyRate !== undefined) {
       updateData.hourlyRate = input.hourlyRate;
     }
-    if (input.categories !== undefined) {
-      updateData.categories = input.categories.map((c) => c as string);
+    if (input.categoryIds !== undefined) {
+      updateData.categoryIds = input.categoryIds;
     }
     if (input.serviceArea !== undefined) {
       updateData.serviceArea = input.serviceArea;
@@ -315,35 +334,26 @@ export class ProService {
   > {
     const proProfiles = await this.proRepository.findAllWithFilters(filters);
 
-    // Get completed jobs count and payout profile completion for each pro
-    const prosWithStats = await Promise.all(
-      proProfiles.map(async (pro) => {
-        // Get completed bookings count
-        const bookings = await this.bookingRepository.findByProProfileId(
-          pro.id
-        );
-        const completedJobsCount = bookings.filter(
-          (b) => b.status === BookingStatus.COMPLETED
-        ).length;
+    // Batch fetch payout profiles for all pros
+    const proProfileIds = proProfiles.map((pro) => pro.id);
+    const payoutProfilesMap =
+      await this.proPayoutProfileRepository.findByProProfileIds(proProfileIds);
 
-        // Get payout profile completion
-        const payoutProfile =
-          await this.proPayoutProfileRepository.findByProProfileId(pro.id);
-        const isPayoutProfileComplete = payoutProfile?.isComplete ?? false;
+    // Map pros to result using stored completedJobsCount and batch-fetched payout profiles
+    return proProfiles.map((pro) => {
+      const payoutProfile = payoutProfilesMap.get(pro.id);
+      const isPayoutProfileComplete = payoutProfile?.isComplete ?? false;
 
-        return {
-          id: pro.id,
-          displayName: pro.displayName,
-          email: pro.email,
-          status: pro.status,
-          completedJobsCount,
-          isPayoutProfileComplete,
-          createdAt: pro.createdAt,
-        };
-      })
-    );
-
-    return prosWithStats;
+      return {
+        id: pro.id,
+        displayName: pro.displayName,
+        email: pro.email,
+        status: pro.status,
+        completedJobsCount: pro.completedJobsCount, // Use stored value
+        isPayoutProfileComplete,
+        createdAt: pro.createdAt,
+      };
+    });
   }
 
   /**
@@ -356,10 +366,15 @@ export class ProService {
     email: string;
     phone: string | null;
     bio: string | null;
+    avatarUrl: string | null;
     hourlyRate: number;
-    categories: string[];
+    categoryIds: string[];
     serviceArea: string | null;
     status: "pending" | "active" | "suspended";
+    profileCompleted: boolean;
+    completedJobsCount: number;
+    isTopPro: boolean;
+    responseTimeMinutes: number | null;
     createdAt: Date;
     updatedAt: Date;
     payoutProfile: {
@@ -389,10 +404,15 @@ export class ProService {
       email: proProfile.email,
       phone: proProfile.phone,
       bio: proProfile.bio,
+      avatarUrl: proProfile.avatarUrl,
       hourlyRate: proProfile.hourlyRate,
-      categories: proProfile.categories,
+      categoryIds: proProfile.categoryIds,
       serviceArea: proProfile.serviceArea,
       status: proProfile.status,
+      profileCompleted: proProfile.profileCompleted,
+      completedJobsCount: proProfile.completedJobsCount,
+      isTopPro: proProfile.isTopPro,
+      responseTimeMinutes: proProfile.responseTimeMinutes,
       createdAt: proProfile.createdAt,
       updatedAt: proProfile.updatedAt,
       payoutProfile: payoutProfile
@@ -540,6 +560,59 @@ export class ProService {
   }
 
   /**
+   * Hook: Called when a review is created
+   * Note: Rating is calculated dynamically from reviews, so no stored fields need updating
+   * This hook is here for consistency and potential future use (e.g., caching, analytics)
+   */
+  async onReviewCreated(proProfileId: string): Promise<void> {
+    // Currently, rating is calculated dynamically from reviews in mapToDomain()
+    // No stored calculated fields need updating
+    // This hook can be extended in the future if needed (e.g., to cache rating)
+
+    // Verify pro exists (for future extensibility)
+    const proProfile = await this.proRepository.findById(proProfileId);
+    if (!proProfile) {
+      // Log but don't throw - review creation should succeed even if pro lookup fails
+      console.warn(
+        `Pro profile not found when processing review creation hook: ${proProfileId}`
+      );
+      return;
+    }
+
+    // Future: Could update cached rating or other calculated fields here
+  }
+
+  /**
+   * Update ProProfile calculated fields after order completion
+   * - Increments completedJobsCount
+   * - Updates isTopPro based on completedJobsCount threshold (>= 10 jobs)
+   * Note: responseTimeMinutes requires acceptedAt timestamp on order (available via acceptedAt field)
+   */
+  async updateCalculatedFieldsOnOrderCompletion(
+    proProfileId: string
+  ): Promise<void> {
+    const proProfile = await this.proRepository.findById(proProfileId);
+    if (!proProfile) {
+      throw new Error(`Pro profile not found: ${proProfileId}`);
+    }
+
+    // Count completed orders using efficient COUNT query
+    const completedJobsCount =
+      await this.orderRepository.countCompletedOrdersByProProfileId(
+        proProfileId
+      );
+
+    // Calculate isTopPro using utility function
+    const isTopPro = calculateIsTopPro(completedJobsCount);
+
+    // Update pro profile with calculated fields
+    await this.proRepository.update(proProfileId, {
+      completedJobsCount,
+      isTopPro,
+    });
+  }
+
+  /**
    * Map ProProfileEntity to Pro domain type
    * Calculates rating and reviewCount from reviews
    * Calculates isAvailable from availability slots array
@@ -572,25 +645,25 @@ export class ProService {
     const availabilitySlots =
       await this.availabilityService.getAvailabilitySlots(entity.id);
 
-    // Map categories from string[] to Category[]
-    const categories = entity.categories.map(
-      (c) => c as Category
-    ) as Category[];
-
     return {
       id: entity.id,
       name: entity.displayName,
       email: entity.email,
       phone: entity.phone ?? undefined,
       bio: entity.bio ?? undefined,
+      avatarUrl: entity.avatarUrl ?? undefined,
       hourlyRate: entity.hourlyRate,
-      categories,
+      categoryIds: entity.categoryIds,
       serviceArea: entity.serviceArea ?? undefined,
       rating,
       reviewCount,
       isApproved,
       isSuspended,
       isAvailable,
+      profileCompleted: entity.profileCompleted,
+      completedJobsCount: entity.completedJobsCount,
+      isTopPro: entity.isTopPro,
+      responseTimeMinutes: entity.responseTimeMinutes ?? undefined,
       availabilitySlots,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,

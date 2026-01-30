@@ -10,7 +10,7 @@ import { formatCurrency } from "@repo/domain";
 interface PaymentRow {
   id: string;
   status: string;
-  bookingId: string;
+  orderId: string;
   provider: string;
   amountEstimated: number;
   amountAuthorized: number | null;
@@ -75,7 +75,7 @@ export function PaymentsTable({ payments, isLoading }: PaymentsTableProps) {
                 Estado
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Reserva
+                Pedido
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Montos
@@ -101,7 +101,7 @@ export function PaymentsTable({ payments, isLoading }: PaymentsTableProps) {
                   </Badge>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {payment.bookingId}
+                  {payment.orderId}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   <div className="space-y-1">

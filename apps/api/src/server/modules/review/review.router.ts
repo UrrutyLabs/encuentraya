@@ -24,12 +24,12 @@ export const reviewRouter = router({
       }
     }),
 
-  byBooking: protectedProcedure
-    .input(z.object({ bookingId: z.string() }))
+  byOrder: protectedProcedure
+    .input(z.object({ orderId: z.string() }))
     .output(reviewSchema.nullable())
     .query(async ({ input, ctx }) => {
       try {
-        return await reviewService.getByBookingId(ctx.actor, input.bookingId);
+        return await reviewService.getByOrderId(ctx.actor, input.orderId);
       } catch (error) {
         throw mapDomainErrorToTRPCError(error);
       }
@@ -56,14 +56,12 @@ export const reviewRouter = router({
       }
     }),
 
-  statusByBookingIds: protectedProcedure
-    .input(z.object({ bookingIds: z.array(z.string()) }))
+  statusByOrderIds: protectedProcedure
+    .input(z.object({ orderIds: z.array(z.string()) }))
     .output(z.record(z.string(), z.boolean()))
     .query(async ({ input }) => {
       try {
-        return await reviewService.getReviewStatusByBookingIds(
-          input.bookingIds
-        );
+        return await reviewService.getReviewStatusByOrderIds(input.orderIds);
       } catch (error) {
         throw mapDomainErrorToTRPCError(error);
       }

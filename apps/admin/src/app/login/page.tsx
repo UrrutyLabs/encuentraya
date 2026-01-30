@@ -18,7 +18,7 @@ export default function LoginPage() {
   // Redirect if already logged in
   useEffect(() => {
     if (!authLoading && user) {
-      router.push("/admin/bookings");
+      router.push("/admin/orders");
     }
   }, [user, authLoading, router]);
 
@@ -34,7 +34,7 @@ export default function LoginPage() {
         setError(error.message);
         setLoading(false);
       } else {
-        router.push("/admin/bookings");
+        router.push("/admin/orders");
       }
     } catch {
       setError("Error al iniciar sesión. Por favor, intentá nuevamente.");

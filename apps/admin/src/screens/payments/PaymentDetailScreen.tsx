@@ -97,9 +97,9 @@ export function PaymentDetailScreen({ paymentId }: PaymentDetailScreenProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <Text variant="small" className="text-gray-600">
-              Reserva
+              Pedido
             </Text>
-            <Text variant="body">{payment.bookingId}</Text>
+            <Text variant="body">{payment.orderId}</Text>
           </div>
           <div>
             <Text variant="small" className="text-gray-600">

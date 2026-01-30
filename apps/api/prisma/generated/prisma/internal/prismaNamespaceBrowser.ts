@@ -55,7 +55,8 @@ export const ModelName = {
   ProProfile: 'ProProfile',
   ClientProfile: 'ClientProfile',
   Availability: 'Availability',
-  Booking: 'Booking',
+  Order: 'Order',
+  OrderLineItem: 'OrderLineItem',
   Review: 'Review',
   Payment: 'Payment',
   PaymentEvent: 'PaymentEvent',
@@ -65,7 +66,10 @@ export const ModelName = {
   Earning: 'Earning',
   Payout: 'Payout',
   PayoutItem: 'PayoutItem',
-  AuditLog: 'AuditLog'
+  AuditLog: 'AuditLog',
+  Category: 'Category',
+  Subcategory: 'Subcategory',
+  ProProfileCategory: 'ProProfileCategory'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -101,10 +105,14 @@ export const ProProfileScalarFieldEnum = {
   email: 'email',
   phone: 'phone',
   bio: 'bio',
+  avatarUrl: 'avatarUrl',
   hourlyRate: 'hourlyRate',
-  categories: 'categories',
   serviceArea: 'serviceArea',
   status: 'status',
+  profileCompleted: 'profileCompleted',
+  completedJobsCount: 'completedJobsCount',
+  isTopPro: 'isTopPro',
+  responseTimeMinutes: 'responseTimeMinutes',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -140,27 +148,81 @@ export const AvailabilityScalarFieldEnum = {
 export type AvailabilityScalarFieldEnum = (typeof AvailabilityScalarFieldEnum)[keyof typeof AvailabilityScalarFieldEnum]
 
 
-export const BookingScalarFieldEnum = {
+export const OrderScalarFieldEnum = {
   id: 'id',
   displayId: 'displayId',
   clientUserId: 'clientUserId',
   proProfileId: 'proProfileId',
-  category: 'category',
-  status: 'status',
-  scheduledAt: 'scheduledAt',
-  hoursEstimate: 'hoursEstimate',
+  categoryId: 'categoryId',
+  subcategoryId: 'subcategoryId',
+  categoryMetadataJson: 'categoryMetadataJson',
+  title: 'title',
+  description: 'description',
   addressText: 'addressText',
-  isFirstBooking: 'isFirstBooking',
+  addressLat: 'addressLat',
+  addressLng: 'addressLng',
+  scheduledWindowStartAt: 'scheduledWindowStartAt',
+  scheduledWindowEndAt: 'scheduledWindowEndAt',
+  status: 'status',
+  acceptedAt: 'acceptedAt',
+  confirmedAt: 'confirmedAt',
+  startedAt: 'startedAt',
+  arrivedAt: 'arrivedAt',
+  completedAt: 'completedAt',
+  paidAt: 'paidAt',
+  canceledAt: 'canceledAt',
+  cancelReason: 'cancelReason',
+  pricingMode: 'pricingMode',
+  hourlyRateSnapshotAmount: 'hourlyRateSnapshotAmount',
+  currency: 'currency',
+  minHoursSnapshot: 'minHoursSnapshot',
+  estimatedHours: 'estimatedHours',
+  finalHoursSubmitted: 'finalHoursSubmitted',
+  approvedHours: 'approvedHours',
+  approvalMethod: 'approvalMethod',
+  approvalDeadlineAt: 'approvalDeadlineAt',
+  subtotalAmount: 'subtotalAmount',
+  platformFeeAmount: 'platformFeeAmount',
+  taxAmount: 'taxAmount',
+  totalAmount: 'totalAmount',
+  totalsCalculatedAt: 'totalsCalculatedAt',
+  taxScheme: 'taxScheme',
+  taxRate: 'taxRate',
+  taxIncluded: 'taxIncluded',
+  taxRegion: 'taxRegion',
+  taxCalculatedAt: 'taxCalculatedAt',
+  disputeStatus: 'disputeStatus',
+  disputeReason: 'disputeReason',
+  disputeOpenedBy: 'disputeOpenedBy',
+  isFirstOrder: 'isFirstOrder',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
-export type BookingScalarFieldEnum = (typeof BookingScalarFieldEnum)[keyof typeof BookingScalarFieldEnum]
+export type OrderScalarFieldEnum = (typeof OrderScalarFieldEnum)[keyof typeof OrderScalarFieldEnum]
+
+
+export const OrderLineItemScalarFieldEnum = {
+  id: 'id',
+  orderId: 'orderId',
+  type: 'type',
+  description: 'description',
+  quantity: 'quantity',
+  unitAmount: 'unitAmount',
+  amount: 'amount',
+  currency: 'currency',
+  taxBehavior: 'taxBehavior',
+  taxRate: 'taxRate',
+  metadata: 'metadata',
+  createdAt: 'createdAt'
+} as const
+
+export type OrderLineItemScalarFieldEnum = (typeof OrderLineItemScalarFieldEnum)[keyof typeof OrderLineItemScalarFieldEnum]
 
 
 export const ReviewScalarFieldEnum = {
   id: 'id',
-  bookingId: 'bookingId',
+  orderId: 'orderId',
   proProfileId: 'proProfileId',
   clientUserId: 'clientUserId',
   rating: 'rating',
@@ -176,7 +238,7 @@ export const PaymentScalarFieldEnum = {
   provider: 'provider',
   type: 'type',
   status: 'status',
-  bookingId: 'bookingId',
+  orderId: 'orderId',
   clientUserId: 'clientUserId',
   proProfileId: 'proProfileId',
   currency: 'currency',
@@ -261,7 +323,7 @@ export type ProPayoutProfileScalarFieldEnum = (typeof ProPayoutProfileScalarFiel
 
 export const EarningScalarFieldEnum = {
   id: 'id',
-  bookingId: 'bookingId',
+  orderId: 'orderId',
   proProfileId: 'proProfileId',
   clientUserId: 'clientUserId',
   currency: 'currency',
@@ -323,6 +385,54 @@ export const AuditLogScalarFieldEnum = {
 export type AuditLogScalarFieldEnum = (typeof AuditLogScalarFieldEnum)[keyof typeof AuditLogScalarFieldEnum]
 
 
+export const CategoryScalarFieldEnum = {
+  id: 'id',
+  key: 'key',
+  name: 'name',
+  slug: 'slug',
+  iconName: 'iconName',
+  description: 'description',
+  sortOrder: 'sortOrder',
+  isActive: 'isActive',
+  deletedAt: 'deletedAt',
+  configJson: 'configJson',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CategoryScalarFieldEnum = (typeof CategoryScalarFieldEnum)[keyof typeof CategoryScalarFieldEnum]
+
+
+export const SubcategoryScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  slug: 'slug',
+  categoryId: 'categoryId',
+  key: 'key',
+  imageUrl: 'imageUrl',
+  description: 'description',
+  displayOrder: 'displayOrder',
+  isActive: 'isActive',
+  configJson: 'configJson',
+  searchKeywords: 'searchKeywords',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SubcategoryScalarFieldEnum = (typeof SubcategoryScalarFieldEnum)[keyof typeof SubcategoryScalarFieldEnum]
+
+
+export const ProProfileCategoryScalarFieldEnum = {
+  id: 'id',
+  proProfileId: 'proProfileId',
+  categoryId: 'categoryId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ProProfileCategoryScalarFieldEnum = (typeof ProProfileCategoryScalarFieldEnum)[keyof typeof ProProfileCategoryScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -331,19 +441,19 @@ export const SortOrder = {
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
 
 
-export const JsonNullValueInput = {
-  JsonNull: 'JsonNull'
-} as const
-
-export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
-
-
 export const NullableJsonNullValueInput = {
   DbNull: 'DbNull',
   JsonNull: 'JsonNull'
 } as const
 
 export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
+
+
+export const JsonNullValueInput = {
+  JsonNull: 'JsonNull'
+} as const
+
+export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
 
 
 export const QueryMode = {

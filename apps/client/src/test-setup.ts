@@ -1,6 +1,23 @@
 import { vi } from "vitest";
 import "@testing-library/jest-dom";
 
+// Mock window.matchMedia for useMediaQuery hook
+Object.defineProperty(window, "matchMedia", {
+  writable: true,
+  value: vi.fn().mockImplementation((query: string) => {
+    return {
+      matches: false, // Default to desktop (non-mobile)
+      media: query,
+      onchange: null,
+      addListener: vi.fn(), // Deprecated
+      removeListener: vi.fn(), // Deprecated
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    };
+  }),
+});
+
 // Mock Next.js router
 vi.mock("next/navigation", () => ({
   useRouter: () => ({
@@ -28,6 +45,14 @@ const mockTrpcProGetById = vi.fn();
 const mockTrpcClientSearchPros = vi.fn();
 const mockTrpcClientProfileGet = vi.fn();
 const mockTrpcClientProfileUpdate = vi.fn();
+// Category mocks
+const mockTrpcCategoryGetAll = vi.fn();
+const mockTrpcCategoryGetById = vi.fn();
+const mockTrpcCategoryGetBySlug = vi.fn();
+const mockTrpcCategoryGetByKey = vi.fn();
+// Subcategory mocks
+const mockTrpcSubcategoryGetByCategoryId = vi.fn();
+const mockTrpcSubcategoryGetBySlugAndCategoryId = vi.fn();
 const mockTrpcAuthSignup = vi.fn();
 const mockTrpcAuthChangePassword = vi.fn();
 const mockTrpcAuthDeleteAccount = vi.fn();
@@ -41,7 +66,20 @@ const mockTrpcReviewByBooking = vi.fn();
 const mockTrpcReviewCreate = vi.fn();
 const mockTrpcPaymentGetByBooking = vi.fn();
 const mockTrpcPaymentCreatePreauthForBooking = vi.fn();
+// Order mocks
+const mockTrpcOrderListByClient = vi.fn();
+const mockTrpcOrderGetById = vi.fn();
+const mockTrpcOrderCreate = vi.fn();
+const mockTrpcOrderCancel = vi.fn();
+const mockTrpcReviewStatusByOrderIds = vi.fn();
+const mockTrpcReviewByOrder = vi.fn();
+const mockTrpcPaymentGetByOrder = vi.fn();
+const mockTrpcPaymentCreatePreauthForOrder = vi.fn();
 const mockTrpcContactSubmit = vi.fn();
+const mockTrpcSubcategoryGetByCategory = vi.fn();
+const mockTrpcSubcategoryGetBySlug = vi.fn();
+const mockTrpcSubcategoryGetById = vi.fn();
+const mockTrpcSubcategoryGetAll = vi.fn();
 
 vi.mock("@/lib/trpc/client", () => {
   return {
@@ -51,9 +89,47 @@ vi.mock("@/lib/trpc/client", () => {
           useQuery: (...args: unknown[]) => mockTrpcProGetById(...args),
         },
       },
-      client: {
+      clientSearch: {
         searchPros: {
           useQuery: (...args: unknown[]) => mockTrpcClientSearchPros(...args),
+        },
+      },
+      category: {
+        getAll: {
+          useQuery: (...args: unknown[]) => mockTrpcCategoryGetAll(...args),
+        },
+        getById: {
+          useQuery: (...args: unknown[]) => mockTrpcCategoryGetById(...args),
+        },
+        getBySlug: {
+          useQuery: (...args: unknown[]) => mockTrpcCategoryGetBySlug(...args),
+        },
+        getByKey: {
+          useQuery: (...args: unknown[]) => mockTrpcCategoryGetByKey(...args),
+        },
+      },
+      subcategory: {
+        getByCategoryId: {
+          useQuery: (...args: unknown[]) =>
+            mockTrpcSubcategoryGetByCategoryId(...args),
+        },
+        getBySlugAndCategoryId: {
+          useQuery: (...args: unknown[]) =>
+            mockTrpcSubcategoryGetBySlugAndCategoryId(...args),
+        },
+        getByCategory: {
+          useQuery: (...args: unknown[]) =>
+            mockTrpcSubcategoryGetByCategory(...args),
+        },
+        getBySlug: {
+          useQuery: (...args: unknown[]) =>
+            mockTrpcSubcategoryGetBySlug(...args),
+        },
+        getById: {
+          useQuery: (...args: unknown[]) => mockTrpcSubcategoryGetById(...args),
+        },
+        getAll: {
+          useQuery: (...args: unknown[]) => mockTrpcSubcategoryGetAll(...args),
         },
       },
       clientProfile: {
@@ -104,6 +180,13 @@ vi.mock("@/lib/trpc/client", () => {
         byBooking: {
           useQuery: (...args: unknown[]) => mockTrpcReviewByBooking(...args),
         },
+        statusByOrderIds: {
+          useQuery: (...args: unknown[]) =>
+            mockTrpcReviewStatusByOrderIds(...args),
+        },
+        byOrder: {
+          useQuery: (...args: unknown[]) => mockTrpcReviewByOrder(...args),
+        },
         create: {
           useMutation: (...args: unknown[]) => mockTrpcReviewCreate(...args),
         },
@@ -116,6 +199,27 @@ vi.mock("@/lib/trpc/client", () => {
         createPreauthForBooking: {
           useMutation: (...args: unknown[]) =>
             mockTrpcPaymentCreatePreauthForBooking(...args),
+        },
+        getByOrder: {
+          useQuery: (...args: unknown[]) => mockTrpcPaymentGetByOrder(...args),
+        },
+        createPreauthForOrder: {
+          useMutation: (...args: unknown[]) =>
+            mockTrpcPaymentCreatePreauthForOrder(...args),
+        },
+      },
+      order: {
+        listByClient: {
+          useQuery: (...args: unknown[]) => mockTrpcOrderListByClient(...args),
+        },
+        getById: {
+          useQuery: (...args: unknown[]) => mockTrpcOrderGetById(...args),
+        },
+        create: {
+          useMutation: (...args: unknown[]) => mockTrpcOrderCreate(...args),
+        },
+        cancel: {
+          useMutation: (...args: unknown[]) => mockTrpcOrderCancel(...args),
         },
       },
       contact: {
@@ -146,7 +250,25 @@ export {
   mockTrpcReviewCreate,
   mockTrpcPaymentGetByBooking,
   mockTrpcPaymentCreatePreauthForBooking,
+  mockTrpcOrderListByClient,
+  mockTrpcOrderGetById,
+  mockTrpcOrderCreate,
+  mockTrpcOrderCancel,
+  mockTrpcReviewStatusByOrderIds,
+  mockTrpcReviewByOrder,
+  mockTrpcPaymentGetByOrder,
+  mockTrpcPaymentCreatePreauthForOrder,
   mockTrpcContactSubmit,
+  mockTrpcSubcategoryGetByCategory,
+  mockTrpcSubcategoryGetBySlug,
+  mockTrpcSubcategoryGetById,
+  mockTrpcSubcategoryGetAll,
+  mockTrpcCategoryGetAll,
+  mockTrpcCategoryGetById,
+  mockTrpcCategoryGetBySlug,
+  mockTrpcCategoryGetByKey,
+  mockTrpcSubcategoryGetByCategoryId,
+  mockTrpcSubcategoryGetBySlugAndCategoryId,
 };
 
 // Mock logger

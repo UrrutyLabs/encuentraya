@@ -3,7 +3,7 @@
 import { Text } from "@repo/ui";
 import { useDashboard } from "@/hooks/useDashboard";
 import { OverviewCards } from "@/components/dashboard/OverviewCards";
-import { BookingStatusBreakdown } from "@/components/dashboard/BookingStatusBreakdown";
+import { OrderStatusBreakdown } from "@/components/dashboard/OrderStatusBreakdown";
 import { RecentActivityFeed } from "@/components/dashboard/RecentActivityFeed";
 import { RevenueTrendChart } from "@/components/dashboard/RevenueTrendChart";
 import { PaymentStatusSummary } from "@/components/dashboard/PaymentStatusSummary";
@@ -46,7 +46,7 @@ export function DashboardScreen() {
 
       {/* Overview Cards */}
       <OverviewCards
-        bookings={stats.bookings}
+        orders={stats.orders}
         revenue={stats.revenue}
         payouts={stats.payouts}
         pros={stats.pros}
@@ -55,8 +55,8 @@ export function DashboardScreen() {
 
       {/* Charts and Breakdowns Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <BookingStatusBreakdown
-          breakdown={stats.bookingStatusBreakdown}
+        <OrderStatusBreakdown
+          breakdown={stats.orderStatusBreakdown}
           isLoading={isLoading}
         />
         <RevenueTrendChart trends={stats.revenueTrends} isLoading={isLoading} />
@@ -84,7 +84,7 @@ export function DashboardScreen() {
 
       {/* Recent Activity */}
       <RecentActivityFeed
-        recentBookings={stats.recentBookings}
+        recentOrders={stats.recentOrders}
         recentPayments={stats.recentPayments}
         recentPayouts={stats.recentPayouts}
         isLoading={isLoading}

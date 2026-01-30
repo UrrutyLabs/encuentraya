@@ -65,6 +65,7 @@ pnpm install
    - `SUPABASE_SERVICE_ROLE_KEY` - Supabase service role key
    - `SUPABASE_ANON_KEY` - Supabase anonymous key
    - `MERCADOPAGO_ACCESS_TOKEN` - MercadoPago API token
+   - `MERCADOPAGO_WEBHOOK_SECRET` - MercadoPago webhook secret (optional, recommended for production)
    - `SENDGRID_API_KEY` - SendGrid API key
    - `TWILIO_ACCOUNT_SID` & `TWILIO_AUTH_TOKEN` - Twilio credentials
    - `UPSTASH_REDIS_REST_URL` & `UPSTASH_REDIS_REST_TOKEN` - Upstash Redis

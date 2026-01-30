@@ -27,7 +27,7 @@ class InMemoryRateLimiter {
         this.cleanup();
       },
       5 * 60 * 1000
-    );
+    ) as unknown as NodeJS.Timeout;
   }
 
   async limit(key: string): Promise<{

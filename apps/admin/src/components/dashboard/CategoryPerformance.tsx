@@ -3,25 +3,16 @@
 import { Card } from "@repo/ui";
 import { Text } from "@repo/ui";
 import { BarChart3 } from "lucide-react";
-import { formatCurrency } from "@repo/domain";
-import { Category } from "@repo/domain";
+import { formatCurrency, type Category } from "@repo/domain";
 
 interface CategoryPerformanceProps {
   performance: Array<{
     category: Category;
-    bookings: number;
+    orders: number;
     revenue: number;
   }>;
   isLoading?: boolean;
 }
-
-const categoryLabels: Record<Category, string> = {
-  [Category.PLUMBING]: "Plomería",
-  [Category.ELECTRICAL]: "Electricidad",
-  [Category.CLEANING]: "Limpieza",
-  [Category.HANDYMAN]: "Manitas",
-  [Category.PAINTING]: "Pintura",
-};
 
 export function CategoryPerformance({
   performance,
@@ -43,7 +34,7 @@ export function CategoryPerformance({
   // Sort by revenue descending
   const sorted = [...performance].sort((a, b) => b.revenue - a.revenue);
   const maxRevenue = Math.max(...sorted.map((p) => p.revenue), 1);
-  const totalBookings = sorted.reduce((sum, p) => sum + p.bookings, 0);
+  const totalOrders = sorted.reduce((sum, p) => sum + p.orders, 0);
   const totalRevenue = sorted.reduce((sum, p) => sum + p.revenue, 0);
 
   if (performance.length === 0) {
@@ -70,21 +61,21 @@ export function CategoryPerformance({
         {sorted.map((item) => {
           const revenuePercentage =
             maxRevenue > 0 ? (item.revenue / maxRevenue) * 100 : 0;
-          const bookingsPercentage =
-            totalBookings > 0 ? (item.bookings / totalBookings) * 100 : 0;
+          const ordersPercentage =
+            totalOrders > 0 ? (item.orders / totalOrders) * 100 : 0;
 
           return (
-            <div key={item.category}>
+            <div key={item.category.id}>
               <div className="flex items-center justify-between mb-2">
                 <Text variant="body" className="font-medium">
-                  {categoryLabels[item.category]}
+                  {item.category.name}
                 </Text>
                 <div className="text-right">
                   <Text variant="small" className="font-semibold">
                     {formatCurrency(item.revenue, "UYU", true)}
                   </Text>
                   <Text variant="xs" className="text-muted">
-                    {item.bookings} reservas
+                    {item.orders} pedidos
                   </Text>
                 </div>
               </div>
@@ -96,7 +87,7 @@ export function CategoryPerformance({
                   />
                 </div>
                 <div className="flex items-center justify-between text-xs text-muted">
-                  <span>{Math.round(bookingsPercentage)}% reservas</span>
+                  <span>{Math.round(ordersPercentage)}% pedidos</span>
                   <span>{Math.round(revenuePercentage)}% ingresos</span>
                 </div>
               </div>
@@ -111,7 +102,7 @@ export function CategoryPerformance({
           </Text>
           <div className="text-right">
             <Text variant="body" className="font-semibold">
-              {totalBookings} reservas
+              {totalOrders} pedidos
             </Text>
             <Text variant="small" className="text-muted">
               {formatCurrency(totalRevenue, "UYU", true)}

@@ -215,7 +215,7 @@ describe("useRouteGuard", () => {
       renderHook(() => useRouteGuard({ requiredRole: Role.PRO }));
 
       await waitFor(() => {
-        expect(mockPerformAuthRedirect).toHaveBeenCalledWith("/my-bookings");
+        expect(mockPerformAuthRedirect).toHaveBeenCalledWith("/my-jobs");
       });
     });
 

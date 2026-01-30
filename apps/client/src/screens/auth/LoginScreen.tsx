@@ -40,8 +40,8 @@ export function LoginScreen() {
       if (role === Role.PRO) {
         router.replace("/pro/download-app");
       } else {
-        // CLIENT or no role yet -> redirect to my-bookings
-        router.replace("/my-bookings");
+        // CLIENT or no role yet -> redirect to my-jobs
+        router.replace("/my-jobs");
       }
     }
   }, [user, role, authLoading, isLoadingRole, router, returnUrl]);

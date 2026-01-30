@@ -43,6 +43,27 @@ export function validateApiEnv(): void {
       validate: validators.nonEmpty,
       description: "MercadoPago API access token",
     },
+    // MercadoPago Webhook Secret - Optional but recommended for production
+    // Used to verify webhook signatures for security
+    MERCADOPAGO_WEBHOOK_SECRET: {
+      required: false,
+      validate: validators.nonEmpty,
+      description:
+        "MercadoPago webhook secret for signature verification (recommended for production)",
+    },
+    // Client App URL - Required for payment return URLs
+    // This is the URL of the client app where payment return pages are hosted
+    // In development: http://localhost:3000 (client app port)
+    // In production: https://arreglatodo.com (or your production client URL)
+    CLIENT_URL: {
+      required: false,
+      validate: (value) => {
+        if (!value) return true; // Optional, will use defaults
+        return validators.url(value);
+      },
+      description:
+        "Client app URL for payment return redirects (defaults to http://localhost:3000 in dev)",
+    },
 
     // SendGrid - Required for email notifications
     SENDGRID_API_KEY: {

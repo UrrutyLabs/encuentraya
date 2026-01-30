@@ -42,7 +42,7 @@ describe("useClientAuth", () => {
   });
 
   describe("when user is authenticated", () => {
-    it("should redirect to /my-bookings when user exists with CLIENT role", async () => {
+    it("should redirect to /my-jobs when user exists with CLIENT role", async () => {
       const mockUser = { id: "user-1", email: "test@example.com" };
 
       mockUseAuth.mockReturnValue({
@@ -59,7 +59,7 @@ describe("useClientAuth", () => {
       renderHook(() => useClientAuth());
 
       await waitFor(() => {
-        expect(mockRouter.replace).toHaveBeenCalledWith("/my-bookings");
+        expect(mockRouter.replace).toHaveBeenCalledWith("/my-jobs");
       });
     });
 
@@ -147,7 +147,7 @@ describe("useClientAuth", () => {
       rerender();
 
       await waitFor(() => {
-        expect(mockRouter.replace).toHaveBeenCalledWith("/my-bookings");
+        expect(mockRouter.replace).toHaveBeenCalledWith("/my-jobs");
       });
     });
   });

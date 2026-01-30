@@ -10,7 +10,7 @@ export function useProSignup() {
   const router = useRouter();
 
   const signupMutation = trpc.auth.proSignup.useMutation({
-    onSuccess: (data) => {
+    onSuccess: (data: { email: string }) => {
       // Redirect to email confirmation screen
       router.replace({
         pathname: "/auth/confirm-email",

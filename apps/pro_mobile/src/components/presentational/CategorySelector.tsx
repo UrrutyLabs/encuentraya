@@ -1,37 +1,48 @@
-import { View, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  ActivityIndicator,
+} from "react-native";
 import { Text } from "../ui/Text";
 import { Badge } from "../ui/Badge";
 import { theme } from "../../theme";
 import { Category } from "@repo/domain";
 
 interface CategorySelectorProps {
+  categories: Category[];
   selected: Category[];
   onSelectionChange: (categories: Category[]) => void;
+  isLoading?: boolean;
 }
 
-const CATEGORY_LABELS: Record<Category, string> = {
-  [Category.PLUMBING]: "Plomería",
-  [Category.ELECTRICAL]: "Electricidad",
-  [Category.CLEANING]: "Limpieza",
-  [Category.HANDYMAN]: "Manitas",
-  [Category.PAINTING]: "Pintura",
-};
-
 export function CategorySelector({
+  categories,
   selected,
   onSelectionChange,
+  isLoading = false,
 }: CategorySelectorProps) {
-  const allCategories = Object.values(Category);
-
   const toggleCategory = (category: Category) => {
-    if (selected.includes(category)) {
+    const isSelected = selected.some((c) => c.id === category.id);
+    if (isSelected) {
       // Remove category if already selected
-      onSelectionChange(selected.filter((c) => c !== category));
+      onSelectionChange(selected.filter((c) => c.id !== category.id));
     } else {
       // Add category if not selected
       onSelectionChange([...selected, category]);
     }
   };
+
+  if (isLoading) {
+    return (
+      <View style={styles.container}>
+        <Text variant="small" style={styles.label}>
+          Categorías de servicio *
+        </Text>
+        <ActivityIndicator size="small" color={theme.colors.primary} />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -39,26 +50,30 @@ export function CategorySelector({
         Categorías de servicio *
       </Text>
       <View style={styles.categoriesContainer}>
-        {allCategories.map((category) => {
-          const isSelected = selected.includes(category);
-          return (
-            <TouchableOpacity
-              key={category}
-              onPress={() => toggleCategory(category)}
-              style={[
-                styles.categoryButton,
-                isSelected && styles.categoryButtonSelected,
-              ]}
-            >
-              <Badge
-                variant={isSelected ? "success" : "info"}
-                style={styles.badge}
+        {categories
+          .filter(
+            (category: Category) => category.isActive && !category.deletedAt
+          )
+          .map((category: Category) => {
+            const isSelected = selected.some((c) => c.id === category.id);
+            return (
+              <TouchableOpacity
+                key={category.id}
+                onPress={() => toggleCategory(category)}
+                style={[
+                  styles.categoryButton,
+                  isSelected && styles.categoryButtonSelected,
+                ]}
               >
-                {CATEGORY_LABELS[category]}
-              </Badge>
-            </TouchableOpacity>
-          );
-        })}
+                <Badge
+                  variant={isSelected ? "success" : "info"}
+                  style={styles.badge}
+                >
+                  {category.name}
+                </Badge>
+              </TouchableOpacity>
+            );
+          })}
       </View>
       {selected.length === 0 && (
         <Text variant="small" style={styles.errorText}>

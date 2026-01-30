@@ -41,7 +41,7 @@ export function PaymentsFilters({
           </label>
           <Input
             type="text"
-            placeholder="ID de reserva o referencia del proveedor"
+            placeholder="ID de pedido o referencia del proveedor"
             value={query}
             onChange={(e) => onQueryChange(e.target.value)}
           />

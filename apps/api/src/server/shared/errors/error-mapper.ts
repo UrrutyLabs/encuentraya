@@ -1,41 +1,20 @@
 import { TRPCError } from "@trpc/server";
 import {
-  InvalidBookingStateError,
-  UnauthorizedBookingActionError,
-  BookingNotFoundError,
-} from "@modules/booking/booking.errors";
-import {
-  BookingNotCompletedError,
+  OrderNotCompletedError,
   ReviewAlreadyExistsError,
   UnauthorizedReviewError,
 } from "@modules/review/review.errors";
+import {
+  InvalidOrderStateError,
+  UnauthorizedOrderActionError,
+  OrderNotFoundError,
+} from "@modules/order/order.errors";
 
 /**
  * Maps domain errors to tRPC errors
  */
 export function mapDomainErrorToTRPCError(error: unknown): TRPCError {
-  if (error instanceof InvalidBookingStateError) {
-    return new TRPCError({
-      code: "BAD_REQUEST",
-      message: error.message,
-    });
-  }
-
-  if (error instanceof UnauthorizedBookingActionError) {
-    return new TRPCError({
-      code: "FORBIDDEN",
-      message: error.message,
-    });
-  }
-
-  if (error instanceof BookingNotFoundError) {
-    return new TRPCError({
-      code: "NOT_FOUND",
-      message: error.message,
-    });
-  }
-
-  if (error instanceof BookingNotCompletedError) {
+  if (error instanceof OrderNotCompletedError) {
     return new TRPCError({
       code: "BAD_REQUEST",
       message: error.message,
@@ -52,6 +31,27 @@ export function mapDomainErrorToTRPCError(error: unknown): TRPCError {
   if (error instanceof UnauthorizedReviewError) {
     return new TRPCError({
       code: "FORBIDDEN",
+      message: error.message,
+    });
+  }
+
+  if (error instanceof InvalidOrderStateError) {
+    return new TRPCError({
+      code: "BAD_REQUEST",
+      message: error.message,
+    });
+  }
+
+  if (error instanceof UnauthorizedOrderActionError) {
+    return new TRPCError({
+      code: "FORBIDDEN",
+      message: error.message,
+    });
+  }
+
+  if (error instanceof OrderNotFoundError) {
+    return new TRPCError({
+      code: "NOT_FOUND",
       message: error.message,
     });
   }

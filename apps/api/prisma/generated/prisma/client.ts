@@ -60,10 +60,15 @@ export type ClientProfile = Prisma.ClientProfileModel
  */
 export type Availability = Prisma.AvailabilityModel
 /**
- * Model Booking
+ * Model Order
  * 
  */
-export type Booking = Prisma.BookingModel
+export type Order = Prisma.OrderModel
+/**
+ * Model OrderLineItem
+ * 
+ */
+export type OrderLineItem = Prisma.OrderLineItemModel
 /**
  * Model Review
  * 
@@ -114,3 +119,18 @@ export type PayoutItem = Prisma.PayoutItemModel
  * 
  */
 export type AuditLog = Prisma.AuditLogModel
+/**
+ * Model Category
+ * 
+ */
+export type Category = Prisma.CategoryModel
+/**
+ * Model Subcategory
+ * 
+ */
+export type Subcategory = Prisma.SubcategoryModel
+/**
+ * Model ProProfileCategory
+ * 
+ */
+export type ProProfileCategory = Prisma.ProProfileCategoryModel

@@ -6,7 +6,7 @@ import { formatCurrency } from "@repo/domain";
 
 interface Earning {
   earningId: string;
-  bookingId: string;
+  orderId: string;
   netAmount: number;
 }
 
@@ -34,7 +34,7 @@ export function PayoutEarningsList({
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
                 <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
-                  Reserva
+                  Pedido
                 </th>
                 <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
                   Monto neto
@@ -45,7 +45,7 @@ export function PayoutEarningsList({
               {earnings.map((earning) => (
                 <tr key={earning.earningId}>
                   <td className="px-4 py-2 text-sm text-gray-900">
-                    {earning.bookingId}
+                    {earning.orderId}
                   </td>
                   <td className="px-4 py-2 text-sm text-gray-900">
                     {formatCurrency(earning.netAmount, currency, true)}

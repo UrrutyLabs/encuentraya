@@ -3,43 +3,44 @@ import { View, StyleSheet, ScrollView } from "react-native";
 import { useRouter } from "expo-router";
 import { Feather } from "@expo/vector-icons";
 import { Text } from "@components/ui/Text";
-import { BookingCard } from "@components/presentational/BookingCard";
+import { JobCard } from "@components/presentational/JobCard";
 import { JobsSkeleton } from "@components/presentational/JobsSkeleton";
-import { BookingStatus, Booking } from "@repo/domain";
+import { OrderStatus, Order } from "@repo/domain";
 import { theme } from "../../theme";
-import { useProJobs } from "@hooks/booking";
+import { useProJobs } from "@hooks/order";
+import { JOB_LABELS } from "../../utils/jobLabels";
 
 export function JobsScreen() {
   const router = useRouter();
 
-  // Fetch pro jobs bookings via hook
-  const { bookings, isLoading, error } = useProJobs();
+  // Fetch pro jobs orders via hook
+  const { orders, isLoading, error } = useProJobs();
 
-  // Filter bookings into upcoming (accepted and arrived) and completed
+  // Filter orders into upcoming (accepted and in_progress) and completed
   const { upcoming, completed } = useMemo<{
-    upcoming: Booking[];
-    completed: Booking[];
+    upcoming: Order[];
+    completed: Order[];
   }>(() => {
-    const upcomingBookings = bookings.filter(
-      (booking: Booking) =>
-        booking.status === BookingStatus.ACCEPTED ||
-        booking.status === BookingStatus.ARRIVED
+    const upcomingOrders = orders.filter(
+      (order: Order) =>
+        order.status === OrderStatus.ACCEPTED ||
+        order.status === OrderStatus.IN_PROGRESS
     );
 
-    const completedBookings = bookings.filter(
-      (booking: Booking) => booking.status === BookingStatus.COMPLETED
+    const completedOrders = orders.filter(
+      (order: Order) => order.status === OrderStatus.COMPLETED
     );
 
     return {
-      upcoming: upcomingBookings,
-      completed: completedBookings,
+      upcoming: upcomingOrders,
+      completed: completedOrders,
     };
-  }, [bookings]);
+  }, [orders]);
 
-  // Memoize card press handler to prevent unnecessary re-renders of BookingCard
+  // Memoize card press handler to prevent unnecessary re-renders
   const handleCardPress = useCallback(
-    (bookingId: string) => {
-      router.push(`/booking/${bookingId}`);
+    (orderId: string) => {
+      router.push(`/job/${orderId}` as any);
     },
     [router]
   );
@@ -60,7 +61,7 @@ export function JobsScreen() {
       <View style={styles.center}>
         <Feather name="alert-circle" size={48} color={theme.colors.danger} />
         <Text variant="body" style={styles.error}>
-          Error al cargar trabajos
+          {JOB_LABELS.errorLoadingJobs}
         </Text>
       </View>
     );
@@ -79,15 +80,15 @@ export function JobsScreen() {
           <View style={styles.emptyContainer}>
             <Feather name="clock" size={48} color={theme.colors.muted} />
             <Text variant="body" style={styles.empty}>
-              No hay trabajos próximos
+              {JOB_LABELS.noUpcomingJobs}
             </Text>
           </View>
         ) : (
-          upcoming.map((booking: Booking) => (
-            <BookingCard
-              key={booking.id}
-              booking={booking}
-              onPress={() => handleCardPress(booking.id)}
+          upcoming.map((job: Order) => (
+            <JobCard
+              key={job.id}
+              job={job}
+              onPress={() => handleCardPress(job.id)}
             />
           ))
         )}
@@ -98,22 +99,22 @@ export function JobsScreen() {
         <View style={styles.sectionHeader}>
           <Feather name="check-circle" size={20} color={theme.colors.primary} />
           <Text variant="h2" style={styles.sectionTitle}>
-            Completados
+            {JOB_LABELS.completedJobs}
           </Text>
         </View>
         {completed.length === 0 ? (
           <View style={styles.emptyContainer}>
             <Feather name="check-circle" size={48} color={theme.colors.muted} />
             <Text variant="body" style={styles.empty}>
-              No hay trabajos completados
+              {JOB_LABELS.noCompletedJobs}
             </Text>
           </View>
         ) : (
-          completed.map((booking: Booking) => (
-            <BookingCard
-              key={booking.id}
-              booking={booking}
-              onPress={() => handleCardPress(booking.id)}
+          completed.map((job: Order) => (
+            <JobCard
+              key={job.id}
+              job={job}
+              onPress={() => handleCardPress(job.id)}
             />
           ))
         )}

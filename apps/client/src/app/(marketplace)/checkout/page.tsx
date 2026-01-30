@@ -1,4 +1,4 @@
-import { CheckoutScreen } from "@/screens/booking/CheckoutScreen";
+import { CheckoutScreen } from "@/screens/job/CheckoutScreen";
 import { AuthenticatedGuard } from "@/components/auth/AuthenticatedGuard";
 import { Role } from "@repo/domain";
 

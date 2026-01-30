@@ -21,8 +21,8 @@ import { theme } from "../../theme";
 
 interface Earning {
   id: string;
-  bookingId: string;
-  bookingDisplayId: string;
+  orderId: string;
+  orderDisplayId: string;
   grossAmount: number;
   platformFeeAmount: number;
   netAmount: number;
@@ -215,8 +215,8 @@ export function EarningsListScreen() {
                       <Text variant="body" style={styles.netAmount}>
                         {formatAmount(earning.netAmount, earning.currency)}
                       </Text>
-                      <Text variant="xs" style={styles.bookingId}>
-                        #{earning.bookingDisplayId}
+                      <Text variant="xs" style={styles.jobId}>
+                        #{earning.orderDisplayId}
                       </Text>
                     </View>
                   </Card>
@@ -272,7 +272,7 @@ const styles = StyleSheet.create({
     flex: 1,
     textAlign: "right",
   },
-  bookingId: {
+  jobId: {
     color: theme.colors.muted,
     fontFamily: "monospace",
   },

@@ -107,10 +107,15 @@ describe("PayoutService", () => {
       email: "pro@example.com",
       phone: null,
       bio: null,
+      avatarUrl: null,
       hourlyRate: 100,
-      categories: [],
+      categoryIds: [],
       serviceArea: null,
       status: "active",
+      profileCompleted: false,
+      completedJobsCount: 0,
+      isTopPro: false,
+      responseTimeMinutes: null,
       createdAt: new Date(),
       updatedAt: new Date(),
       ...overrides,
@@ -122,7 +127,7 @@ describe("PayoutService", () => {
   ): EarningEntity {
     return {
       id: "earning-1",
-      bookingId: "booking-1",
+      orderId: "order-1",
       proProfileId: "pro-1",
       clientUserId: "client-1",
       currency: "UYU",
@@ -590,12 +595,12 @@ describe("PayoutService", () => {
       const earnings = [
         createMockEarning({
           id: "earning-1",
-          bookingId: "booking-1",
+          orderId: "order-1",
           netAmount: 10000,
         }),
         createMockEarning({
           id: "earning-2",
-          bookingId: "booking-2",
+          orderId: "order-2",
           netAmount: 8000,
         }),
       ];
@@ -611,7 +616,7 @@ describe("PayoutService", () => {
       expect(result.id).toBe("payout-1");
       expect(result.earnings).toHaveLength(2);
       expect(result.earnings[0].earningId).toBe("earning-1");
-      expect(result.earnings[0].bookingId).toBe("booking-1");
+      expect(result.earnings[0].orderId).toBe("order-1");
       expect(result.earnings[0].netAmount).toBe(10000);
       expect(mockPayoutRepository.findById).toHaveBeenCalledWith("payout-1");
       expect(mockPayoutItemRepository.findByPayoutId).toHaveBeenCalledWith(

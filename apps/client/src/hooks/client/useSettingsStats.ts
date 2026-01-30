@@ -1,75 +1,68 @@
 import { useMemo } from "react";
-import { useMyBookings } from "../booking";
-import { BookingStatus, Category } from "@repo/domain";
+import { useMyOrders } from "../order";
+import { useCategories } from "../category";
+import { OrderStatus } from "@repo/domain";
 
 /**
- * Hook to compute account statistics from bookings
+ * Hook to compute account statistics from orders
  * Encapsulates statistics calculation logic
  */
 export function useSettingsStats() {
-  const { bookings, isLoading } = useMyBookings();
+  const { orders, isLoading: ordersLoading } = useMyOrders();
+  const { categories, isLoading: categoriesLoading } = useCategories();
 
   const stats = useMemo(() => {
-    if (!bookings || bookings.length === 0) {
+    if (!orders || orders.length === 0) {
       return {
-        totalBookings: 0,
-        completedBookings: 0,
+        totalJobs: 0,
+        completedJobs: 0,
         totalSpent: undefined,
         favoriteCategory: undefined,
       };
     }
 
-    const totalBookings = bookings.length;
-    const completedBookings = bookings.filter(
-      (b) => b.status === BookingStatus.COMPLETED
+    const totalJobs = orders.length;
+    const completedJobs = orders.filter(
+      (o) => o.status === OrderStatus.COMPLETED
     ).length;
 
-    // Calculate total spent from completed bookings with totalAmount
-    const totalSpent = bookings
-      .filter((b) => b.status === BookingStatus.COMPLETED && b.totalAmount)
-      .reduce((sum, b) => sum + (b.totalAmount || 0), 0);
+    // Calculate total spent from completed orders with totalAmount
+    const totalSpent = orders
+      .filter((o) => o.status === OrderStatus.COMPLETED && o.totalAmount)
+      .reduce((sum, o) => sum + (o.totalAmount || 0), 0);
 
-    // Find favorite category (most booked)
-    const categoryCounts: Record<Category, number> = {} as Record<
-      Category,
-      number
-    >;
-    bookings.forEach((b) => {
-      categoryCounts[b.category] = (categoryCounts[b.category] || 0) + 1;
+    // Find favorite category (most ordered) by categoryId
+    const categoryCounts: Record<string, number> = {};
+    orders.forEach((o) => {
+      if (o.categoryId) {
+        categoryCounts[o.categoryId] = (categoryCounts[o.categoryId] || 0) + 1;
+      }
     });
 
-    const favoriteCategoryEntry = (
-      Object.entries(categoryCounts) as [Category, number][]
-    ).reduce<[Category | undefined, number]>(
-      (max, [category, count]) => {
-        return count > max[1] ? [category, count] : max;
+    const favoriteCategoryEntry = Object.entries(categoryCounts).reduce<
+      [string | undefined, number]
+    >(
+      (max, [categoryId, count]) => {
+        return count > max[1] ? [categoryId, count] : max;
       },
       [undefined, 0]
     );
 
-    // Map category enum to Spanish label
-    const categoryLabels: Record<Category, string> = {
-      [Category.PLUMBING]: "Plomería",
-      [Category.ELECTRICAL]: "Electricidad",
-      [Category.CLEANING]: "Limpieza",
-      [Category.HANDYMAN]: "Arreglos generales",
-      [Category.PAINTING]: "Pintura",
-    };
-
+    // Map categoryId to category name
     const favoriteCategory = favoriteCategoryEntry[0]
-      ? categoryLabels[favoriteCategoryEntry[0] as Category]
+      ? categories.find((c) => c.id === favoriteCategoryEntry[0])?.name
       : undefined;
 
     return {
-      totalBookings,
-      completedBookings,
+      totalJobs,
+      completedJobs,
       totalSpent: totalSpent > 0 ? totalSpent : undefined,
       favoriteCategory,
     };
-  }, [bookings]);
+  }, [orders, categories]);
 
   return {
     stats,
-    isLoading,
+    isLoading: ordersLoading || categoriesLoading,
   };
 }

@@ -5,22 +5,20 @@ import { Text } from "@repo/ui";
 import { Badge } from "@repo/ui";
 import { Calendar, CreditCard, Wallet, ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { formatCurrency, OrderStatus, PaymentStatus } from "@repo/domain";
 import {
-  formatCurrency,
-  BookingStatus,
-  PaymentStatus,
-  getBookingStatusLabel,
-  getBookingStatusVariant,
-} from "@repo/domain";
+  getOrderStatusLabel,
+  getOrderStatusVariant,
+} from "@/utils/orderStatus";
+import { ORDER_LABELS } from "@/utils/orderLabels";
 
 interface RecentActivityFeedProps {
-  recentBookings: Array<{
+  recentOrders: Array<{
     id: string;
+    displayId: string;
     createdAt: Date;
-    status: BookingStatus;
-    clientName: string | null;
-    clientEmail: string | null;
-    estimatedAmount: number;
+    status: OrderStatus;
+    totalAmount: number | null;
     currency: string;
   }>;
   recentPayments: Array<{
@@ -42,11 +40,11 @@ interface RecentActivityFeedProps {
 }
 
 const getStatusBadgeVariant = (
-  status: string | BookingStatus | PaymentStatus
+  status: string | OrderStatus | PaymentStatus
 ): "info" | "success" | "warning" | "danger" => {
-  // Handle booking statuses
-  if (Object.values(BookingStatus).includes(status as BookingStatus)) {
-    return getBookingStatusVariant(status as BookingStatus);
+  // Handle order statuses
+  if (Object.values(OrderStatus).includes(status as OrderStatus)) {
+    return getOrderStatusVariant(status as OrderStatus);
   }
   // Handle payment/payout statuses
   if (
@@ -74,11 +72,11 @@ const getStatusBadgeVariant = (
 };
 
 const getStatusLabel = (
-  status: string | BookingStatus | PaymentStatus
+  status: string | OrderStatus | PaymentStatus
 ): string => {
-  // Handle booking statuses
-  if (Object.values(BookingStatus).includes(status as BookingStatus)) {
-    return getBookingStatusLabel(status as BookingStatus);
+  // Handle order statuses
+  if (Object.values(OrderStatus).includes(status as OrderStatus)) {
+    return getOrderStatusLabel(status as OrderStatus);
   }
   // For payment/payout statuses, return as-is (they're already translated elsewhere)
   return status;
@@ -94,7 +92,7 @@ const formatDate = (date: Date) => {
 };
 
 export function RecentActivityFeed({
-  recentBookings,
+  recentOrders,
   recentPayments,
   recentPayouts,
   isLoading,
@@ -116,15 +114,22 @@ export function RecentActivityFeed({
 
   // Combine and sort all activities by date
   const activities = [
-    ...recentBookings.map((b) => ({
-      type: "booking" as const,
-      id: b.id,
-      date: b.createdAt,
-      title: `Reserva de ${b.clientName || b.clientEmail || "Cliente"}`,
-      subtitle: formatCurrency(b.estimatedAmount, b.currency),
-      status: b.status,
-      onClick: () => router.push(`/admin/bookings/${b.id}`),
-    })),
+    ...recentOrders.map((o) => {
+      // adminListOrders returns limited fields, use what's available
+      const displayAmount = o.totalAmount || 0;
+      return {
+        type: "order" as const,
+        id: o.id,
+        date: o.createdAt,
+        title: `${ORDER_LABELS.singular} ${o.displayId || o.id}`,
+        subtitle:
+          displayAmount > 0
+            ? formatCurrency(displayAmount, o.currency)
+            : "Sin monto",
+        status: o.status,
+        onClick: () => router.push(`/admin/orders/${o.id}`),
+      };
+    }),
     ...recentPayments.map((p) => ({
       type: "payment" as const,
       id: p.id,
@@ -147,9 +152,9 @@ export function RecentActivityFeed({
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     .slice(0, 10);
 
-  const getIcon = (type: "booking" | "payment" | "payout") => {
+  const getIcon = (type: "order" | "payment" | "payout") => {
     switch (type) {
-      case "booking":
+      case "order":
         return Calendar;
       case "payment":
         return CreditCard;

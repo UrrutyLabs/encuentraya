@@ -2,6 +2,9 @@
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "strict": true,
+    "skipLibCheck": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "baseUrl": ".",
     "paths": {
       "@/*": ["./*"],
@@ -13,17 +16,18 @@
       "@screens": ["./src/screens"],
       "@lib/*": ["./src/lib/*"],
       "@lib": ["./src/lib"],
-      "@modules/*": ["../api/src/server/modules/*"],
+      "@repo/monitoring/sentry": [
+        "../../packages/monitoring/src/sentry/index.ts"
+      ],
+      "@repo/monitoring/logger": [
+        "../../packages/monitoring/src/logger/index.ts"
+      ],
       "@infra/*": ["../api/src/server/infrastructure/*"],
+      "@modules/*": ["../api/src/server/modules/*"],
       "@shared/*": ["../api/src/server/shared/*"],
-      "@repo/monitoring/sentry": ["../../packages/monitoring/src/sentry/index.ts"],
-      "@repo/monitoring/logger": ["../../packages/monitoring/src/logger/index.ts"]
+      "@/server/*": ["../api/src/server/*"]
     }
   },
-  "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    ".expo/types/**/*.ts",
-    "expo-env.d.ts"
-  ]
+  "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"],
+  "exclude": ["node_modules", "../api/**/*"]
 }

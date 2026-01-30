@@ -12,7 +12,7 @@ export interface Money {
  * Input for creating a preauthorization
  */
 export interface CreatePreauthInput {
-  bookingId: string;
+  orderId: string; // Changed from bookingId
   clientUserId: string;
   proProfileId: string | null;
   amount: Money;

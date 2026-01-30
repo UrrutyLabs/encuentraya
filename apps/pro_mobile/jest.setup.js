@@ -1,10 +1,32 @@
+// Suppress react-test-renderer deprecation warning
+// This is a known issue with @testing-library/react-native and React 19
+// The library still uses react-test-renderer internally
+const originalError = console.error;
+beforeAll(() => {
+  console.error = (...args) => {
+    if (
+      typeof args[0] === "string" &&
+      args[0].includes("react-test-renderer is deprecated")
+    ) {
+      return;
+    }
+    originalError.call(console, ...args);
+  };
+});
+
+afterAll(() => {
+  console.error = originalError;
+});
+
 // Mock React Native JS polyfills before any other imports
-jest.mock("@react-native/js-polyfills/error-guard", () => ({}), { virtual: true });
+jest.mock("@react-native/js-polyfills/error-guard", () => ({}), {
+  virtual: true,
+});
 
 // Mock React Native modules
 jest.mock("react-native", () => {
   const callbacks = [];
-  
+
   return {
     AppState: {
       currentState: "active",
@@ -59,7 +81,9 @@ jest.mock("@react-native-community/netinfo", () => {
 // Mock Expo modules
 jest.mock("expo-notifications", () => ({
   getPermissionsAsync: jest.fn(() => Promise.resolve({ status: "granted" })),
-  requestPermissionsAsync: jest.fn(() => Promise.resolve({ status: "granted" })),
+  requestPermissionsAsync: jest.fn(() =>
+    Promise.resolve({ status: "granted" })
+  ),
   getExpoPushTokenAsync: jest.fn(() => Promise.resolve({ data: "mock-token" })),
 }));
 

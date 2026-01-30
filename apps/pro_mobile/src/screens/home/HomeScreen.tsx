@@ -3,38 +3,39 @@ import { View, StyleSheet, ScrollView } from "react-native";
 import { useRouter } from "expo-router";
 import { Feather } from "@expo/vector-icons";
 import { Text } from "@components/ui/Text";
-import { BookingCard } from "@components/presentational/BookingCard";
+import { JobCard } from "@components/presentational/JobCard";
 import { HomeSkeleton } from "@components/presentational/HomeSkeleton";
-import { Booking, BookingStatus } from "@repo/domain";
+import { Order, OrderStatus } from "@repo/domain";
 import { theme } from "../../theme";
-import { useProInbox } from "@hooks/booking";
+import { useProInbox } from "@hooks/order";
+import { JOB_LABELS } from "../../utils/jobLabels";
 
 export function HomeScreen() {
   const router = useRouter();
 
-  // Fetch pro inbox bookings via hook
-  const { bookings, isLoading, error } = useProInbox();
+  // Fetch pro inbox orders via hook
+  const { orders, isLoading, error } = useProInbox();
 
-  // Filter bookings into pending and accepted
+  // Filter orders into pending and accepted
   const { pending, upcoming } = useMemo(() => {
-    const pendingBookings = bookings.filter(
-      (booking: Booking) => booking.status === BookingStatus.PENDING
+    const pendingOrders = orders.filter(
+      (order: Order) => order.status === OrderStatus.PENDING_PRO_CONFIRMATION
     );
 
-    const upcomingBookings = bookings.filter(
-      (booking: Booking) => booking.status === BookingStatus.ACCEPTED
+    const upcomingOrders = orders.filter(
+      (order: Order) => order.status === OrderStatus.ACCEPTED
     );
 
     return {
-      pending: pendingBookings,
-      upcoming: upcomingBookings,
+      pending: pendingOrders,
+      upcoming: upcomingOrders,
     };
-  }, [bookings]);
+  }, [orders]);
 
-  // Memoize card press handler to prevent unnecessary re-renders of BookingCard
+  // Memoize card press handler to prevent unnecessary re-renders
   const handleCardPress = useCallback(
-    (bookingId: string) => {
-      router.push(`/booking/${bookingId}`);
+    (orderId: string) => {
+      router.push(`/job/${orderId}` as any);
     },
     [router]
   );
@@ -55,7 +56,7 @@ export function HomeScreen() {
       <View style={styles.center}>
         <Feather name="alert-circle" size={48} color={theme.colors.danger} />
         <Text variant="body" style={styles.error}>
-          Error al cargar trabajos
+          {JOB_LABELS.errorLoadingJobs}
         </Text>
       </View>
     );
@@ -67,22 +68,22 @@ export function HomeScreen() {
         <View style={styles.sectionHeader}>
           <Feather name="bell" size={20} color={theme.colors.primary} />
           <Text variant="h2" style={styles.sectionTitle}>
-            Solicitudes nuevas
+            {JOB_LABELS.newRequests}
           </Text>
         </View>
         {pending.length === 0 ? (
           <View style={styles.emptyContainer}>
             <Feather name="inbox" size={48} color={theme.colors.muted} />
             <Text variant="body" style={styles.empty}>
-              No hay solicitudes nuevas
+              {JOB_LABELS.noPendingJobs}
             </Text>
           </View>
         ) : (
-          pending.map((booking: Booking) => (
-            <BookingCard
-              key={booking.id}
-              booking={booking}
-              onPress={() => handleCardPress(booking.id)}
+          pending.map((job: Order) => (
+            <JobCard
+              key={job.id}
+              job={job}
+              onPress={() => handleCardPress(job.id)}
             />
           ))
         )}
@@ -93,22 +94,22 @@ export function HomeScreen() {
         <View style={styles.sectionHeader}>
           <Feather name="calendar" size={20} color={theme.colors.primary} />
           <Text variant="h2" style={styles.sectionTitle}>
-            Próximos trabajos
+            {JOB_LABELS.upcomingJobs}
           </Text>
         </View>
         {upcoming.length === 0 ? (
           <View style={styles.emptyContainer}>
             <Feather name="calendar" size={48} color={theme.colors.muted} />
             <Text variant="body" style={styles.empty}>
-              No hay trabajos próximos
+              {JOB_LABELS.noUpcomingJobs}
             </Text>
           </View>
         ) : (
-          upcoming.map((booking: Booking) => (
-            <BookingCard
-              key={booking.id}
-              booking={booking}
-              onPress={() => handleCardPress(booking.id)}
+          upcoming.map((job: Order) => (
+            <JobCard
+              key={job.id}
+              job={job}
+              onPress={() => handleCardPress(job.id)}
             />
           ))
         )}

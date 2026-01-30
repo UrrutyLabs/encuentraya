@@ -4,9 +4,10 @@ import { Calendar, DollarSign, Wallet, Users } from "lucide-react";
 import { Card } from "@repo/ui";
 import { Text } from "@repo/ui";
 import { formatCurrency } from "@repo/domain";
+import { ORDER_LABELS } from "@/utils/orderLabels";
 
 interface OverviewCardsProps {
-  bookings: {
+  orders: {
     today: number;
     thisWeek: number;
     thisMonth: number;
@@ -30,7 +31,7 @@ interface OverviewCardsProps {
 }
 
 export function OverviewCards({
-  bookings,
+  orders,
   revenue,
   payouts,
   pros,
@@ -51,7 +52,7 @@ export function OverviewCards({
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      {/* Bookings Card */}
+      {/* Orders Card */}
       <Card className="p-6">
         <div className="flex items-center justify-between mb-4">
           <div className="p-3 bg-primary/10 rounded-lg">
@@ -59,15 +60,15 @@ export function OverviewCards({
           </div>
         </div>
         <Text variant="h2" className="mb-1">
-          {bookings.total.toLocaleString()}
+          {orders.total.toLocaleString()}
         </Text>
         <Text variant="small" className="text-muted mb-2">
-          Reservas totales
+          {ORDER_LABELS.totalOrders}
         </Text>
         <div className="flex gap-4 text-xs text-muted">
-          <span>Hoy: {bookings.today}</span>
-          <span>Semana: {bookings.thisWeek}</span>
-          <span>Mes: {bookings.thisMonth}</span>
+          <span>Hoy: {orders.today}</span>
+          <span>Semana: {orders.thisWeek}</span>
+          <span>Mes: {orders.thisMonth}</span>
         </div>
       </Card>
 

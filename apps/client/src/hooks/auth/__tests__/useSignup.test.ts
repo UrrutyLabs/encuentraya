@@ -90,7 +90,7 @@ describe("useSignup", () => {
         }
       );
 
-      const { result } = renderHook(() => useSignup("/my-bookings"));
+      const { result } = renderHook(() => useSignup("/my-jobs"));
 
       await act(async () => {
         await result.current.signup({
@@ -102,7 +102,7 @@ describe("useSignup", () => {
       await waitFor(
         () => {
           expect(mockRouter.push).toHaveBeenCalledWith(
-            "/confirm-email?email=test%40example.com&returnUrl=%2Fmy-bookings"
+            "/confirm-email?email=test%40example.com&returnUrl=%2Fmy-jobs"
           );
         },
         { timeout: 2000 }

@@ -4,13 +4,15 @@ import type { NotificationMessage } from "./provider";
  * Event types that trigger notifications
  */
 export type NotificationEvent =
-  | "booking.created"
-  | "booking.accepted"
-  | "booking.rejected"
-  | "booking.on_my_way"
-  | "booking.arrived"
-  | "booking.completed"
-  | "booking.cancelled"
+  | "order.created"
+  | "order.accepted"
+  | "order.confirmed"
+  | "order.in_progress"
+  | "order.arrived"
+  | "order.awaiting_approval"
+  | "order.completed"
+  | "order.disputed"
+  | "order.canceled"
   | "payment.required"
   | "payment.authorized"
   | "review.received";
@@ -30,22 +32,29 @@ export type RecipientRole = "CLIENT" | "PRO";
  */
 export function buildNotificationMessages(params: {
   event: NotificationEvent;
-  bookingId: string;
+  resourceId: string; // Order ID or other resource ID
   recipientRef: string;
   recipientRole: RecipientRole;
   templateId: string;
   payload: unknown;
 }): NotificationMessage[] {
-  const { event, bookingId, recipientRef, recipientRole, templateId, payload } =
-    params;
+  const {
+    event,
+    resourceId,
+    recipientRef,
+    recipientRole,
+    templateId,
+    payload,
+  } = params;
 
   // Determine if event is "important" (triggers WhatsApp)
   const importantEvents: NotificationEvent[] = [
-    "booking.accepted",
-    "booking.rejected",
-    "booking.on_my_way",
-    "booking.arrived",
-    "booking.completed",
+    "order.created",
+    "order.accepted",
+    "order.awaiting_approval",
+    "order.completed",
+    "order.disputed",
+    "order.canceled",
     "payment.required",
   ];
   const isImportant = importantEvents.includes(event);
@@ -59,7 +68,7 @@ export function buildNotificationMessages(params: {
       recipientRef,
       templateId,
       payload,
-      idempotencyKey: `${event}:${bookingId}:${recipientRef}:EMAIL`,
+      idempotencyKey: `${event}:${resourceId}:${recipientRef}:EMAIL`,
     });
 
     // CLIENT: WHATSAPP only for important events
@@ -69,7 +78,7 @@ export function buildNotificationMessages(params: {
         recipientRef,
         templateId,
         payload,
-        idempotencyKey: `${event}:${bookingId}:${recipientRef}:WHATSAPP`,
+        idempotencyKey: `${event}:${resourceId}:${recipientRef}:WHATSAPP`,
       });
     }
   } else if (recipientRole === "PRO") {
@@ -79,7 +88,7 @@ export function buildNotificationMessages(params: {
       recipientRef,
       templateId,
       payload,
-      idempotencyKey: `${event}:${bookingId}:${recipientRef}:PUSH`,
+      idempotencyKey: `${event}:${resourceId}:${recipientRef}:PUSH`,
     });
 
     // PRO: WHATSAPP only for important/fallback
@@ -89,7 +98,7 @@ export function buildNotificationMessages(params: {
         recipientRef,
         templateId,
         payload,
-        idempotencyKey: `${event}:${bookingId}:${recipientRef}:WHATSAPP`,
+        idempotencyKey: `${event}:${resourceId}:${recipientRef}:WHATSAPP`,
       });
     }
   }

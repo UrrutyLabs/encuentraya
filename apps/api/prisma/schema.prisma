@@ -16,16 +16,6 @@ enum Role {
   admin
 }
 
-enum BookingStatus {
-  pending_payment
-  pending
-  accepted
-  on_my_way
-  arrived
-  rejected
-  completed
-  cancelled
-}
 
 enum PaymentProvider {
   MERCADO_PAGO
@@ -51,13 +41,7 @@ enum ProStatus {
   suspended
 }
 
-enum Category {
-  plumbing
-  electrical
-  cleaning
-  handyman
-  painting
-}
+// Category enum removed - now using data-driven Category model
 
 enum PreferredContactMethod {
   EMAIL
@@ -114,11 +98,57 @@ enum AuditEventType {
   PRO_SUSPENDED
   PRO_UNSUSPENDED
   PRO_APPROVED
-  BOOKING_STATUS_FORCED
+  ORDER_STATUS_FORCED
   PAYMENT_SYNCED
   PAYOUT_CREATED
   PAYOUT_SENT
   USER_ROLE_CHANGED
+}
+
+enum OrderStatus {
+  draft
+  pending_pro_confirmation
+  accepted
+  confirmed
+  in_progress
+  awaiting_client_approval
+  disputed
+  completed
+  paid
+  canceled
+}
+
+enum OrderLineItemType {
+  labor
+  platform_fee
+  tax
+  tip
+  discount
+  adjustment
+  cancellation_fee
+}
+
+enum TaxBehavior {
+  taxable
+  non_taxable
+  tax_included
+}
+
+enum PricingMode {
+  hourly
+}
+
+enum ApprovalMethod {
+  client_accepted
+  auto_accepted
+  admin_adjusted
+}
+
+enum DisputeStatus {
+  none
+  open
+  resolved
+  canceled
 }
 
 model User {
@@ -130,8 +160,8 @@ model User {
   // Relations
   proProfile    ProProfile?
   clientProfile ClientProfile?
-  bookingsAsClient Booking[] @relation("ClientBookings")
-  reviewsAsClient  Review[]  @relation("ClientReviews")
+  ordersAsClient   Order[]   @relation("ClientOrders")
+  reviewsAsClient  Review[]   @relation("ClientReviews")
   paymentsAsClient Payment[] @relation("ClientPayments")
 
   @@index([role])
@@ -146,25 +176,33 @@ model ProProfile {
   email       String
   phone       String?
   bio         String?
+  avatarUrl   String?
   hourlyRate  Float
-  categories  Category[]
   serviceArea String?
   status      ProStatus  @default(pending)
+  profileCompleted Boolean @default(false)
+  completedJobsCount Int   @default(0)
+  isTopPro    Boolean    @default(false)
+  responseTimeMinutes Int?
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
 
   // Relations
   user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   availability Availability[]
-  bookings    Booking[]    @relation("ProBookings")
+  orders      Order[]      @relation("ProOrders")
   reviews     Review[]
   payments    Payment[]
   payoutProfile ProPayoutProfile?
   earnings    Earning[]
   payouts     Payout[]
+  categoryRelations ProProfileCategory[] // New junction table relation
 
   @@index([userId])
   @@index([status])
+  @@index([profileCompleted])
+  @@index([isTopPro])
+  @@index([status, profileCompleted])
   @@map("pro_profiles")
 }
 
@@ -202,38 +240,118 @@ model Availability {
   @@map("availabilities")
 }
 
-model Booking {
-  id             String        @id @default(cuid())
-  displayId      String        @unique
-  clientUserId   String
-  proProfileId   String?
-  category       Category
-  status         BookingStatus @default(pending)
-  scheduledAt    DateTime
-  hoursEstimate  Float
-  addressText    String
-  isFirstBooking    Boolean       @default(false)
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
-
+model Order {
+  id                        String        @id @default(cuid())
+  displayId                 String        @unique
+  clientUserId              String
+  proProfileId              String?
+  categoryId                String        // FK to Category table (required)
+  subcategoryId             String?
+  categoryMetadataJson      Json?         // Answers to dynamic questions from config
+  
+  // Job details
+  title                     String?
+  description               String?
+  addressText               String
+  addressLat                Float?
+  addressLng                Float?
+  scheduledWindowStartAt     DateTime
+  scheduledWindowEndAt      DateTime?
+  
+  // Lifecycle
+  status                    OrderStatus   @default(pending_pro_confirmation)
+  acceptedAt                DateTime?
+  confirmedAt               DateTime?
+  startedAt                 DateTime?
+  arrivedAt                 DateTime?
+  completedAt               DateTime?
+  paidAt                    DateTime?
+  canceledAt                DateTime?
+  cancelReason              String?
+  
+  // Pricing snapshots
+  pricingMode               PricingMode   @default(hourly)
+  hourlyRateSnapshotAmount  Float
+  currency                  String        @default("UYU")
+  minHoursSnapshot          Float?
+  
+  // Hours
+  estimatedHours            Float
+  finalHoursSubmitted      Float?
+  approvedHours             Float?
+  approvalMethod            ApprovalMethod?
+  approvalDeadlineAt        DateTime?
+  
+  // Totals (cached)
+  subtotalAmount            Float?        // labor pre-tax
+  platformFeeAmount         Float?
+  taxAmount                 Float?        // IVA total
+  totalAmount               Float?
+  totalsCalculatedAt        DateTime?
+  
+  // Tax snapshot
+  taxScheme                 String?       @default("iva")
+  taxRate                   Float?       // e.g. 0.22
+  taxIncluded               Boolean      @default(false)
+  taxRegion                 String?      @default("UY")
+  taxCalculatedAt           DateTime?
+  
+  // Dispute fields
+  disputeStatus             DisputeStatus @default(none)
+  disputeReason             String?
+  disputeOpenedBy           String?      // client/pro/admin user ID
+  
+  // Metadata
+  isFirstOrder            Boolean      @default(false)
+  createdAt                 DateTime     @default(now())
+  updatedAt                 DateTime     @updatedAt
+  
   // Relations
-  client     User         @relation("ClientBookings", fields: [clientUserId], references: [id], onDelete: Cascade)
-  proProfile ProProfile?  @relation("ProBookings", fields: [proProfileId], references: [id], onDelete: SetNull)
-  review     Review?
-  payment    Payment?
-  earning    Earning?
-
+  client                    User         @relation("ClientOrders", fields: [clientUserId], references: [id], onDelete: Cascade)
+  proProfile                ProProfile?  @relation("ProOrders", fields: [proProfileId], references: [id], onDelete: SetNull)
+  subcategory               Subcategory? @relation("OrderSubcategory", fields: [subcategoryId], references: [id], onDelete: SetNull)
+  category                  Category     @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  lineItems                 OrderLineItem[]
+  review                    Review?
+  payment                   Payment?
+  earning                   Earning?
+  
   @@index([clientUserId])
   @@index([proProfileId])
   @@index([status])
-  @@index([scheduledAt])
-  @@index([category])
-  @@map("bookings")
+  @@index([scheduledWindowStartAt])
+  @@index([categoryId])
+  @@index([subcategoryId])
+  @@index([categoryId, subcategoryId])
+  @@index([displayId])
+  @@map("orders")
+}
+
+model OrderLineItem {
+  id          String            @id @default(cuid())
+  orderId     String
+  type        OrderLineItemType
+  description String
+  quantity    Float             // decimal; hours for labor
+  unitAmount  Float             // amount per unit
+  amount      Float             // quantity * unitAmount
+  currency    String            @default("UYU")
+  taxBehavior TaxBehavior?
+  taxRate     Float?            // optional per line
+  metadata    Json?             // flexible metadata
+  createdAt   DateTime          @default(now())
+  
+  // Relations
+  order       Order             @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  
+  @@index([orderId])
+  @@index([type])
+  @@map("order_line_items")
 }
 
 model Review {
   id           String   @id @default(cuid())
-  bookingId    String   @unique
+  orderId      String   @unique
   proProfileId String
   clientUserId String
   rating       Int      // 1-5
@@ -241,13 +359,13 @@ model Review {
   createdAt    DateTime @default(now())
 
   // Relations
-  booking    Booking    @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  order      Order      @relation(fields: [orderId], references: [id], onDelete: Cascade)
   proProfile ProProfile @relation(fields: [proProfileId], references: [id], onDelete: Cascade)
   client     User       @relation("ClientReviews", fields: [clientUserId], references: [id], onDelete: Cascade)
 
   @@index([proProfileId])
   @@index([clientUserId])
-  @@index([bookingId])
+  @@index([orderId])
   @@map("reviews")
 }
 
@@ -256,7 +374,7 @@ model Payment {
   provider          PaymentProvider
   type              PaymentType
   status            PaymentStatus  @default(CREATED)
-  bookingId         String        @unique
+  orderId           String        @unique
   clientUserId      String
   proProfileId      String?
   currency          String        // e.g. "UYU"
@@ -270,12 +388,12 @@ model Payment {
   updatedAt         DateTime      @updatedAt
 
   // Relations
-  booking    Booking         @relation(fields: [bookingId], references: [id], onDelete: Cascade)
-  client     User            @relation("ClientPayments", fields: [clientUserId], references: [id], onDelete: Cascade)
-  proProfile ProProfile?     @relation(fields: [proProfileId], references: [id], onDelete: SetNull)
+  order      Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  client     User           @relation("ClientPayments", fields: [clientUserId], references: [id], onDelete: Cascade)
+  proProfile ProProfile?    @relation(fields: [proProfileId], references: [id], onDelete: SetNull)
   events     PaymentEvent[]
 
-  @@index([bookingId])
+  @@index([orderId])
   @@index([providerReference])
   @@index([idempotencyKey])
   @@map("payments")
@@ -359,7 +477,7 @@ model ProPayoutProfile {
 
 model Earning {
   id              String        @id @default(cuid())
-  bookingId       String        @unique
+  orderId         String        @unique
   proProfileId    String
   clientUserId    String
   currency        String
@@ -372,13 +490,14 @@ model Earning {
   updatedAt       DateTime      @updatedAt
 
   // Relations
-  booking    Booking     @relation(fields: [bookingId], references: [id], onDelete: Cascade)
-  proProfile ProProfile  @relation(fields: [proProfileId], references: [id], onDelete: Cascade)
+  order      Order      @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  proProfile ProProfile @relation(fields: [proProfileId], references: [id], onDelete: Cascade)
   payoutItem PayoutItem?
 
   @@index([proProfileId])
   @@index([status])
   @@index([availableAt])
+  @@index([orderId])
   @@map("earnings")
 }
 
@@ -426,7 +545,7 @@ model AuditLog {
   eventType     AuditEventType
   actorId       String         // Who performed the action (admin user ID)
   actorRole     Role           // Admin role for quick filtering
-  resourceType  String         // "pro", "booking", "payment", "payout", etc.
+  resourceType  String         // "pro", "order", "payment", "payout", etc.
   resourceId    String         // ID of the affected resource
   action        String         // "suspend", "force_status", "sync", etc.
   metadata      Json?          // Flexible: reason, oldStatus, newStatus, etc.
@@ -439,4 +558,78 @@ model AuditLog {
   @@index([actorId])
   @@index([createdAt])
   @@map("audit_logs")
+}
+
+
+// Category table - data-driven categories with soft delete
+model Category {
+  id         String    @id @default(cuid())
+  key        String    // Stable identifier like "PLUMBING"
+  name       String    // Display name (migrated from CategoryMetadata.displayName)
+  slug       String
+  iconName   String?   // e.g., "Wrench" (for Lucide icons) - migrated from CategoryMetadata.iconName
+  description String?  // Migrated from CategoryMetadata.description
+  sortOrder  Int       @default(0) // Migrated from CategoryMetadata.displayOrder
+  isActive   Boolean   @default(true)
+  deletedAt  DateTime? // Soft delete timestamp
+  configJson Json?     // Category-level UI defaults
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  // Relations
+  subcategories Subcategory[]
+  orders        Order[]
+  proProfiles   ProProfileCategory[]
+
+  @@index([isActive, sortOrder])
+  @@index([deletedAt])
+  @@map("categories")
+}
+
+model Subcategory {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String
+  categoryId  String   // FK to Category table (required)
+  key         String?  // Stable identifier within category (e.g. "UNCLOG_DRAIN")
+  imageUrl    String?
+  description String?
+  displayOrder Int     @default(0)
+  isActive    Boolean  @default(true)
+  configJson  Json?    // Subcategory-level UI config (overrides category config)
+  searchKeywords String[] @default([]) // Search keywords for this subcategory
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  category    Category  @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  orders      Order[]   @relation("OrderSubcategory")
+
+  @@unique([categoryId, slug]) // Unique slug within category
+  @@unique([categoryId, key]) // Unique key within category
+  @@index([categoryId])
+  @@index([slug])
+  @@index([isActive])
+  @@index([categoryId, isActive, displayOrder])
+  @@map("subcategories")
+}
+
+model ProProfileCategory {
+  id          String     @id @default(cuid())
+  proProfileId String
+  categoryId   String
+  // Optional future metadata fields:
+  // certifiedAt     DateTime?
+  // yearsExperience Int?
+  // isPrimary       Boolean   @default(false)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  proProfile  ProProfile @relation(fields: [proProfileId], references: [id], onDelete: Cascade)
+  category    Category   @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
+  @@unique([proProfileId, categoryId])
+  @@index([categoryId])
+  @@index([proProfileId])
+  @@map("pro_profile_categories")
 }

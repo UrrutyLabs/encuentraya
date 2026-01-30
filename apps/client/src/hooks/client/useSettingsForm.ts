@@ -50,7 +50,7 @@ export function useSettingsForm() {
     ...invalidateRelatedQueries(queryClient, [[["clientProfile", "get"]]]),
     onSuccess: () => {
       // Redirect immediately - profile will refetch when user navigates back
-      router.push("/my-bookings");
+      router.push("/my-jobs");
     },
     onError: (error) => {
       logger.error(

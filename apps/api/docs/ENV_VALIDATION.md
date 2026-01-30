@@ -69,6 +69,7 @@ Please check your .env.local file and ensure all required variables are set.
 
 These are validated if present but won't cause startup failure if missing:
 
+- `MERCADOPAGO_WEBHOOK_SECRET` - MercadoPago webhook secret for signature verification (recommended for production)
 - `UPSTASH_REDIS_REST_URL` - Upstash Redis REST URL (for rate limiting)
 - `UPSTASH_REDIS_REST_TOKEN` - Upstash Redis REST token
 - `CORS_ALLOWED_ORIGINS` - Comma-separated list of allowed CORS origins

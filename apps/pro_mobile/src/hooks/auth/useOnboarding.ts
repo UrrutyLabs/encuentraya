@@ -19,7 +19,7 @@ export function useOnboarding() {
       setError(null);
       router.replace("/(tabs)/home");
     },
-    onError: (err) => {
+    onError: (err: { message?: string }) => {
       setError(err.message || "Error al crear perfil de profesional");
     },
   });

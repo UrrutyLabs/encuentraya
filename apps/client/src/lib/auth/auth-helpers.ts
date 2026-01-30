@@ -23,7 +23,7 @@ export function hasRoleAccess(
  * Determines the redirect destination based on role mismatch
  * Handles cases where:
  * - PRO user tries to access CLIENT route -> redirect to /pro/download-app
- * - CLIENT user tries to access PRO route -> redirect to /my-bookings
+ * - CLIENT user tries to access PRO route -> redirect to /my-jobs
  * - No role requirement -> use default redirect
  *
  * @param userRole - The user's current role (or null/undefined)
@@ -48,9 +48,9 @@ export function getRedirectDestination(
       return "/pro/download-app";
     }
 
-    // CLIENT user trying to access PRO route -> redirect to my-bookings
+    // CLIENT user trying to access PRO route -> redirect to my-jobs
     if (requiredRole === Role.PRO && userRole === Role.CLIENT) {
-      return "/my-bookings";
+      return "/my-jobs";
     }
   }
 

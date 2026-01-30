@@ -34,17 +34,25 @@ export function EditProfileScreen() {
     retry: false,
   });
 
+  // Fetch categories from API
+  const { data: categories = [], isLoading: isLoadingCategories } =
+    trpc.category.getAll.useQuery();
+
   // Initialize form values when profile loads
   useEffect(() => {
-    if (pro) {
+    if (pro && categories.length > 0) {
       setName(pro.name || "");
       setPhone(pro.phone || "");
       setHourlyRate(pro.hourlyRate?.toString() || "");
-      setSelectedCategories((pro.categories as Category[]) || []);
+      // Map categoryIds to Category objects
+      const selected = categories.filter((cat: Category) =>
+        pro.categoryIds?.includes(cat.id)
+      );
+      setSelectedCategories(selected);
       setServiceArea(pro.serviceArea || "");
       setBio(pro.bio || "");
     }
-  }, [pro]);
+  }, [pro, categories]);
 
   // Update mutation
   const updateMutation = trpc.pro.updateProfile.useMutation({
@@ -62,7 +70,7 @@ export function EditProfileScreen() {
         },
       ]);
     },
-    onError: (error) => {
+    onError: (error: { message?: string }) => {
       Alert.alert(
         "Error",
         error.message ||
@@ -109,7 +117,7 @@ export function EditProfileScreen() {
       name: name.trim(),
       phone: phone.trim() || undefined,
       hourlyRate: parseFloat(hourlyRate),
-      categories: selectedCategories,
+      categoryIds: selectedCategories.map((c) => c.id),
       serviceArea: serviceArea.trim() || undefined,
       bio: bio.trim() || undefined,
     });
@@ -206,7 +214,9 @@ export function EditProfileScreen() {
         />
 
         <CategorySelector
+          categories={categories}
           selected={selectedCategories}
+          isLoading={isLoadingCategories}
           onSelectionChange={setSelectedCategories}
         />
 

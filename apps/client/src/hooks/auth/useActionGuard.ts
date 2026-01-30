@@ -51,10 +51,10 @@ export interface UseActionGuardOptions {
  *
  *   const handleClick = requireAuth(() => {
  *     // This only executes if user is authenticated and has CLIENT role
- *     createBooking();
+ *     createOrder();
  *   });
  *
- *   return <Button onClick={handleClick}>Crear reserva</Button>;
+ *   return <Button onClick={handleClick}>Crear trabajo</Button>;
  * }
  * ```
  */

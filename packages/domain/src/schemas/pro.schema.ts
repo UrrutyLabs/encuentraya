@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { categorySchema } from "../enums";
 
 /**
  * Availability slot schema
@@ -24,14 +23,19 @@ export const proSchema = z.object({
   email: z.string().email(),
   phone: z.string().optional(),
   bio: z.string().optional(),
+  avatarUrl: z.string().url().optional(),
   hourlyRate: z.number().positive(),
-  categories: z.array(categorySchema),
+  categoryIds: z.array(z.string()), // FK array to Category table
   serviceArea: z.string().optional(),
   rating: z.number().min(0).max(5).optional(),
   reviewCount: z.number().int().min(0).default(0),
   isApproved: z.boolean().default(false),
   isSuspended: z.boolean().default(false),
   isAvailable: z.boolean().default(false),
+  profileCompleted: z.boolean().default(false),
+  completedJobsCount: z.number().int().min(0).default(0),
+  isTopPro: z.boolean().default(false),
+  responseTimeMinutes: z.number().int().positive().optional(),
   availabilitySlots: z.array(availabilitySlotSchema).optional(),
   createdAt: z.date(),
   updatedAt: z.date(),
@@ -58,9 +62,10 @@ export const proOnboardInputSchema = z.object({
   email: z.string().email(),
   phone: z.string().optional(),
   hourlyRate: z.number().positive(),
-  categories: z.array(categorySchema).min(1),
+  categoryIds: z.array(z.string()).min(1), // FK array to Category table
   serviceArea: z.string().optional(),
   bio: z.string().optional(),
+  avatarUrl: z.string().url().optional(),
 });
 
 export type ProOnboardInput = z.infer<typeof proOnboardInputSchema>;

@@ -1,7 +1,7 @@
 import { injectable, inject } from "tsyringe";
 import type { PaymentRepository } from "./payment.repo";
 import type { PaymentEventRepository } from "./paymentEvent.repo";
-import type { BookingRepository } from "@modules/booking/booking.repo";
+import type { OrderRepository } from "@modules/order/order.repo";
 import type { ProRepository } from "@modules/pro/pro.repo";
 import type { PaymentProviderClient } from "./provider";
 import type { Actor } from "@infra/auth/roles";
@@ -9,10 +9,10 @@ import {
   PaymentProvider,
   PaymentType,
   PaymentStatus,
-  BookingStatus,
+  OrderStatus,
   Role,
 } from "@repo/domain";
-import { BookingNotFoundError } from "@modules/booking/booking.errors";
+import { OrderNotFoundError } from "@modules/order/order.errors";
 import { TOKENS } from "@/server/container/tokens";
 import { getPaymentProviderClient } from "./registry";
 import type { EarningService } from "@modules/payout/earning.service";
@@ -32,8 +32,8 @@ export class PaymentService {
     private readonly paymentRepository: PaymentRepository,
     @inject(TOKENS.PaymentEventRepository)
     private readonly paymentEventRepository: PaymentEventRepository,
-    @inject(TOKENS.BookingRepository)
-    private readonly bookingRepository: BookingRepository,
+    @inject(TOKENS.OrderRepository)
+    private readonly orderRepository: OrderRepository,
     @inject(TOKENS.ProRepository)
     private readonly proRepository: ProRepository,
     @inject(TOKENS.EarningService)
@@ -50,44 +50,44 @@ export class PaymentService {
   }
 
   /**
-   * Create a preauthorization for a booking
+   * Create a preauthorization for an order
    * Business rules:
-   * - Actor must be logged in and must be the booking client
-   * - Booking must be in PENDING_PAYMENT
+   * - Actor must be logged in and must be the order client
+   * - Order must be in ACCEPTED status (pro has accepted, client needs to authorize payment)
    * - Create a Payment row with status CREATED + idempotencyKey
    * - Call provider client createPreauth -> store providerReference + checkoutUrl, update status REQUIRES_ACTION
    * - Return checkoutUrl
    */
-  async createPreauthForBooking(
+  async createPreauthForOrder(
     actor: Actor,
-    input: { bookingId: string }
+    input: { orderId: string }
   ): Promise<{ paymentId: string; checkoutUrl: string | null }> {
     // Authorization: Only clients can create payments
     if (actor.role !== Role.CLIENT) {
       throw new Error("Only clients can create payments");
     }
 
-    // Get booking
-    const booking = await this.bookingRepository.findById(input.bookingId);
-    if (!booking) {
-      throw new BookingNotFoundError(input.bookingId);
+    // Get order
+    const order = await this.orderRepository.findById(input.orderId);
+    if (!order) {
+      throw new OrderNotFoundError(input.orderId);
     }
 
-    // Verify booking belongs to client
-    if (booking.clientUserId !== actor.id) {
-      throw new Error("Booking does not belong to this client");
+    // Verify order belongs to client
+    if (order.clientUserId !== actor.id) {
+      throw new Error("Order does not belong to this client");
     }
 
-    // Verify booking is in PENDING_PAYMENT status
-    if (booking.status !== BookingStatus.PENDING_PAYMENT) {
+    // Verify order is in ACCEPTED status (pro has accepted, ready for payment authorization)
+    if (order.status !== OrderStatus.ACCEPTED) {
       throw new Error(
-        `Booking must be in PENDING_PAYMENT status, current status: ${booking.status}`
+        `Order must be in ACCEPTED status, current status: ${order.status}`
       );
     }
 
     // Check if payment already exists
-    const existingPayment = await this.paymentRepository.findByBookingId(
-      input.bookingId
+    const existingPayment = await this.paymentRepository.findByOrderId(
+      input.orderId
     );
     if (existingPayment) {
       // Return existing payment if it's still in a valid state
@@ -100,47 +100,45 @@ export class PaymentService {
           checkoutUrl: existingPayment.checkoutUrl,
         };
       }
-      throw new Error("Payment already exists for this booking");
+      throw new Error("Payment already exists for this order");
     }
 
-    // Calculate amount (in minor units, e.g., cents)
-    // TODO: Get actual hourly rate from pro profile and calculate total
-    // For now, calculate from booking hoursEstimate and pro hourlyRate
-    let hourlyRate = 0;
-    if (booking.proProfileId) {
-      const pro = await this.proRepository.findById(booking.proProfileId);
-      if (pro) {
-        hourlyRate = pro.hourlyRate;
-      }
+    // Calculate amount from order (use totalAmount if finalized, otherwise estimate)
+    // For orders, we use the totalAmount if finalized, otherwise estimate from hourly rate
+    let amountEstimated: number;
+    if (order.totalAmount !== null) {
+      // Order is finalized, use total amount
+      amountEstimated = Math.round(order.totalAmount * 100); // Convert to minor units
+    } else {
+      // Order not finalized yet, estimate from hourly rate snapshot
+      const totalAmount = order.hourlyRateSnapshotAmount * order.estimatedHours;
+      amountEstimated = Math.round(totalAmount * 100); // Convert to minor units
     }
-    const totalAmount = hourlyRate * booking.hoursEstimate;
-    const amountEstimated = Math.round(totalAmount * 100); // Convert to minor units
 
     // Generate idempotency key
-    const idempotencyKey = `${input.bookingId}-${Date.now()}`;
+    const idempotencyKey = `${input.orderId}-${Date.now()}`;
 
     // Create payment record with CREATED status
     const payment = await this.paymentRepository.create({
       provider: this.provider,
       type: PaymentType.PREAUTH,
-      bookingId: input.bookingId,
+      orderId: input.orderId,
       clientUserId: actor.id,
-      proProfileId: booking.proProfileId,
-      currency: "UYU", // TODO: Make configurable
+      proProfileId: order.proProfileId,
+      currency: order.currency,
       amountEstimated,
       idempotencyKey,
     });
 
     try {
       // Call provider to create preauth
-      // TODO: Implement provider-specific logic in PaymentProviderClient implementation
       const preauthResult = await this.providerClient.createPreauth({
-        bookingId: input.bookingId,
+        orderId: input.orderId,
         clientUserId: actor.id,
-        proProfileId: booking.proProfileId,
+        proProfileId: order.proProfileId,
         amount: {
           amount: amountEstimated,
-          currency: "UYU",
+          currency: order.currency,
         },
         idempotencyKey,
       });
@@ -170,16 +168,16 @@ export class PaymentService {
    * Business rules:
    * - Persist PaymentEvent(raw) - provides idempotency via event storage
    * - Map provider status to PaymentStatus using safe transitions
-   * - If payment becomes AUTHORIZED -> set booking status from PENDING_PAYMENT -> PENDING
-   * - If payment fails/cancelled -> keep booking in PENDING_PAYMENT (client can retry)
+   * - If payment becomes AUTHORIZED -> set order status from ACCEPTED -> CONFIRMED
+   * - If payment fails/cancelled -> keep order in ACCEPTED (client can retry)
    *
    * Idempotency: Events are stored in PaymentEvent table. If the same event arrives twice,
    * it's safe to process again as status transitions are validated.
    *
-   * Booking Status Behavior:
-   * - Payment AUTHORIZED: Booking PENDING_PAYMENT -> PENDING (ready for pro acceptance)
-   * - Payment FAILED/CANCELLED: Booking stays in PENDING_PAYMENT (client can retry or cancel)
-   * - Payment REFUNDED: Booking status unchanged (already completed/cancelled)
+   * Order Status Behavior:
+   * - Payment AUTHORIZED: Order ACCEPTED -> CONFIRMED (ready for pro to start work)
+   * - Payment FAILED/CANCELLED: Order stays in ACCEPTED (client can retry or cancel)
+   * - Payment REFUNDED: Order status unchanged (already completed/cancelled)
    */
   async handleProviderWebhook(event: {
     provider: PaymentProvider;
@@ -236,43 +234,27 @@ export class PaymentService {
         amountCaptured: providerStatus.capturedAmount ?? payment.amountCaptured,
       });
 
-      // Handle booking status updates based on payment status
-      const booking = await this.bookingRepository.findById(payment.bookingId);
-      if (!booking) {
-        return;
-      }
-
-      if (newStatus === PaymentStatus.AUTHORIZED) {
-        // Payment authorized -> booking can proceed to PENDING (awaiting pro acceptance)
-        if (booking.status === BookingStatus.PENDING_PAYMENT) {
-          await this.bookingRepository.updateStatus(
-            payment.bookingId,
-            BookingStatus.PENDING
-          );
-        }
-      } else if (newStatus === PaymentStatus.CAPTURED) {
-        // Payment captured -> create earning if booking is completed
-        if (booking.status === BookingStatus.COMPLETED) {
-          try {
-            await this.earningService.createEarningForCompletedBooking(
-              { role: "SYSTEM" },
-              payment.bookingId
-            );
-          } catch (error) {
-            // Log but don't fail webhook processing if earning creation fails
-            console.error(
-              `Failed to create earning for booking ${payment.bookingId} after payment capture:`,
-              error
-            );
+      // Handle order status updates based on payment status (if payment has orderId)
+      if (payment.orderId) {
+        const order = await this.orderRepository.findById(payment.orderId);
+        if (order) {
+          if (newStatus === PaymentStatus.AUTHORIZED) {
+            // Payment authorized -> order can proceed to CONFIRMED (ready for pro to start)
+            if (order.status === OrderStatus.ACCEPTED) {
+              await this.orderRepository.updateStatus(
+                payment.orderId,
+                OrderStatus.CONFIRMED
+              );
+            }
+          } else if (
+            newStatus === PaymentStatus.FAILED ||
+            newStatus === PaymentStatus.CANCELLED
+          ) {
+            // Payment failed/cancelled -> keep order in ACCEPTED
+            // Client can retry payment or cancel the order
+            // Note: We don't automatically cancel the order - let the client decide
           }
         }
-      } else if (
-        newStatus === PaymentStatus.FAILED ||
-        newStatus === PaymentStatus.CANCELLED
-      ) {
-        // Payment failed/cancelled -> keep booking in PENDING_PAYMENT
-        // Client can retry payment or cancel the booking
-        // Note: We don't automatically cancel the booking - let the client decide
       }
     } else {
       // Status unchanged, but amounts might have changed (e.g., partial capture)
@@ -347,7 +329,7 @@ export class PaymentService {
    * Capture an authorized payment (charge the funds)
    * Business rules:
    * - Payment must be in AUTHORIZED status
-   * - Booking should be COMPLETED (but we allow capture even if not completed for flexibility)
+   * - Order should be COMPLETED (but we allow capture even if not completed for flexibility)
    * - If amount is not provided, captures the full authorized amount
    * - Updates payment status to CAPTURED
    * - Updates amountCaptured field
@@ -393,7 +375,7 @@ export class PaymentService {
 
       return { capturedAmount: captureResult.capturedAmount };
     } catch (error) {
-      // Log error but don't throw - we want booking completion to succeed even if capture fails
+      // Log error but don't throw - we want order finalization to succeed even if capture fails
       // The payment can be captured manually later via syncStatus or admin endpoint
       console.error(`Failed to capture payment ${paymentId}:`, error);
       throw error;
@@ -433,16 +415,16 @@ export class PaymentService {
         amountCaptured: providerStatus.capturedAmount ?? payment.amountCaptured,
       });
 
-      // Update booking status if payment becomes AUTHORIZED
+      // Update order status if payment becomes AUTHORIZED (if payment has orderId)
       if (providerStatus.status === PaymentStatus.AUTHORIZED) {
-        const booking = await this.bookingRepository.findById(
-          payment.bookingId
-        );
-        if (booking && booking.status === BookingStatus.PENDING_PAYMENT) {
-          await this.bookingRepository.updateStatus(
-            payment.bookingId,
-            BookingStatus.PENDING
-          );
+        if (payment.orderId) {
+          const order = await this.orderRepository.findById(payment.orderId);
+          if (order && order.status === OrderStatus.ACCEPTED) {
+            await this.orderRepository.updateStatus(
+              payment.orderId,
+              OrderStatus.CONFIRMED
+            );
+          }
         }
       }
 
@@ -456,7 +438,7 @@ export class PaymentService {
         metadata: {
           previousStatus,
           newStatus: providerStatus.status,
-          bookingId: payment.bookingId,
+          orderId: payment.orderId,
           provider: payment.provider,
           providerReference: payment.providerReference,
         },
@@ -470,18 +452,18 @@ export class PaymentService {
 
   /**
    * Admin: List all payments with filters
-   * Returns payments with booking info
+   * Returns payments with order info
    */
   async adminListPayments(filters?: {
     status?: PaymentStatus;
-    query?: string; // Search by bookingId or providerReference
+    query?: string; // Search by orderId or providerReference
     limit?: number;
     cursor?: string;
   }): Promise<
     Array<{
       id: string;
       status: PaymentStatus;
-      bookingId: string;
+      orderId: string;
       provider: PaymentProvider;
       amountEstimated: number;
       amountAuthorized: number | null;
@@ -495,7 +477,7 @@ export class PaymentService {
     return payments.map((p) => ({
       id: p.id,
       status: p.status,
-      bookingId: p.bookingId,
+      orderId: p.orderId,
       provider: p.provider,
       amountEstimated: p.amountEstimated,
       amountAuthorized: p.amountAuthorized,
@@ -511,7 +493,7 @@ export class PaymentService {
   async adminGetPaymentById(paymentId: string): Promise<{
     id: string;
     status: PaymentStatus;
-    bookingId: string;
+    orderId: string;
     provider: PaymentProvider;
     providerReference: string | null;
     amountEstimated: number;
@@ -537,7 +519,7 @@ export class PaymentService {
     return {
       id: payment.id,
       status: payment.status,
-      bookingId: payment.bookingId,
+      orderId: payment.orderId,
       provider: payment.provider,
       providerReference: payment.providerReference,
       amountEstimated: payment.amountEstimated,

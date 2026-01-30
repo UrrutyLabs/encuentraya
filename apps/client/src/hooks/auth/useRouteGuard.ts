@@ -60,13 +60,13 @@ export interface UseRouteGuardReturn {
  * @example
  * ```tsx
  * // Protect route, require CLIENT role
- * function MyBookingsPage() {
+ * function MyJobsPage() {
  *   const { isAuthenticated, isLoading } = useRouteGuard({ requiredRole: Role.CLIENT });
  *
  *   if (isLoading) return <Loading />;
  *   if (!isAuthenticated) return null; // Redirect handled by hook
  *
- *   return <MyBookingsContent />;
+ *   return <MyJobsContent />;
  * }
  * ```
  */

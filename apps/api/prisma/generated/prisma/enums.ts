@@ -18,20 +18,6 @@ export const Role = {
 export type Role = (typeof Role)[keyof typeof Role]
 
 
-export const BookingStatus = {
-  pending_payment: 'pending_payment',
-  pending: 'pending',
-  accepted: 'accepted',
-  on_my_way: 'on_my_way',
-  arrived: 'arrived',
-  rejected: 'rejected',
-  completed: 'completed',
-  cancelled: 'cancelled'
-} as const
-
-export type BookingStatus = (typeof BookingStatus)[keyof typeof BookingStatus]
-
-
 export const PaymentProvider = {
   MERCADO_PAGO: 'MERCADO_PAGO'
 } as const
@@ -66,17 +52,6 @@ export const ProStatus = {
 } as const
 
 export type ProStatus = (typeof ProStatus)[keyof typeof ProStatus]
-
-
-export const Category = {
-  plumbing: 'plumbing',
-  electrical: 'electrical',
-  cleaning: 'cleaning',
-  handyman: 'handyman',
-  painting: 'painting'
-} as const
-
-export type Category = (typeof Category)[keyof typeof Category]
 
 
 export const PreferredContactMethod = {
@@ -161,7 +136,7 @@ export const AuditEventType = {
   PRO_SUSPENDED: 'PRO_SUSPENDED',
   PRO_UNSUSPENDED: 'PRO_UNSUSPENDED',
   PRO_APPROVED: 'PRO_APPROVED',
-  BOOKING_STATUS_FORCED: 'BOOKING_STATUS_FORCED',
+  ORDER_STATUS_FORCED: 'ORDER_STATUS_FORCED',
   PAYMENT_SYNCED: 'PAYMENT_SYNCED',
   PAYOUT_CREATED: 'PAYOUT_CREATED',
   PAYOUT_SENT: 'PAYOUT_SENT',
@@ -169,3 +144,67 @@ export const AuditEventType = {
 } as const
 
 export type AuditEventType = (typeof AuditEventType)[keyof typeof AuditEventType]
+
+
+export const OrderStatus = {
+  draft: 'draft',
+  pending_pro_confirmation: 'pending_pro_confirmation',
+  accepted: 'accepted',
+  confirmed: 'confirmed',
+  in_progress: 'in_progress',
+  awaiting_client_approval: 'awaiting_client_approval',
+  disputed: 'disputed',
+  completed: 'completed',
+  paid: 'paid',
+  canceled: 'canceled'
+} as const
+
+export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus]
+
+
+export const OrderLineItemType = {
+  labor: 'labor',
+  platform_fee: 'platform_fee',
+  tax: 'tax',
+  tip: 'tip',
+  discount: 'discount',
+  adjustment: 'adjustment',
+  cancellation_fee: 'cancellation_fee'
+} as const
+
+export type OrderLineItemType = (typeof OrderLineItemType)[keyof typeof OrderLineItemType]
+
+
+export const TaxBehavior = {
+  taxable: 'taxable',
+  non_taxable: 'non_taxable',
+  tax_included: 'tax_included'
+} as const
+
+export type TaxBehavior = (typeof TaxBehavior)[keyof typeof TaxBehavior]
+
+
+export const PricingMode = {
+  hourly: 'hourly'
+} as const
+
+export type PricingMode = (typeof PricingMode)[keyof typeof PricingMode]
+
+
+export const ApprovalMethod = {
+  client_accepted: 'client_accepted',
+  auto_accepted: 'auto_accepted',
+  admin_adjusted: 'admin_adjusted'
+} as const
+
+export type ApprovalMethod = (typeof ApprovalMethod)[keyof typeof ApprovalMethod]
+
+
+export const DisputeStatus = {
+  none: 'none',
+  open: 'open',
+  resolved: 'resolved',
+  canceled: 'canceled'
+} as const
+
+export type DisputeStatus = (typeof DisputeStatus)[keyof typeof DisputeStatus]

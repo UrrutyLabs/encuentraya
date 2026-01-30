@@ -1,155 +1,108 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
-import { Filter, Calendar, Clock } from "lucide-react";
-import { Text } from "@repo/ui";
-import { Card } from "@repo/ui";
-import { Input } from "@repo/ui";
+import { useState, useCallback, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Navigation } from "@/components/presentational/Navigation";
-import { ProCard } from "@/components/presentational/ProCard";
-import { EmptyState } from "@/components/presentational/EmptyState";
-import { SearchSkeleton } from "@/components/presentational/SearchSkeleton";
-import { useSearchPros } from "@/hooks/pro";
-import { useTodayDate } from "@/hooks/shared";
-import { useAvailableTimeWindows } from "@/hooks/search";
-import { Category, type Pro, type TimeWindow } from "@repo/domain";
+import { Container } from "@/components/presentational/Container";
+import { SearchHero } from "@/components/search/SearchHero";
+import { CategoryCarousel } from "@/components/search/CategoryCarousel";
+import { SubcategoryGrid } from "@/components/search/SubcategoryGrid";
+import type { Category, Subcategory } from "@repo/domain";
+import { useCategories } from "@/hooks/category";
+import { useMediaQuery } from "@/hooks/shared/useMediaQuery";
 
-const CATEGORY_OPTIONS: { value: Category | ""; label: string }[] = [
-  { value: "", label: "Todas las categorías" },
-  { value: Category.PLUMBING, label: "Plomería" },
-  { value: Category.ELECTRICAL, label: "Electricidad" },
-  { value: Category.CLEANING, label: "Limpieza" },
-  { value: Category.HANDYMAN, label: "Arreglos generales" },
-  { value: Category.PAINTING, label: "Pintura" },
-];
-
+/**
+ * SearchScreen Component
+ *
+ * Main search page that displays:
+ * - Centered search bar
+ * - Horizontal category carousel
+ * - Subcategory grid (shown when category is selected)
+ *
+ * Handles navigation to search results page when:
+ * - User submits search query
+ * - User clicks on a subcategory
+ *
+ * @example
+ * ```tsx
+ * <SearchScreen />
+ * ```
+ */
 export function SearchScreen() {
-  const [category, setCategory] = useState<Category | "">("");
-  const [date, setDate] = useState("");
-  const [timeWindow, setTimeWindow] = useState<TimeWindow | "">("");
+  const router = useRouter();
+  const { categories } = useCategories();
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(
+    null
+  );
+  const isMobile = useMediaQuery("(max-width: 767px)");
 
-  // Get today's date in YYYY-MM-DD format for min date attribute
-  const today = useTodayDate();
+  // Set default selected category to first category when categories load
+  useEffect(() => {
+    if (categories.length > 0 && !selectedCategory) {
+      // Defer setState to avoid synchronous state updates in effect
+      setTimeout(() => {
+        setSelectedCategory(categories[0]);
+      }, 0);
+    }
+  }, [categories, selectedCategory]);
 
-  // Filter available time windows based on selected date
-  const { availableTimeWindows, handleDateChange: handleTimeWindowDateChange } =
-    useAvailableTimeWindows(date, today, timeWindow, setTimeWindow);
-
-  // Handle date change with time window validation
-  const handleDateChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setDate(e.target.value);
-      handleTimeWindowDateChange(e);
+  const handleCategoryClick = useCallback(
+    (category: Category) => {
+      setSelectedCategory(category);
+      // Scroll to subcategories if on mobile (only on client)
+      if (isMobile && typeof document !== "undefined") {
+        setTimeout(() => {
+          const element = document.getElementById("subcategories");
+          if (element) {
+            element.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
+        }, 100);
+      }
     },
-    [handleTimeWindowDateChange]
+    [isMobile]
   );
 
-  // Memoize filters to prevent unnecessary re-renders
-  const filters = useMemo(
-    () => ({
-      category: category || undefined,
-      date: date || undefined,
-      timeWindow: (timeWindow || undefined) as TimeWindow | undefined,
-    }),
-    [category, date, timeWindow]
-  );
-
-  const { pros, isLoading } = useSearchPros(filters);
-
-  // Memoize event handlers
-  const handleCategoryChange = useCallback(
-    (e: React.ChangeEvent<HTMLSelectElement>) => {
-      setCategory(e.target.value as Category | "");
+  const handleSubcategoryClick = useCallback(
+    (subcategory: Subcategory) => {
+      // Navigate to results page with category slug and subcategory slug
+      const params = new URLSearchParams();
+      if (selectedCategory) {
+        params.set("category", selectedCategory.slug);
+      }
+      params.set("subcategory", subcategory.slug);
+      router.push(`/search/results?${params.toString()}`);
     },
-    []
-  );
-
-  const handleTimeWindowChange = useCallback(
-    (e: React.ChangeEvent<HTMLSelectElement>) => {
-      setTimeWindow(e.target.value as TimeWindow | "");
-    },
-    []
+    [router, selectedCategory]
   );
 
   return (
     <div className="min-h-screen bg-bg">
       <Navigation showLogin={true} showProfile={true} />
-      <div className="px-4 py-8">
-        <div className="max-w-6xl mx-auto">
-          <Text variant="h1" className="mb-6 text-primary">
-            Buscar profesionales
-          </Text>
+      <div className="px-4 py-6 md:py-12">
+        <Container maxWidth="4xl">
+          {/* Search Hero - Centered */}
+          <div className="flex justify-center mb-8 md:mb-12">
+            <SearchHero />
+          </div>
 
-          {/* Filters */}
-          <Card className="p-6 mb-6">
-            <div className="space-y-4">
-              {/* Category Filter */}
-              <div>
-                <label className="flex items-center gap-2 text-sm font-medium text-text mb-2">
-                  <Filter className="w-4 h-4 text-primary" />
-                  Categoría de servicio
-                </label>
-                <select
-                  value={category}
-                  onChange={handleCategoryChange}
-                  className="w-full px-3 py-2 border border-border rounded-md bg-surface text-text focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                >
-                  {CATEGORY_OPTIONS.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
+          {/* Category Carousel - Centered horizontal list */}
+          <div className="mb-8 md:mb-12">
+            <CategoryCarousel
+              selectedCategory={selectedCategory}
+              onCategoryClick={handleCategoryClick}
+            />
+          </div>
 
-              {/* Date and Time Filters */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="flex items-center gap-2 text-sm font-medium text-text mb-2">
-                    <Calendar className="w-4 h-4 text-primary" />
-                    Fecha
-                  </label>
-                  <Input
-                    type="date"
-                    value={date}
-                    onChange={handleDateChange}
-                    min={today}
-                  />
-                </div>
-                <div>
-                  <label className="flex items-center gap-2 text-sm font-medium text-text mb-2">
-                    <Clock className="w-4 h-4 text-primary" />
-                    Horario
-                  </label>
-                  <select
-                    value={timeWindow}
-                    onChange={handleTimeWindowChange}
-                    className="w-full px-3 py-2 border border-border rounded-md bg-surface text-text focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                  >
-                    {availableTimeWindows.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-            </div>
-          </Card>
-
-          {/* Results */}
-          {isLoading ? (
-            <SearchSkeleton />
-          ) : pros.length === 0 ? (
-            <EmptyState />
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {pros.map((pro: Pro) => (
-                <ProCard key={pro.id} pro={pro} />
-              ))}
+          {/* Subcategory Grid - Shows when category is selected */}
+          {selectedCategory && (
+            <div id="subcategories" className="mt-8 md:mt-12">
+              <SubcategoryGrid
+                category={selectedCategory}
+                onSubcategoryClick={handleSubcategoryClick}
+              />
             </div>
           )}
-        </div>
+        </Container>
       </div>
     </div>
   );

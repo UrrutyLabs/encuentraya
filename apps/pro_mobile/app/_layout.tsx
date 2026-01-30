@@ -69,9 +69,9 @@ export default function RootLayout() {
           />
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen
-            name="booking/[bookingId]"
+            name="job/[jobId]"
             options={{
-              title: "Detalle de reserva",
+              title: "Detalles del Trabajo",
               headerBackTitle: "Atrás",
             }}
           />

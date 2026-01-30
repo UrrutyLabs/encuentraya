@@ -2,7 +2,7 @@ import { injectable, inject } from "tsyringe";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import type { UserRepository } from "@modules/user/user.repo";
 import type { ClientProfileService } from "@modules/user/clientProfile.service";
-import type { BookingRepository } from "@modules/booking/booking.repo";
+import type { OrderRepository } from "@modules/order/order.repo";
 import type { PaymentRepository } from "@modules/payment/payment.repo";
 import { Role } from "@repo/domain";
 import type { ClientSignupInput, ProSignupInput } from "@repo/domain";
@@ -21,8 +21,8 @@ export class AuthService {
     private readonly userRepository: UserRepository,
     @inject(TOKENS.ClientProfileService)
     private readonly clientProfileService: ClientProfileService,
-    @inject(TOKENS.BookingRepository)
-    private readonly bookingRepository: BookingRepository,
+    @inject(TOKENS.OrderRepository)
+    private readonly orderRepository: OrderRepository,
     @inject(TOKENS.PaymentRepository)
     private readonly paymentRepository: PaymentRepository
   ) {}
@@ -384,11 +384,11 @@ export class AuthService {
   /**
    * Delete user account (Hybrid Approach: Soft Delete + Anonymization)
    *
-   * 1. Prevents deletion if there are active bookings or pending payments
+   * 1. Prevents deletion if there are active orders or pending payments
    * 2. Anonymizes ClientProfile (removes PII for GDPR compliance)
    * 3. Soft deletes User (sets deletedAt timestamp)
    * 4. Deletes Supabase auth user
-   * 5. Keeps all financial records intact (bookings, payments, reviews, earnings)
+   * 5. Keeps all financial records intact (orders, payments, reviews, earnings)
    */
   async deleteAccount(userId: string, password: string): Promise<void> {
     const supabaseAdmin = this.getSupabaseAdmin();
@@ -432,12 +432,12 @@ export class AuthService {
     // If anon key is not available, skip password verification
     // This is less secure but allows the feature to work in development
 
-    // 3. Check for active bookings (prevent deletion if active)
-    const activeBookings =
-      await this.bookingRepository.findActiveByClientUserId(userId);
-    if (activeBookings.length > 0) {
+    // 3. Check for active orders (prevent deletion if active)
+    const activeOrders =
+      await this.orderRepository.findActiveByClientUserId(userId);
+    if (activeOrders.length > 0) {
       throw new Error(
-        `Cannot delete account: ${activeBookings.length} active booking(s) exist. Please complete or cancel all active bookings first.`
+        `Cannot delete account: ${activeOrders.length} active order(s) exist. Please complete or cancel all active orders first.`
       );
     }
 
@@ -455,7 +455,7 @@ export class AuthService {
     await this.clientProfileService.anonymizeProfile(userId);
 
     // 6. Soft delete User (set deletedAt timestamp)
-    // This preserves the User record and all related data (bookings, payments, reviews, earnings)
+    // This preserves the User record and all related data (orders, payments, reviews, earnings)
     await this.userRepository.softDelete(userId);
 
     // 7. Delete Supabase auth user
@@ -467,7 +467,7 @@ export class AuthService {
       throw new Error(deleteError.message || "Failed to delete account");
     }
 
-    // Note: All financial records (bookings, payments, reviews, earnings) are preserved
+    // Note: All financial records (orders, payments, reviews, earnings) are preserved
     // User is soft-deleted (deletedAt set) and ClientProfile is anonymized (PII removed)
     // This maintains financial integrity and audit trails while complying with GDPR
   }

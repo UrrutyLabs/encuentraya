@@ -41,6 +41,9 @@ export interface ProPayoutProfileRepository {
   findByProProfileId(
     proProfileId: string
   ): Promise<ProPayoutProfileEntity | null>;
+  findByProProfileIds(
+    proProfileIds: string[]
+  ): Promise<Map<string, ProPayoutProfileEntity | null>>;
   upsertForProProfile(
     proProfileId: string,
     patch: ProPayoutProfileUpdateInput
@@ -63,6 +66,37 @@ export class ProPayoutProfileRepositoryImpl implements ProPayoutProfileRepositor
     });
 
     return profile ? this.mapPrismaToDomain(profile) : null;
+  }
+
+  async findByProProfileIds(
+    proProfileIds: string[]
+  ): Promise<Map<string, ProPayoutProfileEntity | null>> {
+    if (proProfileIds.length === 0) {
+      return new Map();
+    }
+
+    const profiles = await prisma.proPayoutProfile.findMany({
+      where: {
+        proProfileId: {
+          in: proProfileIds,
+        },
+      },
+    });
+
+    // Create a map with all proProfileIds, setting null for missing ones
+    const profileMap = new Map<string, ProPayoutProfileEntity | null>();
+
+    // Initialize all IDs with null
+    for (const id of proProfileIds) {
+      profileMap.set(id, null);
+    }
+
+    // Set found profiles
+    for (const profile of profiles) {
+      profileMap.set(profile.proProfileId, this.mapPrismaToDomain(profile));
+    }
+
+    return profileMap;
   }
 
   async upsertForProProfile(

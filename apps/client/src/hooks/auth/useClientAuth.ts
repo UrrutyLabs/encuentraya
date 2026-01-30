@@ -27,8 +27,8 @@ export function useClientAuth() {
       if (role === Role.PRO) {
         router.replace("/pro/download-app");
       } else {
-        // CLIENT or no role yet -> redirect to search
-        router.replace("/my-bookings");
+        // CLIENT or no role yet -> redirect to my-jobs
+        router.replace("/my-jobs");
       }
     }
   }, [user, authLoading, role, isLoadingRole, router]);

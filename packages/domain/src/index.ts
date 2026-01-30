@@ -1,28 +1,28 @@
 // Enums and enum schemas
 export {
   Role,
-  BookingStatus,
-  Category,
   PaymentProvider,
   PaymentType,
   PaymentStatus,
+  OrderStatus,
+  OrderLineItemType,
+  TaxBehavior,
+  PricingMode,
+  ApprovalMethod,
+  DisputeStatus,
   roleSchema,
-  bookingStatusSchema,
-  categorySchema,
   paymentProviderSchema,
   paymentTypeSchema,
   paymentStatusSchema,
+  orderStatusSchema,
+  orderLineItemTypeSchema,
+  taxBehaviorSchema,
+  pricingModeSchema,
+  approvalMethodSchema,
+  disputeStatusSchema,
 } from "./enums";
 
-// Booking schemas
-export {
-  bookingSchema,
-  bookingCreateInputSchema,
-  bookingCreateOutputSchema,
-  type Booking,
-  type BookingCreateInput,
-  type BookingCreateOutput,
-} from "./schemas/booking.schema";
+// Booking schemas removed - bookings have been replaced by orders
 
 // Pro schemas
 export {
@@ -82,11 +82,51 @@ export {
   type ContactFormInput,
 } from "./schemas/contact.schema";
 
+// Category schemas
+export {
+  categorySchema,
+  categoryListSchema,
+  categoryCreateInputSchema,
+  categoryUpdateInputSchema,
+  type Category,
+  type CategoryCreateInput,
+  type CategoryUpdateInput,
+} from "./schemas/category.schema";
+
+// Subcategory schemas
+export {
+  subcategorySchema,
+  subcategoryListSchema,
+  subcategoryCreateInputSchema,
+  subcategoryUpdateInputSchema,
+  type Subcategory,
+  type SubcategoryCreateInput,
+  type SubcategoryUpdateInput,
+} from "./schemas/subcategory.schema";
+
+// Order schemas
+export {
+  orderSchema,
+  orderCreateInputSchema,
+  orderUpdateInputSchema,
+  orderLineItemSchema,
+  orderLineItemCreateInputSchema,
+  categoryMetadataInputSchema,
+  orderEstimateInputSchema,
+  orderEstimateOutputSchema,
+  orderEstimateLineItemSchema,
+  type Order,
+  type OrderCreateInput,
+  type OrderUpdateInput,
+  type OrderLineItem,
+  type OrderLineItemCreateInput,
+  type CategoryMetadataInput,
+  type OrderEstimateInput,
+  type OrderEstimateOutput,
+  type OrderEstimateLineItem,
+} from "./schemas/order.schema";
+
 // Format utilities
 export { formatCurrency } from "./utils/format";
 
-// Booking status utilities
-export {
-  getBookingStatusLabel,
-  getBookingStatusVariant,
-} from "./utils/booking-status";
+// Booking status utilities removed - bookings have been replaced by orders

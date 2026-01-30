@@ -6,7 +6,7 @@ import { prisma } from "@infra/db/prisma";
  */
 export interface ReviewEntity {
   id: string;
-  bookingId: string;
+  orderId: string;
   proProfileId: string;
   clientUserId: string;
   rating: number; // 1-5
@@ -18,11 +18,18 @@ export interface ReviewEntity {
  * Review create input
  */
 export interface ReviewCreateInput {
-  bookingId: string;
+  orderId: string;
   proProfileId: string;
   clientUserId: string;
   rating: number;
   comment?: string;
+}
+
+/**
+ * Review entity with client profile data (for listForPro)
+ */
+export interface ReviewWithClientEntity extends ReviewEntity {
+  clientDisplayName?: string; // Formatted as "FirstName L."
 }
 
 /**
@@ -32,14 +39,14 @@ export interface ReviewCreateInput {
 export interface ReviewRepository {
   create(input: ReviewCreateInput): Promise<ReviewEntity>;
   findById(id: string): Promise<ReviewEntity | null>;
-  findByBookingId(bookingId: string): Promise<ReviewEntity | null>;
-  findByBookingIds(bookingIds: string[]): Promise<ReviewEntity[]>;
+  findByOrderId(orderId: string): Promise<ReviewEntity | null>;
+  findByOrderIds(orderIds: string[]): Promise<ReviewEntity[]>;
   findByProProfileId(proProfileId: string): Promise<ReviewEntity[]>;
   listForPro(
     proProfileId: string,
     limit?: number,
     cursor?: string
-  ): Promise<ReviewEntity[]>;
+  ): Promise<ReviewWithClientEntity[]>;
 }
 
 /**
@@ -50,7 +57,7 @@ export class ReviewRepositoryImpl implements ReviewRepository {
   async create(input: ReviewCreateInput): Promise<ReviewEntity> {
     const review = await prisma.review.create({
       data: {
-        bookingId: input.bookingId,
+        orderId: input.orderId,
         proProfileId: input.proProfileId,
         clientUserId: input.clientUserId,
         rating: input.rating,
@@ -69,23 +76,23 @@ export class ReviewRepositoryImpl implements ReviewRepository {
     return review ? this.mapPrismaToDomain(review) : null;
   }
 
-  async findByBookingId(bookingId: string): Promise<ReviewEntity | null> {
+  async findByOrderId(orderId: string): Promise<ReviewEntity | null> {
     const review = await prisma.review.findUnique({
-      where: { bookingId },
+      where: { orderId },
     });
 
     return review ? this.mapPrismaToDomain(review) : null;
   }
 
-  async findByBookingIds(bookingIds: string[]): Promise<ReviewEntity[]> {
-    if (bookingIds.length === 0) {
+  async findByOrderIds(orderIds: string[]): Promise<ReviewEntity[]> {
+    if (orderIds.length === 0) {
       return [];
     }
 
     const reviews = await prisma.review.findMany({
       where: {
-        bookingId: {
-          in: bookingIds,
+        orderId: {
+          in: orderIds,
         },
       },
     });
@@ -94,19 +101,10 @@ export class ReviewRepositoryImpl implements ReviewRepository {
   }
 
   async findByProProfileId(proProfileId: string): Promise<ReviewEntity[]> {
-    // Get all bookings for this pro, then get their reviews
-    const bookings = await prisma.booking.findMany({
-      where: { proProfileId },
-      select: { id: true },
-    });
-
-    const bookingIds = bookings.map((booking) => booking.id);
-
+    // Query reviews directly by proProfileId (indexed field)
     const reviews = await prisma.review.findMany({
       where: {
-        bookingId: {
-          in: bookingIds,
-        },
+        proProfileId,
       },
       orderBy: { createdAt: "desc" },
     });
@@ -118,7 +116,7 @@ export class ReviewRepositoryImpl implements ReviewRepository {
     proProfileId: string,
     limit: number = 20,
     cursor?: string
-  ): Promise<ReviewEntity[]> {
+  ): Promise<ReviewWithClientEntity[]> {
     const reviews = await prisma.review.findMany({
       where: {
         proProfileId,
@@ -128,16 +126,23 @@ export class ReviewRepositoryImpl implements ReviewRepository {
           },
         }),
       },
+      include: {
+        client: {
+          include: {
+            clientProfile: true,
+          },
+        },
+      },
       take: limit,
       orderBy: { createdAt: "desc" },
     });
 
-    return reviews.map(this.mapPrismaToDomain);
+    return reviews.map((review) => this.mapPrismaToDomainWithClient(review));
   }
 
   private mapPrismaToDomain(prismaReview: {
     id: string;
-    bookingId: string;
+    orderId: string;
     proProfileId: string;
     clientUserId: string;
     rating: number;
@@ -146,12 +151,58 @@ export class ReviewRepositoryImpl implements ReviewRepository {
   }): ReviewEntity {
     return {
       id: prismaReview.id,
-      bookingId: prismaReview.bookingId,
+      orderId: prismaReview.orderId,
       proProfileId: prismaReview.proProfileId,
       clientUserId: prismaReview.clientUserId,
       rating: prismaReview.rating,
       comment: prismaReview.comment,
       createdAt: prismaReview.createdAt,
+    };
+  }
+
+  /**
+   * Map Prisma review with client profile to domain entity with formatted display name
+   */
+  private mapPrismaToDomainWithClient(prismaReview: {
+    id: string;
+    orderId: string;
+    proProfileId: string;
+    clientUserId: string;
+    rating: number;
+    comment: string | null;
+    createdAt: Date;
+    client: {
+      clientProfile: {
+        firstName: string | null;
+        lastName: string | null;
+      } | null;
+    };
+  }): ReviewWithClientEntity {
+    const baseEntity = this.mapPrismaToDomain(prismaReview);
+
+    // Format client display name: "FirstName L." (first letter of surname)
+    let clientDisplayName: string | undefined;
+    if (prismaReview.client?.clientProfile) {
+      const profile = prismaReview.client.clientProfile;
+      const firstName = profile.firstName?.trim() || "";
+      const lastNameInitial = profile.lastName
+        ? profile.lastName.trim()[0]?.toUpperCase()
+        : "";
+
+      if (firstName && lastNameInitial) {
+        clientDisplayName = `${firstName} ${lastNameInitial}.`;
+      } else if (firstName) {
+        clientDisplayName = firstName;
+      } else {
+        clientDisplayName = "Cliente";
+      }
+    } else {
+      clientDisplayName = "Cliente";
+    }
+
+    return {
+      ...baseEntity,
+      clientDisplayName,
     };
   }
 }
