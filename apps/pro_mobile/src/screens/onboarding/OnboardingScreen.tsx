@@ -86,7 +86,7 @@ export function OnboardingScreen() {
         email: currentSession.user.email,
         phone: phone.trim() || undefined,
         hourlyRate: parseFloat(hourlyRate),
-        categories: selectedCategories,
+        categoryIds: selectedCategories.map((cat) => cat.id),
         serviceArea: serviceArea.trim() || undefined,
       });
     } catch {

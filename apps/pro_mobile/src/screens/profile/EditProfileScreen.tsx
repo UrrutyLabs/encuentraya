@@ -70,7 +70,7 @@ export function EditProfileScreen() {
         },
       ]);
     },
-    onError: (error) => {
+    onError: (error: { message?: string }) => {
       Alert.alert(
         "Error",
         error.message ||

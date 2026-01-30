@@ -83,7 +83,7 @@ export function PayoutInfoScreen() {
             "Tus datos de cobro fueron guardados correctamente."
           );
         },
-        onError: (error) => {
+        onError: (error: { message?: string }) => {
           Alert.alert(
             "Error",
             error.message ||

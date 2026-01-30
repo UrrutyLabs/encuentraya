@@ -93,7 +93,7 @@ export function useOrderActions(onSuccess?: () => void): UseOrderActionsReturn {
         onSuccess();
       }
     },
-    onError: (err) => {
+    onError: (err: { message?: string }) => {
       setError(err.message || "Error al aceptar el trabajo");
     },
   });
@@ -106,7 +106,7 @@ export function useOrderActions(onSuccess?: () => void): UseOrderActionsReturn {
         onSuccess();
       }
     },
-    onError: (err) => {
+    onError: (err: { message?: string }) => {
       setError(err.message || "Error al rechazar el trabajo");
     },
   });
@@ -119,7 +119,7 @@ export function useOrderActions(onSuccess?: () => void): UseOrderActionsReturn {
         onSuccess();
       }
     },
-    onError: (err) => {
+    onError: (err: { message?: string }) => {
       setError(err.message || "Error al marcar como en camino");
     },
   });
@@ -143,7 +143,7 @@ export function useOrderActions(onSuccess?: () => void): UseOrderActionsReturn {
         onSuccess();
       }
     },
-    onError: (err) => {
+    onError: (err: { message?: string }) => {
       setError(err.message || "Error al marcar como llegado");
     },
     onSettled: (
@@ -168,7 +168,7 @@ export function useOrderActions(onSuccess?: () => void): UseOrderActionsReturn {
         onSuccess();
       }
     },
-    onError: (err) => {
+    onError: (err: { message?: string }) => {
       setError(err.message || "Error al completar el trabajo");
     },
   });
