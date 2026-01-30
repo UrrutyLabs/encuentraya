@@ -15,6 +15,7 @@ import { PaymentProvider } from "@repo/domain";
 import { getPaymentProviderClient } from "@modules/payment/registry";
 import type { EarningService } from "@modules/payout/earning.service";
 import type { AuditService } from "@modules/audit/audit.service";
+import type { ClientProfileService } from "@modules/user/clientProfile.service";
 
 /**
  * PaymentServiceFactory type
@@ -63,6 +64,9 @@ export function registerPaymentModule(container: DependencyContainer): void {
       TOKENS.EarningService
     );
     const auditService = container.resolve<AuditService>(TOKENS.AuditService);
+    const clientProfileService = container.resolve<ClientProfileService>(
+      TOKENS.ClientProfileService
+    );
     // Manually construct PaymentService with all dependencies
     // (providerClient and provider as constructor params, repositories injected)
     return new PaymentService(
@@ -73,7 +77,8 @@ export function registerPaymentModule(container: DependencyContainer): void {
       orderRepo,
       proRepo,
       earningService,
-      auditService
+      auditService,
+      clientProfileService
     );
   };
 

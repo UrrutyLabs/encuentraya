@@ -18,6 +18,7 @@ import { getPaymentProviderClient } from "./registry";
 import type { EarningService } from "@modules/payout/earning.service";
 import type { AuditService } from "@modules/audit/audit.service";
 import { AuditEventType } from "@modules/audit/audit.repo";
+import type { ClientProfileService } from "@modules/user/clientProfile.service";
 
 /**
  * Payment service
@@ -39,7 +40,9 @@ export class PaymentService {
     @inject(TOKENS.EarningService)
     private readonly earningService: EarningService,
     @inject(TOKENS.AuditService)
-    private readonly auditService: AuditService
+    private readonly auditService: AuditService,
+    @inject(TOKENS.ClientProfileService)
+    private readonly clientProfileService: ClientProfileService
   ) {}
 
   /**
@@ -118,6 +121,30 @@ export class PaymentService {
     // Generate idempotency key
     const idempotencyKey = `${input.orderId}-${Date.now()}`;
 
+    // Fetch client profile information for better approval rates
+    let payerInfo:
+      | { email?: string; firstName?: string; lastName?: string }
+      | undefined;
+    try {
+      const clientProfile = await this.clientProfileService.getProfile(
+        actor.id
+      );
+      if (
+        clientProfile.email ||
+        clientProfile.firstName ||
+        clientProfile.lastName
+      ) {
+        payerInfo = {
+          email: clientProfile.email || undefined,
+          firstName: clientProfile.firstName || undefined,
+          lastName: clientProfile.lastName || undefined,
+        };
+      }
+    } catch (error) {
+      // Log but don't fail - payer info is optional
+      console.warn(`Failed to fetch client profile for payment: ${error}`);
+    }
+
     // Create payment record with CREATED status
     const payment = await this.paymentRepository.create({
       provider: this.provider,
@@ -141,6 +168,8 @@ export class PaymentService {
           currency: order.currency,
         },
         idempotencyKey,
+        payer: payerInfo,
+        categoryId: order.categoryId,
       });
 
       // Update payment with provider reference and checkout URL
