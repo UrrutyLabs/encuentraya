@@ -1,6 +1,6 @@
 # Admin App
 
-The admin dashboard for managing the Arreglatodo marketplace platform.
+The admin dashboard for managing the EncuentraYa marketplace platform.
 
 ## Overview
 

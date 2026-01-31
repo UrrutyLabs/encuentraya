@@ -33,7 +33,7 @@ export function LandingForProfessionals() {
             isVisible ? "animate-[fadeIn_0.6s_ease-out_0.25s_both]" : ""
           }`}
         >
-          Sumate a Arreglatodo y conseguí trabajos sin intermediarios
+          Sumate a EncuentraYa y conseguí trabajos sin intermediarios
           innecesarios.
         </Text>
         <Link

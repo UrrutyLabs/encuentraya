@@ -1,6 +1,6 @@
 # EAS Build and Deployment Guide
 
-Complete guide for building and deploying the ArreglatodoPros mobile app using Expo Application Services (EAS).
+Complete guide for building and deploying the EncuentraYa Pros mobile app using Expo Application Services (EAS).
 
 ## Table of Contents
 
@@ -142,15 +142,15 @@ Key fields for EAS:
 ```json
 {
   "expo": {
-    "name": "ArreglatodoPros",
-    "slug": "arreglatodo-pros",
+    "name": "EncuentraYa Pros",
+    "slug": "encuentraya-pros",
     "version": "1.0.0",
     "ios": {
-      "bundleIdentifier": "com.yourcompany.arreglatodopros",
+      "bundleIdentifier": "com.yourcompany.encuentrayapros",
       "buildNumber": "1"
     },
     "android": {
-      "package": "com.yourcompany.arreglatodopros",
+      "package": "com.yourcompany.encuentrayapros",
       "versionCode": 1
     },
     "extra": {
@@ -164,7 +164,7 @@ Key fields for EAS:
 
 **Important Fields**:
 
-- **`bundleIdentifier`** (iOS): Unique identifier (e.g., `com.yourcompany.arreglatodopros`)
+- **`bundleIdentifier`** (iOS): Unique identifier (e.g., `com.yourcompany.encuentrayapros`)
 - **`package`** (Android): Same as bundleIdentifier format
 - **`version`**: Semantic version (e.g., `1.0.0`)
 - **`buildNumber`** (iOS): Increments with each build
@@ -339,7 +339,7 @@ eas build:cancel --id <build-id>
 
 ### Monitoring Builds
 
-1. **Dashboard**: https://expo.dev/accounts/[your-account]/projects/arreglatodo-pros/builds
+1. **Dashboard**: https://expo.dev/accounts/[your-account]/projects/encuentraya-pros/builds
 2. **CLI**: `eas build:list`
 3. **Status**: `eas build:view <build-id>`
 
@@ -381,8 +381,8 @@ Or provide your own:
 
 1. Create app in [App Store Connect](https://appstoreconnect.apple.com)
 2. Fill in app information:
-   - Name: ArreglatodoPros
-   - Bundle ID: `com.yourcompany.arreglatodopros`
+   - Name: EncuentraYa Pros
+   - Bundle ID: `com.yourcompany.encuentrayapros`
    - Primary Language: Spanish (or your preference)
 3. Note the **App Store Connect App ID** (numeric)
 
@@ -804,9 +804,9 @@ eas secret:create --scope project --name NAME --value VALUE
 
 ### Project URLs
 
-- **Dashboard**: https://expo.dev/accounts/[account]/projects/arreglatodo-pros
-- **Builds**: https://expo.dev/accounts/[account]/projects/arreglatodo-pros/builds
-- **Updates**: https://expo.dev/accounts/[account]/projects/arreglatodo-pros/updates
+- **Dashboard**: https://expo.dev/accounts/[account]/projects/encuentraya-pros
+- **Builds**: https://expo.dev/accounts/[account]/projects/encuentraya-pros/builds
+- **Updates**: https://expo.dev/accounts/[account]/projects/encuentraya-pros/updates
 
 ---
 

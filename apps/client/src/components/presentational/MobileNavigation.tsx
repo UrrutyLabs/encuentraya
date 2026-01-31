@@ -69,7 +69,7 @@ export function MobileNavigation({
       <nav className="px-4 py-4 border-b border-border bg-surface md:hidden">
         <div className="flex justify-between items-center">
           <Link href={homeLink} onClick={handleLinkClick}>
-            <Text variant="h2">Arreglatodo</Text>
+            <Text variant="h2">EncuentraYa</Text>
           </Link>
 
           <div className="flex items-center gap-3">

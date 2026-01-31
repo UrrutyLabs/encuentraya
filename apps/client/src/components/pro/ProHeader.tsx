@@ -59,7 +59,7 @@ export function ProHeader() {
         <Link href="/pro" className="flex items-center gap-2">
           <Briefcase className="w-8 h-8 text-primary" />
           <Text variant="h2" className="text-primary">
-            Arreglatodo Pro
+            EncuentraYa Pro
           </Text>
         </Link>
         <div className="flex items-center gap-4">

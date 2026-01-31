@@ -1,4 +1,4 @@
-# Arreglatodo (UY) – Orders, Line Items, IVA & Mercado Pago Strategy (Hourly-only MVP)
+# EncuentraYa (UY) – Orders, Line Items, IVA & Mercado Pago Strategy (Hourly-only MVP)
 
 > **Disclaimer:** This is a technical/product strategy document, not legal/tax advice. You should validate specifics (who must invoice whom, wording, regimes like Literal E, etc.) with your accountant.
 

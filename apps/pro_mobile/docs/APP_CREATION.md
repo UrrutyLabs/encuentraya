@@ -2,7 +2,7 @@
 
 ## Context
 
-Recreate a complete Expo Router mobile app for "Arreglatodo" - a local services marketplace for pros (professionals) to manage bookings. This is a Pro-focused mobile app (not client-facing).
+Recreate a complete Expo Router mobile app for "EncuentraYa" - a local services marketplace for pros (professionals) to manage bookings. This is a Pro-focused mobile app (not client-facing).
 
 ## Project Structure
 

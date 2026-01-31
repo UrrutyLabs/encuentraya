@@ -5,6 +5,7 @@ import { Feather } from "@expo/vector-icons";
 import { Text } from "@components/ui/Text";
 import { Card } from "@components/ui/Card";
 import { Badge } from "@components/ui/Badge";
+import { Alert } from "@components/ui/Alert";
 import { Button } from "@components/ui/Button";
 import { JobDetailSkeleton } from "@components/presentational/JobDetailSkeleton";
 import { useOrderActions, useOrderDetail } from "@hooks/order";
@@ -13,6 +14,7 @@ import { getJobStatusLabel, getJobStatusVariant } from "../../utils/jobStatus";
 import { JOB_LABELS } from "../../utils/jobLabels";
 import { formatAmount } from "../../utils/format";
 import { theme } from "../../theme";
+import { useCategoryLookup } from "../../hooks/category/useCategoryLookup";
 
 export function JobDetailScreen() {
   const { jobId } = useLocalSearchParams<{ jobId: string }>();
@@ -109,12 +111,65 @@ export function JobDetailScreen() {
     [displayStatus]
   );
 
+  // Fetch categories for lookup
+  const { getCategoryName, categoryMap } = useCategoryLookup();
+
   const categoryLabel = useMemo(() => {
     if (!order) return "";
-    // Try to get category name from metadata, fallback to categoryId
-    const categoryName = order.categoryMetadataJson?.name as string | undefined;
-    return categoryName || order.categoryId || "";
-  }, [order]);
+    // First try to get category name from metadata (snapshot at order creation)
+    const categoryNameFromMetadata = order.categoryMetadataJson?.name as
+      | string
+      | undefined;
+    if (categoryNameFromMetadata) {
+      return categoryNameFromMetadata;
+    }
+    // Fallback to fetching category name by ID
+    return getCategoryName(order.categoryId);
+  }, [order, getCategoryName]);
+
+  // Extract and format quick question answers
+  const quickQuestionAnswers = useMemo(() => {
+    if (!order?.categoryMetadataJson) return [];
+
+    const metadata = order.categoryMetadataJson as Record<string, unknown>;
+    const answers = metadata.quickQuestionAnswers as
+      | Record<string, unknown>
+      | undefined;
+
+    if (!answers || Object.keys(answers).length === 0) return [];
+
+    // Get category config to find question labels
+    const category = categoryMap.get(order.categoryId);
+    const configJson = category?.configJson as
+      | { quick_questions?: { key: string; label: string; type: string }[] }
+      | undefined;
+    const questions = configJson?.quick_questions || [];
+
+    // Format answers with labels
+    return questions
+      .filter((q) => answers[q.key] !== undefined && answers[q.key] !== null)
+      .map((q) => {
+        const value = answers[q.key];
+        let formattedValue: string;
+
+        if (value === true || value === "true") {
+          formattedValue = "Sí";
+        } else if (value === false || value === "false") {
+          formattedValue = "No";
+        } else if (Array.isArray(value)) {
+          formattedValue = value.join(", ");
+        } else if (typeof value === "number") {
+          formattedValue = String(value);
+        } else {
+          formattedValue = String(value || "");
+        }
+
+        return {
+          label: q.label,
+          value: formattedValue,
+        };
+      });
+  }, [order, categoryMap]);
 
   const formattedDate = useMemo(
     () =>
@@ -128,6 +183,15 @@ export function JobDetailScreen() {
           }).format(new Date(order.scheduledWindowStartAt))
         : "",
     [order]
+  );
+
+  // Check if payment is still pending (not yet paid)
+  // Must be before early returns (React Rules of Hooks)
+  const isPaymentPending = useMemo(
+    () =>
+      displayStatus !== OrderStatus.PAID &&
+      displayStatus !== OrderStatus.CANCELED,
+    [displayStatus]
   );
 
   if (isLoading) {
@@ -226,6 +290,41 @@ export function JobDetailScreen() {
               {order.description}
             </Text>
           </View>
+        )}
+        {quickQuestionAnswers.length > 0 && (
+          <View style={styles.row}>
+            <View style={styles.labelRow}>
+              <Feather
+                name="help-circle"
+                size={14}
+                color={theme.colors.muted}
+              />
+              <Text variant="small" style={styles.label}>
+                Detalles adicionales:
+              </Text>
+            </View>
+            <View style={styles.quickAnswersContainer}>
+              {quickQuestionAnswers.map((qa, index) => (
+                <View key={index} style={styles.quickAnswerRow}>
+                  <Text variant="small" style={styles.quickAnswerLabel}>
+                    {qa.label}:
+                  </Text>
+                  <Text variant="body" style={styles.quickAnswerValue}>
+                    {qa.value}
+                  </Text>
+                </View>
+              ))}
+            </View>
+          </View>
+        )}
+        {isPaymentPending && (
+          <Alert
+            variant="warning"
+            title="Pago pendiente de confirmación"
+            message="El pago de este trabajo aún está siendo confirmado. Por favor, no inicies el trabajo hasta que recibas la confirmación del pago."
+            showBorder
+            style={styles.paymentAlert}
+          />
         )}
         {order.totalAmount && (
           <View style={styles.row}>
@@ -410,6 +509,24 @@ const styles = StyleSheet.create({
   },
   description: {
     marginTop: theme.spacing[1],
+  },
+  quickAnswersContainer: {
+    marginTop: theme.spacing[1],
+  },
+  quickAnswerRow: {
+    marginBottom: theme.spacing[2],
+  },
+  quickAnswerLabel: {
+    color: theme.colors.muted,
+    marginBottom: 2,
+    fontWeight: theme.typography.weights.medium,
+  },
+  quickAnswerValue: {
+    color: theme.colors.text,
+  },
+  paymentAlert: {
+    marginBottom: theme.spacing[3],
+    padding: theme.spacing[3],
   },
   amount: {
     color: theme.colors.primary,

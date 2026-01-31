@@ -1,6 +1,6 @@
 # Domain Package
 
-Shared domain models, schemas, and utilities used across all applications in the Arreglatodo monorepo.
+Shared domain models, schemas, and utilities used across all applications in the EncuentraYa monorepo.
 
 ## Overview
 

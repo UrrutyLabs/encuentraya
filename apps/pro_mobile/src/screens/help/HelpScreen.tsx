@@ -22,7 +22,7 @@ export function HelpScreen() {
           </Text>
         </View>
         <Text variant="body" style={styles.sectionDescription}>
-          Resolvé tus dudas sobre cómo trabajar con Arreglatodo
+          Resolvé tus dudas sobre cómo trabajar con EncuentraYa
         </Text>
         <FAQAccordion items={proFAQItems} defaultExpandedCount={4} />
       </Card>

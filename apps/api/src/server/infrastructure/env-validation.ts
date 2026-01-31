@@ -54,7 +54,7 @@ export function validateApiEnv(): void {
     // Client App URL - Required for payment return URLs
     // This is the URL of the client app where payment return pages are hosted
     // In development: http://localhost:3000 (client app port)
-    // In production: https://arreglatodo.com (or your production client URL)
+    // In production: https://encuentraya.com (or your production client URL)
     CLIENT_URL: {
       required: false,
       validate: (value) => {

@@ -10,8 +10,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "ArreglaTodo - Admin",
-  description: "Uruguay Services Marketplace - Admin Dashboard",
+  title: "EncuentraYa - Admin",
+  description: "EncuentraYa - Admin Dashboard",
 };
 
 export default function RootLayout({

@@ -30,7 +30,7 @@ export function LandingHero() {
               variant="h1"
               className="mb-6 text-primary animate-[fadeInDown_0.6s_ease-out]"
             >
-              Arreglatodo
+              EncuentraYa
             </Text>
             <Text
               variant="h2"

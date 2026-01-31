@@ -11,6 +11,7 @@ import { ActivityIndicator, View } from "react-native";
 import { TRPCProvider } from "@lib/trpc/Provider";
 import { ErrorBoundary } from "@components/ErrorBoundary";
 import { OfflineIndicator } from "@components/OfflineIndicator";
+import { CategoriesPrefetcher } from "@components/CategoriesPrefetcher";
 import { initCrashReporting } from "@lib/crash-reporting";
 import { initializeEnvValidation } from "@lib/env-validation";
 import { theme } from "../src/theme";
@@ -40,6 +41,7 @@ export default function RootLayout() {
   return (
     <ErrorBoundary>
       <TRPCProvider>
+        <CategoriesPrefetcher />
         <OfflineIndicator />
         <Stack
           screenOptions={{

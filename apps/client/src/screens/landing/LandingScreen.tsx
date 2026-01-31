@@ -1,7 +1,7 @@
 import { LandingHeader } from "@/components/landing/LandingHeader";
 import { LandingHero } from "@/components/landing/LandingHero";
 import { LandingHowItWorks } from "@/components/landing/LandingHowItWorks";
-import { LandingWhyArreglatodo } from "@/components/landing/LandingWhyArreglatodo";
+import { LandingWhyEncuentraYa } from "@/components/landing/LandingWhyEncuentraYa";
 import { LandingForProfessionals } from "@/components/landing/LandingForProfessionals";
 import { LandingFooter } from "@/components/landing/LandingFooter";
 
@@ -11,7 +11,7 @@ export function LandingScreen() {
       <LandingHeader />
       <LandingHero />
       <LandingHowItWorks />
-      <LandingWhyArreglatodo />
+      <LandingWhyEncuentraYa />
       <LandingForProfessionals />
       <LandingFooter />
     </div>

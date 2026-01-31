@@ -136,10 +136,10 @@ export function ContactScreen() {
           <Text variant="small" className="text-muted">
             También podés contactarnos por email en{" "}
             <a
-              href="mailto:support@arreglatodo.com"
+              href="mailto:support@encuentraya.com"
               className="text-primary hover:underline transition-colors hover:text-secondary"
             >
-              support@arreglatodo.com
+              support@encuentraya.com
             </a>
           </Text>
         </div>

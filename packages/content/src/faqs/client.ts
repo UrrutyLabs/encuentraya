@@ -2,9 +2,9 @@ import type { FAQItem } from "./types";
 
 export const clientFAQItems: FAQItem[] = [
   {
-    question: "¿Qué es Arreglatodo?",
+    question: "¿Qué es EncuentraYa?",
     answer:
-      "Arreglatodo es una plataforma que conecta clientes con profesionales independientes para servicios del hogar. Te ayudamos a encontrar el profesional adecuado, gestionar tu reserva y realizar el pago de forma segura.",
+      "EncuentraYa es una plataforma que conecta clientes con profesionales independientes para servicios del hogar. Te ayudamos a encontrar el profesional adecuado, gestionar tu reserva y realizar el pago de forma segura.",
   },
   {
     question: "¿Cómo funciona?",
