@@ -19,6 +19,17 @@ import {
 } from "@hooks/chat";
 import { theme } from "../../theme";
 
+/** Message shown when contact info is detected (must match API). */
+const CHAT_CONTACT_INFO_MESSAGE =
+  "No está permitido compartir teléfono, email u otros datos de contacto. Hacerlo puede resultar en la suspensión de tu cuenta.";
+
+function isContactInfoError(error: { message?: string } | null): boolean {
+  const msg = error?.message ?? "";
+  return (
+    msg.includes("suspensión de tu cuenta") || msg.includes("datos de contacto")
+  );
+}
+
 type ChatMessage = {
   id: string;
   orderId: string;
@@ -151,9 +162,28 @@ export function OrderChatScreen({
 
       {sendError && (
         <View style={styles.sendError}>
-          <Text variant="small" style={styles.sendErrorText}>
-            {sendError.message}
-          </Text>
+          {isContactInfoError(sendError) ? (
+            <View style={styles.contactInfoAlert}>
+              <Feather
+                name="alert-triangle"
+                size={20}
+                color={theme.colors.danger}
+                style={styles.contactInfoIcon}
+              />
+              <View style={styles.contactInfoContent}>
+                <Text variant="small" style={styles.contactInfoTitle}>
+                  Mensaje no permitido
+                </Text>
+                <Text variant="small" style={styles.contactInfoMessage}>
+                  {CHAT_CONTACT_INFO_MESSAGE}
+                </Text>
+              </View>
+            </View>
+          ) : (
+            <Text variant="small" style={styles.sendErrorText}>
+              {sendError.message}
+            </Text>
+          )}
         </View>
       )}
 
@@ -301,6 +331,31 @@ const styles = StyleSheet.create({
   },
   sendErrorText: {
     color: theme.colors.danger,
+  },
+  contactInfoAlert: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    padding: theme.spacing[3],
+    borderRadius: theme.radius.md,
+    borderWidth: 1,
+    borderColor: theme.colors.danger + "80",
+    backgroundColor: theme.colors.danger + "15",
+  },
+  contactInfoIcon: {
+    marginRight: theme.spacing[2],
+    marginTop: 2,
+  },
+  contactInfoContent: {
+    flex: 1,
+  },
+  contactInfoTitle: {
+    fontWeight: theme.typography.weights.semibold,
+    color: theme.colors.danger,
+  },
+  contactInfoMessage: {
+    color: theme.colors.danger,
+    marginTop: theme.spacing[1],
+    opacity: 0.9,
   },
   closedBar: {
     padding: theme.spacing[3],

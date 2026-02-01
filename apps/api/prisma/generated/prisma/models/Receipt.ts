@@ -14,8 +14,7 @@ import type * as Prisma from "../internal/prismaNamespace"
 
 /**
  * Model Receipt
- * Immutable receipt created at order finalization (textbook approach).
- * One-to-one with Order; stores final cost snapshot for display/audit.
+ * 
  */
 export type ReceiptModel = runtime.Types.Result.DefaultSelection<Prisma.$ReceiptPayload>
 

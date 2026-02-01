@@ -12,7 +12,8 @@ type AuditEventType =
   | "PAYMENT_SYNCED"
   | "PAYOUT_CREATED"
   | "PAYOUT_SENT"
-  | "USER_ROLE_CHANGED";
+  | "USER_ROLE_CHANGED"
+  | "CHAT_CONTACT_INFO_DETECTED";
 
 interface AuditLog {
   id: string;
@@ -27,6 +28,10 @@ interface AuditLog {
 interface ProAuditHistoryProps {
   logs: AuditLog[];
   isLoading?: boolean;
+  /** Default: "Historial de Acciones" */
+  title?: string;
+  /** Default: "No hay acciones registradas para este profesional." */
+  emptyMessage?: string;
 }
 
 const formatDate = (date: Date) => {
@@ -49,6 +54,7 @@ const getEventLabel = (eventType: AuditEventType): string => {
     PAYOUT_CREATED: "Cobro Creado",
     PAYOUT_SENT: "Cobro Enviado",
     USER_ROLE_CHANGED: "Rol de Usuario Cambiado",
+    CHAT_CONTACT_INFO_DETECTED: "Chat: contacto detectado",
   };
   return labels[eventType] || eventType;
 };
@@ -68,16 +74,26 @@ const getEventBadgeVariant = (
     PAYOUT_CREATED: "info",
     PAYOUT_SENT: "success",
     USER_ROLE_CHANGED: "warning",
+    CHAT_CONTACT_INFO_DETECTED: "danger",
   };
   return variantMap[eventType] || "info";
 };
 
-export function ProAuditHistory({ logs, isLoading }: ProAuditHistoryProps) {
+const DEFAULT_TITLE = "Historial de Acciones";
+const DEFAULT_EMPTY_MESSAGE =
+  "No hay acciones registradas para este profesional.";
+
+export function ProAuditHistory({
+  logs,
+  isLoading,
+  title = DEFAULT_TITLE,
+  emptyMessage = DEFAULT_EMPTY_MESSAGE,
+}: ProAuditHistoryProps) {
   if (isLoading) {
     return (
       <Card className="p-6">
         <Text variant="h2" className="mb-4">
-          Historial de Acciones
+          {title}
         </Text>
         <Text variant="body" className="text-gray-600">
           Cargando historial...
@@ -90,10 +106,10 @@ export function ProAuditHistory({ logs, isLoading }: ProAuditHistoryProps) {
     return (
       <Card className="p-6">
         <Text variant="h2" className="mb-4">
-          Historial de Acciones
+          {title}
         </Text>
         <Text variant="body" className="text-gray-600">
-          No hay acciones registradas para este profesional.
+          {emptyMessage}
         </Text>
       </Card>
     );
@@ -102,7 +118,7 @@ export function ProAuditHistory({ logs, isLoading }: ProAuditHistoryProps) {
   return (
     <Card className="p-6">
       <Text variant="h2" className="mb-4">
-        Historial de Acciones
+        {title}
       </Text>
       <div className="relative pl-4">
         <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-gray-200" />
@@ -132,6 +148,32 @@ export function ProAuditHistory({ logs, isLoading }: ProAuditHistoryProps) {
                         Estado: {String(log.metadata.previousStatus)} →{" "}
                         {String(log.metadata.newStatus)}
                       </Text>
+                    )}
+                  {log.eventType === "CHAT_CONTACT_INFO_DETECTED" &&
+                    log.metadata != null && (
+                      <div className="mt-2 space-y-1">
+                        {log.metadata.orderDisplayId != null && (
+                          <Text variant="small" className="text-gray-600">
+                            <span className="font-medium">Pedido:</span> #
+                            {String(log.metadata.orderDisplayId)}
+                          </Text>
+                        )}
+                        {log.metadata.senderRole != null && (
+                          <Text variant="small" className="text-gray-600">
+                            <span className="font-medium">Rol:</span>{" "}
+                            {String(log.metadata.senderRole)}
+                          </Text>
+                        )}
+                        {log.metadata.messagePreview != null && (
+                          <Text
+                            variant="small"
+                            className="text-gray-600 truncate block max-w-md"
+                          >
+                            <span className="font-medium">Vista previa:</span>{" "}
+                            {String(log.metadata.messagePreview)}
+                          </Text>
+                        )}
+                      </div>
                     )}
                 </div>
               </div>

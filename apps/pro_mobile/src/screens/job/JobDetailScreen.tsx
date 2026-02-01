@@ -186,12 +186,25 @@ export function JobDetailScreen() {
     [order]
   );
 
-  // Check if payment is still pending (not yet paid)
+  // Pro still needs to accept (pending_pro_confirmation) → show info banner
   // Must be before early returns (React Rules of Hooks)
-  const isPaymentPending = useMemo(
+  const isPendingProConfirmation = useMemo(
+    () => displayStatus === OrderStatus.PENDING_PRO_CONFIRMATION,
+    [displayStatus]
+  );
+
+  // Accepted but not yet paid → show "don't start until paid" disclaimer
+  const isAcceptedButNotPaid = useMemo(
     () =>
-      displayStatus !== OrderStatus.PAID &&
-      displayStatus !== OrderStatus.CANCELED,
+      displayStatus !== null &&
+      [
+        OrderStatus.ACCEPTED,
+        OrderStatus.CONFIRMED,
+        OrderStatus.IN_PROGRESS,
+        OrderStatus.AWAITING_CLIENT_APPROVAL,
+        OrderStatus.DISPUTED,
+        OrderStatus.COMPLETED,
+      ].includes(displayStatus),
     [displayStatus]
   );
 
@@ -318,7 +331,16 @@ export function JobDetailScreen() {
             </View>
           </View>
         )}
-        {isPaymentPending && (
+        {isPendingProConfirmation && (
+          <Alert
+            variant="info"
+            title="Podés chatear con el cliente"
+            message="Antes de aceptar, podés usar Mensajes para entender mejor el trabajo y resolver dudas."
+            showBorder
+            style={styles.paymentAlert}
+          />
+        )}
+        {isAcceptedButNotPaid && (
           <Alert
             variant="warning"
             title="Pago pendiente de confirmación"

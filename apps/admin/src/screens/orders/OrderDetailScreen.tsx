@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { OrderStatus } from "@repo/domain";
 import {
   useOrder,
+  useOrderAuditLogs,
   useCancelOrder,
   useForceOrderStatus,
 } from "@/hooks/useOrders";
@@ -21,6 +22,7 @@ import { Text } from "@repo/ui";
 import { Badge } from "@repo/ui";
 import { formatCurrency, toMajorUnits } from "@repo/domain";
 import { OrderTimeline } from "@/components/orders/OrderTimeline";
+import { ProAuditHistory } from "@/components/pros/ProAuditHistory";
 import { OrderDetailSkeleton } from "@/components/presentational/OrderDetailSkeleton";
 
 interface OrderDetailScreenProps {
@@ -37,6 +39,9 @@ export function OrderDetailScreen({ orderId }: OrderDetailScreenProps) {
   const { data: order, isLoading, refetch } = useOrder(orderId);
   const cancelMutation = useCancelOrder();
   const forceStatusMutation = useForceOrderStatus();
+
+  const { data: orderAuditLogs, isLoading: isLoadingOrderAudit } =
+    useOrderAuditLogs(orderId, { enabled: !!order?.id });
 
   // Fetch category and subcategory data
   const { data: category } = useCategory(order?.categoryId || "", {
@@ -241,6 +246,26 @@ export function OrderDetailScreen({ orderId }: OrderDetailScreenProps) {
           canceledAt={order.canceledAt}
         />
       </Card>
+
+      {/* Order audit history (e.g. contact info blocked, status forced) */}
+      <ProAuditHistory
+        logs={(orderAuditLogs ?? []).map((log) => ({
+          ...log,
+          eventType: log.eventType as
+            | "PRO_SUSPENDED"
+            | "PRO_UNSUSPENDED"
+            | "PRO_APPROVED"
+            | "ORDER_STATUS_FORCED"
+            | "PAYMENT_SYNCED"
+            | "PAYOUT_CREATED"
+            | "PAYOUT_SENT"
+            | "USER_ROLE_CHANGED"
+            | "CHAT_CONTACT_INFO_DETECTED",
+          actorRole: log.actorRole as string,
+        }))}
+        isLoading={isLoadingOrderAudit}
+        emptyMessage="No hay acciones registradas para este pedido."
+      />
 
       {/* Address */}
       <Card className="p-6">

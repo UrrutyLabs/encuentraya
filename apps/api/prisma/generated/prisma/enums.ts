@@ -140,7 +140,8 @@ export const AuditEventType = {
   PAYMENT_SYNCED: 'PAYMENT_SYNCED',
   PAYOUT_CREATED: 'PAYOUT_CREATED',
   PAYOUT_SENT: 'PAYOUT_SENT',
-  USER_ROLE_CHANGED: 'USER_ROLE_CHANGED'
+  USER_ROLE_CHANGED: 'USER_ROLE_CHANGED',
+  CHAT_CONTACT_INFO_DETECTED: 'CHAT_CONTACT_INFO_DETECTED'
 } as const
 
 export type AuditEventType = (typeof AuditEventType)[keyof typeof AuditEventType]

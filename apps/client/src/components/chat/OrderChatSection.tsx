@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { MessageCircle, Send } from "lucide-react";
+import { MessageCircle, Send, AlertTriangle } from "lucide-react";
 import { Text } from "@repo/ui";
 import { Card } from "@repo/ui";
 import { Button } from "@repo/ui";
@@ -11,6 +11,17 @@ import {
   useChatMeta,
   useMarkRead,
 } from "@/hooks/chat";
+
+/** Message shown when contact info is detected (must match API). */
+const CHAT_CONTACT_INFO_MESSAGE =
+  "No está permitido compartir teléfono, email u otros datos de contacto. Hacerlo puede resultar en la suspensión de tu cuenta.";
+
+function isContactInfoError(error: { message?: string } | null): boolean {
+  const msg = error?.message ?? "";
+  return (
+    msg.includes("suspensión de tu cuenta") || msg.includes("datos de contacto")
+  );
+}
 
 type ChatMessage = {
   id: string;
@@ -185,9 +196,28 @@ export function OrderChatSection({
         )}
 
         {sendError && (
-          <Text variant="small" className="text-danger mb-2">
-            {sendError.message}
-          </Text>
+          <div className="mb-2">
+            {isContactInfoError(sendError) ? (
+              <div
+                role="alert"
+                className="flex gap-2 p-3 rounded-lg border border-danger/50 bg-danger/10"
+              >
+                <AlertTriangle className="w-5 h-5 shrink-0 text-danger mt-0.5" />
+                <div>
+                  <Text variant="small" className="font-medium text-danger">
+                    Mensaje no permitido
+                  </Text>
+                  <Text variant="small" className="text-danger/90 mt-0.5">
+                    {CHAT_CONTACT_INFO_MESSAGE}
+                  </Text>
+                </div>
+              </div>
+            ) : (
+              <Text variant="small" className="text-danger">
+                {sendError.message}
+              </Text>
+            )}
+          </div>
         )}
 
         {isChatOpen ? (

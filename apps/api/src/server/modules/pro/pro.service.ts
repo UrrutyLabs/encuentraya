@@ -19,9 +19,10 @@ import type {
   AvailabilitySlot,
   UpdateAvailabilitySlotsInput,
 } from "@repo/domain";
-import { Role, toMinorUnits, toMajorUnits } from "@repo/domain";
+import { Role, toMajorUnits } from "@repo/domain";
 import { TOKENS } from "@/server/container/tokens";
 import type { Actor } from "@infra/auth/roles";
+import { maskDisplayName } from "@shared/display-name";
 import { calculateIsTopPro } from "./pro.calculations";
 
 /**
@@ -133,7 +134,7 @@ export class ProService {
     const proProfile = await this.proRepository.findById(id);
     if (!proProfile) return null;
     if (!proProfile.profileCompleted) return null;
-    return this.mapToDomain(proProfile);
+    return this.mapToDomain(proProfile, { maskName: true });
   }
 
   /**
@@ -153,7 +154,11 @@ export class ProService {
       categoryId: filters.categoryId,
       profileCompleted: true, // Only show pros with completed profiles
     });
-    return Promise.all(proProfiles.map((profile) => this.mapToDomain(profile)));
+    return Promise.all(
+      proProfiles.map((profile) =>
+        this.mapToDomain(profile, { maskName: true })
+      )
+    );
   }
 
   /**
@@ -622,8 +627,12 @@ export class ProService {
    * Map ProProfileEntity to Pro domain type
    * Calculates rating and reviewCount from reviews
    * Calculates isAvailable from availability slots array
+   * When maskName is true (client-facing getById/search), returns firstName + first letter of surname.
    */
-  private async mapToDomain(entity: ProProfileEntity): Promise<Pro> {
+  private async mapToDomain(
+    entity: ProProfileEntity,
+    options?: { maskName?: boolean }
+  ): Promise<Pro> {
     // Get reviews for this pro to calculate rating and reviewCount
     const reviews = await this.reviewRepository.findByProProfileId(entity.id);
 
@@ -656,7 +665,10 @@ export class ProService {
 
     return {
       id: entity.id,
-      name: entity.displayName,
+      name:
+        options?.maskName === true
+          ? maskDisplayName(entity.displayName)
+          : entity.displayName,
       email: entity.email,
       phone: entity.phone ?? undefined,
       bio: entity.bio ?? undefined,

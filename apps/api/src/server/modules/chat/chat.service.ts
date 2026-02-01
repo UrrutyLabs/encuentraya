@@ -7,10 +7,17 @@ import type { ProRepository } from "@modules/pro/pro.repo";
 import type { ClientProfileRepository } from "@modules/user/clientProfile.repo";
 import type { ChatRepository, OrderMessageEntity } from "./chat.repo";
 import type { NotificationService } from "@modules/notification/notification.service";
+import type { AuditService } from "@modules/audit/audit.service";
 import { buildNotificationMessages } from "@modules/notification/policy";
 import { TOKENS } from "@/server/container";
 import { OrderNotFoundError } from "@modules/order/order.errors";
-import { ChatForbiddenError, ChatClosedError } from "./chat.errors";
+import {
+  ChatForbiddenError,
+  ChatClosedError,
+  ChatContactInfoNotAllowedError,
+} from "./chat.errors";
+import { containsContactInfo } from "./contact-info-detector";
+import { AuditEventType } from "@modules/audit/audit.repo";
 
 const CHAT_CLOSE_HOURS_AFTER_COMPLETED = 24;
 
@@ -54,7 +61,9 @@ export class ChatService {
     @inject(TOKENS.ClientProfileRepository)
     private readonly clientProfileRepository: ClientProfileRepository,
     @inject(TOKENS.NotificationService)
-    private readonly notificationService: NotificationService
+    private readonly notificationService: NotificationService,
+    @inject(TOKENS.AuditService)
+    private readonly auditService: AuditService
   ) {}
 
   /**
@@ -110,6 +119,24 @@ export class ChatService {
     const now = new Date();
     if (!isChatOpen(order, now)) throw new ChatClosedError(orderId);
 
+    const trimmedText = text.trim();
+    if (containsContactInfo(trimmedText)) {
+      await this.auditService.logEvent({
+        eventType: AuditEventType.CHAT_CONTACT_INFO_DETECTED,
+        actor,
+        resourceType: "Order",
+        resourceId: orderId,
+        action: "chat_contact_info_blocked",
+        metadata: {
+          orderId,
+          orderDisplayId: order.displayId,
+          messagePreview: trimmedText.slice(0, 200),
+          senderRole: role,
+        },
+      });
+      throw new ChatContactInfoNotAllowedError();
+    }
+
     const senderRole: $Enums.ChatSenderRole =
       role === "client"
         ? $Enums.ChatSenderRole.client
@@ -119,14 +146,14 @@ export class ChatService {
       senderUserId: actor.id,
       senderRole,
       type: $Enums.ChatMessageType.user,
-      text: text.trim(),
+      text: trimmedText,
       attachmentsJson: attachmentsJson ?? null,
     });
 
     const textPreview =
-      text.length > TEXT_PREVIEW_MAX_LEN
-        ? text.slice(0, TEXT_PREVIEW_MAX_LEN) + "..."
-        : text;
+      trimmedText.length > TEXT_PREVIEW_MAX_LEN
+        ? trimmedText.slice(0, TEXT_PREVIEW_MAX_LEN) + "..."
+        : trimmedText;
     const payload = {
       orderId,
       orderDisplayId: order.displayId,

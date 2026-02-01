@@ -14,6 +14,8 @@ import { OrderFinalizationService } from "./order.finalization.service";
 import { OrderService } from "./order.service";
 import { OrderAdminService } from "./order.admin.service";
 import type { ProRepository } from "@modules/pro/pro.repo";
+import type { ClientProfileRepository } from "@modules/user/clientProfile.repo";
+import { maskDisplayName } from "@shared/display-name";
 import {
   orderCreateInputSchema,
   orderEstimateInputSchema,
@@ -76,6 +78,18 @@ const proRepository = container.resolve<ProRepository>(TOKENS.ProRepository);
 const receiptRepository = container.resolve<ReceiptRepository>(
   TOKENS.ReceiptRepository
 );
+const clientProfileRepository = container.resolve<ClientProfileRepository>(
+  TOKENS.ClientProfileRepository
+);
+
+async function getClientDisplayNameMasked(userId: string): Promise<string> {
+  const profile = await clientProfileRepository.findByUserId(userId);
+  if (!profile) return "Cliente";
+  const first = profile.firstName?.trim() ?? "";
+  const last = profile.lastName?.trim() ?? "";
+  const full = [first, last].filter(Boolean).join(" ");
+  return full ? maskDisplayName(full) : "Cliente";
+}
 
 export const orderRouter = router({
   /**
@@ -159,7 +173,10 @@ export const orderRouter = router({
           costBreakdown = { kind: "estimate", ...estimation };
         }
 
-        return { ...order, costBreakdown };
+        const clientDisplayName = await getClientDisplayNameMasked(
+          order.clientUserId
+        );
+        return { ...order, costBreakdown, clientDisplayName };
       } catch (error) {
         throw mapDomainErrorToTRPCError(error);
       }
@@ -204,7 +221,14 @@ export const orderRouter = router({
         if (!proProfile) {
           throw new Error("Pro profile not found");
         }
-        return await orderService.getOrdersByPro(proProfile.id);
+        const orders = await orderService.getOrdersByPro(proProfile.id);
+        const withClientDisplayName = await Promise.all(
+          orders.map(async (o) => ({
+            ...o,
+            clientDisplayName: await getClientDisplayNameMasked(o.clientUserId),
+          }))
+        );
+        return withClientDisplayName;
       } catch (error) {
         throw mapDomainErrorToTRPCError(error);
       }

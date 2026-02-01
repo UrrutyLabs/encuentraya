@@ -319,7 +319,8 @@ export function ProDetailScreen({ proProfileId }: ProDetailScreenProps) {
             | "PAYMENT_SYNCED"
             | "PAYOUT_CREATED"
             | "PAYOUT_SENT"
-            | "USER_ROLE_CHANGED",
+            | "USER_ROLE_CHANGED"
+            | "CHAT_CONTACT_INFO_DETECTED",
           actorRole: log.actorRole as string,
         }))}
         isLoading={isLoadingAuditLogs}

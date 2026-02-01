@@ -111,6 +111,9 @@ export const orderSchema = z.object({
   isFirstOrder: z.boolean(),
   createdAt: z.date(),
   updatedAt: z.date(),
+
+  // Optional: masked client name (firstName + first letter of surname) for pro view
+  clientDisplayName: z.string().optional(),
 });
 
 export type Order = z.infer<typeof orderSchema>;

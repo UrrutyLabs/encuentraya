@@ -63,10 +63,23 @@ function JobCardComponent({ job, onPress, onChatPress }: JobCardProps) {
     [job.description]
   );
 
-  // Check if payment is still pending (not yet paid)
-  const isPaymentPending = useMemo(
+  // Pro still needs to accept (pending_pro_confirmation) → show info banner
+  const isPendingProConfirmation = useMemo(
+    () => job.status === OrderStatus.PENDING_PRO_CONFIRMATION,
+    [job.status]
+  );
+
+  // Accepted but not yet paid → show "don't start until paid" disclaimer
+  const isAcceptedButNotPaid = useMemo(
     () =>
-      job.status !== OrderStatus.PAID && job.status !== OrderStatus.CANCELED,
+      [
+        OrderStatus.ACCEPTED,
+        OrderStatus.CONFIRMED,
+        OrderStatus.IN_PROGRESS,
+        OrderStatus.AWAITING_CLIENT_APPROVAL,
+        OrderStatus.DISPUTED,
+        OrderStatus.COMPLETED,
+      ].includes(job.status),
     [job.status]
   );
 
@@ -106,7 +119,13 @@ function JobCardComponent({ job, onPress, onChatPress }: JobCardProps) {
             {formattedDate}
           </Text>
         </View>
-        {isPaymentPending && (
+        {isPendingProConfirmation && (
+          <Alert
+            variant="info"
+            message="Podés chatear con el cliente para entender mejor el trabajo antes de aceptar."
+          />
+        )}
+        {isAcceptedButNotPaid && (
           <Alert
             variant="warning"
             message="El pago aún está siendo confirmado. No inicies el trabajo hasta que recibas la confirmación."
