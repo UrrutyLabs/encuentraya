@@ -168,6 +168,8 @@ pnpm format
 ## 📚 Documentation
 
 - **[Guidelines](./docs/GUIDELINES.md)** - Project guidelines and architecture rules
+- **[Order Flow](./docs/ORDER_FLOW.md)** - Order lifecycle, state machine, and transitions
+- **[Pricing and Order Strategy](./docs/PRICING_AND_ORDER_STRATEGY.md)** - How hourly vs fixed (quote) pricing works and how it relates to the order flow
 - **[Railway Deployment](./apps/api/docs/RAILWAY.md)** - API deployment on Railway
 - **[Authentication](./docs/AUTH_IMPLEMENTATION.md)** - Auth implementation details
 - **[Backend Best Practices](./docs/BE_BEST_PRACTICES.md)** - Backend development guidelines

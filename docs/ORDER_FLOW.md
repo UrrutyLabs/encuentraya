@@ -269,6 +269,11 @@ stateDiagram-v2
 ## Non-goals (MVP)
 
 - No bidding
-- No fixed-price quotes
 - No multi-pro competition per order
 - No calendar slot booking independent of orders
+
+---
+
+## Extension: Fixed-price (quote) flow
+
+The platform now supports **fixed-price (quote)** categories alongside hourly. The **same order statuses** are used; only the steps and data within certain statuses differ (e.g. quote sub-flow inside `accepted`, completion without hours). For a product-level explanation of hourly vs fixed and how they relate to this order flow, see **[Pricing and Order Strategy](./PRICING_AND_ORDER_STRATEGY.md)**.
