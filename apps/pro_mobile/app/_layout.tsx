@@ -78,6 +78,13 @@ export default function RootLayout() {
             }}
           />
           <Stack.Screen
+            name="job/[jobId]/chat"
+            options={{
+              title: "Mensajes",
+              headerBackTitle: "Atrás",
+            }}
+          />
+          <Stack.Screen
             name="settings/payout"
             options={{
               title: "Cobros",

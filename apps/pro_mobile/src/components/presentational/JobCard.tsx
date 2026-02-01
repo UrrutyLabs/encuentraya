@@ -16,9 +16,10 @@ import { useCategoryLookup } from "../../hooks/category/useCategoryLookup";
 interface JobCardProps {
   job: Order;
   onPress: () => void;
+  onChatPress?: (orderId: string) => void;
 }
 
-function JobCardComponent({ job, onPress }: JobCardProps) {
+function JobCardComponent({ job, onPress, onChatPress }: JobCardProps) {
   // Fetch categories and get lookup function
   const { getCategoryName } = useCategoryLookup();
 
@@ -124,6 +125,22 @@ function JobCardComponent({ job, onPress }: JobCardProps) {
             </Text>
           </View>
         )}
+        {job.proProfileId && onChatPress && (
+          <TouchableOpacity
+            style={styles.mensajesRow}
+            onPress={() => onChatPress(job.id)}
+            activeOpacity={0.7}
+          >
+            <Feather
+              name="message-circle"
+              size={16}
+              color={theme.colors.primary}
+            />
+            <Text variant="body" style={styles.mensajesText}>
+              Mensajes
+            </Text>
+          </TouchableOpacity>
+        )}
       </Card>
     </TouchableOpacity>
   );
@@ -184,6 +201,22 @@ const styles = StyleSheet.create({
     fontWeight: theme.typography.weights.semibold,
     color: theme.colors.primary,
   },
+  mensajesRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: theme.spacing[1],
+    marginTop: theme.spacing[2],
+    paddingVertical: theme.spacing[2],
+    paddingHorizontal: theme.spacing[2],
+    borderWidth: 1,
+    borderColor: theme.colors.primary,
+    borderRadius: theme.radius.md,
+    alignSelf: "flex-start",
+  },
+  mensajesText: {
+    color: theme.colors.primary,
+    fontWeight: theme.typography.weights.medium,
+  },
 });
 
 // Memoize component to prevent unnecessary re-renders
@@ -193,6 +226,8 @@ export const JobCard = React.memo(JobCardComponent, (prevProps, nextProps) => {
     prevProps.job.id === nextProps.job.id &&
     prevProps.job.status === nextProps.job.status &&
     prevProps.job.isFirstOrder === nextProps.job.isFirstOrder &&
-    prevProps.onPress === nextProps.onPress
+    prevProps.job.proProfileId === nextProps.job.proProfileId &&
+    prevProps.onPress === nextProps.onPress &&
+    prevProps.onChatPress === nextProps.onChatPress
   );
 });

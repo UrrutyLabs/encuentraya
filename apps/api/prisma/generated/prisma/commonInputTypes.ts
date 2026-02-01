@@ -460,6 +460,40 @@ export type EnumTaxBehaviorNullableWithAggregatesFilter<$PrismaModel = never> = 
   _max?: Prisma.NestedEnumTaxBehaviorNullableFilter<$PrismaModel>
 }
 
+export type EnumChatSenderRoleFilter<$PrismaModel = never> = {
+  equals?: $Enums.ChatSenderRole | Prisma.EnumChatSenderRoleFieldRefInput<$PrismaModel>
+  in?: $Enums.ChatSenderRole[] | Prisma.ListEnumChatSenderRoleFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ChatSenderRole[] | Prisma.ListEnumChatSenderRoleFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumChatSenderRoleFilter<$PrismaModel> | $Enums.ChatSenderRole
+}
+
+export type EnumChatMessageTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.ChatMessageType | Prisma.EnumChatMessageTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.ChatMessageType[] | Prisma.ListEnumChatMessageTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ChatMessageType[] | Prisma.ListEnumChatMessageTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumChatMessageTypeFilter<$PrismaModel> | $Enums.ChatMessageType
+}
+
+export type EnumChatSenderRoleWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ChatSenderRole | Prisma.EnumChatSenderRoleFieldRefInput<$PrismaModel>
+  in?: $Enums.ChatSenderRole[] | Prisma.ListEnumChatSenderRoleFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ChatSenderRole[] | Prisma.ListEnumChatSenderRoleFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumChatSenderRoleWithAggregatesFilter<$PrismaModel> | $Enums.ChatSenderRole
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumChatSenderRoleFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumChatSenderRoleFilter<$PrismaModel>
+}
+
+export type EnumChatMessageTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ChatMessageType | Prisma.EnumChatMessageTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.ChatMessageType[] | Prisma.ListEnumChatMessageTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ChatMessageType[] | Prisma.ListEnumChatMessageTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumChatMessageTypeWithAggregatesFilter<$PrismaModel> | $Enums.ChatMessageType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumChatMessageTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumChatMessageTypeFilter<$PrismaModel>
+}
+
 export type EnumPaymentProviderFilter<$PrismaModel = never> = {
   equals?: $Enums.PaymentProvider | Prisma.EnumPaymentProviderFieldRefInput<$PrismaModel>
   in?: $Enums.PaymentProvider[] | Prisma.ListEnumPaymentProviderFieldRefInput<$PrismaModel>
@@ -1123,6 +1157,40 @@ export type NestedEnumTaxBehaviorNullableWithAggregatesFilter<$PrismaModel = nev
   _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
   _min?: Prisma.NestedEnumTaxBehaviorNullableFilter<$PrismaModel>
   _max?: Prisma.NestedEnumTaxBehaviorNullableFilter<$PrismaModel>
+}
+
+export type NestedEnumChatSenderRoleFilter<$PrismaModel = never> = {
+  equals?: $Enums.ChatSenderRole | Prisma.EnumChatSenderRoleFieldRefInput<$PrismaModel>
+  in?: $Enums.ChatSenderRole[] | Prisma.ListEnumChatSenderRoleFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ChatSenderRole[] | Prisma.ListEnumChatSenderRoleFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumChatSenderRoleFilter<$PrismaModel> | $Enums.ChatSenderRole
+}
+
+export type NestedEnumChatMessageTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.ChatMessageType | Prisma.EnumChatMessageTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.ChatMessageType[] | Prisma.ListEnumChatMessageTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ChatMessageType[] | Prisma.ListEnumChatMessageTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumChatMessageTypeFilter<$PrismaModel> | $Enums.ChatMessageType
+}
+
+export type NestedEnumChatSenderRoleWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ChatSenderRole | Prisma.EnumChatSenderRoleFieldRefInput<$PrismaModel>
+  in?: $Enums.ChatSenderRole[] | Prisma.ListEnumChatSenderRoleFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ChatSenderRole[] | Prisma.ListEnumChatSenderRoleFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumChatSenderRoleWithAggregatesFilter<$PrismaModel> | $Enums.ChatSenderRole
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumChatSenderRoleFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumChatSenderRoleFilter<$PrismaModel>
+}
+
+export type NestedEnumChatMessageTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.ChatMessageType | Prisma.EnumChatMessageTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.ChatMessageType[] | Prisma.ListEnumChatMessageTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.ChatMessageType[] | Prisma.ListEnumChatMessageTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumChatMessageTypeWithAggregatesFilter<$PrismaModel> | $Enums.ChatMessageType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumChatMessageTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumChatMessageTypeFilter<$PrismaModel>
 }
 
 export type NestedEnumPaymentProviderFilter<$PrismaModel = never> = {

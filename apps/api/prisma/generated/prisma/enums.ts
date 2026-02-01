@@ -208,3 +208,21 @@ export const DisputeStatus = {
 } as const
 
 export type DisputeStatus = (typeof DisputeStatus)[keyof typeof DisputeStatus]
+
+
+export const ChatSenderRole = {
+  client: 'client',
+  pro: 'pro',
+  admin: 'admin',
+  system: 'system'
+} as const
+
+export type ChatSenderRole = (typeof ChatSenderRole)[keyof typeof ChatSenderRole]
+
+
+export const ChatMessageType = {
+  user: 'user',
+  system: 'system'
+} as const
+
+export type ChatMessageType = (typeof ChatMessageType)[keyof typeof ChatMessageType]

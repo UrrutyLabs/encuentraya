@@ -29,9 +29,9 @@ export const JOB_LABELS = {
   // Action labels
   cancelJob: "Cancelar Trabajo",
   viewJob: "Ver Trabajo",
-  payJob: "Pagar Trabajo",
-  reviewJob: "Calificar Trabajo",
-  rebookJob: "Reagendar Trabajo",
+  payJob: "Pagar",
+  reviewJob: "Calificar",
+  rebookJob: "Reagendar",
 
   // Status-related labels
   jobStatus: "Estado del Trabajo",

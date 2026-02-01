@@ -20,6 +20,7 @@ import {
   orderEstimateOutputSchema,
   orderSchema,
   orderStatusSchema,
+  orderWithCostEstimateSchema,
   ApprovalMethod,
 } from "@repo/domain";
 import { mapDomainErrorToTRPCError } from "@shared/errors/error-mapper";
@@ -75,14 +76,30 @@ export const orderRouter = router({
     }),
 
   /**
-   * Get order by ID
+   * Get order by ID.
+   * When the order has no persisted totals (pre-finalization), includes
+   * costEstimate so clients can show the full cost breakdown.
    */
   getById: publicProcedure
     .input(z.object({ id: z.string() }))
-    .output(orderSchema.nullable())
+    .output(orderWithCostEstimateSchema.nullable())
     .query(async ({ input }) => {
       try {
-        return await orderService.getOrderById(input.id);
+        const order = await orderService.getOrderById(input.id);
+        if (!order) return null;
+
+        const hasPersistedTotals =
+          order.totalAmount != null && order.subtotalAmount != null;
+        if (hasPersistedTotals || !order.proProfileId) {
+          return order;
+        }
+
+        const costEstimate = await orderEstimationService.estimateOrderCost({
+          proProfileId: order.proProfileId,
+          estimatedHours: order.estimatedHours,
+          categoryId: order.categoryId,
+        });
+        return { ...order, costEstimate };
       } catch (error) {
         throw mapDomainErrorToTRPCError(error);
       }

@@ -179,6 +179,8 @@ export type UserWhereInput = {
   ordersAsClient?: Prisma.OrderListRelationFilter
   reviewsAsClient?: Prisma.ReviewListRelationFilter
   paymentsAsClient?: Prisma.PaymentListRelationFilter
+  messagesSent?: Prisma.OrderMessageListRelationFilter
+  threadStates?: Prisma.OrderThreadStateListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -191,6 +193,8 @@ export type UserOrderByWithRelationInput = {
   ordersAsClient?: Prisma.OrderOrderByRelationAggregateInput
   reviewsAsClient?: Prisma.ReviewOrderByRelationAggregateInput
   paymentsAsClient?: Prisma.PaymentOrderByRelationAggregateInput
+  messagesSent?: Prisma.OrderMessageOrderByRelationAggregateInput
+  threadStates?: Prisma.OrderThreadStateOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -206,6 +210,8 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   ordersAsClient?: Prisma.OrderListRelationFilter
   reviewsAsClient?: Prisma.ReviewListRelationFilter
   paymentsAsClient?: Prisma.PaymentListRelationFilter
+  messagesSent?: Prisma.OrderMessageListRelationFilter
+  threadStates?: Prisma.OrderThreadStateListRelationFilter
 }, "id">
 
 export type UserOrderByWithAggregationInput = {
@@ -238,6 +244,8 @@ export type UserCreateInput = {
   ordersAsClient?: Prisma.OrderCreateNestedManyWithoutClientInput
   reviewsAsClient?: Prisma.ReviewCreateNestedManyWithoutClientInput
   paymentsAsClient?: Prisma.PaymentCreateNestedManyWithoutClientInput
+  messagesSent?: Prisma.OrderMessageCreateNestedManyWithoutSenderInput
+  threadStates?: Prisma.OrderThreadStateCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -250,6 +258,8 @@ export type UserUncheckedCreateInput = {
   ordersAsClient?: Prisma.OrderUncheckedCreateNestedManyWithoutClientInput
   reviewsAsClient?: Prisma.ReviewUncheckedCreateNestedManyWithoutClientInput
   paymentsAsClient?: Prisma.PaymentUncheckedCreateNestedManyWithoutClientInput
+  messagesSent?: Prisma.OrderMessageUncheckedCreateNestedManyWithoutSenderInput
+  threadStates?: Prisma.OrderThreadStateUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -262,6 +272,8 @@ export type UserUpdateInput = {
   ordersAsClient?: Prisma.OrderUpdateManyWithoutClientNestedInput
   reviewsAsClient?: Prisma.ReviewUpdateManyWithoutClientNestedInput
   paymentsAsClient?: Prisma.PaymentUpdateManyWithoutClientNestedInput
+  messagesSent?: Prisma.OrderMessageUpdateManyWithoutSenderNestedInput
+  threadStates?: Prisma.OrderThreadStateUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -274,6 +286,8 @@ export type UserUncheckedUpdateInput = {
   ordersAsClient?: Prisma.OrderUncheckedUpdateManyWithoutClientNestedInput
   reviewsAsClient?: Prisma.ReviewUncheckedUpdateManyWithoutClientNestedInput
   paymentsAsClient?: Prisma.PaymentUncheckedUpdateManyWithoutClientNestedInput
+  messagesSent?: Prisma.OrderMessageUncheckedUpdateManyWithoutSenderNestedInput
+  threadStates?: Prisma.OrderThreadStateUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -321,6 +335,11 @@ export type UserMinOrderByAggregateInput = {
 export type UserScalarRelationFilter = {
   is?: Prisma.UserWhereInput
   isNot?: Prisma.UserWhereInput
+}
+
+export type UserNullableScalarRelationFilter = {
+  is?: Prisma.UserWhereInput | null
+  isNot?: Prisma.UserWhereInput | null
 }
 
 export type StringFieldUpdateOperationsInput = {
@@ -381,6 +400,36 @@ export type UserUpdateOneRequiredWithoutOrdersAsClientNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutOrdersAsClientInput, Prisma.UserUpdateWithoutOrdersAsClientInput>, Prisma.UserUncheckedUpdateWithoutOrdersAsClientInput>
 }
 
+export type UserCreateNestedOneWithoutMessagesSentInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutMessagesSentInput, Prisma.UserUncheckedCreateWithoutMessagesSentInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutMessagesSentInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutMessagesSentNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutMessagesSentInput, Prisma.UserUncheckedCreateWithoutMessagesSentInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutMessagesSentInput
+  upsert?: Prisma.UserUpsertWithoutMessagesSentInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutMessagesSentInput, Prisma.UserUpdateWithoutMessagesSentInput>, Prisma.UserUncheckedUpdateWithoutMessagesSentInput>
+}
+
+export type UserCreateNestedOneWithoutThreadStatesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutThreadStatesInput, Prisma.UserUncheckedCreateWithoutThreadStatesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutThreadStatesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutThreadStatesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutThreadStatesInput, Prisma.UserUncheckedCreateWithoutThreadStatesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutThreadStatesInput
+  upsert?: Prisma.UserUpsertWithoutThreadStatesInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutThreadStatesInput, Prisma.UserUpdateWithoutThreadStatesInput>, Prisma.UserUncheckedUpdateWithoutThreadStatesInput>
+}
+
 export type UserCreateNestedOneWithoutReviewsAsClientInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutReviewsAsClientInput, Prisma.UserUncheckedCreateWithoutReviewsAsClientInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutReviewsAsClientInput
@@ -418,6 +467,8 @@ export type UserCreateWithoutProProfileInput = {
   ordersAsClient?: Prisma.OrderCreateNestedManyWithoutClientInput
   reviewsAsClient?: Prisma.ReviewCreateNestedManyWithoutClientInput
   paymentsAsClient?: Prisma.PaymentCreateNestedManyWithoutClientInput
+  messagesSent?: Prisma.OrderMessageCreateNestedManyWithoutSenderInput
+  threadStates?: Prisma.OrderThreadStateCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutProProfileInput = {
@@ -429,6 +480,8 @@ export type UserUncheckedCreateWithoutProProfileInput = {
   ordersAsClient?: Prisma.OrderUncheckedCreateNestedManyWithoutClientInput
   reviewsAsClient?: Prisma.ReviewUncheckedCreateNestedManyWithoutClientInput
   paymentsAsClient?: Prisma.PaymentUncheckedCreateNestedManyWithoutClientInput
+  messagesSent?: Prisma.OrderMessageUncheckedCreateNestedManyWithoutSenderInput
+  threadStates?: Prisma.OrderThreadStateUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutProProfileInput = {
@@ -456,6 +509,8 @@ export type UserUpdateWithoutProProfileInput = {
   ordersAsClient?: Prisma.OrderUpdateManyWithoutClientNestedInput
   reviewsAsClient?: Prisma.ReviewUpdateManyWithoutClientNestedInput
   paymentsAsClient?: Prisma.PaymentUpdateManyWithoutClientNestedInput
+  messagesSent?: Prisma.OrderMessageUpdateManyWithoutSenderNestedInput
+  threadStates?: Prisma.OrderThreadStateUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutProProfileInput = {
@@ -467,6 +522,8 @@ export type UserUncheckedUpdateWithoutProProfileInput = {
   ordersAsClient?: Prisma.OrderUncheckedUpdateManyWithoutClientNestedInput
   reviewsAsClient?: Prisma.ReviewUncheckedUpdateManyWithoutClientNestedInput
   paymentsAsClient?: Prisma.PaymentUncheckedUpdateManyWithoutClientNestedInput
+  messagesSent?: Prisma.OrderMessageUncheckedUpdateManyWithoutSenderNestedInput
+  threadStates?: Prisma.OrderThreadStateUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutClientProfileInput = {
@@ -478,6 +535,8 @@ export type UserCreateWithoutClientProfileInput = {
   ordersAsClient?: Prisma.OrderCreateNestedManyWithoutClientInput
   reviewsAsClient?: Prisma.ReviewCreateNestedManyWithoutClientInput
   paymentsAsClient?: Prisma.PaymentCreateNestedManyWithoutClientInput
+  messagesSent?: Prisma.OrderMessageCreateNestedManyWithoutSenderInput
+  threadStates?: Prisma.OrderThreadStateCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutClientProfileInput = {
@@ -489,6 +548,8 @@ export type UserUncheckedCreateWithoutClientProfileInput = {
   ordersAsClient?: Prisma.OrderUncheckedCreateNestedManyWithoutClientInput
   reviewsAsClient?: Prisma.ReviewUncheckedCreateNestedManyWithoutClientInput
   paymentsAsClient?: Prisma.PaymentUncheckedCreateNestedManyWithoutClientInput
+  messagesSent?: Prisma.OrderMessageUncheckedCreateNestedManyWithoutSenderInput
+  threadStates?: Prisma.OrderThreadStateUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutClientProfileInput = {
@@ -516,6 +577,8 @@ export type UserUpdateWithoutClientProfileInput = {
   ordersAsClient?: Prisma.OrderUpdateManyWithoutClientNestedInput
   reviewsAsClient?: Prisma.ReviewUpdateManyWithoutClientNestedInput
   paymentsAsClient?: Prisma.PaymentUpdateManyWithoutClientNestedInput
+  messagesSent?: Prisma.OrderMessageUpdateManyWithoutSenderNestedInput
+  threadStates?: Prisma.OrderThreadStateUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutClientProfileInput = {
@@ -527,6 +590,8 @@ export type UserUncheckedUpdateWithoutClientProfileInput = {
   ordersAsClient?: Prisma.OrderUncheckedUpdateManyWithoutClientNestedInput
   reviewsAsClient?: Prisma.ReviewUncheckedUpdateManyWithoutClientNestedInput
   paymentsAsClient?: Prisma.PaymentUncheckedUpdateManyWithoutClientNestedInput
+  messagesSent?: Prisma.OrderMessageUncheckedUpdateManyWithoutSenderNestedInput
+  threadStates?: Prisma.OrderThreadStateUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutOrdersAsClientInput = {
@@ -538,6 +603,8 @@ export type UserCreateWithoutOrdersAsClientInput = {
   clientProfile?: Prisma.ClientProfileCreateNestedOneWithoutUserInput
   reviewsAsClient?: Prisma.ReviewCreateNestedManyWithoutClientInput
   paymentsAsClient?: Prisma.PaymentCreateNestedManyWithoutClientInput
+  messagesSent?: Prisma.OrderMessageCreateNestedManyWithoutSenderInput
+  threadStates?: Prisma.OrderThreadStateCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutOrdersAsClientInput = {
@@ -549,6 +616,8 @@ export type UserUncheckedCreateWithoutOrdersAsClientInput = {
   clientProfile?: Prisma.ClientProfileUncheckedCreateNestedOneWithoutUserInput
   reviewsAsClient?: Prisma.ReviewUncheckedCreateNestedManyWithoutClientInput
   paymentsAsClient?: Prisma.PaymentUncheckedCreateNestedManyWithoutClientInput
+  messagesSent?: Prisma.OrderMessageUncheckedCreateNestedManyWithoutSenderInput
+  threadStates?: Prisma.OrderThreadStateUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutOrdersAsClientInput = {
@@ -576,6 +645,8 @@ export type UserUpdateWithoutOrdersAsClientInput = {
   clientProfile?: Prisma.ClientProfileUpdateOneWithoutUserNestedInput
   reviewsAsClient?: Prisma.ReviewUpdateManyWithoutClientNestedInput
   paymentsAsClient?: Prisma.PaymentUpdateManyWithoutClientNestedInput
+  messagesSent?: Prisma.OrderMessageUpdateManyWithoutSenderNestedInput
+  threadStates?: Prisma.OrderThreadStateUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutOrdersAsClientInput = {
@@ -587,6 +658,144 @@ export type UserUncheckedUpdateWithoutOrdersAsClientInput = {
   clientProfile?: Prisma.ClientProfileUncheckedUpdateOneWithoutUserNestedInput
   reviewsAsClient?: Prisma.ReviewUncheckedUpdateManyWithoutClientNestedInput
   paymentsAsClient?: Prisma.PaymentUncheckedUpdateManyWithoutClientNestedInput
+  messagesSent?: Prisma.OrderMessageUncheckedUpdateManyWithoutSenderNestedInput
+  threadStates?: Prisma.OrderThreadStateUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutMessagesSentInput = {
+  id?: string
+  role?: $Enums.Role
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  proProfile?: Prisma.ProProfileCreateNestedOneWithoutUserInput
+  clientProfile?: Prisma.ClientProfileCreateNestedOneWithoutUserInput
+  ordersAsClient?: Prisma.OrderCreateNestedManyWithoutClientInput
+  reviewsAsClient?: Prisma.ReviewCreateNestedManyWithoutClientInput
+  paymentsAsClient?: Prisma.PaymentCreateNestedManyWithoutClientInput
+  threadStates?: Prisma.OrderThreadStateCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutMessagesSentInput = {
+  id?: string
+  role?: $Enums.Role
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  proProfile?: Prisma.ProProfileUncheckedCreateNestedOneWithoutUserInput
+  clientProfile?: Prisma.ClientProfileUncheckedCreateNestedOneWithoutUserInput
+  ordersAsClient?: Prisma.OrderUncheckedCreateNestedManyWithoutClientInput
+  reviewsAsClient?: Prisma.ReviewUncheckedCreateNestedManyWithoutClientInput
+  paymentsAsClient?: Prisma.PaymentUncheckedCreateNestedManyWithoutClientInput
+  threadStates?: Prisma.OrderThreadStateUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutMessagesSentInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutMessagesSentInput, Prisma.UserUncheckedCreateWithoutMessagesSentInput>
+}
+
+export type UserUpsertWithoutMessagesSentInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutMessagesSentInput, Prisma.UserUncheckedUpdateWithoutMessagesSentInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutMessagesSentInput, Prisma.UserUncheckedCreateWithoutMessagesSentInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutMessagesSentInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutMessagesSentInput, Prisma.UserUncheckedUpdateWithoutMessagesSentInput>
+}
+
+export type UserUpdateWithoutMessagesSentInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  proProfile?: Prisma.ProProfileUpdateOneWithoutUserNestedInput
+  clientProfile?: Prisma.ClientProfileUpdateOneWithoutUserNestedInput
+  ordersAsClient?: Prisma.OrderUpdateManyWithoutClientNestedInput
+  reviewsAsClient?: Prisma.ReviewUpdateManyWithoutClientNestedInput
+  paymentsAsClient?: Prisma.PaymentUpdateManyWithoutClientNestedInput
+  threadStates?: Prisma.OrderThreadStateUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutMessagesSentInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  proProfile?: Prisma.ProProfileUncheckedUpdateOneWithoutUserNestedInput
+  clientProfile?: Prisma.ClientProfileUncheckedUpdateOneWithoutUserNestedInput
+  ordersAsClient?: Prisma.OrderUncheckedUpdateManyWithoutClientNestedInput
+  reviewsAsClient?: Prisma.ReviewUncheckedUpdateManyWithoutClientNestedInput
+  paymentsAsClient?: Prisma.PaymentUncheckedUpdateManyWithoutClientNestedInput
+  threadStates?: Prisma.OrderThreadStateUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutThreadStatesInput = {
+  id?: string
+  role?: $Enums.Role
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  proProfile?: Prisma.ProProfileCreateNestedOneWithoutUserInput
+  clientProfile?: Prisma.ClientProfileCreateNestedOneWithoutUserInput
+  ordersAsClient?: Prisma.OrderCreateNestedManyWithoutClientInput
+  reviewsAsClient?: Prisma.ReviewCreateNestedManyWithoutClientInput
+  paymentsAsClient?: Prisma.PaymentCreateNestedManyWithoutClientInput
+  messagesSent?: Prisma.OrderMessageCreateNestedManyWithoutSenderInput
+}
+
+export type UserUncheckedCreateWithoutThreadStatesInput = {
+  id?: string
+  role?: $Enums.Role
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  proProfile?: Prisma.ProProfileUncheckedCreateNestedOneWithoutUserInput
+  clientProfile?: Prisma.ClientProfileUncheckedCreateNestedOneWithoutUserInput
+  ordersAsClient?: Prisma.OrderUncheckedCreateNestedManyWithoutClientInput
+  reviewsAsClient?: Prisma.ReviewUncheckedCreateNestedManyWithoutClientInput
+  paymentsAsClient?: Prisma.PaymentUncheckedCreateNestedManyWithoutClientInput
+  messagesSent?: Prisma.OrderMessageUncheckedCreateNestedManyWithoutSenderInput
+}
+
+export type UserCreateOrConnectWithoutThreadStatesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutThreadStatesInput, Prisma.UserUncheckedCreateWithoutThreadStatesInput>
+}
+
+export type UserUpsertWithoutThreadStatesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutThreadStatesInput, Prisma.UserUncheckedUpdateWithoutThreadStatesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutThreadStatesInput, Prisma.UserUncheckedCreateWithoutThreadStatesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutThreadStatesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutThreadStatesInput, Prisma.UserUncheckedUpdateWithoutThreadStatesInput>
+}
+
+export type UserUpdateWithoutThreadStatesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  proProfile?: Prisma.ProProfileUpdateOneWithoutUserNestedInput
+  clientProfile?: Prisma.ClientProfileUpdateOneWithoutUserNestedInput
+  ordersAsClient?: Prisma.OrderUpdateManyWithoutClientNestedInput
+  reviewsAsClient?: Prisma.ReviewUpdateManyWithoutClientNestedInput
+  paymentsAsClient?: Prisma.PaymentUpdateManyWithoutClientNestedInput
+  messagesSent?: Prisma.OrderMessageUpdateManyWithoutSenderNestedInput
+}
+
+export type UserUncheckedUpdateWithoutThreadStatesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  proProfile?: Prisma.ProProfileUncheckedUpdateOneWithoutUserNestedInput
+  clientProfile?: Prisma.ClientProfileUncheckedUpdateOneWithoutUserNestedInput
+  ordersAsClient?: Prisma.OrderUncheckedUpdateManyWithoutClientNestedInput
+  reviewsAsClient?: Prisma.ReviewUncheckedUpdateManyWithoutClientNestedInput
+  paymentsAsClient?: Prisma.PaymentUncheckedUpdateManyWithoutClientNestedInput
+  messagesSent?: Prisma.OrderMessageUncheckedUpdateManyWithoutSenderNestedInput
 }
 
 export type UserCreateWithoutReviewsAsClientInput = {
@@ -598,6 +807,8 @@ export type UserCreateWithoutReviewsAsClientInput = {
   clientProfile?: Prisma.ClientProfileCreateNestedOneWithoutUserInput
   ordersAsClient?: Prisma.OrderCreateNestedManyWithoutClientInput
   paymentsAsClient?: Prisma.PaymentCreateNestedManyWithoutClientInput
+  messagesSent?: Prisma.OrderMessageCreateNestedManyWithoutSenderInput
+  threadStates?: Prisma.OrderThreadStateCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutReviewsAsClientInput = {
@@ -609,6 +820,8 @@ export type UserUncheckedCreateWithoutReviewsAsClientInput = {
   clientProfile?: Prisma.ClientProfileUncheckedCreateNestedOneWithoutUserInput
   ordersAsClient?: Prisma.OrderUncheckedCreateNestedManyWithoutClientInput
   paymentsAsClient?: Prisma.PaymentUncheckedCreateNestedManyWithoutClientInput
+  messagesSent?: Prisma.OrderMessageUncheckedCreateNestedManyWithoutSenderInput
+  threadStates?: Prisma.OrderThreadStateUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutReviewsAsClientInput = {
@@ -636,6 +849,8 @@ export type UserUpdateWithoutReviewsAsClientInput = {
   clientProfile?: Prisma.ClientProfileUpdateOneWithoutUserNestedInput
   ordersAsClient?: Prisma.OrderUpdateManyWithoutClientNestedInput
   paymentsAsClient?: Prisma.PaymentUpdateManyWithoutClientNestedInput
+  messagesSent?: Prisma.OrderMessageUpdateManyWithoutSenderNestedInput
+  threadStates?: Prisma.OrderThreadStateUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReviewsAsClientInput = {
@@ -647,6 +862,8 @@ export type UserUncheckedUpdateWithoutReviewsAsClientInput = {
   clientProfile?: Prisma.ClientProfileUncheckedUpdateOneWithoutUserNestedInput
   ordersAsClient?: Prisma.OrderUncheckedUpdateManyWithoutClientNestedInput
   paymentsAsClient?: Prisma.PaymentUncheckedUpdateManyWithoutClientNestedInput
+  messagesSent?: Prisma.OrderMessageUncheckedUpdateManyWithoutSenderNestedInput
+  threadStates?: Prisma.OrderThreadStateUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutPaymentsAsClientInput = {
@@ -658,6 +875,8 @@ export type UserCreateWithoutPaymentsAsClientInput = {
   clientProfile?: Prisma.ClientProfileCreateNestedOneWithoutUserInput
   ordersAsClient?: Prisma.OrderCreateNestedManyWithoutClientInput
   reviewsAsClient?: Prisma.ReviewCreateNestedManyWithoutClientInput
+  messagesSent?: Prisma.OrderMessageCreateNestedManyWithoutSenderInput
+  threadStates?: Prisma.OrderThreadStateCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutPaymentsAsClientInput = {
@@ -669,6 +888,8 @@ export type UserUncheckedCreateWithoutPaymentsAsClientInput = {
   clientProfile?: Prisma.ClientProfileUncheckedCreateNestedOneWithoutUserInput
   ordersAsClient?: Prisma.OrderUncheckedCreateNestedManyWithoutClientInput
   reviewsAsClient?: Prisma.ReviewUncheckedCreateNestedManyWithoutClientInput
+  messagesSent?: Prisma.OrderMessageUncheckedCreateNestedManyWithoutSenderInput
+  threadStates?: Prisma.OrderThreadStateUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutPaymentsAsClientInput = {
@@ -696,6 +917,8 @@ export type UserUpdateWithoutPaymentsAsClientInput = {
   clientProfile?: Prisma.ClientProfileUpdateOneWithoutUserNestedInput
   ordersAsClient?: Prisma.OrderUpdateManyWithoutClientNestedInput
   reviewsAsClient?: Prisma.ReviewUpdateManyWithoutClientNestedInput
+  messagesSent?: Prisma.OrderMessageUpdateManyWithoutSenderNestedInput
+  threadStates?: Prisma.OrderThreadStateUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPaymentsAsClientInput = {
@@ -707,6 +930,8 @@ export type UserUncheckedUpdateWithoutPaymentsAsClientInput = {
   clientProfile?: Prisma.ClientProfileUncheckedUpdateOneWithoutUserNestedInput
   ordersAsClient?: Prisma.OrderUncheckedUpdateManyWithoutClientNestedInput
   reviewsAsClient?: Prisma.ReviewUncheckedUpdateManyWithoutClientNestedInput
+  messagesSent?: Prisma.OrderMessageUncheckedUpdateManyWithoutSenderNestedInput
+  threadStates?: Prisma.OrderThreadStateUncheckedUpdateManyWithoutUserNestedInput
 }
 
 
@@ -718,12 +943,16 @@ export type UserCountOutputType = {
   ordersAsClient: number
   reviewsAsClient: number
   paymentsAsClient: number
+  messagesSent: number
+  threadStates: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   ordersAsClient?: boolean | UserCountOutputTypeCountOrdersAsClientArgs
   reviewsAsClient?: boolean | UserCountOutputTypeCountReviewsAsClientArgs
   paymentsAsClient?: boolean | UserCountOutputTypeCountPaymentsAsClientArgs
+  messagesSent?: boolean | UserCountOutputTypeCountMessagesSentArgs
+  threadStates?: boolean | UserCountOutputTypeCountThreadStatesArgs
 }
 
 /**
@@ -757,6 +986,20 @@ export type UserCountOutputTypeCountPaymentsAsClientArgs<ExtArgs extends runtime
   where?: Prisma.PaymentWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountMessagesSentArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.OrderMessageWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountThreadStatesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.OrderThreadStateWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -768,6 +1011,8 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   ordersAsClient?: boolean | Prisma.User$ordersAsClientArgs<ExtArgs>
   reviewsAsClient?: boolean | Prisma.User$reviewsAsClientArgs<ExtArgs>
   paymentsAsClient?: boolean | Prisma.User$paymentsAsClientArgs<ExtArgs>
+  messagesSent?: boolean | Prisma.User$messagesSentArgs<ExtArgs>
+  threadStates?: boolean | Prisma.User$threadStatesArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -799,6 +1044,8 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   ordersAsClient?: boolean | Prisma.User$ordersAsClientArgs<ExtArgs>
   reviewsAsClient?: boolean | Prisma.User$reviewsAsClientArgs<ExtArgs>
   paymentsAsClient?: boolean | Prisma.User$paymentsAsClientArgs<ExtArgs>
+  messagesSent?: boolean | Prisma.User$messagesSentArgs<ExtArgs>
+  threadStates?: boolean | Prisma.User$threadStatesArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -812,6 +1059,8 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     ordersAsClient: Prisma.$OrderPayload<ExtArgs>[]
     reviewsAsClient: Prisma.$ReviewPayload<ExtArgs>[]
     paymentsAsClient: Prisma.$PaymentPayload<ExtArgs>[]
+    messagesSent: Prisma.$OrderMessagePayload<ExtArgs>[]
+    threadStates: Prisma.$OrderThreadStatePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1217,6 +1466,8 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   ordersAsClient<T extends Prisma.User$ordersAsClientArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$ordersAsClientArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   reviewsAsClient<T extends Prisma.User$reviewsAsClientArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$reviewsAsClientArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReviewPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   paymentsAsClient<T extends Prisma.User$paymentsAsClientArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$paymentsAsClientArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  messagesSent<T extends Prisma.User$messagesSentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$messagesSentArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OrderMessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  threadStates<T extends Prisma.User$threadStatesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$threadStatesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OrderThreadStatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1745,6 +1996,54 @@ export type User$paymentsAsClientArgs<ExtArgs extends runtime.Types.Extensions.I
   take?: number
   skip?: number
   distinct?: Prisma.PaymentScalarFieldEnum | Prisma.PaymentScalarFieldEnum[]
+}
+
+/**
+ * User.messagesSent
+ */
+export type User$messagesSentArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the OrderMessage
+   */
+  select?: Prisma.OrderMessageSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the OrderMessage
+   */
+  omit?: Prisma.OrderMessageOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.OrderMessageInclude<ExtArgs> | null
+  where?: Prisma.OrderMessageWhereInput
+  orderBy?: Prisma.OrderMessageOrderByWithRelationInput | Prisma.OrderMessageOrderByWithRelationInput[]
+  cursor?: Prisma.OrderMessageWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.OrderMessageScalarFieldEnum | Prisma.OrderMessageScalarFieldEnum[]
+}
+
+/**
+ * User.threadStates
+ */
+export type User$threadStatesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the OrderThreadState
+   */
+  select?: Prisma.OrderThreadStateSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the OrderThreadState
+   */
+  omit?: Prisma.OrderThreadStateOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.OrderThreadStateInclude<ExtArgs> | null
+  where?: Prisma.OrderThreadStateWhereInput
+  orderBy?: Prisma.OrderThreadStateOrderByWithRelationInput | Prisma.OrderThreadStateOrderByWithRelationInput[]
+  cursor?: Prisma.OrderThreadStateWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.OrderThreadStateScalarFieldEnum | Prisma.OrderThreadStateScalarFieldEnum[]
 }
 
 /**

@@ -15,7 +15,8 @@ export type NotificationEvent =
   | "order.canceled"
   | "payment.required"
   | "payment.authorized"
-  | "review.received";
+  | "review.received"
+  | "chat.new_message";
 
 /**
  * Recipient role (determines channel preferences)
@@ -56,6 +57,7 @@ export function buildNotificationMessages(params: {
     "order.disputed",
     "order.canceled",
     "payment.required",
+    "chat.new_message",
   ];
   const isImportant = importantEvents.includes(event);
 

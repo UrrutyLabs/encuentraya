@@ -57,6 +57,8 @@ export const ModelName = {
   Availability: 'Availability',
   Order: 'Order',
   OrderLineItem: 'OrderLineItem',
+  OrderMessage: 'OrderMessage',
+  OrderThreadState: 'OrderThreadState',
   Review: 'Review',
   Payment: 'Payment',
   PaymentEvent: 'PaymentEvent',
@@ -218,6 +220,33 @@ export const OrderLineItemScalarFieldEnum = {
 } as const
 
 export type OrderLineItemScalarFieldEnum = (typeof OrderLineItemScalarFieldEnum)[keyof typeof OrderLineItemScalarFieldEnum]
+
+
+export const OrderMessageScalarFieldEnum = {
+  id: 'id',
+  orderId: 'orderId',
+  senderUserId: 'senderUserId',
+  senderRole: 'senderRole',
+  type: 'type',
+  text: 'text',
+  attachmentsJson: 'attachmentsJson',
+  createdAt: 'createdAt'
+} as const
+
+export type OrderMessageScalarFieldEnum = (typeof OrderMessageScalarFieldEnum)[keyof typeof OrderMessageScalarFieldEnum]
+
+
+export const OrderThreadStateScalarFieldEnum = {
+  id: 'id',
+  orderId: 'orderId',
+  userId: 'userId',
+  lastReadAt: 'lastReadAt',
+  mutedUntil: 'mutedUntil',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type OrderThreadStateScalarFieldEnum = (typeof OrderThreadStateScalarFieldEnum)[keyof typeof OrderThreadStateScalarFieldEnum]
 
 
 export const ReviewScalarFieldEnum = {

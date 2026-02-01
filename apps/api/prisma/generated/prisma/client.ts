@@ -70,6 +70,16 @@ export type Order = Prisma.OrderModel
  */
 export type OrderLineItem = Prisma.OrderLineItemModel
 /**
+ * Model OrderMessage
+ * 
+ */
+export type OrderMessage = Prisma.OrderMessageModel
+/**
+ * Model OrderThreadState
+ * 
+ */
+export type OrderThreadState = Prisma.OrderThreadStateModel
+/**
  * Model Review
  * 
  */

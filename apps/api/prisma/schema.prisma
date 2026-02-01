@@ -151,6 +151,18 @@ enum DisputeStatus {
   canceled
 }
 
+enum ChatSenderRole {
+  client
+  pro
+  admin
+  system
+}
+
+enum ChatMessageType {
+  user
+  system
+}
+
 model User {
   id        String    @id @default(cuid())
   role      Role      @default(client)
@@ -163,6 +175,8 @@ model User {
   ordersAsClient   Order[]   @relation("ClientOrders")
   reviewsAsClient  Review[]   @relation("ClientReviews")
   paymentsAsClient Payment[] @relation("ClientPayments")
+  messagesSent     OrderMessage[]
+  threadStates     OrderThreadState[]
 
   @@index([role])
   @@index([deletedAt])
@@ -315,6 +329,8 @@ model Order {
   review                    Review?
   payment                   Payment?
   earning                   Earning?
+  messages                  OrderMessage[]
+  threadStates              OrderThreadState[]
   
   @@index([clientUserId])
   @@index([proProfileId])
@@ -347,6 +363,44 @@ model OrderLineItem {
   @@index([orderId])
   @@index([type])
   @@map("order_line_items")
+}
+
+model OrderMessage {
+  id              String          @id @default(cuid())
+  orderId         String
+  senderUserId    String?
+  senderRole      ChatSenderRole  @default(system)
+  type            ChatMessageType @default(user)
+  text            String
+  attachmentsJson Json?
+  createdAt       DateTime        @default(now())
+
+  // Relations
+  order  Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  sender User?  @relation(fields: [senderUserId], references: [id], onDelete: SetNull)
+
+  @@index([orderId, createdAt])
+  @@index([senderUserId])
+  @@map("order_messages")
+}
+
+model OrderThreadState {
+  id         String   @id @default(cuid())
+  orderId    String
+  userId     String
+  lastReadAt DateTime?
+  mutedUntil DateTime?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Relations
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([orderId, userId])
+  @@index([userId])
+  @@index([orderId])
+  @@map("order_thread_states")
 }
 
 model Review {

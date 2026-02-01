@@ -216,3 +216,14 @@ export const orderEstimateOutputSchema = z.object({
 });
 
 export type OrderEstimateOutput = z.infer<typeof orderEstimateOutputSchema>;
+
+/**
+ * Order with optional server-computed cost estimate.
+ * Used by getById when order has no persisted totals (pre-finalization).
+ */
+export const orderWithCostEstimateSchema = orderSchema.merge(
+  z.object({
+    costEstimate: orderEstimateOutputSchema.optional(),
+  })
+);
+export type OrderWithCostEstimate = z.infer<typeof orderWithCostEstimateSchema>;

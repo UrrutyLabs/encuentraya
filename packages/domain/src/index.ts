@@ -115,6 +115,7 @@ export {
   orderEstimateInputSchema,
   orderEstimateOutputSchema,
   orderEstimateLineItemSchema,
+  orderWithCostEstimateSchema,
   type Order,
   type OrderCreateInput,
   type OrderUpdateInput,
@@ -124,6 +125,7 @@ export {
   type OrderEstimateInput,
   type OrderEstimateOutput,
   type OrderEstimateLineItem,
+  type OrderWithCostEstimate,
 } from "./schemas/order.schema";
 
 // Format utilities

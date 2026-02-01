@@ -1,6 +1,6 @@
-import { View, StyleSheet, ScrollView } from "react-native";
+import { View, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
 import { useState, useCallback, useMemo } from "react";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { Feather } from "@expo/vector-icons";
 import { Text } from "@components/ui/Text";
 import { Card } from "@components/ui/Card";
@@ -18,6 +18,7 @@ import { useCategoryLookup } from "../../hooks/category/useCategoryLookup";
 
 export function JobDetailScreen() {
   const { jobId } = useLocalSearchParams<{ jobId: string }>();
+  const router = useRouter();
   const [localStatus, setLocalStatus] = useState<OrderStatus | null>(null);
 
   // Fetch order by id via hook (using jobId from route, but orderId for API)
@@ -345,6 +346,33 @@ export function JobDetailScreen() {
         )}
       </Card>
 
+      {/* Mensajes CTA */}
+      {orderId && (
+        <Card style={styles.chatCard}>
+          <TouchableOpacity
+            style={styles.chatCta}
+            onPress={() => router.push(`/job/${orderId}/chat` as any)}
+            activeOpacity={0.7}
+          >
+            <View style={styles.chatCtaLeft}>
+              <Feather
+                name="message-circle"
+                size={22}
+                color={theme.colors.primary}
+              />
+              <Text variant="h2" style={styles.chatCtaText}>
+                Mensajes
+              </Text>
+            </View>
+            <Feather
+              name="chevron-right"
+              size={20}
+              color={theme.colors.muted}
+            />
+          </TouchableOpacity>
+        </Card>
+      )}
+
       {/* Actions */}
       {actionError && (
         <Card style={styles.errorCard}>
@@ -481,6 +509,24 @@ const styles = StyleSheet.create({
   },
   card: {
     marginBottom: theme.spacing[4],
+  },
+  chatCard: {
+    marginBottom: theme.spacing[4],
+  },
+  chatCta: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: theme.spacing[2],
+    paddingHorizontal: theme.spacing[3],
+  },
+  chatCtaLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: theme.spacing[2],
+  },
+  chatCtaText: {
+    color: theme.colors.text,
   },
   sectionHeader: {
     flexDirection: "row",

@@ -2,8 +2,32 @@ import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
 
 /**
- * Date formatting utilities
+ * Date formatting utilities (es-UY locale)
  */
+
+/**
+ * Format date with day, long month, year, and time (e.g. "30 enero 2025, 14:30")
+ */
+export function formatDate(date: Date): string {
+  return new Intl.DateTimeFormat("es-UY", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(date);
+}
+
+/**
+ * Format date short: day, short month, year (e.g. "30 ene. 2025")
+ */
+export function formatDateShort(date: Date): string {
+  return new Intl.DateTimeFormat("es-UY", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  }).format(date);
+}
 
 /**
  * Format a date as "X days ago" in Spanish using date-fns

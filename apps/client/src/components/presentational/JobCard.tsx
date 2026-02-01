@@ -3,7 +3,14 @@
 import { memo, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Clock, CreditCard, RotateCcw, Star, ArrowRight } from "lucide-react";
+import {
+  Clock,
+  CreditCard,
+  RotateCcw,
+  Star,
+  ArrowRight,
+  MessageCircle,
+} from "lucide-react";
 import { Card } from "@repo/ui";
 import { Text } from "@repo/ui";
 import { Badge } from "@repo/ui";
@@ -63,6 +70,7 @@ export const JobCard = memo(
       () => job.status === OrderStatus.COMPLETED && job.proProfileId,
       [job.status, job.proProfileId]
     );
+    const showMensajes = !!job.proProfileId;
 
     // Memoize event handlers
     const handleCardClick = useCallback(() => {
@@ -125,6 +133,16 @@ export const JobCard = memo(
             ${displayAmount.toFixed(0)}
           </Text>
           <div className="flex items-center gap-2 flex-wrap justify-end">
+            {showMensajes && (
+              <Link
+                href={`/my-jobs/${job.id}/chat`}
+                onClick={(e) => e.stopPropagation()}
+                className="min-h-[44px] md:min-h-0 flex items-center gap-1 px-4 py-2 md:px-3 md:py-1 border border-primary text-primary rounded-lg text-sm font-medium touch-manipulation hover:bg-primary/5 transition-colors"
+              >
+                <MessageCircle className="w-4 h-4" />
+                Mensajes
+              </Link>
+            )}
             {showPaymentPrompt && (
               <button
                 onClick={handlePayNow}
@@ -189,6 +207,7 @@ export const JobCard = memo(
       prevProps.job.id === nextProps.job.id &&
       prevProps.job.status === nextProps.job.status &&
       prevProps.job.categoryId === nextProps.job.categoryId &&
+      prevProps.job.proProfileId === nextProps.job.proProfileId &&
       prevProps.hasReview === nextProps.hasReview
     );
   }

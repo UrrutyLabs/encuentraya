@@ -9,6 +9,5 @@ export { ReviewSectionProfessional } from "./ReviewSectionProfessional";
 export { ReviewSectionServiceDetails } from "./ReviewSectionServiceDetails";
 export { ReviewSectionLocation } from "./ReviewSectionLocation";
 export { ReviewSectionSummary } from "./ReviewSectionSummary";
-export { ReviewCostBreakdown } from "./ReviewCostBreakdown";
 export { ReviewQuestionAnswers } from "./ReviewQuestionAnswers";
 export type { FormattedQuestionAnswer } from "./ReviewQuestionAnswers";
