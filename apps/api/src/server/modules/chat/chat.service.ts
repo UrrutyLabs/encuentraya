@@ -16,7 +16,7 @@ import {
   ChatClosedError,
   ChatContactInfoNotAllowedError,
 } from "./chat.errors";
-import { containsContactInfo } from "./contact-info-detector";
+import { containsContactInfoAsync } from "./openai-violation-detector";
 import { AuditEventType } from "@modules/audit/audit.repo";
 
 const CHAT_CLOSE_HOURS_AFTER_COMPLETED = 24;
@@ -120,7 +120,7 @@ export class ChatService {
     if (!isChatOpen(order, now)) throw new ChatClosedError(orderId);
 
     const trimmedText = text.trim();
-    if (containsContactInfo(trimmedText)) {
+    if (await containsContactInfoAsync(trimmedText)) {
       await this.auditService.logEvent({
         eventType: AuditEventType.CHAT_CONTACT_INFO_DETECTED,
         actor,

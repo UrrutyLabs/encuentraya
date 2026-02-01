@@ -29,10 +29,10 @@ import {
   ChatContactInfoNotAllowedError,
 } from "../chat.errors";
 import { AuditEventType } from "@modules/audit/audit.repo";
-import * as contactInfoDetector from "../contact-info-detector";
+import * as openaiViolationDetector from "../openai-violation-detector";
 
-vi.mock("../contact-info-detector", () => ({
-  containsContactInfo: vi.fn(),
+vi.mock("../openai-violation-detector", () => ({
+  containsContactInfoAsync: vi.fn(),
 }));
 
 function createMockOrder(overrides?: Partial<OrderEntity>): OrderEntity {
@@ -139,7 +139,9 @@ describe("ChatService", () => {
       mockNotificationService as unknown as NotificationService,
       mockAuditService as unknown as AuditService
     );
-    vi.mocked(contactInfoDetector.containsContactInfo).mockReturnValue(false);
+    vi.mocked(
+      openaiViolationDetector.containsContactInfoAsync
+    ).mockResolvedValue(false);
     vi.clearAllMocks();
   });
 
@@ -245,7 +247,9 @@ describe("ChatService", () => {
       const order = createMockOrder({ clientUserId: "client-1" });
       mockOrderRepo.findById.mockResolvedValue(order);
       mockProRepo.findById.mockResolvedValue(null);
-      vi.mocked(contactInfoDetector.containsContactInfo).mockReturnValue(true);
+      vi.mocked(
+        openaiViolationDetector.containsContactInfoAsync
+      ).mockResolvedValue(true);
 
       await expect(
         service.send(
@@ -309,9 +313,9 @@ describe("ChatService", () => {
         "  Hello  "
       );
 
-      expect(contactInfoDetector.containsContactInfo).toHaveBeenCalledWith(
-        "Hello"
-      );
+      expect(
+        openaiViolationDetector.containsContactInfoAsync
+      ).toHaveBeenCalledWith("Hello");
       expect(mockChatRepo.createMessage).toHaveBeenCalledWith({
         orderId: "order-1",
         senderUserId: "client-1",
@@ -335,9 +339,9 @@ describe("ChatService", () => {
         "  Hi there  "
       );
 
-      expect(contactInfoDetector.containsContactInfo).toHaveBeenCalledWith(
-        "Hi there"
-      );
+      expect(
+        openaiViolationDetector.containsContactInfoAsync
+      ).toHaveBeenCalledWith("Hi there");
       expect(mockChatRepo.createMessage).toHaveBeenCalledWith(
         expect.objectContaining({ text: "Hi there" })
       );
