@@ -4,6 +4,7 @@ vi.mock("@/server/container", () => ({
   TOKENS: {
     OrderRepository: "OrderRepository",
     OrderLineItemRepository: "OrderLineItemRepository",
+    ReceiptRepository: "ReceiptRepository",
     OrderService: "OrderService",
     PaymentServiceFactory: "PaymentServiceFactory",
     PaymentRepository: "PaymentRepository",
@@ -17,6 +18,7 @@ import type {
   OrderLineItemRepository,
   OrderLineItemEntity,
 } from "../orderLineItem.repo";
+import type { ReceiptRepository } from "../receipt.repo";
 import type {
   PaymentRepository,
   PaymentEntity,
@@ -42,6 +44,7 @@ describe("OrderFinalizationService", () => {
   let mockOrderLineItemRepository: ReturnType<
     typeof createMockOrderLineItemRepository
   >;
+  let mockReceiptRepository: ReturnType<typeof createMockReceiptRepository>;
   let mockOrderService: ReturnType<typeof createMockOrderService>;
   let mockPaymentServiceFactory: ReturnType<
     typeof createMockPaymentServiceFactory
@@ -94,6 +97,16 @@ describe("OrderFinalizationService", () => {
   } {
     return {
       createEarningForOrder: vi.fn(),
+    };
+  }
+
+  function createMockReceiptRepository(): {
+    create: ReturnType<typeof vi.fn>;
+    findByOrderId: ReturnType<typeof vi.fn>;
+  } {
+    return {
+      create: vi.fn().mockResolvedValue(undefined),
+      findByOrderId: vi.fn().mockResolvedValue(null),
     };
   }
 
@@ -264,6 +277,7 @@ describe("OrderFinalizationService", () => {
 
     mockOrderRepository = createMockOrderRepository();
     mockOrderLineItemRepository = createMockOrderLineItemRepository();
+    mockReceiptRepository = createMockReceiptRepository();
     mockOrderService = createMockOrderService();
     mockPaymentServiceFactory = createMockPaymentServiceFactory();
     mockPaymentRepository = createMockPaymentRepository();
@@ -272,6 +286,7 @@ describe("OrderFinalizationService", () => {
     service = new OrderFinalizationService(
       mockOrderRepository as unknown as OrderRepository,
       mockOrderLineItemRepository as unknown as OrderLineItemRepository,
+      mockReceiptRepository as unknown as ReceiptRepository,
       mockOrderService as unknown as OrderService,
       mockPaymentServiceFactory,
       mockPaymentRepository as unknown as PaymentRepository,

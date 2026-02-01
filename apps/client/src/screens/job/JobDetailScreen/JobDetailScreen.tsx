@@ -3,7 +3,7 @@
 import { useParams, useRouter } from "next/navigation";
 import { Navigation } from "@/components/presentational/Navigation";
 import { JobDetailSkeleton } from "@/components/presentational/JobDetailSkeleton";
-import { OrderStatus, type OrderWithCostEstimate } from "@repo/domain";
+import { OrderStatus, type OrderDetailView } from "@repo/domain";
 import { useOrderDetail } from "@/hooks/order";
 import { useCancelOrder } from "@/hooks/order";
 import { useCategory } from "@/hooks/category";
@@ -31,7 +31,7 @@ export function JobDetailScreen() {
   const { cancelOrder, isPending: isCancelling } = useCancelOrder(orderId);
   const { category } = useCategory(order?.categoryId);
 
-  const job: OrderWithCostEstimate | undefined = order ?? undefined;
+  const job: OrderDetailView | undefined = order ?? undefined;
 
   const canCancel =
     job &&

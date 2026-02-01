@@ -8,6 +8,10 @@ import {
   OrderLineItemRepository,
   OrderLineItemRepositoryImpl,
 } from "@modules/order/orderLineItem.repo";
+import {
+  ReceiptRepository,
+  ReceiptRepositoryImpl,
+} from "@modules/order/receipt.repo";
 import { OrderService } from "@modules/order/order.service";
 import { OrderCreationService } from "@modules/order/order.creation.service";
 import { OrderEstimationService } from "@modules/order/order.estimation.service";
@@ -27,6 +31,10 @@ export function registerOrderModule(container: DependencyContainer): void {
 
   container.register<OrderLineItemRepository>(TOKENS.OrderLineItemRepository, {
     useClass: OrderLineItemRepositoryImpl,
+  });
+
+  container.register<ReceiptRepository>(TOKENS.ReceiptRepository, {
+    useClass: ReceiptRepositoryImpl,
   });
 
   // Register services (auto-resolves dependencies)

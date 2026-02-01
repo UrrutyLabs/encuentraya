@@ -48,6 +48,12 @@ export type Order = Prisma.OrderModel
  */
 export type OrderLineItem = Prisma.OrderLineItemModel
 /**
+ * Model Receipt
+ * Immutable receipt created at order finalization (textbook approach).
+ * One-to-one with Order; stores final cost snapshot for display/audit.
+ */
+export type Receipt = Prisma.ReceiptModel
+/**
  * Model OrderMessage
  * 
  */

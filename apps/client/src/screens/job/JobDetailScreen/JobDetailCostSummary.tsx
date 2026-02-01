@@ -4,15 +4,14 @@ import { Text } from "@repo/ui";
 import { Card } from "@repo/ui";
 import { toMajorUnits } from "@repo/domain";
 import { CostBreakdown } from "@/components/presentational/CostBreakdown";
-import { orderToCostEstimation } from "./utils/orderToCostEstimation";
-import type { OrderWithCostEstimate } from "@repo/domain";
+import type { OrderDetailView } from "@repo/domain";
 
 interface JobDetailCostSummaryProps {
-  job: OrderWithCostEstimate;
+  job: OrderDetailView;
 }
 
 export function JobDetailCostSummary({ job }: JobDetailCostSummaryProps) {
-  const estimation = job.costEstimate ?? orderToCostEstimation(job);
+  const { kind: _kind, ...estimation } = job.costBreakdown;
 
   return (
     <Card className="p-4 md:p-6 mb-4 md:mb-6">

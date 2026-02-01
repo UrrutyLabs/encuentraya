@@ -25,6 +25,7 @@ export const TOKENS = {
   ProProfileCategoryRepository: "ProProfileCategoryRepository",
   OrderRepository: "OrderRepository",
   OrderLineItemRepository: "OrderLineItemRepository",
+  ReceiptRepository: "ReceiptRepository",
   ChatRepository: "ChatRepository",
 
   // Services

@@ -57,6 +57,7 @@ export const ModelName = {
   Availability: 'Availability',
   Order: 'Order',
   OrderLineItem: 'OrderLineItem',
+  Receipt: 'Receipt',
   OrderMessage: 'OrderMessage',
   OrderThreadState: 'OrderThreadState',
   Review: 'Review',
@@ -220,6 +221,26 @@ export const OrderLineItemScalarFieldEnum = {
 } as const
 
 export type OrderLineItemScalarFieldEnum = (typeof OrderLineItemScalarFieldEnum)[keyof typeof OrderLineItemScalarFieldEnum]
+
+
+export const ReceiptScalarFieldEnum = {
+  id: 'id',
+  orderId: 'orderId',
+  lineItems: 'lineItems',
+  laborAmount: 'laborAmount',
+  platformFeeAmount: 'platformFeeAmount',
+  platformFeeRate: 'platformFeeRate',
+  taxAmount: 'taxAmount',
+  taxRate: 'taxRate',
+  subtotalAmount: 'subtotalAmount',
+  totalAmount: 'totalAmount',
+  currency: 'currency',
+  finalizedAt: 'finalizedAt',
+  approvedHours: 'approvedHours',
+  createdAt: 'createdAt'
+} as const
+
+export type ReceiptScalarFieldEnum = (typeof ReceiptScalarFieldEnum)[keyof typeof ReceiptScalarFieldEnum]
 
 
 export const OrderMessageScalarFieldEnum = {

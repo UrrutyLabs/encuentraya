@@ -206,7 +206,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: theme.spacing[1],
     marginTop: theme.spacing[2],
-    paddingVertical: theme.spacing[2],
+    paddingVertical: theme.spacing[1],
     paddingHorizontal: theme.spacing[2],
     borderWidth: 1,
     borderColor: theme.colors.primary,

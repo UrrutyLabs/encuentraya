@@ -365,6 +365,26 @@ model OrderLineItem {
   @@map("order_line_items")
 }
 
+model Receipt {
+  id                 String   @id @default(cuid())
+  orderId            String   @unique
+  lineItems          Json     // array of { type, description, amount } (minor units)
+  laborAmount        Float    // minor units
+  platformFeeAmount  Float    // minor units
+  platformFeeRate    Float
+  taxAmount          Float    // minor units
+  taxRate            Float
+  subtotalAmount     Float    // minor units
+  totalAmount        Float    // minor units
+  currency           String   @default("UYU")
+  finalizedAt        DateTime
+  approvedHours      Float?   // hours used for final calculation
+  createdAt          DateTime @default(now())
+
+  @@index([orderId])
+  @@map("receipts")
+}
+
 model OrderMessage {
   id              String          @id @default(cuid())
   orderId         String

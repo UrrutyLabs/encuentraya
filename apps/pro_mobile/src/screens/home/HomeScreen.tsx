@@ -40,6 +40,13 @@ export function HomeScreen() {
     [router]
   );
 
+  const handleChatPress = useCallback(
+    (orderId: string) => {
+      router.push(`/job/${orderId}/chat` as any);
+    },
+    [router]
+  );
+
   if (isLoading) {
     return (
       <ScrollView
@@ -84,6 +91,7 @@ export function HomeScreen() {
               key={job.id}
               job={job}
               onPress={() => handleCardPress(job.id)}
+              onChatPress={handleChatPress}
             />
           ))
         )}
@@ -110,6 +118,7 @@ export function HomeScreen() {
               key={job.id}
               job={job}
               onPress={() => handleCardPress(job.id)}
+              onChatPress={handleChatPress}
             />
           ))
         )}
