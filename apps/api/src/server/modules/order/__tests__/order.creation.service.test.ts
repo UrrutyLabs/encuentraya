@@ -4,6 +4,7 @@ vi.mock("@/server/container", () => ({
   TOKENS: {
     OrderRepository: "OrderRepository",
     ProRepository: "ProRepository",
+    ProProfileCategoryRepository: "ProProfileCategoryRepository",
     ClientProfileService: "ClientProfileService",
     OrderService: "OrderService",
     CategoryRepository: "CategoryRepository",
@@ -18,6 +19,7 @@ import type { ClientProfileService } from "@modules/user/clientProfile.service";
 import { OrderService } from "../order.service";
 import type { CategoryRepository } from "@modules/category/category.repo";
 import type { SubcategoryService } from "@modules/subcategory/subcategory.service";
+import type { ProProfileCategoryRepository } from "@modules/pro/proProfileCategory.repo";
 import type {
   ApprovalMethod,
   DisputeStatus,
@@ -38,6 +40,17 @@ describe("OrderCreationService", () => {
   let mockOrderService: ReturnType<typeof createMockOrderService>;
   let mockCategoryRepository: ReturnType<typeof createMockCategoryRepository>;
   let mockSubcategoryService: ReturnType<typeof createMockSubcategoryService>;
+  let mockProProfileCategoryRepository: ReturnType<
+    typeof createMockProProfileCategoryRepository
+  >;
+
+  function createMockProProfileCategoryRepository(): {
+    findByProProfileAndCategory: ReturnType<typeof vi.fn>;
+  } {
+    return {
+      findByProProfileAndCategory: vi.fn(),
+    };
+  }
 
   function createMockOrderRepository(): {
     create: ReturnType<typeof vi.fn>;
@@ -151,6 +164,10 @@ describe("OrderCreationService", () => {
       hourlyRateSnapshotAmount: 10000, // 100 UYU/hour in minor units (cents)
       currency: "UYU",
       minHoursSnapshot: null,
+      quotedAmountCents: null,
+      quotedAt: null,
+      quoteMessage: null,
+      quoteAcceptedAt: null,
       estimatedHours: 2,
       finalHoursSubmitted: null,
       approvedHours: null,
@@ -191,6 +208,7 @@ describe("OrderCreationService", () => {
 
     mockOrderRepository = createMockOrderRepository();
     mockProRepository = createMockProRepository();
+    mockProProfileCategoryRepository = createMockProProfileCategoryRepository();
     mockClientProfileService = createMockClientProfileService();
     mockOrderService = createMockOrderService();
     mockCategoryRepository = createMockCategoryRepository();
@@ -199,6 +217,7 @@ describe("OrderCreationService", () => {
     service = new OrderCreationService(
       mockOrderRepository as unknown as OrderRepository,
       mockProRepository as unknown as ProRepository,
+      mockProProfileCategoryRepository as unknown as ProProfileCategoryRepository,
       mockClientProfileService as unknown as ClientProfileService,
       mockOrderService as unknown as OrderService,
       mockCategoryRepository as unknown as CategoryRepository,
@@ -470,6 +489,108 @@ describe("OrderCreationService", () => {
       expect(
         mockClientProfileService.ensureClientProfileExists
       ).toHaveBeenCalledWith(actor.id);
+    });
+
+    it("should create fixed-price order when category has pricingMode fixed", async () => {
+      const actor = createMockActor();
+      const input = createValidInput();
+      input.estimatedHours = 0;
+      const proProfile = createMockProProfile();
+      const orderEntity = createMockOrderEntity({
+        pricingMode: "fixed",
+        estimatedHours: null,
+        hourlyRateSnapshotAmount: 0,
+      });
+      const order = createMockOrder();
+
+      mockClientProfileService.ensureClientProfileExists.mockResolvedValue(
+        undefined
+      );
+      mockProRepository.findById.mockResolvedValue(proProfile);
+      mockCategoryRepository.findById.mockResolvedValue({
+        id: "cat-plumbing",
+        key: "PLUMBING",
+        name: "Plomería",
+        slug: "plomeria",
+        iconName: null,
+        description: null,
+        sortOrder: 0,
+        pricingMode: "fixed",
+        paymentStrategy: "single_capture",
+        isActive: true,
+        deletedAt: null,
+        configJson: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+      mockOrderRepository.findByClientUserId.mockResolvedValue([]);
+      mockOrderRepository.create.mockResolvedValue(orderEntity);
+      mockOrderService.getOrderById.mockResolvedValue(order);
+
+      const result = await service.createOrderRequest(actor, input);
+
+      expect(result).toBeDefined();
+      expect(mockOrderRepository.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          pricingMode: "fixed",
+          estimatedHours: 0,
+          hourlyRateSnapshotAmount: 0,
+        })
+      );
+    });
+
+    it("should use ProProfileCategory hourlyRateCents when present for hourly order", async () => {
+      const actor = createMockActor();
+      const input = createValidInput();
+      const proProfile = createMockProProfile({ hourlyRate: 10000 });
+      const orderEntity = createMockOrderEntity({
+        hourlyRateSnapshotAmount: 25000, // 250 UYU from junction
+      });
+      const order = createMockOrder();
+
+      mockClientProfileService.ensureClientProfileExists.mockResolvedValue(
+        undefined
+      );
+      mockProRepository.findById.mockResolvedValue(proProfile);
+      mockCategoryRepository.findById.mockResolvedValue({
+        id: "cat-plumbing",
+        key: "PLUMBING",
+        name: "Plomería",
+        slug: "plomeria",
+        iconName: null,
+        description: null,
+        sortOrder: 0,
+        pricingMode: "hourly",
+        paymentStrategy: "single_capture",
+        isActive: true,
+        deletedAt: null,
+        configJson: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+      mockProProfileCategoryRepository.findByProProfileAndCategory.mockResolvedValue(
+        {
+          id: "rel-1",
+          proProfileId: "pro-1",
+          categoryId: "cat-plumbing",
+          hourlyRateCents: 25000,
+          startingFromCents: null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        }
+      );
+      mockOrderRepository.findByClientUserId.mockResolvedValue([]);
+      mockOrderRepository.create.mockResolvedValue(orderEntity);
+      mockOrderService.getOrderById.mockResolvedValue(order);
+
+      await service.createOrderRequest(actor, input);
+
+      expect(mockOrderRepository.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          hourlyRateSnapshotAmount: 25000,
+          pricingMode: "hourly",
+        })
+      );
     });
   });
 });

@@ -118,6 +118,47 @@ describe("useCheckout", () => {
       expect(mockMutateAsync).toHaveBeenCalledWith({ orderId: "order-1" });
       expect(mockAssign).toHaveBeenCalledWith("https://checkout.example.com");
     });
+
+    it("should call createPreauth for fixed order with quotedAmountCents when no payment yet", async () => {
+      const mockOrder = {
+        id: "order-1",
+        status: OrderStatus.ACCEPTED,
+        pricingMode: "fixed" as const,
+        quotedAmountCents: 50000,
+        currency: "UYU",
+      };
+
+      mockTrpcOrderGetById.mockReturnValue({
+        data: mockOrder,
+        isLoading: false,
+        error: null,
+      });
+
+      mockTrpcPaymentGetByOrder.mockReturnValue({
+        data: undefined,
+        isLoading: false,
+        error: null,
+      });
+
+      const mockMutateAsync = vi.fn().mockResolvedValue({
+        paymentId: "payment-1",
+        checkoutUrl: "https://checkout.example.com",
+      });
+
+      mockTrpcPaymentCreatePreauthForOrder.mockImplementation(() => ({
+        mutateAsync: mockMutateAsync,
+        isPending: false,
+        error: null,
+      }));
+
+      const { result } = renderHook(() => useCheckout("order-1"));
+
+      await act(async () => {
+        await result.current.authorizePayment();
+      });
+
+      expect(mockMutateAsync).toHaveBeenCalledWith({ orderId: "order-1" });
+    });
   });
 
   describe("when orderId is undefined", () => {

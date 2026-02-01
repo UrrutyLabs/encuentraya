@@ -16,11 +16,13 @@ interface ReviewStepContentProps {
   formattedQuestionAnswers: FormattedQuestionAnswer[];
   address: string;
   hours: string;
-  estimatedCost: number;
+  /** Undefined for fixed-price (pro will send quote) */
+  estimatedCost: number | undefined;
   hourlyRate: number;
   costEstimation: OrderEstimateOutput | null | undefined;
   isEstimatingCost: boolean;
   costEstimationError: unknown;
+  isFixedPrice?: boolean;
 }
 
 /**
@@ -42,6 +44,7 @@ export function ReviewStepContent({
   costEstimation,
   isEstimatingCost,
   costEstimationError,
+  isFixedPrice = false,
 }: ReviewStepContentProps) {
   return (
     <>
@@ -62,7 +65,11 @@ export function ReviewStepContent({
 
           <div className="border-t border-border" aria-hidden />
 
-          <ReviewSectionLocation address={address} hours={hours} />
+          <ReviewSectionLocation
+            address={address}
+            hours={hours}
+            isFixedPrice={isFixedPrice}
+          />
         </div>
       </Card>
 
@@ -75,6 +82,7 @@ export function ReviewStepContent({
           estimatedCost={estimatedCost}
           hourlyRate={hourlyRate}
           hours={hours}
+          isFixedPrice={isFixedPrice}
         />
       </Card>
     </>

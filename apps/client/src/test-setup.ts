@@ -71,6 +71,8 @@ const mockTrpcOrderListByClient = vi.fn();
 const mockTrpcOrderGetById = vi.fn();
 const mockTrpcOrderCreate = vi.fn();
 const mockTrpcOrderCancel = vi.fn();
+const mockTrpcOrderAcceptQuote = vi.fn();
+const mockTrpcOrderApproveHours = vi.fn();
 const mockTrpcReviewStatusByOrderIds = vi.fn();
 const mockTrpcReviewByOrder = vi.fn();
 const mockTrpcPaymentGetByOrder = vi.fn();
@@ -221,6 +223,14 @@ vi.mock("@/lib/trpc/client", () => {
         cancel: {
           useMutation: (...args: unknown[]) => mockTrpcOrderCancel(...args),
         },
+        acceptQuote: {
+          useMutation: (...args: unknown[]) =>
+            mockTrpcOrderAcceptQuote(...args),
+        },
+        approveHours: {
+          useMutation: (...args: unknown[]) =>
+            mockTrpcOrderApproveHours(...args),
+        },
       },
       contact: {
         submit: {
@@ -254,6 +264,8 @@ export {
   mockTrpcOrderGetById,
   mockTrpcOrderCreate,
   mockTrpcOrderCancel,
+  mockTrpcOrderAcceptQuote,
+  mockTrpcOrderApproveHours,
   mockTrpcReviewStatusByOrderIds,
   mockTrpcReviewByOrder,
   mockTrpcPaymentGetByOrder,

@@ -137,6 +137,14 @@ enum TaxBehavior {
 
 enum PricingMode {
   hourly
+  fixed
+}
+
+// How payment is captured for an order (single_capture = full amount at completion; reserve for future: deposit_balance, milestones)
+enum PaymentStrategy {
+  single_capture
+  // deposit_balance
+  // milestones
 }
 
 enum ApprovalMethod {
@@ -290,8 +298,14 @@ model Order {
   currency                  String        @default("UYU")
   minHoursSnapshot          Float?
   
+  // Quote (fixed-price flow)
+  quotedAmountCents        Int?
+  quotedAt                 DateTime?
+  quoteMessage             String?
+  quoteAcceptedAt          DateTime?
+
   // Hours
-  estimatedHours            Float
+  estimatedHours            Float?       // Optional for fixed; use 0 or null when pricingMode is fixed
   finalHoursSubmitted      Float?
   approvedHours             Float?
   approvalMethod            ApprovalMethod?
@@ -638,18 +652,20 @@ model AuditLog {
 
 // Category table - data-driven categories with soft delete
 model Category {
-  id         String    @id @default(cuid())
-  key        String    // Stable identifier like "PLUMBING"
-  name       String    // Display name (migrated from CategoryMetadata.displayName)
-  slug       String
-  iconName   String?   // e.g., "Wrench" (for Lucide icons) - migrated from CategoryMetadata.iconName
-  description String?  // Migrated from CategoryMetadata.description
-  sortOrder  Int       @default(0) // Migrated from CategoryMetadata.displayOrder
-  isActive   Boolean   @default(true)
-  deletedAt  DateTime? // Soft delete timestamp
-  configJson Json?     // Category-level UI defaults
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+  id               String           @id @default(cuid())
+  key              String           // Stable identifier like "PLUMBING"
+  name             String           // Display name (migrated from CategoryMetadata.displayName)
+  slug             String
+  iconName         String?          // e.g., "Wrench" (for Lucide icons) - migrated from CategoryMetadata.iconName
+  description      String?          // Migrated from CategoryMetadata.description
+  sortOrder        Int              @default(0) // Migrated from CategoryMetadata.displayOrder
+  pricingMode      PricingMode      @default(hourly)
+  paymentStrategy  PaymentStrategy  @default(single_capture)
+  isActive         Boolean          @default(true)
+  deletedAt        DateTime?        // Soft delete timestamp
+  configJson       Json?            // Category-level UI defaults
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
 
   // Relations
   subcategories Subcategory[]
@@ -690,15 +706,13 @@ model Subcategory {
 }
 
 model ProProfileCategory {
-  id          String     @id @default(cuid())
-  proProfileId String
-  categoryId   String
-  // Optional future metadata fields:
-  // certifiedAt     DateTime?
-  // yearsExperience Int?
-  // isPrimary       Boolean   @default(false)
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
+  id                String     @id @default(cuid())
+  proProfileId      String
+  categoryId        String
+  hourlyRateCents   Int?       // For hourly categories: rate in minor units
+  startingFromCents Int?       // For fixed categories: "starting from" price in minor units
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
 
   proProfile  ProProfile @relation(fields: [proProfileId], references: [id], onDelete: Cascade)
   category    Category   @relation(fields: [categoryId], references: [id], onDelete: Restrict)

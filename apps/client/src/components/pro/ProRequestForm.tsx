@@ -2,9 +2,13 @@ import { Calendar } from "lucide-react";
 import { Text } from "@repo/ui";
 import { Card } from "@repo/ui";
 import { Button } from "@repo/ui";
+import type { StartingPriceForCategory } from "@repo/domain";
 
 interface ProRequestFormProps {
+  /** Fallback when no category context (e.g. legacy) */
   hourlyRate: number;
+  /** When pro.getById was called with categoryId; used for "$X/hora" (hourly) or "Desde $X" (fixed) */
+  startingPriceForCategory?: StartingPriceForCategory | null;
   proId: string;
   onContratar: () => void;
   disabled?: boolean;
@@ -14,23 +18,44 @@ interface ProRequestFormProps {
   isMobileFooter?: boolean;
 }
 
+function formatPriceLabel(
+  startingPriceForCategory: StartingPriceForCategory | null | undefined,
+  hourlyRate: number
+): string {
+  if (!startingPriceForCategory) {
+    return `$${hourlyRate.toFixed(0)}/hora`;
+  }
+  const { pricingMode, hourlyRateCents, startingFromCents } =
+    startingPriceForCategory;
+  if (pricingMode === "fixed" && startingFromCents != null) {
+    return `Desde $${(startingFromCents / 100).toFixed(0)}`;
+  }
+  if (hourlyRateCents != null) {
+    return `$${(hourlyRateCents / 100).toFixed(0)}/hora`;
+  }
+  return `$${hourlyRate.toFixed(0)}/hora`;
+}
+
 /**
  * Pro Request Form Component
  * Fixed sidebar form (desktop) or inline form (mobile footer)
- * Displays rate/hour and Contratar button
+ * Displays starting price (by category) and Contratar button. Only shown when category context is set.
  */
 export function ProRequestForm({
   hourlyRate,
+  startingPriceForCategory,
   onContratar,
   disabled = false,
   isMobileFooter = false,
 }: ProRequestFormProps) {
+  const priceLabel = formatPriceLabel(startingPriceForCategory, hourlyRate);
+
   const content = (
     <>
-      {/* Rate/hour - Hidden on mobile footer, shown on desktop */}
+      {/* Rate - Hidden on mobile footer, shown on desktop */}
       <div className="hidden md:block mb-6">
         <Text variant="h2" className="text-primary text-center">
-          ${hourlyRate.toFixed(0)}/hora
+          {priceLabel}
         </Text>
       </div>
 
@@ -41,7 +66,7 @@ export function ProRequestForm({
             Tarifa
           </Text>
           <Text variant="h3" className="text-primary">
-            ${hourlyRate.toFixed(0)}/hora
+            {priceLabel}
           </Text>
         </div>
         <Button

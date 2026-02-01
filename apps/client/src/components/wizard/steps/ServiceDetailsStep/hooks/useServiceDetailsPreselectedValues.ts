@@ -80,7 +80,7 @@ export function useServiceDetailsPreselectedValues({
       return {
         categorySlug: rebookCategory.slug,
         address: rebookTemplate.addressText,
-        hours: rebookTemplate.estimatedHours.toString(),
+        hours: (rebookTemplate.estimatedHours ?? 0).toString(),
       };
     }
     return null;

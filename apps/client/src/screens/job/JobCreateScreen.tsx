@@ -50,7 +50,7 @@ function JobCreateContent() {
       return {
         categoryId: rebookTemplate.categoryId,
         address: rebookTemplate.addressText,
-        hours: rebookTemplate.estimatedHours.toString(),
+        hours: (rebookTemplate.estimatedHours ?? 0).toString(),
       };
     }
     return null;

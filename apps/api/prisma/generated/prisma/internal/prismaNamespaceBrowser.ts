@@ -179,6 +179,10 @@ export const OrderScalarFieldEnum = {
   hourlyRateSnapshotAmount: 'hourlyRateSnapshotAmount',
   currency: 'currency',
   minHoursSnapshot: 'minHoursSnapshot',
+  quotedAmountCents: 'quotedAmountCents',
+  quotedAt: 'quotedAt',
+  quoteMessage: 'quoteMessage',
+  quoteAcceptedAt: 'quoteAcceptedAt',
   estimatedHours: 'estimatedHours',
   finalHoursSubmitted: 'finalHoursSubmitted',
   approvedHours: 'approvedHours',
@@ -443,6 +447,8 @@ export const CategoryScalarFieldEnum = {
   iconName: 'iconName',
   description: 'description',
   sortOrder: 'sortOrder',
+  pricingMode: 'pricingMode',
+  paymentStrategy: 'paymentStrategy',
   isActive: 'isActive',
   deletedAt: 'deletedAt',
   configJson: 'configJson',
@@ -476,6 +482,8 @@ export const ProProfileCategoryScalarFieldEnum = {
   id: 'id',
   proProfileId: 'proProfileId',
   categoryId: 'categoryId',
+  hourlyRateCents: 'hourlyRateCents',
+  startingFromCents: 'startingFromCents',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

@@ -10,6 +10,7 @@ import { container, TOKENS } from "@/server/container";
 import { ProService } from "./pro.service";
 import {
   proOnboardInputSchema,
+  proUpdateProfileInputSchema,
   proSetAvailabilityInputSchema,
   updateAvailabilitySlotsInputSchema,
 } from "@repo/domain";
@@ -50,9 +51,15 @@ export const proRouter = router({
     }),
 
   getById: publicProcedure
-    .input(z.object({ id: z.string() }))
+    .input(
+      z.object({
+        id: z.string(),
+        categoryId: z.string().optional(),
+        subcategoryId: z.string().optional(),
+      })
+    )
     .query(async ({ input }) => {
-      const pro = await proService.getProById(input.id);
+      const pro = await proService.getProById(input.id, input.categoryId);
       if (!pro) {
         throw new TRPCError({
           code: "NOT_FOUND",
@@ -164,7 +171,7 @@ export const proRouter = router({
     }),
 
   updateProfile: proProcedure
-    .input(proOnboardInputSchema.partial())
+    .input(proUpdateProfileInputSchema)
     .mutation(async ({ input, ctx }) => {
       try {
         return await proService.updateProfile(ctx.actor.id, input);

@@ -10,11 +10,19 @@ interface UseOrderActionsReturn {
   markOnMyWay: (orderId: string) => Promise<void>;
   arriveOrder: (orderId: string) => Promise<void>;
   completeOrder: (orderId: string, finalHours: number) => Promise<void>;
+  submitQuote: (
+    orderId: string,
+    amountCents: number,
+    message?: string
+  ) => Promise<void>;
+  submitCompletion: (orderId: string) => Promise<void>;
   isAccepting: boolean;
   isRejecting: boolean;
   isMarkingOnMyWay: boolean;
   isArriving: boolean;
   isCompleting: boolean;
+  isSubmittingQuote: boolean;
+  isSubmittingCompletion: boolean;
   error: string | null;
 }
 
@@ -173,6 +181,47 @@ export function useOrderActions(onSuccess?: () => void): UseOrderActionsReturn {
     },
   });
 
+  const submitQuoteMutation = trpc.order.submitQuote.useMutation({
+    onMutate: async (variables: { orderId: string }) => {
+      const orderQueryKey: [string[], { id: string }] = [
+        ["order", "getById"],
+        { id: variables.orderId },
+      ];
+      await queryClient.cancelQueries({ queryKey: orderQueryKey });
+      await queryClient.cancelQueries({
+        queryKey: [["order", "listByPro"]],
+      });
+    },
+    onSuccess: (_, variables) => {
+      setError(null);
+      if (onSuccess) {
+        onSuccess();
+      }
+    },
+    onError: (err: { message?: string }) => {
+      setError(err.message || "Error al enviar el presupuesto");
+    },
+    onSettled: (_, __, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: [["order", "getById"], { id: variables.orderId }],
+      });
+      queryClient.invalidateQueries({ queryKey: [["order", "listByPro"]] });
+    },
+  });
+
+  const submitCompletionMutation = trpc.order.submitCompletion.useMutation({
+    ...createOrderOptimisticUpdate(OrderStatus.AWAITING_CLIENT_APPROVAL),
+    onSuccess: () => {
+      setError(null);
+      if (onSuccess) {
+        onSuccess();
+      }
+    },
+    onError: (err: { message?: string }) => {
+      setError(err.message || "Error al completar el trabajo");
+    },
+  });
+
   const acceptOrder = async (orderId: string) => {
     setError(null);
     try {
@@ -233,17 +282,49 @@ export function useOrderActions(onSuccess?: () => void): UseOrderActionsReturn {
     }
   };
 
+  const submitQuote = async (
+    orderId: string,
+    amountCents: number,
+    message?: string
+  ) => {
+    setError(null);
+    try {
+      await submitQuoteMutation.mutateAsync({ orderId, amountCents, message });
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Error al enviar el presupuesto";
+      setError(message);
+      throw err;
+    }
+  };
+
+  const submitCompletion = async (orderId: string) => {
+    setError(null);
+    try {
+      await submitCompletionMutation.mutateAsync({ orderId });
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Error al completar el trabajo";
+      setError(message);
+      throw err;
+    }
+  };
+
   return {
     acceptOrder,
     rejectOrder,
     markOnMyWay,
     arriveOrder,
     completeOrder,
+    submitQuote,
+    submitCompletion,
     isAccepting: acceptMutation.isPending,
     isRejecting: rejectMutation.isPending,
     isMarkingOnMyWay: markOnMyWayMutation.isPending,
     isArriving: arriveMutation.isPending,
     isCompleting: completeMutation.isPending,
+    isSubmittingQuote: submitQuoteMutation.isPending,
+    isSubmittingCompletion: submitCompletionMutation.isPending,
     error,
   };
 }

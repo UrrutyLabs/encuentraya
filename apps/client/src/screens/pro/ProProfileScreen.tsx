@@ -38,16 +38,16 @@ export function ProProfileScreen() {
   const categorySlug = searchParams.get("category") || undefined;
   const subcategorySlug = searchParams.get("subcategory") || undefined;
 
-  const { pro, isLoading, error } = useProDetail(proId);
-  const { user, loading: authLoading } = useAuth();
-  const { categories } = useCategories();
-
-  // Fetch category and subcategory from slugs
+  // Fetch category and subcategory from slugs first (needed for pro query with categoryId)
   const { category } = useCategoryBySlug(categorySlug);
   const { subcategory } = useSubcategoryBySlugAndCategoryId(
     subcategorySlug,
     category?.id
   );
+
+  const { pro, isLoading, error } = useProDetail(proId, category?.id);
+  const { user, loading: authLoading } = useAuth();
+  const { categories } = useCategories();
 
   // Map categoryIds to Category objects for display
   const proCategories = useMemo(
@@ -271,30 +271,35 @@ export function ProProfileScreen() {
               />
             </div>
 
-            {/* Right: Fixed Request Form (1 column on lg+) */}
+            {/* Right: Fixed Request Form (1 column on lg+) - only when category context set */}
             <div className="hidden lg:block lg:col-span-1">
               <div className="lg:sticky lg:top-4">
-                {isActive && !pro.isSuspended && !serviceValidationError && (
-                  <ProRequestForm
-                    hourlyRate={pro.hourlyRate}
-                    proId={pro.id}
-                    onContratar={handleReserveClick}
-                    disabled={authLoading}
-                    isMobileFooter={false}
-                  />
-                )}
+                {isActive &&
+                  !pro.isSuspended &&
+                  !serviceValidationError &&
+                  category && (
+                    <ProRequestForm
+                      hourlyRate={pro.hourlyRate}
+                      startingPriceForCategory={pro.startingPriceForCategory}
+                      proId={pro.id}
+                      onContratar={handleReserveClick}
+                      disabled={authLoading}
+                      isMobileFooter={false}
+                    />
+                  )}
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Mobile: Sticky Footer */}
-      {isActive && !pro.isSuspended && !serviceValidationError && (
+      {/* Mobile: Sticky Footer - only when category context set */}
+      {isActive && !pro.isSuspended && !serviceValidationError && category && (
         <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden border-t border-border bg-surface shadow-lg">
           <div className="px-4 py-3">
             <ProRequestForm
               hourlyRate={pro.hourlyRate}
+              startingPriceForCategory={pro.startingPriceForCategory}
               proId={pro.id}
               onContratar={handleReserveClick}
               disabled={authLoading}

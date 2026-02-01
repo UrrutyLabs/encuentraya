@@ -77,12 +77,18 @@ export const orderSchema = z.object({
 
   // Pricing snapshots
   pricingMode: pricingModeSchema,
-  hourlyRateSnapshotAmount: z.number().positive(),
+  hourlyRateSnapshotAmount: z.number().nonnegative(), // 0 for fixed orders
   currency: z.string(),
   minHoursSnapshot: z.number().positive().nullable(),
 
-  // Hours
-  estimatedHours: z.number().positive(),
+  // Quote (fixed-price flow); optional for backward compat until API returns them
+  quotedAmountCents: z.number().int().positive().nullable().optional(),
+  quotedAt: z.date().nullable().optional(),
+  quoteMessage: z.string().nullable().optional(),
+  quoteAcceptedAt: z.date().nullable().optional(),
+
+  // Hours (optional for fixed; use 0 or null when pricingMode is fixed)
+  estimatedHours: z.number().nonnegative().nullable().optional(),
   finalHoursSubmitted: z.number().positive().nullable(),
   approvedHours: z.number().positive().nullable(),
   approvalMethod: approvalMethodSchema.nullable(),
@@ -133,7 +139,8 @@ export const orderCreateInputSchema = z.object({
   addressLng: z.number().optional(),
   scheduledWindowStartAt: z.date(),
   scheduledWindowEndAt: z.date().optional(),
-  estimatedHours: z.number().positive(),
+  pricingMode: pricingModeSchema.optional(), // Set by backend from category; client may send for fixed
+  estimatedHours: z.number().nonnegative().optional(), // Optional/zero when pricingMode is fixed
   isFirstOrder: z.boolean().optional(),
 });
 

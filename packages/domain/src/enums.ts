@@ -79,6 +79,15 @@ export enum TaxBehavior {
  */
 export enum PricingMode {
   HOURLY = "hourly",
+  FIXED = "fixed",
+}
+
+/**
+ * How payment is captured for an order (single_capture = full amount at completion).
+ * Reserve for future: deposit_balance, milestones.
+ */
+export enum PaymentStrategy {
+  SINGLE_CAPTURE = "single_capture",
 }
 
 /**
@@ -113,5 +122,6 @@ export const orderStatusSchema = z.nativeEnum(OrderStatus);
 export const orderLineItemTypeSchema = z.nativeEnum(OrderLineItemType);
 export const taxBehaviorSchema = z.nativeEnum(TaxBehavior);
 export const pricingModeSchema = z.nativeEnum(PricingMode);
+export const paymentStrategySchema = z.nativeEnum(PaymentStrategy);
 export const approvalMethodSchema = z.nativeEnum(ApprovalMethod);
 export const disputeStatusSchema = z.nativeEnum(DisputeStatus);

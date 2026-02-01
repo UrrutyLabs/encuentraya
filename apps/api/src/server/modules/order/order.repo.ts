@@ -43,8 +43,14 @@ export interface OrderEntity {
   currency: string;
   minHoursSnapshot: number | null;
 
-  // Hours
-  estimatedHours: number;
+  // Quote (fixed-price flow)
+  quotedAmountCents: number | null;
+  quotedAt: Date | null;
+  quoteMessage: string | null;
+  quoteAcceptedAt: Date | null;
+
+  // Hours (null for fixed orders)
+  estimatedHours: number | null;
   finalHoursSubmitted: number | null;
   approvedHours: number | null;
   approvalMethod: string | null; // ApprovalMethod enum value
@@ -91,8 +97,12 @@ export interface OrderCreateInput {
   addressLng?: number;
   scheduledWindowStartAt: Date;
   scheduledWindowEndAt?: Date;
-  estimatedHours: number;
+  estimatedHours?: number | null; // Optional/null for fixed
   pricingMode?: string; // PricingMode enum value, defaults to "hourly"
+  quotedAmountCents?: number | null;
+  quotedAt?: Date | null;
+  quoteMessage?: string | null;
+  quoteAcceptedAt?: Date | null;
   hourlyRateSnapshotAmount: number;
   currency?: string; // defaults to "UYU"
   minHoursSnapshot?: number;
@@ -110,16 +120,20 @@ export interface OrderUpdateInput {
   addressLng?: number | null;
   scheduledWindowStartAt?: Date;
   scheduledWindowEndAt?: Date | null;
-  estimatedHours?: number;
+  estimatedHours?: number | null;
   finalHoursSubmitted?: number | null;
   approvedHours?: number | null;
-  approvalMethod?: string | null; // ApprovalMethod enum value
+  approvalMethod?: string | null;
   approvalDeadlineAt?: Date | null;
   arrivedAt?: Date | null;
   completedAt?: Date | null;
   cancelReason?: string | null;
   disputeReason?: string | null;
   disputeOpenedBy?: string | null;
+  quotedAmountCents?: number | null;
+  quotedAt?: Date | null;
+  quoteMessage?: string | null;
+  quoteAcceptedAt?: Date | null;
   subtotalAmount?: number | null;
   platformFeeAmount?: number | null;
   taxAmount?: number | null;
@@ -191,7 +205,7 @@ export class OrderRepositoryImpl implements OrderRepository {
         hourlyRateSnapshotAmount: input.hourlyRateSnapshotAmount,
         currency: input.currency ?? "UYU",
         minHoursSnapshot: input.minHoursSnapshot ?? null,
-        estimatedHours: input.estimatedHours,
+        estimatedHours: input.estimatedHours ?? null,
         isFirstOrder: input.isFirstOrder ?? false,
         status: $Enums.OrderStatus.pending_pro_confirmation,
       },
@@ -294,6 +308,13 @@ export class OrderRepositoryImpl implements OrderRepository {
     if (data.arrivedAt !== undefined) updateData.arrivedAt = data.arrivedAt;
     if (data.completedAt !== undefined)
       updateData.completedAt = data.completedAt;
+    if (data.quotedAmountCents !== undefined)
+      updateData.quotedAmountCents = data.quotedAmountCents;
+    if (data.quotedAt !== undefined) updateData.quotedAt = data.quotedAt;
+    if (data.quoteMessage !== undefined)
+      updateData.quoteMessage = data.quoteMessage;
+    if (data.quoteAcceptedAt !== undefined)
+      updateData.quoteAcceptedAt = data.quoteAcceptedAt;
     if (data.cancelReason !== undefined)
       updateData.cancelReason = data.cancelReason;
     if (data.disputeReason !== undefined)
@@ -420,7 +441,11 @@ export class OrderRepositoryImpl implements OrderRepository {
       hourlyRateSnapshotAmount: p.hourlyRateSnapshotAmount,
       currency: p.currency,
       minHoursSnapshot: p.minHoursSnapshot,
-      estimatedHours: p.estimatedHours,
+      quotedAmountCents: p.quotedAmountCents ?? null,
+      quotedAt: p.quotedAt ?? null,
+      quoteMessage: p.quoteMessage ?? null,
+      quoteAcceptedAt: p.quoteAcceptedAt ?? null,
+      estimatedHours: p.estimatedHours ?? null,
       finalHoursSubmitted: p.finalHoursSubmitted,
       approvedHours: p.approvedHours,
       approvalMethod: p.approvalMethod ? String(p.approvalMethod) : null,

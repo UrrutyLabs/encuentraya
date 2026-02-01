@@ -11,7 +11,12 @@ interface JobDetailCostSummaryProps {
 }
 
 export function JobDetailCostSummary({ job }: JobDetailCostSummaryProps) {
-  const { kind: _kind, ...estimation } = job.costBreakdown;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- omit kind from breakdown
+  const { kind, ...estimation } = job.costBreakdown;
+  const isFixed = job.pricingMode === "fixed";
+  const fixedFallbackAmount = isFixed
+    ? toMajorUnits(job.quotedAmountCents ?? job.totalAmount ?? 0)
+    : undefined;
 
   return (
     <Card className="p-4 md:p-6 mb-4 md:mb-6">
@@ -25,10 +30,12 @@ export function JobDetailCostSummary({ job }: JobDetailCostSummaryProps) {
         isLoading={false}
         error={null}
         fallbackLaborAmount={toMajorUnits(
-          job.hourlyRateSnapshotAmount * job.estimatedHours
+          job.hourlyRateSnapshotAmount * (job.estimatedHours ?? 0)
         )}
         fallbackHourlyRate={toMajorUnits(job.hourlyRateSnapshotAmount)}
-        fallbackHours={String(job.estimatedHours)}
+        fallbackHours={String(job.estimatedHours ?? 0)}
+        fallbackFixedAmount={fixedFallbackAmount}
+        fallbackCurrency={job.currency ?? "UYU"}
       />
     </Card>
   );

@@ -7,6 +7,7 @@ import { ReviewInfoRow } from "./ReviewInfoRow";
 interface ReviewSectionLocationProps {
   address: string;
   hours: string;
+  isFixedPrice?: boolean;
 }
 
 /**
@@ -16,7 +17,13 @@ interface ReviewSectionLocationProps {
 export function ReviewSectionLocation({
   address,
   hours,
+  isFixedPrice = false,
 }: ReviewSectionLocationProps) {
+  const durationValue = isFixedPrice
+    ? "El profesional te enviará un presupuesto"
+    : `${hours} horas`;
+  const durationLabel = isFixedPrice ? "Presupuesto" : "Horas estimadas";
+
   return (
     <section aria-labelledby="review-section-location">
       <Text
@@ -30,8 +37,8 @@ export function ReviewSectionLocation({
         <ReviewInfoRow icon={MapPin} label="Dirección" value={address} />
         <ReviewInfoRow
           icon={Hourglass}
-          label="Horas estimadas"
-          value={`${hours} horas`}
+          label={durationLabel}
+          value={durationValue}
         />
       </div>
     </section>

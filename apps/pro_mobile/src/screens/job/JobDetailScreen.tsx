@@ -1,4 +1,10 @@
-import { View, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  TextInput,
+} from "react-native";
 import { useState, useCallback, useMemo } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Feather } from "@expo/vector-icons";
@@ -7,14 +13,17 @@ import { Card } from "@components/ui/Card";
 import { Badge } from "@components/ui/Badge";
 import { Alert } from "@components/ui/Alert";
 import { Button } from "@components/ui/Button";
+import { Input } from "@components/ui/Input";
 import { JobDetailSkeleton } from "@components/presentational/JobDetailSkeleton";
 import { useOrderActions, useOrderDetail } from "@hooks/order";
-import { OrderStatus } from "@repo/domain";
+import { OrderStatus, toMinorUnits } from "@repo/domain";
 import { getJobStatusLabel, getJobStatusVariant } from "../../utils/jobStatus";
 import { JOB_LABELS } from "../../utils/jobLabels";
 import { formatAmount } from "../../utils/format";
 import { theme } from "../../theme";
 import { useCategoryLookup } from "../../hooks/category/useCategoryLookup";
+
+const QUOTE_AMOUNT_MAX_MAJOR = 999999;
 
 export function JobDetailScreen() {
   const { jobId } = useLocalSearchParams<{ jobId: string }>();
@@ -31,16 +40,23 @@ export function JobDetailScreen() {
     markOnMyWay,
     arriveOrder,
     completeOrder,
+    submitQuote,
+    submitCompletion,
     isAccepting,
     isRejecting,
     isMarkingOnMyWay,
     isArriving,
     isCompleting,
+    isSubmittingQuote,
+    isSubmittingCompletion,
     error: actionError,
   } = useOrderActions(() => {
-    // Refetch order data after successful action
     refetch();
   });
+
+  const [quoteAmount, setQuoteAmount] = useState("");
+  const [quoteMessage, setQuoteMessage] = useState("");
+  const [quoteError, setQuoteError] = useState("");
 
   // Use local status if set, otherwise use order status
   const displayStatus: OrderStatus | null =
@@ -92,14 +108,43 @@ export function JobDetailScreen() {
   const handleComplete = useCallback(async () => {
     if (!orderId || !order) return;
     try {
-      // submitHours requires finalHours - use estimatedHours as default
-      const finalHours = order.finalHoursSubmitted || order.estimatedHours;
-      await completeOrder(orderId, finalHours);
+      const isFixed = order.pricingMode === "fixed";
+      if (isFixed) {
+        await submitCompletion(orderId);
+      } else {
+        const finalHours =
+          order.finalHoursSubmitted ?? order.estimatedHours ?? 0;
+        await completeOrder(orderId, finalHours);
+      }
       setLocalStatus(OrderStatus.AWAITING_CLIENT_APPROVAL);
     } catch {
       // Error handled by hook
     }
-  }, [orderId, order, completeOrder]);
+  }, [orderId, order, completeOrder, submitCompletion]);
+
+  const handleSubmitQuote = useCallback(async () => {
+    if (!orderId) return;
+    setQuoteError("");
+    const num = parseFloat(quoteAmount);
+    if (!quoteAmount.trim()) {
+      setQuoteError("Ingresá el monto del presupuesto");
+      return;
+    }
+    if (isNaN(num) || num <= 0) {
+      setQuoteError("El monto debe ser mayor a 0");
+      return;
+    }
+    if (num > QUOTE_AMOUNT_MAX_MAJOR) {
+      setQuoteError(`Máximo ${QUOTE_AMOUNT_MAX_MAJOR}`);
+      return;
+    }
+    try {
+      const amountCents = toMinorUnits(num);
+      await submitQuote(orderId, amountCents, quoteMessage.trim() || undefined);
+    } catch {
+      // Error handled by hook
+    }
+  }, [orderId, quoteAmount, quoteMessage, submitQuote]);
 
   // Memoize computed values (must be before early returns)
   const statusLabel = useMemo(
@@ -223,6 +268,7 @@ export function JobDetailScreen() {
     );
   }
 
+  const isFixedOrder = order.pricingMode === "fixed";
   const canAccept = displayStatus === OrderStatus.PENDING_PRO_CONFIRMATION;
   const canReject = displayStatus === OrderStatus.PENDING_PRO_CONFIRMATION;
   const canMarkOnMyWay = displayStatus === OrderStatus.CONFIRMED;
@@ -230,6 +276,14 @@ export function JobDetailScreen() {
     displayStatus === OrderStatus.IN_PROGRESS && !order.arrivedAt;
   const canComplete =
     displayStatus === OrderStatus.IN_PROGRESS && !!order.arrivedAt;
+  const showSendQuoteForm =
+    displayStatus === OrderStatus.ACCEPTED &&
+    isFixedOrder &&
+    !(order.quotedAmountCents ?? 0);
+  const showQuoteSent =
+    displayStatus === OrderStatus.ACCEPTED &&
+    isFixedOrder &&
+    (order.quotedAmountCents ?? 0) > 0;
   const isReadOnly =
     displayStatus === OrderStatus.COMPLETED ||
     displayStatus === OrderStatus.CANCELED ||
@@ -444,6 +498,75 @@ export function JobDetailScreen() {
             </Button>
           )}
 
+          {showSendQuoteForm && (
+            <Card style={styles.quoteCard}>
+              <Text variant="h2" style={styles.quoteSectionTitle}>
+                Enviar presupuesto
+              </Text>
+              <Input
+                label="Monto (UYU) *"
+                icon="dollar-sign"
+                value={quoteAmount}
+                onChangeText={(text) => {
+                  setQuoteAmount(text.replace(/[^0-9.]/g, ""));
+                  if (quoteError) setQuoteError("");
+                }}
+                placeholder="Ej: 5000"
+                keyboardType="numeric"
+                style={styles.quoteInput}
+              />
+              <View style={styles.quoteMessageRow}>
+                <Text variant="small" style={styles.quoteLabel}>
+                  Mensaje (opcional)
+                </Text>
+                <TextInput
+                  style={styles.quoteMessageInput}
+                  placeholder="Mensaje para el cliente..."
+                  placeholderTextColor={theme.colors.muted}
+                  value={quoteMessage}
+                  onChangeText={setQuoteMessage}
+                  multiline
+                  numberOfLines={2}
+                />
+              </View>
+              {quoteError ? (
+                <View style={styles.quoteErrorRow}>
+                  <Feather
+                    name="alert-circle"
+                    size={14}
+                    color={theme.colors.danger}
+                  />
+                  <Text variant="small" style={styles.quoteError}>
+                    {quoteError}
+                  </Text>
+                </View>
+              ) : null}
+              <Button
+                variant="primary"
+                onPress={handleSubmitQuote}
+                disabled={isSubmittingQuote}
+                style={styles.actionButton}
+              >
+                {isSubmittingQuote ? "Enviando..." : "Enviar presupuesto"}
+              </Button>
+            </Card>
+          )}
+
+          {showQuoteSent && (
+            <View style={styles.quoteSentBlock}>
+              <Text variant="body" style={styles.quoteSentText}>
+                Presupuesto enviado. Esperando aceptación del cliente.
+              </Text>
+              {order.quotedAmountCents != null &&
+                order.quotedAmountCents > 0 && (
+                  <Text variant="body" style={styles.quoteSentAmount}>
+                    Monto:{" "}
+                    {formatAmount(order.quotedAmountCents, order.currency)}
+                  </Text>
+                )}
+            </View>
+          )}
+
           {canMarkOnMyWay && (
             <Button
               variant="primary"
@@ -470,10 +593,12 @@ export function JobDetailScreen() {
             <Button
               variant="primary"
               onPress={handleComplete}
-              disabled={isCompleting}
+              disabled={isCompleting || isSubmittingCompletion}
               style={styles.actionButton}
             >
-              {isCompleting ? "Completando..." : JOB_LABELS.completeJob}
+              {isCompleting || isSubmittingCompletion
+                ? "Completando..."
+                : JOB_LABELS.completeJob}
             </Button>
           )}
         </Card>
@@ -605,5 +730,55 @@ const styles = StyleSheet.create({
   },
   actionButton: {
     marginBottom: theme.spacing[2],
+  },
+  quoteCard: {
+    marginBottom: theme.spacing[4],
+    padding: theme.spacing[4],
+  },
+  quoteSectionTitle: {
+    marginBottom: theme.spacing[3],
+  },
+  quoteInput: {
+    marginBottom: theme.spacing[3],
+  },
+  quoteMessageRow: {
+    marginBottom: theme.spacing[3],
+  },
+  quoteLabel: {
+    marginBottom: theme.spacing[1],
+    color: theme.colors.muted,
+  },
+  quoteMessageInput: {
+    minHeight: 60,
+    paddingHorizontal: theme.spacing[3],
+    paddingVertical: theme.spacing[2],
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderRadius: theme.radius.md,
+    backgroundColor: theme.colors.surface,
+    color: theme.colors.text,
+    fontSize: theme.typography.sizes.body.fontSize,
+  },
+  quoteErrorRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: theme.spacing[2],
+  },
+  quoteError: {
+    marginLeft: theme.spacing[1],
+    color: theme.colors.danger,
+  },
+  quoteSentBlock: {
+    marginBottom: theme.spacing[4],
+    padding: theme.spacing[3],
+    backgroundColor: `${theme.colors.primary}0D`,
+    borderRadius: theme.radius.md,
+  },
+  quoteSentText: {
+    marginBottom: theme.spacing[1],
+  },
+  quoteSentAmount: {
+    fontWeight: theme.typography.weights.semibold,
+    color: theme.colors.primary,
   },
 });

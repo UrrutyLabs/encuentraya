@@ -2,12 +2,23 @@ import { injectable } from "tsyringe";
 import { prisma } from "@infra/db/prisma";
 
 /**
+ * Per-category rate input for bulk create
+ */
+export interface CategoryRateItem {
+  categoryId: string;
+  hourlyRateCents?: number;
+  startingFromCents?: number;
+}
+
+/**
  * ProProfileCategory entity (junction table)
  */
 export interface ProProfileCategoryEntity {
   id: string;
   proProfileId: string;
   categoryId: string;
+  hourlyRateCents: number | null;
+  startingFromCents: number | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -25,13 +36,14 @@ export interface ProProfileCategoryRepository {
   ): Promise<ProProfileCategoryEntity | null>;
   create(
     proProfileId: string,
-    categoryId: string
+    categoryId: string,
+    rates?: { hourlyRateCents?: number; startingFromCents?: number }
   ): Promise<ProProfileCategoryEntity>;
   delete(proProfileId: string, categoryId: string): Promise<void>;
   deleteByProProfileId(proProfileId: string): Promise<void>;
   bulkCreate(
     proProfileId: string,
-    categoryIds: string[]
+    items: (string | CategoryRateItem)[]
   ): Promise<ProProfileCategoryEntity[]>;
   bulkDelete(proProfileId: string, categoryIds: string[]): Promise<void>;
 }
@@ -92,12 +104,15 @@ export class ProProfileCategoryRepositoryImpl implements ProProfileCategoryRepos
 
   async create(
     proProfileId: string,
-    categoryId: string
+    categoryId: string,
+    rates?: { hourlyRateCents?: number; startingFromCents?: number }
   ): Promise<ProProfileCategoryEntity> {
     const relation = await prisma.proProfileCategory.create({
       data: {
         proProfileId,
         categoryId,
+        hourlyRateCents: rates?.hourlyRateCents ?? null,
+        startingFromCents: rates?.startingFromCents ?? null,
       },
     });
 
@@ -125,28 +140,41 @@ export class ProProfileCategoryRepositoryImpl implements ProProfileCategoryRepos
 
   async bulkCreate(
     proProfileId: string,
-    categoryIds: string[]
+    items: (string | CategoryRateItem)[]
   ): Promise<ProProfileCategoryEntity[]> {
-    if (categoryIds.length === 0) {
+    if (items.length === 0) {
       return [];
     }
 
-    // Use createMany for better performance
-    await prisma.proProfileCategory.createMany({
-      data: categoryIds.map((categoryId) => ({
+    const data = items.map((item) => {
+      if (typeof item === "string") {
+        return {
+          proProfileId,
+          categoryId: item,
+          hourlyRateCents: null,
+          startingFromCents: null,
+        };
+      }
+      return {
         proProfileId,
-        categoryId,
-      })),
-      skipDuplicates: true, // Skip if relation already exists
+        categoryId: item.categoryId,
+        hourlyRateCents: item.hourlyRateCents ?? null,
+        startingFromCents: item.startingFromCents ?? null,
+      };
     });
 
-    // Fetch created relations
+    await prisma.proProfileCategory.createMany({
+      data,
+      skipDuplicates: true,
+    });
+
+    const categoryIds = items.map((item) =>
+      typeof item === "string" ? item : item.categoryId
+    );
     const relations = await prisma.proProfileCategory.findMany({
       where: {
         proProfileId,
-        categoryId: {
-          in: categoryIds,
-        },
+        categoryId: { in: categoryIds },
       },
     });
 
@@ -172,6 +200,8 @@ export class ProProfileCategoryRepositoryImpl implements ProProfileCategoryRepos
     id: string;
     proProfileId: string;
     categoryId: string;
+    hourlyRateCents: number | null;
+    startingFromCents: number | null;
     createdAt: Date;
     updatedAt: Date;
   }): ProProfileCategoryEntity {
@@ -179,6 +209,8 @@ export class ProProfileCategoryRepositoryImpl implements ProProfileCategoryRepos
       id: prismaRelation.id,
       proProfileId: prismaRelation.proProfileId,
       categoryId: prismaRelation.categoryId,
+      hourlyRateCents: prismaRelation.hourlyRateCents ?? null,
+      startingFromCents: prismaRelation.startingFromCents ?? null,
       createdAt: prismaRelation.createdAt,
       updatedAt: prismaRelation.updatedAt,
     };

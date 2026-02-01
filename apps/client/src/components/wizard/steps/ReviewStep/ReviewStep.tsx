@@ -77,6 +77,7 @@ export function ReviewStep({}: ReviewStepProps) {
         costEstimation={costEstimation}
         isEstimatingCost={isEstimatingCost}
         costEstimationError={costEstimationError}
+        isFixedPrice={category?.pricingMode === "fixed"}
       />
 
       {createError != null && (

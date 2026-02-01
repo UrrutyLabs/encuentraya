@@ -30,17 +30,20 @@ export function useReviewStepSubmit({
   const { createOrder, isPending, error } = useCreateOrder();
 
   const handleSubmit = useCallback(async () => {
+    const isFixedPrice = category?.pricingMode === "fixed";
+    const hasHours = state.hours && parseFloat(state.hours) > 0;
     if (
       !state.proId ||
       !category?.id ||
       !state.date ||
       !state.time ||
       !state.address ||
-      !state.hours
+      (!isFixedPrice && !hasHours)
     ) {
       return;
     }
     const scheduledAt = new Date(`${state.date}T${state.time}`);
+    const estimatedHours = isFixedPrice ? 0 : parseFloat(state.hours!);
     try {
       await createOrder({
         proProfileId: state.proId,
@@ -48,7 +51,7 @@ export function useReviewStepSubmit({
         description: `Servicio en ${state.address}`,
         addressText: state.address,
         scheduledWindowStartAt: scheduledAt,
-        estimatedHours: parseFloat(state.hours),
+        estimatedHours,
         categoryMetadataJson: categoryMetadataJson,
       });
     } catch (err) {

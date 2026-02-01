@@ -315,4 +315,37 @@ describe("OrderEstimationService", () => {
       expect(result.platformFeeAmount).toBeCloseTo(expectedPlatformFee, 0); // Round to nearest cent (minor unit)
     });
   });
+
+  describe("estimateFromQuotedAmount", () => {
+    it("should build cost breakdown from quoted amount (fixed-price)", () => {
+      const quotedAmountCents = 50000; // 500 UYU
+      const result = service.estimateFromQuotedAmount(quotedAmountCents, "UYU");
+
+      const expectedPlatformFee = 5000; // 10%
+      const expectedTax = Math.round((50000 + 5000) * DEFAULT_TAX_RATE); // 12100
+      const expectedSubtotal = 55000;
+      const expectedTotal = 55000 + expectedTax;
+
+      expect(result.laborAmount).toBe(50000);
+      expect(result.platformFeeAmount).toBe(expectedPlatformFee);
+      expect(result.platformFeeRate).toBe(DEFAULT_PLATFORM_FEE_RATE);
+      expect(result.taxAmount).toBe(expectedTax);
+      expect(result.taxRate).toBe(DEFAULT_TAX_RATE);
+      expect(result.subtotalAmount).toBe(expectedSubtotal);
+      expect(result.totalAmount).toBe(expectedTotal);
+      expect(result.currency).toBe("UYU");
+      expect(result.lineItems).toHaveLength(3);
+      expect(result.lineItems[0]).toEqual({
+        type: "labor",
+        description: "Labor (presupuesto fijo)",
+        amount: 50000,
+      });
+    });
+
+    it("should use default currency UYU when not provided", () => {
+      const result = service.estimateFromQuotedAmount(30000);
+      expect(result.currency).toBe("UYU");
+      expect(result.laborAmount).toBe(30000);
+    });
+  });
 });

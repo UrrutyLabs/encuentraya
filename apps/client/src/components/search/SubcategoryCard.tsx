@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, memo } from "react";
+import Image from "next/image";
 import { Text } from "@repo/ui";
 import { Card } from "@repo/ui";
 import { type Subcategory } from "@repo/domain";
@@ -40,10 +41,11 @@ export const SubcategoryCard = memo(function SubcategoryCard({
         className={`relative w-full aspect-video bg-gradient-to-br ${placeholderColor} overflow-hidden`}
       >
         {!imageError && subcategory.imageUrl ? (
-          <img
+          <Image
             src={subcategory.imageUrl}
             alt={subcategory.name}
-            className="w-full h-full object-cover"
+            fill
+            className="object-cover"
             onError={() => setImageError(true)}
           />
         ) : (

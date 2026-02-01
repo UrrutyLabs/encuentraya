@@ -186,10 +186,18 @@ export type TaxBehavior = (typeof TaxBehavior)[keyof typeof TaxBehavior]
 
 
 export const PricingMode = {
-  hourly: 'hourly'
+  hourly: 'hourly',
+  fixed: 'fixed'
 } as const
 
 export type PricingMode = (typeof PricingMode)[keyof typeof PricingMode]
+
+
+export const PaymentStrategy = {
+  single_capture: 'single_capture'
+} as const
+
+export type PaymentStrategy = (typeof PaymentStrategy)[keyof typeof PaymentStrategy]
 
 
 export const ApprovalMethod = {

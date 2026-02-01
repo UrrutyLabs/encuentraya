@@ -2180,6 +2180,10 @@ export const OrderScalarFieldEnum = {
   hourlyRateSnapshotAmount: 'hourlyRateSnapshotAmount',
   currency: 'currency',
   minHoursSnapshot: 'minHoursSnapshot',
+  quotedAmountCents: 'quotedAmountCents',
+  quotedAt: 'quotedAt',
+  quoteMessage: 'quoteMessage',
+  quoteAcceptedAt: 'quoteAcceptedAt',
   estimatedHours: 'estimatedHours',
   finalHoursSubmitted: 'finalHoursSubmitted',
   approvedHours: 'approvedHours',
@@ -2444,6 +2448,8 @@ export const CategoryScalarFieldEnum = {
   iconName: 'iconName',
   description: 'description',
   sortOrder: 'sortOrder',
+  pricingMode: 'pricingMode',
+  paymentStrategy: 'paymentStrategy',
   isActive: 'isActive',
   deletedAt: 'deletedAt',
   configJson: 'configJson',
@@ -2477,6 +2483,8 @@ export const ProProfileCategoryScalarFieldEnum = {
   id: 'id',
   proProfileId: 'proProfileId',
   categoryId: 'categoryId',
+  hourlyRateCents: 'hourlyRateCents',
+  startingFromCents: 'startingFromCents',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -2934,6 +2942,20 @@ export type EnumAuditEventTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$P
  * Reference to a field of type 'AuditEventType[]'
  */
 export type ListEnumAuditEventTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AuditEventType[]'>
+    
+
+
+/**
+ * Reference to a field of type 'PaymentStrategy'
+ */
+export type EnumPaymentStrategyFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PaymentStrategy'>
+    
+
+
+/**
+ * Reference to a field of type 'PaymentStrategy[]'
+ */
+export type ListEnumPaymentStrategyFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PaymentStrategy[]'>
     
 
 /**

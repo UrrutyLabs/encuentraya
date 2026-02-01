@@ -31,6 +31,7 @@ export type OrderAvgAggregateOutputType = {
   addressLng: number | null
   hourlyRateSnapshotAmount: number | null
   minHoursSnapshot: number | null
+  quotedAmountCents: number | null
   estimatedHours: number | null
   finalHoursSubmitted: number | null
   approvedHours: number | null
@@ -46,6 +47,7 @@ export type OrderSumAggregateOutputType = {
   addressLng: number | null
   hourlyRateSnapshotAmount: number | null
   minHoursSnapshot: number | null
+  quotedAmountCents: number | null
   estimatedHours: number | null
   finalHoursSubmitted: number | null
   approvedHours: number | null
@@ -83,6 +85,10 @@ export type OrderMinAggregateOutputType = {
   hourlyRateSnapshotAmount: number | null
   currency: string | null
   minHoursSnapshot: number | null
+  quotedAmountCents: number | null
+  quotedAt: Date | null
+  quoteMessage: string | null
+  quoteAcceptedAt: Date | null
   estimatedHours: number | null
   finalHoursSubmitted: number | null
   approvedHours: number | null
@@ -133,6 +139,10 @@ export type OrderMaxAggregateOutputType = {
   hourlyRateSnapshotAmount: number | null
   currency: string | null
   minHoursSnapshot: number | null
+  quotedAmountCents: number | null
+  quotedAt: Date | null
+  quoteMessage: string | null
+  quoteAcceptedAt: Date | null
   estimatedHours: number | null
   finalHoursSubmitted: number | null
   approvedHours: number | null
@@ -184,6 +194,10 @@ export type OrderCountAggregateOutputType = {
   hourlyRateSnapshotAmount: number
   currency: number
   minHoursSnapshot: number
+  quotedAmountCents: number
+  quotedAt: number
+  quoteMessage: number
+  quoteAcceptedAt: number
   estimatedHours: number
   finalHoursSubmitted: number
   approvedHours: number
@@ -214,6 +228,7 @@ export type OrderAvgAggregateInputType = {
   addressLng?: true
   hourlyRateSnapshotAmount?: true
   minHoursSnapshot?: true
+  quotedAmountCents?: true
   estimatedHours?: true
   finalHoursSubmitted?: true
   approvedHours?: true
@@ -229,6 +244,7 @@ export type OrderSumAggregateInputType = {
   addressLng?: true
   hourlyRateSnapshotAmount?: true
   minHoursSnapshot?: true
+  quotedAmountCents?: true
   estimatedHours?: true
   finalHoursSubmitted?: true
   approvedHours?: true
@@ -266,6 +282,10 @@ export type OrderMinAggregateInputType = {
   hourlyRateSnapshotAmount?: true
   currency?: true
   minHoursSnapshot?: true
+  quotedAmountCents?: true
+  quotedAt?: true
+  quoteMessage?: true
+  quoteAcceptedAt?: true
   estimatedHours?: true
   finalHoursSubmitted?: true
   approvedHours?: true
@@ -316,6 +336,10 @@ export type OrderMaxAggregateInputType = {
   hourlyRateSnapshotAmount?: true
   currency?: true
   minHoursSnapshot?: true
+  quotedAmountCents?: true
+  quotedAt?: true
+  quoteMessage?: true
+  quoteAcceptedAt?: true
   estimatedHours?: true
   finalHoursSubmitted?: true
   approvedHours?: true
@@ -367,6 +391,10 @@ export type OrderCountAggregateInputType = {
   hourlyRateSnapshotAmount?: true
   currency?: true
   minHoursSnapshot?: true
+  quotedAmountCents?: true
+  quotedAt?: true
+  quoteMessage?: true
+  quoteAcceptedAt?: true
   estimatedHours?: true
   finalHoursSubmitted?: true
   approvedHours?: true
@@ -505,7 +533,11 @@ export type OrderGroupByOutputType = {
   hourlyRateSnapshotAmount: number
   currency: string
   minHoursSnapshot: number | null
-  estimatedHours: number
+  quotedAmountCents: number | null
+  quotedAt: Date | null
+  quoteMessage: string | null
+  quoteAcceptedAt: Date | null
+  estimatedHours: number | null
   finalHoursSubmitted: number | null
   approvedHours: number | null
   approvalMethod: $Enums.ApprovalMethod | null
@@ -579,7 +611,11 @@ export type OrderWhereInput = {
   hourlyRateSnapshotAmount?: Prisma.FloatFilter<"Order"> | number
   currency?: Prisma.StringFilter<"Order"> | string
   minHoursSnapshot?: Prisma.FloatNullableFilter<"Order"> | number | null
-  estimatedHours?: Prisma.FloatFilter<"Order"> | number
+  quotedAmountCents?: Prisma.IntNullableFilter<"Order"> | number | null
+  quotedAt?: Prisma.DateTimeNullableFilter<"Order"> | Date | string | null
+  quoteMessage?: Prisma.StringNullableFilter<"Order"> | string | null
+  quoteAcceptedAt?: Prisma.DateTimeNullableFilter<"Order"> | Date | string | null
+  estimatedHours?: Prisma.FloatNullableFilter<"Order"> | number | null
   finalHoursSubmitted?: Prisma.FloatNullableFilter<"Order"> | number | null
   approvedHours?: Prisma.FloatNullableFilter<"Order"> | number | null
   approvalMethod?: Prisma.EnumApprovalMethodNullableFilter<"Order"> | $Enums.ApprovalMethod | null
@@ -640,7 +676,11 @@ export type OrderOrderByWithRelationInput = {
   hourlyRateSnapshotAmount?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   minHoursSnapshot?: Prisma.SortOrderInput | Prisma.SortOrder
-  estimatedHours?: Prisma.SortOrder
+  quotedAmountCents?: Prisma.SortOrderInput | Prisma.SortOrder
+  quotedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  quoteMessage?: Prisma.SortOrderInput | Prisma.SortOrder
+  quoteAcceptedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  estimatedHours?: Prisma.SortOrderInput | Prisma.SortOrder
   finalHoursSubmitted?: Prisma.SortOrderInput | Prisma.SortOrder
   approvedHours?: Prisma.SortOrderInput | Prisma.SortOrder
   approvalMethod?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -704,7 +744,11 @@ export type OrderWhereUniqueInput = Prisma.AtLeast<{
   hourlyRateSnapshotAmount?: Prisma.FloatFilter<"Order"> | number
   currency?: Prisma.StringFilter<"Order"> | string
   minHoursSnapshot?: Prisma.FloatNullableFilter<"Order"> | number | null
-  estimatedHours?: Prisma.FloatFilter<"Order"> | number
+  quotedAmountCents?: Prisma.IntNullableFilter<"Order"> | number | null
+  quotedAt?: Prisma.DateTimeNullableFilter<"Order"> | Date | string | null
+  quoteMessage?: Prisma.StringNullableFilter<"Order"> | string | null
+  quoteAcceptedAt?: Prisma.DateTimeNullableFilter<"Order"> | Date | string | null
+  estimatedHours?: Prisma.FloatNullableFilter<"Order"> | number | null
   finalHoursSubmitted?: Prisma.FloatNullableFilter<"Order"> | number | null
   approvedHours?: Prisma.FloatNullableFilter<"Order"> | number | null
   approvalMethod?: Prisma.EnumApprovalMethodNullableFilter<"Order"> | $Enums.ApprovalMethod | null
@@ -765,7 +809,11 @@ export type OrderOrderByWithAggregationInput = {
   hourlyRateSnapshotAmount?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   minHoursSnapshot?: Prisma.SortOrderInput | Prisma.SortOrder
-  estimatedHours?: Prisma.SortOrder
+  quotedAmountCents?: Prisma.SortOrderInput | Prisma.SortOrder
+  quotedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  quoteMessage?: Prisma.SortOrderInput | Prisma.SortOrder
+  quoteAcceptedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  estimatedHours?: Prisma.SortOrderInput | Prisma.SortOrder
   finalHoursSubmitted?: Prisma.SortOrderInput | Prisma.SortOrder
   approvedHours?: Prisma.SortOrderInput | Prisma.SortOrder
   approvalMethod?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -824,7 +872,11 @@ export type OrderScalarWhereWithAggregatesInput = {
   hourlyRateSnapshotAmount?: Prisma.FloatWithAggregatesFilter<"Order"> | number
   currency?: Prisma.StringWithAggregatesFilter<"Order"> | string
   minHoursSnapshot?: Prisma.FloatNullableWithAggregatesFilter<"Order"> | number | null
-  estimatedHours?: Prisma.FloatWithAggregatesFilter<"Order"> | number
+  quotedAmountCents?: Prisma.IntNullableWithAggregatesFilter<"Order"> | number | null
+  quotedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Order"> | Date | string | null
+  quoteMessage?: Prisma.StringNullableWithAggregatesFilter<"Order"> | string | null
+  quoteAcceptedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Order"> | Date | string | null
+  estimatedHours?: Prisma.FloatNullableWithAggregatesFilter<"Order"> | number | null
   finalHoursSubmitted?: Prisma.FloatNullableWithAggregatesFilter<"Order"> | number | null
   approvedHours?: Prisma.FloatNullableWithAggregatesFilter<"Order"> | number | null
   approvalMethod?: Prisma.EnumApprovalMethodNullableWithAggregatesFilter<"Order"> | $Enums.ApprovalMethod | null
@@ -871,7 +923,11 @@ export type OrderCreateInput = {
   hourlyRateSnapshotAmount: number
   currency?: string
   minHoursSnapshot?: number | null
-  estimatedHours: number
+  quotedAmountCents?: number | null
+  quotedAt?: Date | string | null
+  quoteMessage?: string | null
+  quoteAcceptedAt?: Date | string | null
+  estimatedHours?: number | null
   finalHoursSubmitted?: number | null
   approvedHours?: number | null
   approvalMethod?: $Enums.ApprovalMethod | null
@@ -932,7 +988,11 @@ export type OrderUncheckedCreateInput = {
   hourlyRateSnapshotAmount: number
   currency?: string
   minHoursSnapshot?: number | null
-  estimatedHours: number
+  quotedAmountCents?: number | null
+  quotedAt?: Date | string | null
+  quoteMessage?: string | null
+  quoteAcceptedAt?: Date | string | null
+  estimatedHours?: number | null
   finalHoursSubmitted?: number | null
   approvedHours?: number | null
   approvalMethod?: $Enums.ApprovalMethod | null
@@ -985,7 +1045,11 @@ export type OrderUpdateInput = {
   hourlyRateSnapshotAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   minHoursSnapshot?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  estimatedHours?: Prisma.FloatFieldUpdateOperationsInput | number
+  quotedAmountCents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  quotedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  quoteMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quoteAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  estimatedHours?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   finalHoursSubmitted?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   approvedHours?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   approvalMethod?: Prisma.NullableEnumApprovalMethodFieldUpdateOperationsInput | $Enums.ApprovalMethod | null
@@ -1046,7 +1110,11 @@ export type OrderUncheckedUpdateInput = {
   hourlyRateSnapshotAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   minHoursSnapshot?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  estimatedHours?: Prisma.FloatFieldUpdateOperationsInput | number
+  quotedAmountCents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  quotedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  quoteMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quoteAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  estimatedHours?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   finalHoursSubmitted?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   approvedHours?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   approvalMethod?: Prisma.NullableEnumApprovalMethodFieldUpdateOperationsInput | $Enums.ApprovalMethod | null
@@ -1103,7 +1171,11 @@ export type OrderCreateManyInput = {
   hourlyRateSnapshotAmount: number
   currency?: string
   minHoursSnapshot?: number | null
-  estimatedHours: number
+  quotedAmountCents?: number | null
+  quotedAt?: Date | string | null
+  quoteMessage?: string | null
+  quoteAcceptedAt?: Date | string | null
+  estimatedHours?: number | null
   finalHoursSubmitted?: number | null
   approvedHours?: number | null
   approvalMethod?: $Enums.ApprovalMethod | null
@@ -1150,7 +1222,11 @@ export type OrderUpdateManyMutationInput = {
   hourlyRateSnapshotAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   minHoursSnapshot?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  estimatedHours?: Prisma.FloatFieldUpdateOperationsInput | number
+  quotedAmountCents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  quotedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  quoteMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quoteAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  estimatedHours?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   finalHoursSubmitted?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   approvedHours?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   approvalMethod?: Prisma.NullableEnumApprovalMethodFieldUpdateOperationsInput | $Enums.ApprovalMethod | null
@@ -1201,7 +1277,11 @@ export type OrderUncheckedUpdateManyInput = {
   hourlyRateSnapshotAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   minHoursSnapshot?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  estimatedHours?: Prisma.FloatFieldUpdateOperationsInput | number
+  quotedAmountCents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  quotedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  quoteMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quoteAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  estimatedHours?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   finalHoursSubmitted?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   approvedHours?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   approvalMethod?: Prisma.NullableEnumApprovalMethodFieldUpdateOperationsInput | $Enums.ApprovalMethod | null
@@ -1262,6 +1342,10 @@ export type OrderCountOrderByAggregateInput = {
   hourlyRateSnapshotAmount?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   minHoursSnapshot?: Prisma.SortOrder
+  quotedAmountCents?: Prisma.SortOrder
+  quotedAt?: Prisma.SortOrder
+  quoteMessage?: Prisma.SortOrder
+  quoteAcceptedAt?: Prisma.SortOrder
   estimatedHours?: Prisma.SortOrder
   finalHoursSubmitted?: Prisma.SortOrder
   approvedHours?: Prisma.SortOrder
@@ -1290,6 +1374,7 @@ export type OrderAvgOrderByAggregateInput = {
   addressLng?: Prisma.SortOrder
   hourlyRateSnapshotAmount?: Prisma.SortOrder
   minHoursSnapshot?: Prisma.SortOrder
+  quotedAmountCents?: Prisma.SortOrder
   estimatedHours?: Prisma.SortOrder
   finalHoursSubmitted?: Prisma.SortOrder
   approvedHours?: Prisma.SortOrder
@@ -1327,6 +1412,10 @@ export type OrderMaxOrderByAggregateInput = {
   hourlyRateSnapshotAmount?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   minHoursSnapshot?: Prisma.SortOrder
+  quotedAmountCents?: Prisma.SortOrder
+  quotedAt?: Prisma.SortOrder
+  quoteMessage?: Prisma.SortOrder
+  quoteAcceptedAt?: Prisma.SortOrder
   estimatedHours?: Prisma.SortOrder
   finalHoursSubmitted?: Prisma.SortOrder
   approvedHours?: Prisma.SortOrder
@@ -1377,6 +1466,10 @@ export type OrderMinOrderByAggregateInput = {
   hourlyRateSnapshotAmount?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   minHoursSnapshot?: Prisma.SortOrder
+  quotedAmountCents?: Prisma.SortOrder
+  quotedAt?: Prisma.SortOrder
+  quoteMessage?: Prisma.SortOrder
+  quoteAcceptedAt?: Prisma.SortOrder
   estimatedHours?: Prisma.SortOrder
   finalHoursSubmitted?: Prisma.SortOrder
   approvedHours?: Prisma.SortOrder
@@ -1405,6 +1498,7 @@ export type OrderSumOrderByAggregateInput = {
   addressLng?: Prisma.SortOrder
   hourlyRateSnapshotAmount?: Prisma.SortOrder
   minHoursSnapshot?: Prisma.SortOrder
+  quotedAmountCents?: Prisma.SortOrder
   estimatedHours?: Prisma.SortOrder
   finalHoursSubmitted?: Prisma.SortOrder
   approvedHours?: Prisma.SortOrder
@@ -1720,7 +1814,11 @@ export type OrderCreateWithoutClientInput = {
   hourlyRateSnapshotAmount: number
   currency?: string
   minHoursSnapshot?: number | null
-  estimatedHours: number
+  quotedAmountCents?: number | null
+  quotedAt?: Date | string | null
+  quoteMessage?: string | null
+  quoteAcceptedAt?: Date | string | null
+  estimatedHours?: number | null
   finalHoursSubmitted?: number | null
   approvedHours?: number | null
   approvalMethod?: $Enums.ApprovalMethod | null
@@ -1779,7 +1877,11 @@ export type OrderUncheckedCreateWithoutClientInput = {
   hourlyRateSnapshotAmount: number
   currency?: string
   minHoursSnapshot?: number | null
-  estimatedHours: number
+  quotedAmountCents?: number | null
+  quotedAt?: Date | string | null
+  quoteMessage?: string | null
+  quoteAcceptedAt?: Date | string | null
+  estimatedHours?: number | null
   finalHoursSubmitted?: number | null
   approvedHours?: number | null
   approvalMethod?: $Enums.ApprovalMethod | null
@@ -1865,7 +1967,11 @@ export type OrderScalarWhereInput = {
   hourlyRateSnapshotAmount?: Prisma.FloatFilter<"Order"> | number
   currency?: Prisma.StringFilter<"Order"> | string
   minHoursSnapshot?: Prisma.FloatNullableFilter<"Order"> | number | null
-  estimatedHours?: Prisma.FloatFilter<"Order"> | number
+  quotedAmountCents?: Prisma.IntNullableFilter<"Order"> | number | null
+  quotedAt?: Prisma.DateTimeNullableFilter<"Order"> | Date | string | null
+  quoteMessage?: Prisma.StringNullableFilter<"Order"> | string | null
+  quoteAcceptedAt?: Prisma.DateTimeNullableFilter<"Order"> | Date | string | null
+  estimatedHours?: Prisma.FloatNullableFilter<"Order"> | number | null
   finalHoursSubmitted?: Prisma.FloatNullableFilter<"Order"> | number | null
   approvedHours?: Prisma.FloatNullableFilter<"Order"> | number | null
   approvalMethod?: Prisma.EnumApprovalMethodNullableFilter<"Order"> | $Enums.ApprovalMethod | null
@@ -1912,7 +2018,11 @@ export type OrderCreateWithoutProProfileInput = {
   hourlyRateSnapshotAmount: number
   currency?: string
   minHoursSnapshot?: number | null
-  estimatedHours: number
+  quotedAmountCents?: number | null
+  quotedAt?: Date | string | null
+  quoteMessage?: string | null
+  quoteAcceptedAt?: Date | string | null
+  estimatedHours?: number | null
   finalHoursSubmitted?: number | null
   approvedHours?: number | null
   approvalMethod?: $Enums.ApprovalMethod | null
@@ -1971,7 +2081,11 @@ export type OrderUncheckedCreateWithoutProProfileInput = {
   hourlyRateSnapshotAmount: number
   currency?: string
   minHoursSnapshot?: number | null
-  estimatedHours: number
+  quotedAmountCents?: number | null
+  quotedAt?: Date | string | null
+  quoteMessage?: string | null
+  quoteAcceptedAt?: Date | string | null
+  estimatedHours?: number | null
   finalHoursSubmitted?: number | null
   approvedHours?: number | null
   approvalMethod?: $Enums.ApprovalMethod | null
@@ -2050,7 +2164,11 @@ export type OrderCreateWithoutLineItemsInput = {
   hourlyRateSnapshotAmount: number
   currency?: string
   minHoursSnapshot?: number | null
-  estimatedHours: number
+  quotedAmountCents?: number | null
+  quotedAt?: Date | string | null
+  quoteMessage?: string | null
+  quoteAcceptedAt?: Date | string | null
+  estimatedHours?: number | null
   finalHoursSubmitted?: number | null
   approvedHours?: number | null
   approvalMethod?: $Enums.ApprovalMethod | null
@@ -2110,7 +2228,11 @@ export type OrderUncheckedCreateWithoutLineItemsInput = {
   hourlyRateSnapshotAmount: number
   currency?: string
   minHoursSnapshot?: number | null
-  estimatedHours: number
+  quotedAmountCents?: number | null
+  quotedAt?: Date | string | null
+  quoteMessage?: string | null
+  quoteAcceptedAt?: Date | string | null
+  estimatedHours?: number | null
   finalHoursSubmitted?: number | null
   approvedHours?: number | null
   approvalMethod?: $Enums.ApprovalMethod | null
@@ -2178,7 +2300,11 @@ export type OrderUpdateWithoutLineItemsInput = {
   hourlyRateSnapshotAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   minHoursSnapshot?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  estimatedHours?: Prisma.FloatFieldUpdateOperationsInput | number
+  quotedAmountCents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  quotedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  quoteMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quoteAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  estimatedHours?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   finalHoursSubmitted?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   approvedHours?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   approvalMethod?: Prisma.NullableEnumApprovalMethodFieldUpdateOperationsInput | $Enums.ApprovalMethod | null
@@ -2238,7 +2364,11 @@ export type OrderUncheckedUpdateWithoutLineItemsInput = {
   hourlyRateSnapshotAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   minHoursSnapshot?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  estimatedHours?: Prisma.FloatFieldUpdateOperationsInput | number
+  quotedAmountCents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  quotedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  quoteMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quoteAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  estimatedHours?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   finalHoursSubmitted?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   approvedHours?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   approvalMethod?: Prisma.NullableEnumApprovalMethodFieldUpdateOperationsInput | $Enums.ApprovalMethod | null
@@ -2290,7 +2420,11 @@ export type OrderCreateWithoutMessagesInput = {
   hourlyRateSnapshotAmount: number
   currency?: string
   minHoursSnapshot?: number | null
-  estimatedHours: number
+  quotedAmountCents?: number | null
+  quotedAt?: Date | string | null
+  quoteMessage?: string | null
+  quoteAcceptedAt?: Date | string | null
+  estimatedHours?: number | null
   finalHoursSubmitted?: number | null
   approvedHours?: number | null
   approvalMethod?: $Enums.ApprovalMethod | null
@@ -2350,7 +2484,11 @@ export type OrderUncheckedCreateWithoutMessagesInput = {
   hourlyRateSnapshotAmount: number
   currency?: string
   minHoursSnapshot?: number | null
-  estimatedHours: number
+  quotedAmountCents?: number | null
+  quotedAt?: Date | string | null
+  quoteMessage?: string | null
+  quoteAcceptedAt?: Date | string | null
+  estimatedHours?: number | null
   finalHoursSubmitted?: number | null
   approvedHours?: number | null
   approvalMethod?: $Enums.ApprovalMethod | null
@@ -2418,7 +2556,11 @@ export type OrderUpdateWithoutMessagesInput = {
   hourlyRateSnapshotAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   minHoursSnapshot?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  estimatedHours?: Prisma.FloatFieldUpdateOperationsInput | number
+  quotedAmountCents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  quotedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  quoteMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quoteAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  estimatedHours?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   finalHoursSubmitted?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   approvedHours?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   approvalMethod?: Prisma.NullableEnumApprovalMethodFieldUpdateOperationsInput | $Enums.ApprovalMethod | null
@@ -2478,7 +2620,11 @@ export type OrderUncheckedUpdateWithoutMessagesInput = {
   hourlyRateSnapshotAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   minHoursSnapshot?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  estimatedHours?: Prisma.FloatFieldUpdateOperationsInput | number
+  quotedAmountCents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  quotedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  quoteMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quoteAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  estimatedHours?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   finalHoursSubmitted?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   approvedHours?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   approvalMethod?: Prisma.NullableEnumApprovalMethodFieldUpdateOperationsInput | $Enums.ApprovalMethod | null
@@ -2530,7 +2676,11 @@ export type OrderCreateWithoutThreadStatesInput = {
   hourlyRateSnapshotAmount: number
   currency?: string
   minHoursSnapshot?: number | null
-  estimatedHours: number
+  quotedAmountCents?: number | null
+  quotedAt?: Date | string | null
+  quoteMessage?: string | null
+  quoteAcceptedAt?: Date | string | null
+  estimatedHours?: number | null
   finalHoursSubmitted?: number | null
   approvedHours?: number | null
   approvalMethod?: $Enums.ApprovalMethod | null
@@ -2590,7 +2740,11 @@ export type OrderUncheckedCreateWithoutThreadStatesInput = {
   hourlyRateSnapshotAmount: number
   currency?: string
   minHoursSnapshot?: number | null
-  estimatedHours: number
+  quotedAmountCents?: number | null
+  quotedAt?: Date | string | null
+  quoteMessage?: string | null
+  quoteAcceptedAt?: Date | string | null
+  estimatedHours?: number | null
   finalHoursSubmitted?: number | null
   approvedHours?: number | null
   approvalMethod?: $Enums.ApprovalMethod | null
@@ -2658,7 +2812,11 @@ export type OrderUpdateWithoutThreadStatesInput = {
   hourlyRateSnapshotAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   minHoursSnapshot?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  estimatedHours?: Prisma.FloatFieldUpdateOperationsInput | number
+  quotedAmountCents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  quotedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  quoteMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quoteAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  estimatedHours?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   finalHoursSubmitted?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   approvedHours?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   approvalMethod?: Prisma.NullableEnumApprovalMethodFieldUpdateOperationsInput | $Enums.ApprovalMethod | null
@@ -2718,7 +2876,11 @@ export type OrderUncheckedUpdateWithoutThreadStatesInput = {
   hourlyRateSnapshotAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   minHoursSnapshot?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  estimatedHours?: Prisma.FloatFieldUpdateOperationsInput | number
+  quotedAmountCents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  quotedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  quoteMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quoteAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  estimatedHours?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   finalHoursSubmitted?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   approvedHours?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   approvalMethod?: Prisma.NullableEnumApprovalMethodFieldUpdateOperationsInput | $Enums.ApprovalMethod | null
@@ -2770,7 +2932,11 @@ export type OrderCreateWithoutReviewInput = {
   hourlyRateSnapshotAmount: number
   currency?: string
   minHoursSnapshot?: number | null
-  estimatedHours: number
+  quotedAmountCents?: number | null
+  quotedAt?: Date | string | null
+  quoteMessage?: string | null
+  quoteAcceptedAt?: Date | string | null
+  estimatedHours?: number | null
   finalHoursSubmitted?: number | null
   approvedHours?: number | null
   approvalMethod?: $Enums.ApprovalMethod | null
@@ -2830,7 +2996,11 @@ export type OrderUncheckedCreateWithoutReviewInput = {
   hourlyRateSnapshotAmount: number
   currency?: string
   minHoursSnapshot?: number | null
-  estimatedHours: number
+  quotedAmountCents?: number | null
+  quotedAt?: Date | string | null
+  quoteMessage?: string | null
+  quoteAcceptedAt?: Date | string | null
+  estimatedHours?: number | null
   finalHoursSubmitted?: number | null
   approvedHours?: number | null
   approvalMethod?: $Enums.ApprovalMethod | null
@@ -2898,7 +3068,11 @@ export type OrderUpdateWithoutReviewInput = {
   hourlyRateSnapshotAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   minHoursSnapshot?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  estimatedHours?: Prisma.FloatFieldUpdateOperationsInput | number
+  quotedAmountCents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  quotedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  quoteMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quoteAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  estimatedHours?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   finalHoursSubmitted?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   approvedHours?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   approvalMethod?: Prisma.NullableEnumApprovalMethodFieldUpdateOperationsInput | $Enums.ApprovalMethod | null
@@ -2958,7 +3132,11 @@ export type OrderUncheckedUpdateWithoutReviewInput = {
   hourlyRateSnapshotAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   minHoursSnapshot?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  estimatedHours?: Prisma.FloatFieldUpdateOperationsInput | number
+  quotedAmountCents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  quotedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  quoteMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quoteAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  estimatedHours?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   finalHoursSubmitted?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   approvedHours?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   approvalMethod?: Prisma.NullableEnumApprovalMethodFieldUpdateOperationsInput | $Enums.ApprovalMethod | null
@@ -3010,7 +3188,11 @@ export type OrderCreateWithoutPaymentInput = {
   hourlyRateSnapshotAmount: number
   currency?: string
   minHoursSnapshot?: number | null
-  estimatedHours: number
+  quotedAmountCents?: number | null
+  quotedAt?: Date | string | null
+  quoteMessage?: string | null
+  quoteAcceptedAt?: Date | string | null
+  estimatedHours?: number | null
   finalHoursSubmitted?: number | null
   approvedHours?: number | null
   approvalMethod?: $Enums.ApprovalMethod | null
@@ -3070,7 +3252,11 @@ export type OrderUncheckedCreateWithoutPaymentInput = {
   hourlyRateSnapshotAmount: number
   currency?: string
   minHoursSnapshot?: number | null
-  estimatedHours: number
+  quotedAmountCents?: number | null
+  quotedAt?: Date | string | null
+  quoteMessage?: string | null
+  quoteAcceptedAt?: Date | string | null
+  estimatedHours?: number | null
   finalHoursSubmitted?: number | null
   approvedHours?: number | null
   approvalMethod?: $Enums.ApprovalMethod | null
@@ -3138,7 +3324,11 @@ export type OrderUpdateWithoutPaymentInput = {
   hourlyRateSnapshotAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   minHoursSnapshot?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  estimatedHours?: Prisma.FloatFieldUpdateOperationsInput | number
+  quotedAmountCents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  quotedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  quoteMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quoteAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  estimatedHours?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   finalHoursSubmitted?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   approvedHours?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   approvalMethod?: Prisma.NullableEnumApprovalMethodFieldUpdateOperationsInput | $Enums.ApprovalMethod | null
@@ -3198,7 +3388,11 @@ export type OrderUncheckedUpdateWithoutPaymentInput = {
   hourlyRateSnapshotAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   minHoursSnapshot?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  estimatedHours?: Prisma.FloatFieldUpdateOperationsInput | number
+  quotedAmountCents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  quotedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  quoteMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quoteAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  estimatedHours?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   finalHoursSubmitted?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   approvedHours?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   approvalMethod?: Prisma.NullableEnumApprovalMethodFieldUpdateOperationsInput | $Enums.ApprovalMethod | null
@@ -3250,7 +3444,11 @@ export type OrderCreateWithoutEarningInput = {
   hourlyRateSnapshotAmount: number
   currency?: string
   minHoursSnapshot?: number | null
-  estimatedHours: number
+  quotedAmountCents?: number | null
+  quotedAt?: Date | string | null
+  quoteMessage?: string | null
+  quoteAcceptedAt?: Date | string | null
+  estimatedHours?: number | null
   finalHoursSubmitted?: number | null
   approvedHours?: number | null
   approvalMethod?: $Enums.ApprovalMethod | null
@@ -3310,7 +3508,11 @@ export type OrderUncheckedCreateWithoutEarningInput = {
   hourlyRateSnapshotAmount: number
   currency?: string
   minHoursSnapshot?: number | null
-  estimatedHours: number
+  quotedAmountCents?: number | null
+  quotedAt?: Date | string | null
+  quoteMessage?: string | null
+  quoteAcceptedAt?: Date | string | null
+  estimatedHours?: number | null
   finalHoursSubmitted?: number | null
   approvedHours?: number | null
   approvalMethod?: $Enums.ApprovalMethod | null
@@ -3378,7 +3580,11 @@ export type OrderUpdateWithoutEarningInput = {
   hourlyRateSnapshotAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   minHoursSnapshot?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  estimatedHours?: Prisma.FloatFieldUpdateOperationsInput | number
+  quotedAmountCents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  quotedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  quoteMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quoteAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  estimatedHours?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   finalHoursSubmitted?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   approvedHours?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   approvalMethod?: Prisma.NullableEnumApprovalMethodFieldUpdateOperationsInput | $Enums.ApprovalMethod | null
@@ -3438,7 +3644,11 @@ export type OrderUncheckedUpdateWithoutEarningInput = {
   hourlyRateSnapshotAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   minHoursSnapshot?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  estimatedHours?: Prisma.FloatFieldUpdateOperationsInput | number
+  quotedAmountCents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  quotedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  quoteMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quoteAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  estimatedHours?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   finalHoursSubmitted?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   approvedHours?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   approvalMethod?: Prisma.NullableEnumApprovalMethodFieldUpdateOperationsInput | $Enums.ApprovalMethod | null
@@ -3490,7 +3700,11 @@ export type OrderCreateWithoutCategoryInput = {
   hourlyRateSnapshotAmount: number
   currency?: string
   minHoursSnapshot?: number | null
-  estimatedHours: number
+  quotedAmountCents?: number | null
+  quotedAt?: Date | string | null
+  quoteMessage?: string | null
+  quoteAcceptedAt?: Date | string | null
+  estimatedHours?: number | null
   finalHoursSubmitted?: number | null
   approvedHours?: number | null
   approvalMethod?: $Enums.ApprovalMethod | null
@@ -3549,7 +3763,11 @@ export type OrderUncheckedCreateWithoutCategoryInput = {
   hourlyRateSnapshotAmount: number
   currency?: string
   minHoursSnapshot?: number | null
-  estimatedHours: number
+  quotedAmountCents?: number | null
+  quotedAt?: Date | string | null
+  quoteMessage?: string | null
+  quoteAcceptedAt?: Date | string | null
+  estimatedHours?: number | null
   finalHoursSubmitted?: number | null
   approvedHours?: number | null
   approvalMethod?: $Enums.ApprovalMethod | null
@@ -3628,7 +3846,11 @@ export type OrderCreateWithoutSubcategoryInput = {
   hourlyRateSnapshotAmount: number
   currency?: string
   minHoursSnapshot?: number | null
-  estimatedHours: number
+  quotedAmountCents?: number | null
+  quotedAt?: Date | string | null
+  quoteMessage?: string | null
+  quoteAcceptedAt?: Date | string | null
+  estimatedHours?: number | null
   finalHoursSubmitted?: number | null
   approvedHours?: number | null
   approvalMethod?: $Enums.ApprovalMethod | null
@@ -3687,7 +3909,11 @@ export type OrderUncheckedCreateWithoutSubcategoryInput = {
   hourlyRateSnapshotAmount: number
   currency?: string
   minHoursSnapshot?: number | null
-  estimatedHours: number
+  quotedAmountCents?: number | null
+  quotedAt?: Date | string | null
+  quoteMessage?: string | null
+  quoteAcceptedAt?: Date | string | null
+  estimatedHours?: number | null
   finalHoursSubmitted?: number | null
   approvedHours?: number | null
   approvalMethod?: $Enums.ApprovalMethod | null
@@ -3769,7 +3995,11 @@ export type OrderCreateManyClientInput = {
   hourlyRateSnapshotAmount: number
   currency?: string
   minHoursSnapshot?: number | null
-  estimatedHours: number
+  quotedAmountCents?: number | null
+  quotedAt?: Date | string | null
+  quoteMessage?: string | null
+  quoteAcceptedAt?: Date | string | null
+  estimatedHours?: number | null
   finalHoursSubmitted?: number | null
   approvedHours?: number | null
   approvalMethod?: $Enums.ApprovalMethod | null
@@ -3816,7 +4046,11 @@ export type OrderUpdateWithoutClientInput = {
   hourlyRateSnapshotAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   minHoursSnapshot?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  estimatedHours?: Prisma.FloatFieldUpdateOperationsInput | number
+  quotedAmountCents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  quotedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  quoteMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quoteAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  estimatedHours?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   finalHoursSubmitted?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   approvedHours?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   approvalMethod?: Prisma.NullableEnumApprovalMethodFieldUpdateOperationsInput | $Enums.ApprovalMethod | null
@@ -3875,7 +4109,11 @@ export type OrderUncheckedUpdateWithoutClientInput = {
   hourlyRateSnapshotAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   minHoursSnapshot?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  estimatedHours?: Prisma.FloatFieldUpdateOperationsInput | number
+  quotedAmountCents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  quotedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  quoteMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quoteAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  estimatedHours?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   finalHoursSubmitted?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   approvedHours?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   approvalMethod?: Prisma.NullableEnumApprovalMethodFieldUpdateOperationsInput | $Enums.ApprovalMethod | null
@@ -3931,7 +4169,11 @@ export type OrderUncheckedUpdateManyWithoutClientInput = {
   hourlyRateSnapshotAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   minHoursSnapshot?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  estimatedHours?: Prisma.FloatFieldUpdateOperationsInput | number
+  quotedAmountCents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  quotedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  quoteMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quoteAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  estimatedHours?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   finalHoursSubmitted?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   approvedHours?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   approvalMethod?: Prisma.NullableEnumApprovalMethodFieldUpdateOperationsInput | $Enums.ApprovalMethod | null
@@ -3981,7 +4223,11 @@ export type OrderCreateManyProProfileInput = {
   hourlyRateSnapshotAmount: number
   currency?: string
   minHoursSnapshot?: number | null
-  estimatedHours: number
+  quotedAmountCents?: number | null
+  quotedAt?: Date | string | null
+  quoteMessage?: string | null
+  quoteAcceptedAt?: Date | string | null
+  estimatedHours?: number | null
   finalHoursSubmitted?: number | null
   approvedHours?: number | null
   approvalMethod?: $Enums.ApprovalMethod | null
@@ -4028,7 +4274,11 @@ export type OrderUpdateWithoutProProfileInput = {
   hourlyRateSnapshotAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   minHoursSnapshot?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  estimatedHours?: Prisma.FloatFieldUpdateOperationsInput | number
+  quotedAmountCents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  quotedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  quoteMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quoteAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  estimatedHours?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   finalHoursSubmitted?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   approvedHours?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   approvalMethod?: Prisma.NullableEnumApprovalMethodFieldUpdateOperationsInput | $Enums.ApprovalMethod | null
@@ -4087,7 +4337,11 @@ export type OrderUncheckedUpdateWithoutProProfileInput = {
   hourlyRateSnapshotAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   minHoursSnapshot?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  estimatedHours?: Prisma.FloatFieldUpdateOperationsInput | number
+  quotedAmountCents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  quotedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  quoteMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quoteAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  estimatedHours?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   finalHoursSubmitted?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   approvedHours?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   approvalMethod?: Prisma.NullableEnumApprovalMethodFieldUpdateOperationsInput | $Enums.ApprovalMethod | null
@@ -4143,7 +4397,11 @@ export type OrderUncheckedUpdateManyWithoutProProfileInput = {
   hourlyRateSnapshotAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   minHoursSnapshot?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  estimatedHours?: Prisma.FloatFieldUpdateOperationsInput | number
+  quotedAmountCents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  quotedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  quoteMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quoteAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  estimatedHours?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   finalHoursSubmitted?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   approvedHours?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   approvalMethod?: Prisma.NullableEnumApprovalMethodFieldUpdateOperationsInput | $Enums.ApprovalMethod | null
@@ -4193,7 +4451,11 @@ export type OrderCreateManyCategoryInput = {
   hourlyRateSnapshotAmount: number
   currency?: string
   minHoursSnapshot?: number | null
-  estimatedHours: number
+  quotedAmountCents?: number | null
+  quotedAt?: Date | string | null
+  quoteMessage?: string | null
+  quoteAcceptedAt?: Date | string | null
+  estimatedHours?: number | null
   finalHoursSubmitted?: number | null
   approvedHours?: number | null
   approvalMethod?: $Enums.ApprovalMethod | null
@@ -4240,7 +4502,11 @@ export type OrderUpdateWithoutCategoryInput = {
   hourlyRateSnapshotAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   minHoursSnapshot?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  estimatedHours?: Prisma.FloatFieldUpdateOperationsInput | number
+  quotedAmountCents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  quotedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  quoteMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quoteAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  estimatedHours?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   finalHoursSubmitted?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   approvedHours?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   approvalMethod?: Prisma.NullableEnumApprovalMethodFieldUpdateOperationsInput | $Enums.ApprovalMethod | null
@@ -4299,7 +4565,11 @@ export type OrderUncheckedUpdateWithoutCategoryInput = {
   hourlyRateSnapshotAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   minHoursSnapshot?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  estimatedHours?: Prisma.FloatFieldUpdateOperationsInput | number
+  quotedAmountCents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  quotedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  quoteMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quoteAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  estimatedHours?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   finalHoursSubmitted?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   approvedHours?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   approvalMethod?: Prisma.NullableEnumApprovalMethodFieldUpdateOperationsInput | $Enums.ApprovalMethod | null
@@ -4355,7 +4625,11 @@ export type OrderUncheckedUpdateManyWithoutCategoryInput = {
   hourlyRateSnapshotAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   minHoursSnapshot?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  estimatedHours?: Prisma.FloatFieldUpdateOperationsInput | number
+  quotedAmountCents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  quotedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  quoteMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quoteAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  estimatedHours?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   finalHoursSubmitted?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   approvedHours?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   approvalMethod?: Prisma.NullableEnumApprovalMethodFieldUpdateOperationsInput | $Enums.ApprovalMethod | null
@@ -4405,7 +4679,11 @@ export type OrderCreateManySubcategoryInput = {
   hourlyRateSnapshotAmount: number
   currency?: string
   minHoursSnapshot?: number | null
-  estimatedHours: number
+  quotedAmountCents?: number | null
+  quotedAt?: Date | string | null
+  quoteMessage?: string | null
+  quoteAcceptedAt?: Date | string | null
+  estimatedHours?: number | null
   finalHoursSubmitted?: number | null
   approvedHours?: number | null
   approvalMethod?: $Enums.ApprovalMethod | null
@@ -4452,7 +4730,11 @@ export type OrderUpdateWithoutSubcategoryInput = {
   hourlyRateSnapshotAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   minHoursSnapshot?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  estimatedHours?: Prisma.FloatFieldUpdateOperationsInput | number
+  quotedAmountCents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  quotedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  quoteMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quoteAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  estimatedHours?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   finalHoursSubmitted?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   approvedHours?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   approvalMethod?: Prisma.NullableEnumApprovalMethodFieldUpdateOperationsInput | $Enums.ApprovalMethod | null
@@ -4511,7 +4793,11 @@ export type OrderUncheckedUpdateWithoutSubcategoryInput = {
   hourlyRateSnapshotAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   minHoursSnapshot?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  estimatedHours?: Prisma.FloatFieldUpdateOperationsInput | number
+  quotedAmountCents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  quotedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  quoteMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quoteAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  estimatedHours?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   finalHoursSubmitted?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   approvedHours?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   approvalMethod?: Prisma.NullableEnumApprovalMethodFieldUpdateOperationsInput | $Enums.ApprovalMethod | null
@@ -4567,7 +4853,11 @@ export type OrderUncheckedUpdateManyWithoutSubcategoryInput = {
   hourlyRateSnapshotAmount?: Prisma.FloatFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   minHoursSnapshot?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  estimatedHours?: Prisma.FloatFieldUpdateOperationsInput | number
+  quotedAmountCents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  quotedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  quoteMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quoteAcceptedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  estimatedHours?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   finalHoursSubmitted?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   approvedHours?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   approvalMethod?: Prisma.NullableEnumApprovalMethodFieldUpdateOperationsInput | $Enums.ApprovalMethod | null
@@ -4667,6 +4957,10 @@ export type OrderSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   hourlyRateSnapshotAmount?: boolean
   currency?: boolean
   minHoursSnapshot?: boolean
+  quotedAmountCents?: boolean
+  quotedAt?: boolean
+  quoteMessage?: boolean
+  quoteAcceptedAt?: boolean
   estimatedHours?: boolean
   finalHoursSubmitted?: boolean
   approvedHours?: boolean
@@ -4729,6 +5023,10 @@ export type OrderSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   hourlyRateSnapshotAmount?: boolean
   currency?: boolean
   minHoursSnapshot?: boolean
+  quotedAmountCents?: boolean
+  quotedAt?: boolean
+  quoteMessage?: boolean
+  quoteAcceptedAt?: boolean
   estimatedHours?: boolean
   finalHoursSubmitted?: boolean
   approvedHours?: boolean
@@ -4784,6 +5082,10 @@ export type OrderSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   hourlyRateSnapshotAmount?: boolean
   currency?: boolean
   minHoursSnapshot?: boolean
+  quotedAmountCents?: boolean
+  quotedAt?: boolean
+  quoteMessage?: boolean
+  quoteAcceptedAt?: boolean
   estimatedHours?: boolean
   finalHoursSubmitted?: boolean
   approvedHours?: boolean
@@ -4839,6 +5141,10 @@ export type OrderSelectScalar = {
   hourlyRateSnapshotAmount?: boolean
   currency?: boolean
   minHoursSnapshot?: boolean
+  quotedAmountCents?: boolean
+  quotedAt?: boolean
+  quoteMessage?: boolean
+  quoteAcceptedAt?: boolean
   estimatedHours?: boolean
   finalHoursSubmitted?: boolean
   approvedHours?: boolean
@@ -4862,7 +5168,7 @@ export type OrderSelectScalar = {
   updatedAt?: boolean
 }
 
-export type OrderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "displayId" | "clientUserId" | "proProfileId" | "categoryId" | "subcategoryId" | "categoryMetadataJson" | "title" | "description" | "addressText" | "addressLat" | "addressLng" | "scheduledWindowStartAt" | "scheduledWindowEndAt" | "status" | "acceptedAt" | "confirmedAt" | "startedAt" | "arrivedAt" | "completedAt" | "paidAt" | "canceledAt" | "cancelReason" | "pricingMode" | "hourlyRateSnapshotAmount" | "currency" | "minHoursSnapshot" | "estimatedHours" | "finalHoursSubmitted" | "approvedHours" | "approvalMethod" | "approvalDeadlineAt" | "subtotalAmount" | "platformFeeAmount" | "taxAmount" | "totalAmount" | "totalsCalculatedAt" | "taxScheme" | "taxRate" | "taxIncluded" | "taxRegion" | "taxCalculatedAt" | "disputeStatus" | "disputeReason" | "disputeOpenedBy" | "isFirstOrder" | "createdAt" | "updatedAt", ExtArgs["result"]["order"]>
+export type OrderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "displayId" | "clientUserId" | "proProfileId" | "categoryId" | "subcategoryId" | "categoryMetadataJson" | "title" | "description" | "addressText" | "addressLat" | "addressLng" | "scheduledWindowStartAt" | "scheduledWindowEndAt" | "status" | "acceptedAt" | "confirmedAt" | "startedAt" | "arrivedAt" | "completedAt" | "paidAt" | "canceledAt" | "cancelReason" | "pricingMode" | "hourlyRateSnapshotAmount" | "currency" | "minHoursSnapshot" | "quotedAmountCents" | "quotedAt" | "quoteMessage" | "quoteAcceptedAt" | "estimatedHours" | "finalHoursSubmitted" | "approvedHours" | "approvalMethod" | "approvalDeadlineAt" | "subtotalAmount" | "platformFeeAmount" | "taxAmount" | "totalAmount" | "totalsCalculatedAt" | "taxScheme" | "taxRate" | "taxIncluded" | "taxRegion" | "taxCalculatedAt" | "disputeStatus" | "disputeReason" | "disputeOpenedBy" | "isFirstOrder" | "createdAt" | "updatedAt", ExtArgs["result"]["order"]>
 export type OrderInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   client?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   proProfile?: boolean | Prisma.Order$proProfileArgs<ExtArgs>
@@ -4931,7 +5237,11 @@ export type $OrderPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     hourlyRateSnapshotAmount: number
     currency: string
     minHoursSnapshot: number | null
-    estimatedHours: number
+    quotedAmountCents: number | null
+    quotedAt: Date | null
+    quoteMessage: string | null
+    quoteAcceptedAt: Date | null
+    estimatedHours: number | null
     finalHoursSubmitted: number | null
     approvedHours: number | null
     approvalMethod: $Enums.ApprovalMethod | null
@@ -5412,6 +5722,10 @@ export interface OrderFieldRefs {
   readonly hourlyRateSnapshotAmount: Prisma.FieldRef<"Order", 'Float'>
   readonly currency: Prisma.FieldRef<"Order", 'String'>
   readonly minHoursSnapshot: Prisma.FieldRef<"Order", 'Float'>
+  readonly quotedAmountCents: Prisma.FieldRef<"Order", 'Int'>
+  readonly quotedAt: Prisma.FieldRef<"Order", 'DateTime'>
+  readonly quoteMessage: Prisma.FieldRef<"Order", 'String'>
+  readonly quoteAcceptedAt: Prisma.FieldRef<"Order", 'DateTime'>
   readonly estimatedHours: Prisma.FieldRef<"Order", 'Float'>
   readonly finalHoursSubmitted: Prisma.FieldRef<"Order", 'Float'>
   readonly approvedHours: Prisma.FieldRef<"Order", 'Float'>

@@ -61,12 +61,14 @@ describe("useCreateOrder", () => {
         });
       });
 
-      expect(mockMutateAsync).toHaveBeenCalledWith({
-        categoryId: "cat-plumbing",
-        addressText: "123 Main St",
-        scheduledWindowStartAt: expect.any(Date),
-        estimatedHours: 2,
-      });
+      expect(mockMutateAsync).toHaveBeenCalledWith(
+        expect.objectContaining({
+          categoryId: "cat-plumbing",
+          addressText: "123 Main St",
+          scheduledWindowStartAt: expect.any(Date),
+          estimatedHours: 2,
+        })
+      );
 
       await waitFor(
         () => {
@@ -121,6 +123,53 @@ describe("useCreateOrder", () => {
           expect(mockRouter.push).toHaveBeenCalledWith("/my-jobs/order-1");
         },
         { timeout: 2000 }
+      );
+    });
+
+    it("should accept estimatedHours 0 for fixed-price category (backend infers pricingMode)", async () => {
+      const mockMutateAsync = vi.fn().mockResolvedValue({
+        id: "order-1",
+        status: OrderStatus.PENDING_PRO_CONFIRMATION,
+      });
+
+      let onSuccessCallback:
+        | ((data: { id: string; status: OrderStatus }) => void)
+        | undefined;
+
+      mockTrpcOrderCreate.mockImplementation(
+        (options?: {
+          onSuccess?: (data: { id: string; status: OrderStatus }) => void;
+        }) => {
+          onSuccessCallback = options?.onSuccess;
+          return {
+            mutateAsync: async (input: unknown) => {
+              const result = await mockMutateAsync(input);
+              onSuccessCallback?.(result);
+              return result;
+            },
+            isPending: false,
+            error: null,
+          };
+        }
+      );
+
+      const { result } = renderHook(() => useCreateOrder());
+
+      await act(async () => {
+        await result.current.createOrder({
+          categoryId: "cat-fixed",
+          addressText: "123 Main St",
+          scheduledWindowStartAt: new Date(),
+          estimatedHours: 0,
+        });
+      });
+
+      expect(mockMutateAsync).toHaveBeenCalledWith(
+        expect.objectContaining({
+          categoryId: "cat-fixed",
+          addressText: "123 Main St",
+          estimatedHours: 0,
+        })
       );
     });
   });

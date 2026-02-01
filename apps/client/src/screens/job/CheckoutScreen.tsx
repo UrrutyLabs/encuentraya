@@ -221,12 +221,15 @@ function CheckoutContent() {
 
   // Use job variable for display (type is Order)
   const job: Order | undefined = order ?? undefined;
+  const isFixedOrder = job?.pricingMode === "fixed";
 
-  // Calculate amount: all amounts are in minor units
-  // Convert to major units for display
+  // Calculate amount: payment first; for fixed without payment use quotedAmountCents
   const amountEstimatedMinor =
-    payment?.amountEstimated ?? job?.totalAmount ?? 0;
-  const amountEstimated = toMajorUnits(amountEstimatedMinor); // Convert to major units for display
+    payment?.amountEstimated ??
+    (isFixedOrder && job?.quotedAmountCents ? job.quotedAmountCents : null) ??
+    job?.totalAmount ??
+    0;
+  const amountEstimated = toMajorUnits(amountEstimatedMinor);
   const currency = payment?.currency || job?.currency || "UYU";
 
   return (
@@ -273,19 +276,31 @@ function CheckoutContent() {
                     </Text>
                   </div>
                 )}
-                {job.estimatedHours && (
+                {isFixedOrder ? (
                   <div>
                     <div className="flex items-center gap-2 mb-1">
                       <Hourglass className="w-4 h-4 text-muted" />
                       <Text variant="small" className="text-muted">
-                        {JOB_LABELS.estimatedHours}:
+                        Presupuesto acordado
                       </Text>
                     </div>
-                    <Text variant="body" className="text-text">
-                      {job.estimatedHours}{" "}
-                      {job.estimatedHours === 1 ? "hora" : "horas"}
-                    </Text>
                   </div>
+                ) : (
+                  job.estimatedHours != null &&
+                  job.estimatedHours > 0 && (
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <Hourglass className="w-4 h-4 text-muted" />
+                        <Text variant="small" className="text-muted">
+                          {JOB_LABELS.estimatedHours}:
+                        </Text>
+                      </div>
+                      <Text variant="body" className="text-text">
+                        {job.estimatedHours}{" "}
+                        {job.estimatedHours === 1 ? "hora" : "horas"}
+                      </Text>
+                    </div>
+                  )
                 )}
               </div>
             </Card>
