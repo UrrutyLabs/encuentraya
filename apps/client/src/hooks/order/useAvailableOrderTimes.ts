@@ -79,9 +79,10 @@ export function useAvailableOrderTimes(
             );
           });
         });
+      } else {
+        // No availability for this day: show no times (pro is not available)
+        filteredTimes = [];
       }
-      // If no availability slots for this day, keep all times (fallback)
-      // This allows users to select times even if pro hasn't set availability for that day
     }
 
     // If date is today, filter out times that are less than minBufferMinutes from now
