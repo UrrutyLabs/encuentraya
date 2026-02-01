@@ -1,4 +1,4 @@
-# Order Flow – Hourly-only MVP (Arreglatodo)
+# Order Flow – Hourly-only MVP (EncuentraYa)
 
 This document defines the **end-to-end order lifecycle** for the hourly-only MVP.
 It is the canonical reference for **backend state machine, payments, and client/pro actions**.

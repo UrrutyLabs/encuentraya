@@ -42,7 +42,7 @@ export function ProLandingScreen() {
               <div className="flex items-center justify-center lg:justify-start gap-3 mb-6 animate-[fadeInDown_0.6s_ease-out]">
                 <Briefcase className="w-12 h-12 text-primary transition-transform duration-300 hover:scale-110" />
                 <Text variant="h1" className="text-primary">
-                  Arreglatodo para Profesionales
+                  EncuentraYa para Profesionales
                 </Text>
               </div>
               <Text
@@ -93,7 +93,7 @@ export function ProLandingScreen() {
             variant="h2"
             className="text-center mb-12 text-text animate-[fadeInDown_0.6s_ease-out]"
           >
-            ¿Por qué elegir Arreglatodo?
+            ¿Por qué elegir EncuentraYa?
           </Text>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             <Card className="p-6 transition-all duration-300 hover:scale-105 hover:shadow-xl hover:-translate-y-2 group">

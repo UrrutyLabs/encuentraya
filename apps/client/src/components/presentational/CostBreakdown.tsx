@@ -4,29 +4,28 @@ import { DollarSign, Loader2 } from "lucide-react";
 import { Text } from "@repo/ui";
 import { toMajorUnits, type OrderEstimateOutput } from "@repo/domain";
 
-interface ReviewCostBreakdownProps {
+interface CostBreakdownProps {
   estimation: OrderEstimateOutput | null | undefined;
   isLoading: boolean;
   error: unknown;
-  // Fallback values when estimation is not available
+  /** Fallback when estimation is not available */
   fallbackLaborAmount: number;
   fallbackHourlyRate: number;
   fallbackHours: string;
 }
 
 /**
- * Presentational: Cost breakdown with line items, taxes, and totals
- * Shows loading state, error fallback, or full breakdown
+ * Presentational: Cost breakdown with line items, taxes, and totals.
+ * Shows loading state, error fallback, or full breakdown.
  */
-export function ReviewCostBreakdown({
+export function CostBreakdown({
   estimation,
   isLoading,
   error,
   fallbackLaborAmount,
   fallbackHourlyRate,
   fallbackHours,
-}: ReviewCostBreakdownProps) {
-  // Loading state
+}: CostBreakdownProps) {
   if (isLoading) {
     return (
       <div className="space-y-3">
@@ -40,7 +39,6 @@ export function ReviewCostBreakdown({
     );
   }
 
-  // Error or no estimation: fallback to simple calculation
   if (error || !estimation) {
     return (
       <div className="space-y-3">
@@ -64,19 +62,14 @@ export function ReviewCostBreakdown({
     );
   }
 
-  // Full breakdown with estimation data
-  // All amounts from estimation are in minor units, convert to major for display
   const { lineItems, subtotalAmount, taxAmount, totalAmount, currency } =
     estimation;
-
-  // Convert all amounts to major units for display
   const subtotalMajor = toMajorUnits(subtotalAmount);
   const taxMajor = toMajorUnits(taxAmount);
   const totalMajor = toMajorUnits(totalAmount);
 
   return (
     <div className="space-y-3">
-      {/* Line items */}
       <div className="space-y-2">
         {lineItems.map((item, index) => (
           <div
@@ -93,10 +86,8 @@ export function ReviewCostBreakdown({
         ))}
       </div>
 
-      {/* Divider */}
       <div className="border-t border-border my-2" aria-hidden />
 
-      {/* Subtotal */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-1 md:gap-4">
         <Text variant="body" className="font-medium">
           Subtotal
@@ -106,7 +97,6 @@ export function ReviewCostBreakdown({
         </Text>
       </div>
 
-      {/* Tax */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-1 md:gap-4">
         <Text variant="small" className="text-muted">
           IVA ({estimation.taxRate * 100}%)
@@ -116,7 +106,6 @@ export function ReviewCostBreakdown({
         </Text>
       </div>
 
-      {/* Total */}
       <div className="border-t border-border pt-2 mt-2">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
           <div className="flex items-center gap-2">

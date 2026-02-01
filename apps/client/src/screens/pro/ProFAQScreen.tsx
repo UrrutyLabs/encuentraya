@@ -13,7 +13,7 @@ export function ProFAQScreen() {
       <ProHeader />
       <FAQ
         title="Preguntas frecuentes para profesionales"
-        description="Resolvemos tus dudas sobre cómo trabajar con Arreglatodo"
+        description="Resolvemos tus dudas sobre cómo trabajar con EncuentraYa"
         items={proFAQItems}
         showContactCTA={false}
       />

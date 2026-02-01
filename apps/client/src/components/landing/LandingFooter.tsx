@@ -12,7 +12,7 @@ export function LandingFooter() {
           <div className="flex items-center gap-2 transition-transform duration-200 hover:scale-105">
             <Wrench className="w-5 h-5 text-muted transition-transform duration-300" />
             <Text variant="small" className="text-muted">
-              © Arreglatodo — Hecho para resolver lo cotidiano.
+              © EncuentraYa — Hecho para resolver lo cotidiano.
             </Text>
           </div>
           <div className="flex gap-6">

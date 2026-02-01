@@ -72,12 +72,12 @@ export class MercadoPagoClient implements PaymentProviderClient {
 
     // Build return URLs (these are the payment return pages in the CLIENT app)
     // Note: Payment pages are in the client app, not the API server
-    // CLIENT_URL should point to the client app (e.g., http://localhost:3000 in dev, https://arreglatodo.com in prod)
+    // CLIENT_URL should point to the client app (e.g., http://localhost:3000 in dev, https://encuentraya.com in prod)
     const clientBaseUrl =
       process.env.CLIENT_URL ||
       process.env.NEXT_PUBLIC_CLIENT_URL ||
       (process.env.NODE_ENV === "production"
-        ? "https://arreglatodo.com" // Update with your production client URL
+        ? "https://encuentraya.com" // Update with your production client URL
         : "http://localhost:3000"); // Client app runs on port 3000 in development
     const successUrl = `${clientBaseUrl}/payment/success`;
     const pendingUrl = `${clientBaseUrl}/payment/pending`;
@@ -88,7 +88,7 @@ export class MercadoPagoClient implements PaymentProviderClient {
       process.env.API_URL ||
       process.env.NEXT_PUBLIC_API_URL ||
       (process.env.NODE_ENV === "production"
-        ? "https://api.arreglatodo.com" // Update with your production API URL
+        ? "https://api.encuentraya.com" // Update with your production API URL
         : "http://localhost:3002"); // API runs on port 3002 in development
     const notificationUrl = `${apiBaseUrl}/api/webhooks/mercadopago`;
 

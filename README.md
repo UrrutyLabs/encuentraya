@@ -1,10 +1,10 @@
-# Arreglatodo
+# EncuentraYa
 
 A local services marketplace connecting clients with trusted professionals for small jobs.
 
 ## 🎯 Overview
 
-Arreglatodo is a TaskRabbit-style marketplace that enables:
+EncuentraYa is a TaskRabbit-style marketplace that enables:
 
 - **Clients** to find, book, and pay professionals for services
 - **Professionals** to manage availability, accept jobs, and get paid
@@ -64,7 +64,7 @@ This is a production-oriented MVP built with modern web and mobile technologies.
 ## 📁 Project Structure
 
 ```
-arreglatodo/
+encuentraya/
 ├── apps/
 │   ├── api/          # tRPC API server (Next.js)
 │   ├── client/       # Client web app (Next.js)
@@ -95,7 +95,7 @@ arreglatodo/
 ```bash
 # Clone the repository
 git clone <repository-url>
-cd arreglatodo
+cd encuentraya
 
 # Install dependencies
 pnpm install

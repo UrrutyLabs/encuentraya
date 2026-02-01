@@ -477,7 +477,7 @@ MERCADOPAGO_WEBHOOK_URL="https://abc123.ngrok.io"  # Optional
 
 ```bash
 MERCADOPAGO_ACCESS_TOKEN="APP_USR-..."  # Production token
-MERCADOPAGO_WEBHOOK_URL="https://api.arreglatodo.com"  # Required
+MERCADOPAGO_WEBHOOK_URL="https://api.encuentraya.com"  # Required
 MERCADOPAGO_WEBHOOK_SECRET="..."  # Required
 ```
 

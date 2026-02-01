@@ -30,6 +30,20 @@ export function useOrder(orderId: string) {
 }
 
 /**
+ * Hook to get audit logs for an order (e.g. contact info blocked, status forced).
+ * Use when showing order detail to admin.
+ */
+export function useOrderAuditLogs(
+  orderId: string,
+  options?: { enabled?: boolean }
+) {
+  return trpc.audit.getResourceLogs.useQuery(
+    { resourceType: "Order", resourceId: orderId },
+    { enabled: options?.enabled ?? true }
+  );
+}
+
+/**
  * Hook to cancel an order
  */
 export function useCancelOrder() {

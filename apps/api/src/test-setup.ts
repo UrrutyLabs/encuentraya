@@ -29,7 +29,8 @@ vi.mock("@infra/db/prisma", () => {
         SENT: "SENT",
         FAILED: "FAILED",
       },
-      // Add other enums as needed by tests
+      ChatSenderRole: { client: "client", pro: "pro" },
+      ChatMessageType: { user: "user" },
     },
   };
 });

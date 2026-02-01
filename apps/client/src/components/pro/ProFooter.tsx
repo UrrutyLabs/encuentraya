@@ -10,7 +10,7 @@ export function ProFooter() {
           <div className="flex items-center gap-2">
             <Wrench className="w-5 h-5 text-muted" />
             <Text variant="small" className="text-muted">
-              © Arreglatodo — Hecho para resolver lo cotidiano.
+              © EncuentraYa — Hecho para resolver lo cotidiano.
             </Text>
           </div>
           <div className="flex gap-6">

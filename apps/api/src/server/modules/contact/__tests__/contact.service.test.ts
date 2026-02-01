@@ -157,7 +157,7 @@ describe("ContactService", () => {
 
       // Assert
       const callArgs = mockNotificationService.deliverNow.mock.calls[0][0];
-      expect(callArgs.recipientRef).toBe("support@arreglatodo.com");
+      expect(callArgs.recipientRef).toBe("support@encuentraya.com");
 
       // Cleanup
       if (originalAdminEmail) {

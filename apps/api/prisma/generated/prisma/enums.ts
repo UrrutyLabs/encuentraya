@@ -140,7 +140,8 @@ export const AuditEventType = {
   PAYMENT_SYNCED: 'PAYMENT_SYNCED',
   PAYOUT_CREATED: 'PAYOUT_CREATED',
   PAYOUT_SENT: 'PAYOUT_SENT',
-  USER_ROLE_CHANGED: 'USER_ROLE_CHANGED'
+  USER_ROLE_CHANGED: 'USER_ROLE_CHANGED',
+  CHAT_CONTACT_INFO_DETECTED: 'CHAT_CONTACT_INFO_DETECTED'
 } as const
 
 export type AuditEventType = (typeof AuditEventType)[keyof typeof AuditEventType]
@@ -208,3 +209,21 @@ export const DisputeStatus = {
 } as const
 
 export type DisputeStatus = (typeof DisputeStatus)[keyof typeof DisputeStatus]
+
+
+export const ChatSenderRole = {
+  client: 'client',
+  pro: 'pro',
+  admin: 'admin',
+  system: 'system'
+} as const
+
+export type ChatSenderRole = (typeof ChatSenderRole)[keyof typeof ChatSenderRole]
+
+
+export const ChatMessageType = {
+  user: 'user',
+  system: 'system'
+} as const
+
+export type ChatMessageType = (typeof ChatMessageType)[keyof typeof ChatMessageType]

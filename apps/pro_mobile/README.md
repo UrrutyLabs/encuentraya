@@ -1,6 +1,6 @@
 # Pro Mobile App
 
-The professional mobile application for the Arreglatodo marketplace platform.
+The professional mobile application for the EncuentraYa marketplace platform.
 
 ## Overview
 

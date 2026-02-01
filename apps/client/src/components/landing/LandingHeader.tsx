@@ -15,7 +15,7 @@ export function LandingHeader() {
         >
           <Wrench className="w-8 h-8 text-primary transition-transform duration-300" />
           <Text variant="h2" className="text-primary">
-            Arreglatodo
+            EncuentraYa
           </Text>
         </Link>
         <Link href="/login">

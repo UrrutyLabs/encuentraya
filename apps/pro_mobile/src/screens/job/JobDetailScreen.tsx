@@ -1,10 +1,11 @@
-import { View, StyleSheet, ScrollView } from "react-native";
+import { View, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
 import { useState, useCallback, useMemo } from "react";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { Feather } from "@expo/vector-icons";
 import { Text } from "@components/ui/Text";
 import { Card } from "@components/ui/Card";
 import { Badge } from "@components/ui/Badge";
+import { Alert } from "@components/ui/Alert";
 import { Button } from "@components/ui/Button";
 import { JobDetailSkeleton } from "@components/presentational/JobDetailSkeleton";
 import { useOrderActions, useOrderDetail } from "@hooks/order";
@@ -13,9 +14,11 @@ import { getJobStatusLabel, getJobStatusVariant } from "../../utils/jobStatus";
 import { JOB_LABELS } from "../../utils/jobLabels";
 import { formatAmount } from "../../utils/format";
 import { theme } from "../../theme";
+import { useCategoryLookup } from "../../hooks/category/useCategoryLookup";
 
 export function JobDetailScreen() {
   const { jobId } = useLocalSearchParams<{ jobId: string }>();
+  const router = useRouter();
   const [localStatus, setLocalStatus] = useState<OrderStatus | null>(null);
 
   // Fetch order by id via hook (using jobId from route, but orderId for API)
@@ -109,12 +112,65 @@ export function JobDetailScreen() {
     [displayStatus]
   );
 
+  // Fetch categories for lookup
+  const { getCategoryName, categoryMap } = useCategoryLookup();
+
   const categoryLabel = useMemo(() => {
     if (!order) return "";
-    // Try to get category name from metadata, fallback to categoryId
-    const categoryName = order.categoryMetadataJson?.name as string | undefined;
-    return categoryName || order.categoryId || "";
-  }, [order]);
+    // First try to get category name from metadata (snapshot at order creation)
+    const categoryNameFromMetadata = order.categoryMetadataJson?.name as
+      | string
+      | undefined;
+    if (categoryNameFromMetadata) {
+      return categoryNameFromMetadata;
+    }
+    // Fallback to fetching category name by ID
+    return getCategoryName(order.categoryId);
+  }, [order, getCategoryName]);
+
+  // Extract and format quick question answers
+  const quickQuestionAnswers = useMemo(() => {
+    if (!order?.categoryMetadataJson) return [];
+
+    const metadata = order.categoryMetadataJson as Record<string, unknown>;
+    const answers = metadata.quickQuestionAnswers as
+      | Record<string, unknown>
+      | undefined;
+
+    if (!answers || Object.keys(answers).length === 0) return [];
+
+    // Get category config to find question labels
+    const category = categoryMap.get(order.categoryId);
+    const configJson = category?.configJson as
+      | { quick_questions?: { key: string; label: string; type: string }[] }
+      | undefined;
+    const questions = configJson?.quick_questions || [];
+
+    // Format answers with labels
+    return questions
+      .filter((q) => answers[q.key] !== undefined && answers[q.key] !== null)
+      .map((q) => {
+        const value = answers[q.key];
+        let formattedValue: string;
+
+        if (value === true || value === "true") {
+          formattedValue = "Sí";
+        } else if (value === false || value === "false") {
+          formattedValue = "No";
+        } else if (Array.isArray(value)) {
+          formattedValue = value.join(", ");
+        } else if (typeof value === "number") {
+          formattedValue = String(value);
+        } else {
+          formattedValue = String(value || "");
+        }
+
+        return {
+          label: q.label,
+          value: formattedValue,
+        };
+      });
+  }, [order, categoryMap]);
 
   const formattedDate = useMemo(
     () =>
@@ -128,6 +184,28 @@ export function JobDetailScreen() {
           }).format(new Date(order.scheduledWindowStartAt))
         : "",
     [order]
+  );
+
+  // Pro still needs to accept (pending_pro_confirmation) → show info banner
+  // Must be before early returns (React Rules of Hooks)
+  const isPendingProConfirmation = useMemo(
+    () => displayStatus === OrderStatus.PENDING_PRO_CONFIRMATION,
+    [displayStatus]
+  );
+
+  // Accepted but not yet paid → show "don't start until paid" disclaimer
+  const isAcceptedButNotPaid = useMemo(
+    () =>
+      displayStatus !== null &&
+      [
+        OrderStatus.ACCEPTED,
+        OrderStatus.CONFIRMED,
+        OrderStatus.IN_PROGRESS,
+        OrderStatus.AWAITING_CLIENT_APPROVAL,
+        OrderStatus.DISPUTED,
+        OrderStatus.COMPLETED,
+      ].includes(displayStatus),
+    [displayStatus]
   );
 
   if (isLoading) {
@@ -227,6 +305,50 @@ export function JobDetailScreen() {
             </Text>
           </View>
         )}
+        {quickQuestionAnswers.length > 0 && (
+          <View style={styles.row}>
+            <View style={styles.labelRow}>
+              <Feather
+                name="help-circle"
+                size={14}
+                color={theme.colors.muted}
+              />
+              <Text variant="small" style={styles.label}>
+                Detalles adicionales:
+              </Text>
+            </View>
+            <View style={styles.quickAnswersContainer}>
+              {quickQuestionAnswers.map((qa, index) => (
+                <View key={index} style={styles.quickAnswerRow}>
+                  <Text variant="small" style={styles.quickAnswerLabel}>
+                    {qa.label}:
+                  </Text>
+                  <Text variant="body" style={styles.quickAnswerValue}>
+                    {qa.value}
+                  </Text>
+                </View>
+              ))}
+            </View>
+          </View>
+        )}
+        {isPendingProConfirmation && (
+          <Alert
+            variant="info"
+            title="Podés chatear con el cliente"
+            message="Antes de aceptar, podés usar Mensajes para entender mejor el trabajo y resolver dudas."
+            showBorder
+            style={styles.paymentAlert}
+          />
+        )}
+        {isAcceptedButNotPaid && (
+          <Alert
+            variant="warning"
+            title="Pago pendiente de confirmación"
+            message="El pago de este trabajo aún está siendo confirmado. Por favor, no inicies el trabajo hasta que recibas la confirmación del pago."
+            showBorder
+            style={styles.paymentAlert}
+          />
+        )}
         {order.totalAmount && (
           <View style={styles.row}>
             <View style={styles.labelRow}>
@@ -245,6 +367,33 @@ export function JobDetailScreen() {
           </View>
         )}
       </Card>
+
+      {/* Mensajes CTA */}
+      {orderId && (
+        <Card style={styles.chatCard}>
+          <TouchableOpacity
+            style={styles.chatCta}
+            onPress={() => router.push(`/job/${orderId}/chat` as any)}
+            activeOpacity={0.7}
+          >
+            <View style={styles.chatCtaLeft}>
+              <Feather
+                name="message-circle"
+                size={22}
+                color={theme.colors.primary}
+              />
+              <Text variant="h2" style={styles.chatCtaText}>
+                Mensajes
+              </Text>
+            </View>
+            <Feather
+              name="chevron-right"
+              size={20}
+              color={theme.colors.muted}
+            />
+          </TouchableOpacity>
+        </Card>
+      )}
 
       {/* Actions */}
       {actionError && (
@@ -383,6 +532,24 @@ const styles = StyleSheet.create({
   card: {
     marginBottom: theme.spacing[4],
   },
+  chatCard: {
+    marginBottom: theme.spacing[4],
+  },
+  chatCta: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: theme.spacing[2],
+    paddingHorizontal: theme.spacing[3],
+  },
+  chatCtaLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: theme.spacing[2],
+  },
+  chatCtaText: {
+    color: theme.colors.text,
+  },
   sectionHeader: {
     flexDirection: "row",
     alignItems: "center",
@@ -410,6 +577,24 @@ const styles = StyleSheet.create({
   },
   description: {
     marginTop: theme.spacing[1],
+  },
+  quickAnswersContainer: {
+    marginTop: theme.spacing[1],
+  },
+  quickAnswerRow: {
+    marginBottom: theme.spacing[2],
+  },
+  quickAnswerLabel: {
+    color: theme.colors.muted,
+    marginBottom: 2,
+    fontWeight: theme.typography.weights.medium,
+  },
+  quickAnswerValue: {
+    color: theme.colors.text,
+  },
+  paymentAlert: {
+    marginBottom: theme.spacing[3],
+    padding: theme.spacing[3],
   },
   amount: {
     color: theme.colors.primary,

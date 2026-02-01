@@ -10,7 +10,7 @@ export default function ClientFAQPage() {
       <Navigation showLogin={true} showProfile={true} />
       <FAQ
         title="Preguntas frecuentes"
-        description="Resolvemos tus dudas sobre cómo funciona Arreglatodo"
+        description="Resolvemos tus dudas sobre cómo funciona EncuentraYa"
         items={clientFAQItems}
       />
     </div>

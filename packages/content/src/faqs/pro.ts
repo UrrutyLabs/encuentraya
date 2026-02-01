@@ -2,9 +2,9 @@ import type { FAQItem } from "./types";
 
 export const proFAQItems: FAQItem[] = [
   {
-    question: "¿Qué es Arreglatodo para profesionales?",
+    question: "¿Qué es EncuentraYa para profesionales?",
     answer:
-      "Arreglatodo es una herramienta que te permite recibir solicitudes de trabajo de clientes y gestionar tus servicios de forma independiente. Conectamos clientes que necesitan servicios del hogar con profesionales como vos, facilitando la comunicación y el pago.",
+      "EncuentraYa es una herramienta que te permite recibir solicitudes de trabajo de clientes y gestionar tus servicios de forma independiente. Conectamos clientes que necesitan servicios del hogar con profesionales como vos, facilitando la comunicación y el pago.",
   },
   {
     question: "¿Cómo me registro como profesional?",
@@ -29,7 +29,7 @@ export const proFAQItems: FAQItem[] = [
   {
     question: "¿La plataforma cobra una comisión?",
     answer:
-      "Sí, Arreglatodo cobra una comisión sobre cada trabajo completado. Esta comisión se deduce del monto total antes de transferirte tu pago. La comisión exacta y los detalles de pago los verás claramente en la app antes de aceptar cada trabajo.",
+      "Sí, EncuentraYa cobra una comisión sobre cada trabajo completado. Esta comisión se deduce del monto total antes de transferirte tu pago. La comisión exacta y los detalles de pago los verás claramente en la app antes de aceptar cada trabajo.",
   },
   {
     question: "¿Qué información necesito para cobrar?",

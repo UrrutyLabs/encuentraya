@@ -13,7 +13,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Arreglatodo - Soluciones confiables para tu hogar",
+  title: "EncuentraYa - Soluciones confiables para tu hogar",
   description:
     "Encontrá, reservá y pagá profesionales verificados para arreglos y servicios cotidianos en Uruguay.",
 };

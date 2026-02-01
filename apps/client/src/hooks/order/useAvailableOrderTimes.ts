@@ -80,7 +80,7 @@ export function useAvailableOrderTimes(
           });
         });
       } else {
-        // No availability for this day, return empty array
+        // No availability for this day: show no times (pro is not available)
         filteredTimes = [];
       }
     }

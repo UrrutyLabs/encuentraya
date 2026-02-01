@@ -9,6 +9,11 @@ import {
   UnauthorizedOrderActionError,
   OrderNotFoundError,
 } from "@modules/order/order.errors";
+import {
+  ChatForbiddenError,
+  ChatClosedError,
+  ChatContactInfoNotAllowedError,
+} from "@modules/chat/chat.errors";
 
 /**
  * Maps domain errors to tRPC errors
@@ -52,6 +57,27 @@ export function mapDomainErrorToTRPCError(error: unknown): TRPCError {
   if (error instanceof OrderNotFoundError) {
     return new TRPCError({
       code: "NOT_FOUND",
+      message: error.message,
+    });
+  }
+
+  if (error instanceof ChatForbiddenError) {
+    return new TRPCError({
+      code: "FORBIDDEN",
+      message: error.message,
+    });
+  }
+
+  if (error instanceof ChatClosedError) {
+    return new TRPCError({
+      code: "BAD_REQUEST",
+      message: error.message,
+    });
+  }
+
+  if (error instanceof ChatContactInfoNotAllowedError) {
+    return new TRPCError({
+      code: "BAD_REQUEST",
       message: error.message,
     });
   }

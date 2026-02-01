@@ -53,7 +53,7 @@ export function getApiUrl(): string {
       // Preview/staging API URL
       return (
         process.env.EXPO_PUBLIC_STAGING_API_URL ||
-        "https://api-staging.arreglatodo.com"
+        "https://api-staging.encuentraya.com"
       ); // Update with your staging URL
     case "development":
     default:

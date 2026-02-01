@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "ArreglatodoPros",
-    "slug": "arreglatodo-pros",
+    "name": "EncuentraYa Pros",
+    "slug": "encuentraya-pros",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "arreglatodopros",
+    "scheme": "encuentrayapros",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {

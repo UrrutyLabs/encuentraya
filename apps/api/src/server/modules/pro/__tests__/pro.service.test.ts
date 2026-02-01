@@ -498,7 +498,7 @@ describe("ProService", () => {
       );
       expect(result).toMatchObject({
         id: proProfile.id,
-        name: proProfile.displayName,
+        name: "Test P.", // getProById returns masked name (firstName + first letter of surname)
         bio: proProfile.bio,
         rating: 4.5,
         reviewCount: 2,

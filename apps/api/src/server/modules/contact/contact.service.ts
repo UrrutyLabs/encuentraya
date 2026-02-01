@@ -54,7 +54,7 @@ Este mensaje fue enviado desde el formulario de contacto.
     const adminEmail =
       process.env.ADMIN_EMAIL ||
       process.env.SUPPORT_EMAIL ||
-      "support@arreglatodo.com";
+      "support@encuentraya.com";
 
     // Send notification via NotificationService
     const idempotencyKey = `contact:${input.email}:${Date.now()}`;

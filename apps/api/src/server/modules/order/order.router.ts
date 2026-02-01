@@ -14,15 +14,48 @@ import { OrderFinalizationService } from "./order.finalization.service";
 import { OrderService } from "./order.service";
 import { OrderAdminService } from "./order.admin.service";
 import type { ProRepository } from "@modules/pro/pro.repo";
+import type { ClientProfileRepository } from "@modules/user/clientProfile.repo";
+import { maskDisplayName } from "@shared/display-name";
 import {
   orderCreateInputSchema,
   orderEstimateInputSchema,
   orderEstimateOutputSchema,
   orderSchema,
   orderStatusSchema,
+  orderDetailViewSchema,
+  OrderStatus,
   ApprovalMethod,
+  type OrderCostBreakdown,
 } from "@repo/domain";
 import { mapDomainErrorToTRPCError } from "@shared/errors/error-mapper";
+import type { OrderEstimateOutput } from "@repo/domain";
+import type { Order } from "@repo/domain";
+import type { ReceiptRepository } from "./receipt.repo";
+import { receiptEntityToOrderReceipt } from "./receipt.repo";
+
+/** Fallback estimate when estimation service cannot be called (e.g. no proProfileId). */
+function buildFallbackEstimate(order: Order): OrderEstimateOutput {
+  const laborAmount = Math.round(
+    order.hourlyRateSnapshotAmount * order.estimatedHours
+  );
+  return {
+    laborAmount,
+    platformFeeAmount: 0,
+    platformFeeRate: 0,
+    taxAmount: 0,
+    taxRate: 0.22,
+    subtotalAmount: laborAmount,
+    totalAmount: laborAmount,
+    currency: order.currency,
+    lineItems: [
+      {
+        type: "labor",
+        description: `Labor (${order.estimatedHours} horas)`,
+        amount: laborAmount,
+      },
+    ],
+  };
+}
 
 // Resolve services from container
 const orderCreationService = container.resolve<OrderCreationService>(
@@ -42,6 +75,21 @@ const orderAdminService = container.resolve<OrderAdminService>(
   TOKENS.OrderAdminService
 );
 const proRepository = container.resolve<ProRepository>(TOKENS.ProRepository);
+const receiptRepository = container.resolve<ReceiptRepository>(
+  TOKENS.ReceiptRepository
+);
+const clientProfileRepository = container.resolve<ClientProfileRepository>(
+  TOKENS.ClientProfileRepository
+);
+
+async function getClientDisplayNameMasked(userId: string): Promise<string> {
+  const profile = await clientProfileRepository.findByUserId(userId);
+  if (!profile) return "Cliente";
+  const first = profile.firstName?.trim() ?? "";
+  const last = profile.lastName?.trim() ?? "";
+  const full = [first, last].filter(Boolean).join(" ");
+  return full ? maskDisplayName(full) : "Cliente";
+}
 
 export const orderRouter = router({
   /**
@@ -75,14 +123,60 @@ export const orderRouter = router({
     }),
 
   /**
-   * Get order by ID
+   * Get order by ID (detail view).
+   * Returns OrderDetailView with costBreakdown: receipt when finalized, estimate otherwise.
    */
   getById: publicProcedure
     .input(z.object({ id: z.string() }))
-    .output(orderSchema.nullable())
+    .output(orderDetailViewSchema.nullable())
     .query(async ({ input }) => {
       try {
-        return await orderService.getOrderById(input.id);
+        const order = await orderService.getOrderById(input.id);
+        if (!order) return null;
+
+        const isFinalized =
+          order.status === OrderStatus.COMPLETED ||
+          order.status === OrderStatus.PAID;
+        let costBreakdown: OrderCostBreakdown;
+
+        if (isFinalized) {
+          const receipt = await receiptRepository.findByOrderId(input.id);
+          if (receipt) {
+            costBreakdown = {
+              kind: "receipt",
+              ...receiptEntityToOrderReceipt(receipt),
+            };
+          } else {
+            const estimation =
+              (order.proProfileId
+                ? await orderEstimationService
+                    .estimateOrderCost({
+                      proProfileId: order.proProfileId,
+                      estimatedHours: order.estimatedHours,
+                      categoryId: order.categoryId,
+                    })
+                    .catch(() => null)
+                : null) ?? buildFallbackEstimate(order);
+            costBreakdown = { kind: "estimate", ...estimation };
+          }
+        } else {
+          const estimation =
+            (order.proProfileId
+              ? await orderEstimationService
+                  .estimateOrderCost({
+                    proProfileId: order.proProfileId,
+                    estimatedHours: order.estimatedHours,
+                    categoryId: order.categoryId,
+                  })
+                  .catch(() => null)
+              : null) ?? buildFallbackEstimate(order);
+          costBreakdown = { kind: "estimate", ...estimation };
+        }
+
+        const clientDisplayName = await getClientDisplayNameMasked(
+          order.clientUserId
+        );
+        return { ...order, costBreakdown, clientDisplayName };
       } catch (error) {
         throw mapDomainErrorToTRPCError(error);
       }
@@ -127,7 +221,14 @@ export const orderRouter = router({
         if (!proProfile) {
           throw new Error("Pro profile not found");
         }
-        return await orderService.getOrdersByPro(proProfile.id);
+        const orders = await orderService.getOrdersByPro(proProfile.id);
+        const withClientDisplayName = await Promise.all(
+          orders.map(async (o) => ({
+            ...o,
+            clientDisplayName: await getClientDisplayNameMasked(o.clientUserId),
+          }))
+        );
+        return withClientDisplayName;
       } catch (error) {
         throw mapDomainErrorToTRPCError(error);
       }

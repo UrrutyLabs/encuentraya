@@ -5,7 +5,7 @@ import { Card } from "@repo/ui";
 import { Text } from "@repo/ui";
 import { useScrollReveal } from "@/hooks/shared/useScrollReveal";
 
-export function LandingWhyArreglatodo() {
+export function LandingWhyEncuentraYa() {
   const { elementRef: titleRef, isVisible: titleVisible } = useScrollReveal();
   const { elementRef: gridRef, isVisible: gridVisible } = useScrollReveal();
 
@@ -19,7 +19,7 @@ export function LandingWhyArreglatodo() {
               titleVisible ? "animate-[fadeInDown_0.6s_ease-out]" : "opacity-0"
             }`}
           >
-            Por qué Arreglatodo
+            Por qué EncuentraYa
           </Text>
         </div>
         <div

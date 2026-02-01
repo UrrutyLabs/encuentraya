@@ -1,6 +1,6 @@
-# Arreglatodo MVP – Categories & Subcategories Data Model (UY)
+# EncuentraYa MVP – Categories & Subcategories Data Model (UY)
 
-This document describes the recommended **2-level taxonomy** (Category → Subcategory) for Arreglatodo’s MVP, plus how it integrates with Orders and UI configuration.
+This document describes the recommended **2-level taxonomy** (Category → Subcategory) for EncuentraYa’s MVP, plus how it integrates with Orders and UI configuration.
 
 ---
 

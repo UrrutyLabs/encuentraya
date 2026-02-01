@@ -1,6 +1,7 @@
 import { injectable, inject } from "tsyringe";
 import type { OrderRepository } from "./order.repo";
 import type { OrderLineItemRepository } from "./orderLineItem.repo";
+import type { ReceiptRepository } from "./receipt.repo";
 import type { Order } from "@repo/domain";
 import { OrderStatus, ApprovalMethod, PaymentStatus } from "@repo/domain";
 import { TOKENS } from "@/server/container";
@@ -32,6 +33,8 @@ export class OrderFinalizationService {
     private readonly orderRepository: OrderRepository,
     @inject(TOKENS.OrderLineItemRepository)
     private readonly orderLineItemRepository: OrderLineItemRepository,
+    @inject(TOKENS.ReceiptRepository)
+    private readonly receiptRepository: ReceiptRepository,
     @inject(TOKENS.OrderService)
     private readonly orderService: OrderService,
     @inject(TOKENS.PaymentServiceFactory)
@@ -135,6 +138,39 @@ export class OrderFinalizationService {
 
     if (!finalizedOrder) {
       throw new Error(`Failed to finalize order: ${orderId}`);
+    }
+
+    // Persist receipt (immutable snapshot for display/audit)
+    const finalizedAt = new Date();
+    const receiptLineItems = finalLineItems.map((item) => ({
+      type: item.type,
+      description: item.description,
+      amount: item.amount,
+    }));
+    const laborItem = finalLineItems.find((i) => i.type === "labor");
+    const laborAmount = laborItem ? roundMinorUnits(laborItem.amount) : 0;
+    try {
+      await this.receiptRepository.create({
+        orderId,
+        lineItems: receiptLineItems,
+        laborAmount,
+        platformFeeAmount,
+        platformFeeRate,
+        taxAmount,
+        taxRate,
+        subtotalAmount: subtotal,
+        totalAmount: total,
+        currency: updatedOrder.currency,
+        finalizedAt,
+        approvedHours,
+      });
+    } catch (error) {
+      // Idempotent: if receipt already exists (e.g. duplicate finalize), log and continue
+      const existing = await this.receiptRepository.findByOrderId(orderId);
+      if (!existing) {
+        console.error(`Failed to create receipt for order ${orderId}:`, error);
+        throw error;
+      }
     }
 
     // Update status to COMPLETED

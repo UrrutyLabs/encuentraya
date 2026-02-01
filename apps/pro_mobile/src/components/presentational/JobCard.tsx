@@ -4,25 +4,37 @@ import { Feather } from "@expo/vector-icons";
 import { Card } from "../ui/Card";
 import { Text } from "../ui/Text";
 import { Badge } from "../ui/Badge";
+import { Alert } from "../ui/Alert";
 import type { Order } from "@repo/domain";
 import { OrderStatus } from "@repo/domain";
 import { getJobStatusLabel, getJobStatusVariant } from "../../utils/jobStatus";
 import { JOB_LABELS } from "../../utils/jobLabels";
 import { formatAmount } from "../../utils/format";
 import { theme } from "../../theme";
+import { useCategoryLookup } from "../../hooks/category/useCategoryLookup";
 
 interface JobCardProps {
   job: Order;
   onPress: () => void;
+  onChatPress?: (orderId: string) => void;
 }
 
-function JobCardComponent({ job, onPress }: JobCardProps) {
+function JobCardComponent({ job, onPress, onChatPress }: JobCardProps) {
+  // Fetch categories and get lookup function
+  const { getCategoryName } = useCategoryLookup();
+
   // Memoize computed values to avoid recalculation on re-renders
   const categoryLabel = useMemo(() => {
-    // Try to get category name from metadata, fallback to categoryId
-    const categoryName = job.categoryMetadataJson?.name as string | undefined;
-    return categoryName || job.categoryId || "";
-  }, [job.categoryMetadataJson, job.categoryId]);
+    // First try to get category name from metadata (snapshot at order creation)
+    const categoryNameFromMetadata = job.categoryMetadataJson?.name as
+      | string
+      | undefined;
+    if (categoryNameFromMetadata) {
+      return categoryNameFromMetadata;
+    }
+    // Fallback to fetching category name by ID
+    return getCategoryName(job.categoryId);
+  }, [job.categoryMetadataJson, job.categoryId, getCategoryName]);
 
   const statusLabel = useMemo(
     () => getJobStatusLabel(job.status),
@@ -51,22 +63,49 @@ function JobCardComponent({ job, onPress }: JobCardProps) {
     [job.description]
   );
 
+  // Pro still needs to accept (pending_pro_confirmation) → show info banner
+  const isPendingProConfirmation = useMemo(
+    () => job.status === OrderStatus.PENDING_PRO_CONFIRMATION,
+    [job.status]
+  );
+
+  // Accepted but not yet paid → show "don't start until paid" disclaimer
+  const isAcceptedButNotPaid = useMemo(
+    () =>
+      [
+        OrderStatus.ACCEPTED,
+        OrderStatus.CONFIRMED,
+        OrderStatus.IN_PROGRESS,
+        OrderStatus.AWAITING_CLIENT_APPROVAL,
+        OrderStatus.DISPUTED,
+        OrderStatus.COMPLETED,
+      ].includes(job.status),
+    [job.status]
+  );
+
   return (
     <TouchableOpacity onPress={onPress}>
       <Card style={styles.card}>
         <View style={styles.header}>
           <View style={styles.leftSection}>
-            <Text variant="h2" style={styles.category}>
-              {categoryLabel}
-            </Text>
+            <View style={styles.categoryContainer}>
+              <Text variant="h2" style={styles.category}>
+                {categoryLabel}
+              </Text>
+              {job.displayId && (
+                <Text variant="small" style={styles.displayId}>
+                  {JOB_LABELS.jobNumber} #{job.displayId}
+                </Text>
+              )}
+            </View>
           </View>
           <View style={styles.badgesContainer}>
-            {job.isFirstOrder && job.status !== OrderStatus.COMPLETED && (
-              <Badge variant="new">Nuevo Cliente</Badge>
-            )}
             <Badge variant={statusVariant} showIcon>
               {statusLabel}
             </Badge>
+            {job.isFirstOrder && job.status !== OrderStatus.COMPLETED && (
+              <Badge variant="new">Nuevo Cliente</Badge>
+            )}
           </View>
         </View>
         {job.description && (
@@ -80,6 +119,18 @@ function JobCardComponent({ job, onPress }: JobCardProps) {
             {formattedDate}
           </Text>
         </View>
+        {isPendingProConfirmation && (
+          <Alert
+            variant="info"
+            message="Podés chatear con el cliente para entender mejor el trabajo antes de aceptar."
+          />
+        )}
+        {isAcceptedButNotPaid && (
+          <Alert
+            variant="warning"
+            message="El pago aún está siendo confirmado. No inicies el trabajo hasta que recibas la confirmación."
+          />
+        )}
         {job.totalAmount && (
           <View style={styles.amountRow}>
             <Feather
@@ -93,6 +144,22 @@ function JobCardComponent({ job, onPress }: JobCardProps) {
             </Text>
           </View>
         )}
+        {job.proProfileId && onChatPress && (
+          <TouchableOpacity
+            style={styles.mensajesRow}
+            onPress={() => onChatPress(job.id)}
+            activeOpacity={0.7}
+          >
+            <Feather
+              name="message-circle"
+              size={16}
+              color={theme.colors.primary}
+            />
+            <Text variant="body" style={styles.mensajesText}>
+              Mensajes
+            </Text>
+          </TouchableOpacity>
+        )}
       </Card>
     </TouchableOpacity>
   );
@@ -105,7 +172,7 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
+    alignItems: "flex-start",
     marginBottom: theme.spacing[2],
   },
   leftSection: {
@@ -115,13 +182,20 @@ const styles = StyleSheet.create({
     gap: theme.spacing[2],
     flexWrap: "wrap",
   },
+  categoryContainer: {
+    flexShrink: 1,
+  },
   category: {
     flexShrink: 1,
   },
+  displayId: {
+    marginTop: 2,
+    color: theme.colors.muted,
+  },
   badgesContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: theme.spacing[1],
+    flexDirection: "column",
+    alignItems: "flex-start",
+    gap: theme.spacing[2],
   },
   description: {
     marginBottom: theme.spacing[2],
@@ -130,7 +204,7 @@ const styles = StyleSheet.create({
   dateRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: theme.spacing[1],
+    marginBottom: theme.spacing[2],
   },
   date: {
     marginLeft: theme.spacing[1],
@@ -146,6 +220,22 @@ const styles = StyleSheet.create({
     fontWeight: theme.typography.weights.semibold,
     color: theme.colors.primary,
   },
+  mensajesRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: theme.spacing[1],
+    marginTop: theme.spacing[2],
+    paddingVertical: theme.spacing[1],
+    paddingHorizontal: theme.spacing[2],
+    borderWidth: 1,
+    borderColor: theme.colors.primary,
+    borderRadius: theme.radius.md,
+    alignSelf: "flex-start",
+  },
+  mensajesText: {
+    color: theme.colors.primary,
+    fontWeight: theme.typography.weights.medium,
+  },
 });
 
 // Memoize component to prevent unnecessary re-renders
@@ -155,6 +245,8 @@ export const JobCard = React.memo(JobCardComponent, (prevProps, nextProps) => {
     prevProps.job.id === nextProps.job.id &&
     prevProps.job.status === nextProps.job.status &&
     prevProps.job.isFirstOrder === nextProps.job.isFirstOrder &&
-    prevProps.onPress === nextProps.onPress
+    prevProps.job.proProfileId === nextProps.job.proProfileId &&
+    prevProps.onPress === nextProps.onPress &&
+    prevProps.onChatPress === nextProps.onChatPress
   );
 });

@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ArreglaTodo API",
-  description: "ArreglaTodo API Server",
+  title: "EncuentraYa API",
+  description: "EncuentraYa API Server",
 };
 
 export default function RootLayout({

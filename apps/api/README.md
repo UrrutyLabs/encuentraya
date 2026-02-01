@@ -1,6 +1,6 @@
 # API
 
-The tRPC API server for the Arreglatodo marketplace platform.
+The tRPC API server for the EncuentraYa marketplace platform.
 
 ## Overview
 

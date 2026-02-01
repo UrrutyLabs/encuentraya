@@ -111,6 +111,9 @@ export const orderSchema = z.object({
   isFirstOrder: z.boolean(),
   createdAt: z.date(),
   updatedAt: z.date(),
+
+  // Optional: masked client name (firstName + first letter of surname) for pro view
+  clientDisplayName: z.string().optional(),
 });
 
 export type Order = z.infer<typeof orderSchema>;
@@ -216,3 +219,42 @@ export const orderEstimateOutputSchema = z.object({
 });
 
 export type OrderEstimateOutput = z.infer<typeof orderEstimateOutputSchema>;
+
+/**
+ * Order receipt schema (finalized order cost snapshot).
+ * Same display shape as estimate so one UI component can render both.
+ * Optional receipt-only fields: finalizedAt, approvedHours, orderId.
+ */
+export const orderReceiptSchema = orderEstimateOutputSchema.extend({
+  finalizedAt: z.date().optional(),
+  approvedHours: z.number().positive().optional(),
+  orderId: z.string().optional(),
+});
+export type OrderReceipt = z.infer<typeof orderReceiptSchema>;
+
+/**
+ * Cost breakdown for order detail view: either estimate (pre-finalization) or receipt (finalized).
+ * Discriminated union so client can use kind for labels ("Estimado" vs "Comprobante final").
+ */
+const estimateCostBreakdownSchema = z
+  .object({ kind: z.literal("estimate") })
+  .merge(orderEstimateOutputSchema);
+const receiptCostBreakdownSchema = z
+  .object({ kind: z.literal("receipt") })
+  .merge(orderReceiptSchema);
+export const orderCostBreakdownSchema = z.discriminatedUnion("kind", [
+  estimateCostBreakdownSchema,
+  receiptCostBreakdownSchema,
+]);
+export type OrderCostBreakdown = z.infer<typeof orderCostBreakdownSchema>;
+
+/**
+ * Order detail view: order plus single costBreakdown field (estimate or receipt).
+ * Used by getById so clients use costBreakdown only for the cost UI, not raw order totals.
+ */
+export const orderDetailViewSchema = orderSchema.merge(
+  z.object({
+    costBreakdown: orderCostBreakdownSchema,
+  })
+);
+export type OrderDetailView = z.infer<typeof orderDetailViewSchema>;

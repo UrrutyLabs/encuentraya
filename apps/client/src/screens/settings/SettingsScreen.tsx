@@ -82,13 +82,13 @@ export function SettingsScreen() {
       },
       onContactSupportClick: () => {
         // MVP: Open mailto link
-        const email = "soporte@arreglatodo.com";
+        const email = "soporte@encuentraya.com";
         const subject = encodeURIComponent("Consulta de soporte");
         window.location.href = `mailto:${email}?subject=${subject}`;
       },
       onReportProblemClick: () => {
         // MVP: Open mailto link for bug reports
-        const email = "soporte@arreglatodo.com";
+        const email = "soporte@encuentraya.com";
         const subject = encodeURIComponent("Reporte de problema");
         window.location.href = `mailto:${email}?subject=${subject}`;
       },

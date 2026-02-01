@@ -1,7 +1,7 @@
 "use client";
 
 import { Text } from "@repo/ui";
-import { ReviewCostBreakdown } from "./ReviewCostBreakdown";
+import { CostBreakdown } from "@/components/presentational/CostBreakdown";
 import type { OrderEstimateOutput } from "@repo/domain";
 
 interface ReviewSectionSummaryProps {
@@ -36,7 +36,7 @@ export function ReviewSectionSummary({
       >
         Resumen
       </Text>
-      <ReviewCostBreakdown
+      <CostBreakdown
         estimation={costEstimation}
         isLoading={isEstimatingCost}
         error={costEstimationError}

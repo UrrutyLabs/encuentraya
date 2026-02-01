@@ -1,6 +1,6 @@
 # Client App
 
-The customer-facing web application for the Arreglatodo marketplace.
+The customer-facing web application for the EncuentraYa marketplace.
 
 ## Overview
 

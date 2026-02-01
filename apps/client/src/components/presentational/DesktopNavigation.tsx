@@ -85,7 +85,7 @@ export function DesktopNavigation({
       >
         {/* Left: Logo */}
         <Link href={homeLink} className="shrink-0">
-          <Text variant="h2">Arreglatodo</Text>
+          <Text variant="h2">EncuentraYa</Text>
         </Link>
 
         {/* Center: Search Bar (always reserve space) */}
