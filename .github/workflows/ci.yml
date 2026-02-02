@@ -3,7 +3,7 @@ name: CI
 on:
   push:
     branches:
-      - main
+      - development
     paths:
       - "apps/api/**"
       - "apps/admin/**"
@@ -15,7 +15,7 @@ on:
       - "pnpm-lock.yaml"
   pull_request:
     branches:
-      - main
+      - development
     paths:
       - "apps/api/**"
       - "apps/admin/**"
