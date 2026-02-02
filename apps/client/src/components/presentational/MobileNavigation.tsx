@@ -4,7 +4,7 @@ import { useState } from "react";
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Menu, Search, Calendar, User, Settings, LogOut } from "lucide-react";
+import { Menu, Calendar, User, Settings, LogOut } from "lucide-react";
 import { Button } from "@repo/ui";
 import { Text } from "@repo/ui";
 import { useAuth } from "@/hooks/auth";
@@ -36,7 +36,7 @@ export function MobileNavigation({
     ? "/"
     : role === Role.PRO
       ? "/pro/download-app"
-      : "/search";
+      : "/";
 
   const handleSignOut = async () => {
     try {
@@ -74,24 +74,14 @@ export function MobileNavigation({
 
           <div className="flex items-center gap-3">
             {isAuthenticated && (
-              <>
-                <Link href="/search" onClick={handleLinkClick}>
-                  <button
-                    className="min-w-[44px] min-h-[44px] w-11 h-11 flex items-center justify-center rounded-lg hover:bg-surface/80 active:bg-surface/60 transition-colors touch-manipulation"
-                    aria-label="Buscar"
-                  >
-                    <Search className="w-5 h-5 text-text" />
-                  </button>
-                </Link>
-                <Link href="/my-jobs" onClick={handleLinkClick}>
-                  <button
-                    className="min-w-[44px] min-h-[44px] w-11 h-11 flex items-center justify-center rounded-lg hover:bg-surface/80 active:bg-surface/60 transition-colors touch-manipulation"
-                    aria-label={JOB_LABELS.myJobs}
-                  >
-                    <Calendar className="w-5 h-5 text-text" />
-                  </button>
-                </Link>
-              </>
+              <Link href="/my-jobs" onClick={handleLinkClick}>
+                <button
+                  className="min-w-[44px] min-h-[44px] w-11 h-11 flex items-center justify-center rounded-lg hover:bg-surface/80 active:bg-surface/60 transition-colors touch-manipulation"
+                  aria-label={JOB_LABELS.myJobs}
+                >
+                  <Calendar className="w-5 h-5 text-text" />
+                </button>
+              </Link>
             )}
 
             <button
@@ -112,7 +102,7 @@ export function MobileNavigation({
         <div className="py-4">
           {/* Search Bar (if provided) */}
           {centerContent && (
-            <div className="px-4 pb-4 border-b border-border">
+            <div className="px-4 pb-4 border-b border-border animate-[fadeIn_0.2s_ease-out_both]">
               {centerContent}
             </div>
           )}
@@ -135,14 +125,13 @@ export function MobileNavigation({
 
               {/* Navigation Links */}
               <div className="py-2">
-                {!centerContent && (
+                {!isAuthenticated && (
                   <Link
-                    href="/search"
+                    href="/pro"
                     onClick={handleLinkClick}
-                    className="flex items-center gap-3 px-4 py-4 min-h-[44px] hover:bg-surface/80 active:bg-surface/60 transition-colors touch-manipulation"
+                    className="flex items-center gap-3 px-4 py-4 min-h-[44px] text-muted no-underline hover:no-underline hover:text-muted hover:bg-surface/80 active:bg-surface/60 transition-colors touch-manipulation"
                   >
-                    <Search className="w-5 h-5 text-muted" />
-                    <Text variant="body">Buscar</Text>
+                    <Text variant="body">Registrarme como Profesional</Text>
                   </Link>
                 )}
 
@@ -178,13 +167,22 @@ export function MobileNavigation({
             </>
           )}
 
-          {!isAuthenticated && showLogin && (
-            <div className="px-4 py-2">
-              <Link href="/login" onClick={handleLinkClick}>
-                <Button variant="primary" className="w-full">
-                  Iniciar sesión
-                </Button>
+          {!isAuthenticated && (
+            <div className="px-4 py-2 space-y-2">
+              <Link
+                href="/pro"
+                onClick={handleLinkClick}
+                className="flex items-center justify-center px-4 py-4 min-h-[44px] text-muted no-underline hover:no-underline hover:text-muted transition-colors touch-manipulation"
+              >
+                <Text variant="body">Registrarme como Profesional</Text>
               </Link>
+              {showLogin && (
+                <Link href="/login" onClick={handleLinkClick}>
+                  <Button variant="primary" className="w-full">
+                    Iniciar sesión
+                  </Button>
+                </Link>
+              )}
             </div>
           )}
         </div>

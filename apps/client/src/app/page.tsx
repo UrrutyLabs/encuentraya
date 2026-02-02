@@ -1,15 +1,5 @@
-"use client";
-
-import { useClientAuth } from "@/hooks/auth";
-import { LandingLoading } from "@/components/landing/LandingLoading";
-import { LandingScreen } from "@/screens/landing/LandingScreen";
+import { SearchScreen } from "@/screens/search/SearchScreen";
 
 export default function Home() {
-  const { isLoading } = useClientAuth();
-
-  if (isLoading) {
-    return <LandingLoading />;
-  }
-
-  return <LandingScreen />;
+  return <SearchScreen />;
 }

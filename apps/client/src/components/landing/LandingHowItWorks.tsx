@@ -60,7 +60,8 @@ export function LandingHowItWorks() {
               </Text>
             </div>
             <Text variant="body" className="text-muted">
-              Personas reales, perfiles claros, precios visibles.
+              Personas reales, perfiles claros. Precio por hora o presupuesto
+              según el rubro.
             </Text>
           </Card>
 

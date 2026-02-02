@@ -177,7 +177,7 @@ export function ProProfileScreen() {
               <Text variant="body" className="text-muted mb-4">
                 El profesional que buscas no existe o fue eliminado.
               </Text>
-              <Link href="/search">
+              <Link href="/">
                 <Button
                   variant="primary"
                   className="flex items-center gap-2 mx-auto"

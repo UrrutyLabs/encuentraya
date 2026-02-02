@@ -38,7 +38,7 @@ export const SubcategoryCard = memo(function SubcategoryCard({
     >
       {/* Image */}
       <div
-        className={`relative w-full aspect-video bg-gradient-to-br ${placeholderColor} overflow-hidden`}
+        className={`relative w-full aspect-video bg-linear-to-br ${placeholderColor} overflow-hidden`}
       >
         {!imageError && subcategory.imageUrl ? (
           <Image

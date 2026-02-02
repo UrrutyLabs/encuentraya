@@ -1,12 +1,17 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Navigation } from "@/components/presentational/Navigation";
+import { StickySearchBar } from "@/components/presentational/StickySearchBar";
 import { Container } from "@/components/presentational/Container";
 import { SearchHero } from "@/components/search/SearchHero";
 import { CategoryCarousel } from "@/components/search/CategoryCarousel";
 import { SubcategoryGrid } from "@/components/search/SubcategoryGrid";
+import { LandingHowItWorks } from "@/components/landing/LandingHowItWorks";
+import { LandingWhyEncuentraYa } from "@/components/landing/LandingWhyEncuentraYa";
+import { LandingForProfessionals } from "@/components/landing/LandingForProfessionals";
+import { LandingFooter } from "@/components/landing/LandingFooter";
 import type { Category, Subcategory } from "@repo/domain";
 import { useCategories } from "@/hooks/category";
 import { useMediaQuery } from "@/hooks/shared/useMediaQuery";
@@ -34,7 +39,31 @@ export function SearchScreen() {
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(
     null
   );
+  const [showSearchInHeader, setShowSearchInHeader] = useState(false);
+  const howItWorksRef = useRef<HTMLElement>(null);
+  const isFirstIntersectionRef = useRef(true);
   const isMobile = useMediaQuery("(max-width: 767px)");
+
+  // Show search bar in sticky header only when scrolling into "Cómo Funciona"
+  useEffect(() => {
+    const section = howItWorksRef.current;
+    if (!section) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        // Ignore first callback to avoid flash on reload (layout may report wrong intersection)
+        if (isFirstIntersectionRef.current) {
+          isFirstIntersectionRef.current = false;
+          setShowSearchInHeader(false);
+          return;
+        }
+        setShowSearchInHeader(entry.isIntersecting);
+      },
+      { threshold: 0, rootMargin: "0px" }
+    );
+    observer.observe(section);
+    return () => observer.disconnect();
+  }, []);
 
   // Set default selected category to first category when categories load
   useEffect(() => {
@@ -77,16 +106,21 @@ export function SearchScreen() {
 
   return (
     <div className="min-h-screen bg-bg">
+      {/* Main nav scrolls away with the page (not sticky) */}
       <Navigation showLogin={true} showProfile={true} />
+
+      {/* Sticky search-only bar appears when scrolling into "Cómo Funciona" */}
+      {showSearchInHeader && <StickySearchBar />}
+
       <div className="px-4 py-6 md:py-12">
         <Container maxWidth="4xl">
           {/* Search Hero - Centered */}
-          <div className="flex justify-center mb-8 md:mb-12">
+          <div className="flex justify-center mb-8 md:mb-12 animate-[fadeInDown_0.6s_ease-out]">
             <SearchHero />
           </div>
 
           {/* Category Carousel - Centered horizontal list */}
-          <div className="mb-8 md:mb-12">
+          <div className="mb-8 md:mb-12 animate-[fadeIn_0.6s_ease-out_0.15s_both]">
             <CategoryCarousel
               selectedCategory={selectedCategory}
               onCategoryClick={handleCategoryClick}
@@ -95,7 +129,10 @@ export function SearchScreen() {
 
           {/* Subcategory Grid - Shows when category is selected */}
           {selectedCategory && (
-            <div id="subcategories" className="mt-8 md:mt-12">
+            <div
+              id="subcategories"
+              className="mt-8 md:mt-12 animate-[fadeIn_0.6s_ease-out_0.3s_both]"
+            >
               <SubcategoryGrid
                 category={selectedCategory}
                 onSubcategoryClick={handleSubcategoryClick}
@@ -104,6 +141,15 @@ export function SearchScreen() {
           )}
         </Container>
       </div>
+
+      {/* About: How it works, Why us, For professionals */}
+      <section ref={howItWorksRef} id="how-it-works" aria-label="Cómo funciona">
+        <LandingHowItWorks />
+        <LandingWhyEncuentraYa />
+        <LandingForProfessionals />
+      </section>
+
+      <LandingFooter />
     </div>
   );
 }

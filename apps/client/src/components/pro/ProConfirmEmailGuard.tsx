@@ -15,7 +15,7 @@ interface ProConfirmEmailGuardProps {
  * Guard for pro confirm-email page
  * - Allows unauthenticated users (they just signed up)
  * - Allows authenticated PRO users
- * - Redirects authenticated CLIENT users to /search
+ * - Redirects authenticated CLIENT users to /
  */
 export function ProConfirmEmailGuard({ children }: ProConfirmEmailGuardProps) {
   const router = useRouter();
@@ -30,7 +30,7 @@ export function ProConfirmEmailGuard({ children }: ProConfirmEmailGuardProps) {
 
     // If user is authenticated and has CLIENT role, redirect them
     if (user && role === Role.CLIENT) {
-      router.replace("/search");
+      router.replace("/");
       return;
     }
 
