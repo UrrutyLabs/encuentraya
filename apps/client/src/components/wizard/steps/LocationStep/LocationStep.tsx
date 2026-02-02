@@ -29,7 +29,7 @@ export function LocationStep({}: LocationStepProps) {
   const handleNext = useCallback(() => {
     if (!canProceed) return;
     const isFixed = category?.pricingMode === "fixed";
-    navigateToStep("review", {
+    navigateToStep("photos", {
       address,
       hours: isFixed ? "0" : hours,
     });

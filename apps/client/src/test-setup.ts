@@ -78,6 +78,7 @@ const mockTrpcReviewByOrder = vi.fn();
 const mockTrpcPaymentGetByOrder = vi.fn();
 const mockTrpcPaymentCreatePreauthForOrder = vi.fn();
 const mockTrpcContactSubmit = vi.fn();
+const mockTrpcUploadGetPresignedUploadUrl = vi.fn();
 const mockTrpcSubcategoryGetByCategory = vi.fn();
 const mockTrpcSubcategoryGetBySlug = vi.fn();
 const mockTrpcSubcategoryGetById = vi.fn();
@@ -237,6 +238,12 @@ vi.mock("@/lib/trpc/client", () => {
           useMutation: (...args: unknown[]) => mockTrpcContactSubmit(...args),
         },
       },
+      upload: {
+        getPresignedUploadUrl: {
+          useMutation: (...args: unknown[]) =>
+            mockTrpcUploadGetPresignedUploadUrl(...args),
+        },
+      },
     },
   };
 });
@@ -271,6 +278,7 @@ export {
   mockTrpcPaymentGetByOrder,
   mockTrpcPaymentCreatePreauthForOrder,
   mockTrpcContactSubmit,
+  mockTrpcUploadGetPresignedUploadUrl,
   mockTrpcSubcategoryGetByCategory,
   mockTrpcSubcategoryGetBySlug,
   mockTrpcSubcategoryGetById,

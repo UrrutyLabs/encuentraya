@@ -77,6 +77,8 @@ export interface OrderEntity {
 
   // Metadata
   isFirstOrder: boolean;
+  photoUrlsJson?: unknown;
+  workProofPhotoUrlsJson?: unknown;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -107,6 +109,7 @@ export interface OrderCreateInput {
   currency?: string; // defaults to "UYU"
   minHoursSnapshot?: number;
   isFirstOrder?: boolean;
+  photoUrls?: string[]; // Order photos from wizard (storage URLs)
 }
 
 /**
@@ -144,6 +147,7 @@ export interface OrderUpdateInput {
   taxIncluded?: boolean;
   taxRegion?: string | null;
   taxCalculatedAt?: Date | null;
+  workProofPhotoUrlsJson?: unknown; // Array of storage URLs as JSON
 }
 
 /**
@@ -207,6 +211,9 @@ export class OrderRepositoryImpl implements OrderRepository {
         minHoursSnapshot: input.minHoursSnapshot ?? null,
         estimatedHours: input.estimatedHours ?? null,
         isFirstOrder: input.isFirstOrder ?? false,
+        photoUrlsJson: input.photoUrls
+          ? (input.photoUrls as unknown as Prisma.InputJsonValue)
+          : undefined,
         status: $Enums.OrderStatus.pending_pro_confirmation,
       },
     });
@@ -337,6 +344,9 @@ export class OrderRepositoryImpl implements OrderRepository {
     if (data.taxRegion !== undefined) updateData.taxRegion = data.taxRegion;
     if (data.taxCalculatedAt !== undefined)
       updateData.taxCalculatedAt = data.taxCalculatedAt;
+    if (data.workProofPhotoUrlsJson !== undefined)
+      updateData.workProofPhotoUrlsJson =
+        data.workProofPhotoUrlsJson as Prisma.InputJsonValue;
 
     const order = await prisma.order.update({
       where: { id },
@@ -464,6 +474,10 @@ export class OrderRepositoryImpl implements OrderRepository {
       disputeReason: p.disputeReason,
       disputeOpenedBy: p.disputeOpenedBy,
       isFirstOrder: p.isFirstOrder,
+      ...(p.photoUrlsJson !== undefined && { photoUrlsJson: p.photoUrlsJson }),
+      ...(p.workProofPhotoUrlsJson !== undefined && {
+        workProofPhotoUrlsJson: p.workProofPhotoUrlsJson,
+      }),
       createdAt: p.createdAt,
       updatedAt: p.updatedAt,
     };

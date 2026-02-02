@@ -4,6 +4,7 @@ import type { ProRepository } from "@modules/pro/pro.repo";
 import type { Order } from "@repo/domain";
 import { OrderStatus, PaymentStatus, PricingMode } from "@repo/domain";
 import type { Actor } from "@infra/auth/roles";
+import { MAX_WORK_PROOF_PHOTOS } from "@repo/upload";
 import { TOKENS } from "@/server/container";
 import { OrderService } from "./order.service";
 import type { PaymentServiceFactory } from "@modules/payment";
@@ -254,7 +255,11 @@ export class OrderLifecycleService {
    * Transition: in_progress → awaiting_client_approval
    * Only for fixed-price orders.
    */
-  async submitCompletion(actor: Actor, orderId: string): Promise<Order> {
+  async submitCompletion(
+    actor: Actor,
+    orderId: string,
+    options?: { photoUrls?: string[] }
+  ): Promise<Order> {
     const order = await this.orderService.getOrderOrThrow(orderId);
 
     if (order.status !== OrderStatus.IN_PROGRESS) {
@@ -277,9 +282,21 @@ export class OrderLifecycleService {
       this.proRepository
     );
 
+    if (
+      options?.photoUrls &&
+      options.photoUrls.length > MAX_WORK_PROOF_PHOTOS
+    ) {
+      throw new Error(
+        `Work proof photos cannot exceed ${MAX_WORK_PROOF_PHOTOS}. Received ${options.photoUrls.length}.`
+      );
+    }
+
     await this.orderRepository.update(orderId, {
       completedAt: new Date(),
       finalHoursSubmitted: null,
+      workProofPhotoUrlsJson: options?.photoUrls
+        ? (options.photoUrls as unknown)
+        : undefined,
     });
 
     const updated = await this.orderService.updateOrderStatus(
@@ -299,7 +316,8 @@ export class OrderLifecycleService {
   async submitHours(
     actor: Actor,
     orderId: string,
-    finalHours: number
+    finalHours: number,
+    options?: { photoUrls?: string[] }
   ): Promise<Order> {
     const order = await this.orderService.getOrderOrThrow(orderId);
 
@@ -314,10 +332,22 @@ export class OrderLifecycleService {
       throw new Error("Final hours must be greater than 0");
     }
 
+    if (
+      options?.photoUrls &&
+      options.photoUrls.length > MAX_WORK_PROOF_PHOTOS
+    ) {
+      throw new Error(
+        `Work proof photos cannot exceed ${MAX_WORK_PROOF_PHOTOS}. Received ${options.photoUrls.length}.`
+      );
+    }
+
     // Update order with final hours and set status to awaiting_client_approval
     await this.orderRepository.update(orderId, {
       finalHoursSubmitted: finalHours,
       completedAt: new Date(),
+      workProofPhotoUrlsJson: options?.photoUrls
+        ? (options.photoUrls as unknown)
+        : undefined,
     });
 
     const updated = await this.orderService.updateOrderStatus(

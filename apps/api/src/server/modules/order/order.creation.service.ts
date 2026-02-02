@@ -3,7 +3,8 @@ import type { OrderRepository } from "./order.repo";
 import type { ProRepository } from "@modules/pro/pro.repo";
 import type { ProProfileCategoryRepository } from "@modules/pro/proProfileCategory.repo";
 import type { OrderCreateInput, Order } from "@repo/domain";
-import { toMinorUnits, PricingMode } from "@repo/domain";
+import { PricingMode } from "@repo/domain";
+import { MAX_ORDER_PHOTOS } from "@repo/upload";
 import type { Actor } from "@infra/auth/roles";
 import { TOKENS } from "@/server/container";
 import type { ClientProfileService } from "@modules/user/clientProfile.service";
@@ -146,6 +147,12 @@ export class OrderCreationService {
       }
     }
 
+    if (input.photoUrls && input.photoUrls.length > MAX_ORDER_PHOTOS) {
+      throw new Error(
+        `Order photos cannot exceed ${MAX_ORDER_PHOTOS}. Received ${input.photoUrls.length}.`
+      );
+    }
+
     const existingOrders = await this.orderRepository.findByClientUserId(
       actor.id
     );
@@ -170,6 +177,7 @@ export class OrderCreationService {
       currency: "UYU",
       minHoursSnapshot: undefined,
       isFirstOrder,
+      photoUrls: input.photoUrls,
     });
 
     // Return domain object

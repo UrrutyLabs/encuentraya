@@ -18,7 +18,7 @@ This is a production-oriented MVP built with modern web and mobile technologies.
 
 - 🔍 Search professionals by category, location, and availability
 - 👤 View professional profiles with ratings and reviews
-- 📅 Create and manage bookings
+- 📅 Create and manage bookings (with optional photos of the job)
 - 💳 In-app payment processing
 - ⭐ Leave reviews after service completion
 
@@ -26,7 +26,7 @@ This is a production-oriented MVP built with modern web and mobile technologies.
 
 - 📱 Mobile app for managing jobs on the go
 - ⏰ Set availability and service areas
-- 📋 Receive and manage job requests
+- 📋 Receive and manage job requests (view client photos; add work proof photos on completion)
 - 💰 Track earnings and payouts
 - 📊 View booking history and statistics
 

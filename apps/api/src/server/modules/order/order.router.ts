@@ -27,6 +27,7 @@ import {
   ApprovalMethod,
   type OrderCostBreakdown,
 } from "@repo/domain";
+import { photoUrlsSchema } from "@repo/upload";
 import { mapDomainErrorToTRPCError } from "@shared/errors/error-mapper";
 import type { OrderEstimateOutput, Order } from "@repo/domain";
 import type { ReceiptRepository } from "./receipt.repo";
@@ -350,6 +351,7 @@ export const orderRouter = router({
       z.object({
         orderId: z.string(),
         finalHours: z.number().positive(),
+        photoUrls: photoUrlsSchema.optional(),
       })
     )
     .output(orderSchema)
@@ -358,7 +360,8 @@ export const orderRouter = router({
         return await orderLifecycleService.submitHours(
           ctx.actor,
           input.orderId,
-          input.finalHours
+          input.finalHours,
+          { photoUrls: input.photoUrls }
         );
       } catch (error) {
         throw mapDomainErrorToTRPCError(error);
@@ -446,13 +449,19 @@ export const orderRouter = router({
    * Transition: in_progress → awaiting_client_approval. Fixed orders only.
    */
   submitCompletion: proProcedure
-    .input(z.object({ orderId: z.string() }))
+    .input(
+      z.object({
+        orderId: z.string(),
+        photoUrls: photoUrlsSchema.optional(),
+      })
+    )
     .output(orderSchema)
     .mutation(async ({ input, ctx }) => {
       try {
         return await orderLifecycleService.submitCompletion(
           ctx.actor,
-          input.orderId
+          input.orderId,
+          { photoUrls: input.photoUrls }
         );
       } catch (error) {
         throw mapDomainErrorToTRPCError(error);

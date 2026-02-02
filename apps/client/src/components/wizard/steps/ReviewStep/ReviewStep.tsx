@@ -6,6 +6,7 @@ import { ReviewStepHeader } from "./ReviewStepHeader";
 import { ReviewStepErrors } from "./ReviewStepErrors";
 import { ReviewStepContent } from "./ReviewStepContent";
 import { ReviewStepNavigation } from "./ReviewStepNavigation";
+import { usePhotoUrls } from "@/contexts/PhotoUrlsContext";
 import {
   useReviewStepData,
   useReviewStepValidation,
@@ -38,6 +39,7 @@ export function ReviewStep({}: ReviewStepProps) {
     pro,
   });
 
+  const { photoUrls } = usePhotoUrls();
   const {
     handleSubmit,
     isPending,
@@ -48,7 +50,7 @@ export function ReviewStep({}: ReviewStepProps) {
   });
 
   const handleBack = useCallback(() => {
-    navigateToStep("location");
+    navigateToStep("photos");
   }, [navigateToStep]);
 
   if (!hasCompleteState || isLoadingPro) {
@@ -78,6 +80,7 @@ export function ReviewStep({}: ReviewStepProps) {
         isEstimatingCost={isEstimatingCost}
         costEstimationError={costEstimationError}
         isFixedPrice={category?.pricingMode === "fixed"}
+        photoUrls={photoUrls}
       />
 
       {createError != null && (

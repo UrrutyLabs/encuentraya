@@ -202,6 +202,8 @@ export const OrderScalarFieldEnum = {
   disputeReason: 'disputeReason',
   disputeOpenedBy: 'disputeOpenedBy',
   isFirstOrder: 'isFirstOrder',
+  photoUrlsJson: 'photoUrlsJson',
+  workProofPhotoUrlsJson: 'workProofPhotoUrlsJson',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

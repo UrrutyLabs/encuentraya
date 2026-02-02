@@ -332,9 +332,11 @@ model Order {
   
   // Metadata
   isFirstOrder            Boolean      @default(false)
+  photoUrlsJson           Json?        // Order photos from create job wizard (array of storage URLs)
+  workProofPhotoUrlsJson   Json?        // Work proof photos from pro on completion (array of storage URLs)
   createdAt                 DateTime     @default(now())
   updatedAt                 DateTime     @updatedAt
-  
+
   // Relations
   client                    User         @relation("ClientOrders", fields: [clientUserId], references: [id], onDelete: Cascade)
   proProfile                ProProfile?  @relation("ProOrders", fields: [proProfileId], references: [id], onDelete: SetNull)

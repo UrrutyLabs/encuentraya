@@ -4,18 +4,33 @@ import { useQueryClient } from "../shared/useQueryClient";
 import { OrderStatus } from "@repo/domain";
 import type { Order } from "@repo/domain";
 
+export interface CompleteOrderOptions {
+  photoUrls?: string[];
+}
+
+export interface SubmitCompletionOptions {
+  photoUrls?: string[];
+}
+
 interface UseOrderActionsReturn {
   acceptOrder: (orderId: string) => Promise<void>;
   rejectOrder: (orderId: string, reason?: string) => Promise<void>;
   markOnMyWay: (orderId: string) => Promise<void>;
   arriveOrder: (orderId: string) => Promise<void>;
-  completeOrder: (orderId: string, finalHours: number) => Promise<void>;
+  completeOrder: (
+    orderId: string,
+    finalHours: number,
+    options?: CompleteOrderOptions
+  ) => Promise<void>;
   submitQuote: (
     orderId: string,
     amountCents: number,
     message?: string
   ) => Promise<void>;
-  submitCompletion: (orderId: string) => Promise<void>;
+  submitCompletion: (
+    orderId: string,
+    options?: SubmitCompletionOptions
+  ) => Promise<void>;
   isAccepting: boolean;
   isRejecting: boolean;
   isMarkingOnMyWay: boolean;
@@ -270,10 +285,18 @@ export function useOrderActions(onSuccess?: () => void): UseOrderActionsReturn {
     }
   };
 
-  const completeOrder = async (orderId: string, finalHours: number) => {
+  const completeOrder = async (
+    orderId: string,
+    finalHours: number,
+    options?: CompleteOrderOptions
+  ) => {
     setError(null);
     try {
-      await completeMutation.mutateAsync({ orderId, finalHours });
+      await completeMutation.mutateAsync(
+        options?.photoUrls?.length
+          ? { orderId, finalHours, photoUrls: options.photoUrls }
+          : { orderId, finalHours }
+      );
     } catch (err) {
       const message =
         err instanceof Error ? err.message : "Error al completar el trabajo";
@@ -298,10 +321,17 @@ export function useOrderActions(onSuccess?: () => void): UseOrderActionsReturn {
     }
   };
 
-  const submitCompletion = async (orderId: string) => {
+  const submitCompletion = async (
+    orderId: string,
+    options?: SubmitCompletionOptions
+  ) => {
     setError(null);
     try {
-      await submitCompletionMutation.mutateAsync({ orderId });
+      await submitCompletionMutation.mutateAsync(
+        options?.photoUrls?.length
+          ? { orderId, photoUrls: options.photoUrls }
+          : { orderId }
+      );
     } catch (err) {
       const message =
         err instanceof Error ? err.message : "Error al completar el trabajo";

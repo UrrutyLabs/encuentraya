@@ -196,6 +196,12 @@ export class OrderService {
       disputeReason: entity.disputeReason,
       disputeOpenedBy: entity.disputeOpenedBy,
       isFirstOrder: entity.isFirstOrder,
+      photoUrls: Array.isArray(entity.photoUrlsJson)
+        ? (entity.photoUrlsJson as string[])
+        : undefined,
+      workProofPhotoUrls: Array.isArray(entity.workProofPhotoUrlsJson)
+        ? (entity.workProofPhotoUrlsJson as string[])
+        : undefined,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
     };

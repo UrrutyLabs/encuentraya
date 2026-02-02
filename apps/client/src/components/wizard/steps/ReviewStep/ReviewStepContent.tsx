@@ -23,6 +23,7 @@ interface ReviewStepContentProps {
   isEstimatingCost: boolean;
   costEstimationError: unknown;
   isFixedPrice?: boolean;
+  photoUrls?: string[];
 }
 
 /**
@@ -45,6 +46,7 @@ export function ReviewStepContent({
   isEstimatingCost,
   costEstimationError,
   isFixedPrice = false,
+  photoUrls = [],
 }: ReviewStepContentProps) {
   return (
     <>
@@ -54,7 +56,7 @@ export function ReviewStepContent({
         categoryName={categoryName}
       />
 
-      {/* Card 2: Service Details + Location */}
+      {/* Card 2: Service Details + Location (+ optional photos) */}
       <Card className="p-4 md:p-6 mb-4 md:mb-6">
         <div className="space-y-6 md:space-y-6">
           <ReviewSectionServiceDetails
@@ -70,6 +72,27 @@ export function ReviewStepContent({
             hours={hours}
             isFixedPrice={isFixedPrice}
           />
+
+          {photoUrls.length > 0 && (
+            <>
+              <div className="border-t border-border" aria-hidden />
+              <div>
+                <p className="text-sm font-medium text-text mb-2">
+                  Fotos ({photoUrls.length})
+                </p>
+                <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
+                  {photoUrls.map((url) => (
+                    <img
+                      key={url}
+                      src={url}
+                      alt="Orden"
+                      className="aspect-square object-cover rounded-lg border border-border"
+                    />
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </Card>
 

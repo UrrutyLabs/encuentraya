@@ -3,6 +3,7 @@
 import { useCallback } from "react";
 import { useCreateOrder } from "@/hooks/order";
 import { useWizardState } from "@/lib/wizard/useWizardState";
+import { usePhotoUrls } from "@/contexts/PhotoUrlsContext";
 import type { CategoryMetadataInput } from "@repo/domain";
 import type { Category } from "@repo/domain";
 import { logger } from "@/lib/logger";
@@ -27,6 +28,7 @@ export function useReviewStepSubmit({
   categoryMetadataJson,
 }: UseReviewStepSubmitProps): UseReviewStepSubmitReturn {
   const { state } = useWizardState();
+  const { photoUrls } = usePhotoUrls();
   const { createOrder, isPending, error } = useCreateOrder();
 
   const handleSubmit = useCallback(async () => {
@@ -53,6 +55,7 @@ export function useReviewStepSubmit({
         scheduledWindowStartAt: scheduledAt,
         estimatedHours,
         categoryMetadataJson: categoryMetadataJson,
+        photoUrls: photoUrls.length > 0 ? photoUrls : undefined,
       });
     } catch (err) {
       logger.error(
@@ -69,6 +72,7 @@ export function useReviewStepSubmit({
     state.hours,
     category,
     categoryMetadataJson,
+    photoUrls,
     createOrder,
   ]);
 

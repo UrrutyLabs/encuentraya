@@ -35,13 +35,21 @@ It is the canonical reference for **backend state machine, payments, and client/
 
 ### 1) Order creation (client)
 
+The client goes through a **create-order wizard**:
+
+1. **Service details** – Category/subcategory, selected professional, description
+2. **Location & duration** – Address, preferred time window, estimated hours
+3. **Add photos** (optional) – Client can attach up to 10 photos (e.g. of the space or problem). Images are compressed client-side, then uploaded to storage via presigned URLs. URLs are stored with the order as `photoUrls`.
+4. **Review & confirm** – Summary and cost estimate; client submits the order.
+
 Client provides:
 
 - Category / subcategory
 - Selected professional
 - Address
 - Preferred time window
-- Description + optional photos
+- Description
+- **Optional photos** (order photos, shown to the pro in job details)
 
 **Order status:** `pending_pro_confirmation`
 
@@ -125,7 +133,8 @@ These steps are important for:
 Professional:
 
 - Marks **“Completed”**
-- Submits `final_hours`
+- Optionally attaches **work proof photos** (e.g. before/after; from camera or gallery). Up to 10 photos; compressed on device, uploaded via presigned URLs, stored as `workProofPhotoUrls`.
+- Submits `final_hours` (hourly) or completes without hours (fixed-price).
 
 **Order status:** `awaiting_client_approval`
 

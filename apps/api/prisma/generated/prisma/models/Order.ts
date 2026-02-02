@@ -217,6 +217,8 @@ export type OrderCountAggregateOutputType = {
   disputeReason: number
   disputeOpenedBy: number
   isFirstOrder: number
+  photoUrlsJson: number
+  workProofPhotoUrlsJson: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -414,6 +416,8 @@ export type OrderCountAggregateInputType = {
   disputeReason?: true
   disputeOpenedBy?: true
   isFirstOrder?: true
+  photoUrlsJson?: true
+  workProofPhotoUrlsJson?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -556,6 +560,8 @@ export type OrderGroupByOutputType = {
   disputeReason: string | null
   disputeOpenedBy: string | null
   isFirstOrder: boolean
+  photoUrlsJson: runtime.JsonValue | null
+  workProofPhotoUrlsJson: runtime.JsonValue | null
   createdAt: Date
   updatedAt: Date
   _count: OrderCountAggregateOutputType | null
@@ -634,6 +640,8 @@ export type OrderWhereInput = {
   disputeReason?: Prisma.StringNullableFilter<"Order"> | string | null
   disputeOpenedBy?: Prisma.StringNullableFilter<"Order"> | string | null
   isFirstOrder?: Prisma.BoolFilter<"Order"> | boolean
+  photoUrlsJson?: Prisma.JsonNullableFilter<"Order">
+  workProofPhotoUrlsJson?: Prisma.JsonNullableFilter<"Order">
   createdAt?: Prisma.DateTimeFilter<"Order"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Order"> | Date | string
   client?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -699,6 +707,8 @@ export type OrderOrderByWithRelationInput = {
   disputeReason?: Prisma.SortOrderInput | Prisma.SortOrder
   disputeOpenedBy?: Prisma.SortOrderInput | Prisma.SortOrder
   isFirstOrder?: Prisma.SortOrder
+  photoUrlsJson?: Prisma.SortOrderInput | Prisma.SortOrder
+  workProofPhotoUrlsJson?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   client?: Prisma.UserOrderByWithRelationInput
@@ -767,6 +777,8 @@ export type OrderWhereUniqueInput = Prisma.AtLeast<{
   disputeReason?: Prisma.StringNullableFilter<"Order"> | string | null
   disputeOpenedBy?: Prisma.StringNullableFilter<"Order"> | string | null
   isFirstOrder?: Prisma.BoolFilter<"Order"> | boolean
+  photoUrlsJson?: Prisma.JsonNullableFilter<"Order">
+  workProofPhotoUrlsJson?: Prisma.JsonNullableFilter<"Order">
   createdAt?: Prisma.DateTimeFilter<"Order"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Order"> | Date | string
   client?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -832,6 +844,8 @@ export type OrderOrderByWithAggregationInput = {
   disputeReason?: Prisma.SortOrderInput | Prisma.SortOrder
   disputeOpenedBy?: Prisma.SortOrderInput | Prisma.SortOrder
   isFirstOrder?: Prisma.SortOrder
+  photoUrlsJson?: Prisma.SortOrderInput | Prisma.SortOrder
+  workProofPhotoUrlsJson?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.OrderCountOrderByAggregateInput
@@ -895,6 +909,8 @@ export type OrderScalarWhereWithAggregatesInput = {
   disputeReason?: Prisma.StringNullableWithAggregatesFilter<"Order"> | string | null
   disputeOpenedBy?: Prisma.StringNullableWithAggregatesFilter<"Order"> | string | null
   isFirstOrder?: Prisma.BoolWithAggregatesFilter<"Order"> | boolean
+  photoUrlsJson?: Prisma.JsonNullableWithAggregatesFilter<"Order">
+  workProofPhotoUrlsJson?: Prisma.JsonNullableWithAggregatesFilter<"Order">
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Order"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Order"> | Date | string
 }
@@ -946,6 +962,8 @@ export type OrderCreateInput = {
   disputeReason?: string | null
   disputeOpenedBy?: string | null
   isFirstOrder?: boolean
+  photoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  workProofPhotoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
   client: Prisma.UserCreateNestedOneWithoutOrdersAsClientInput
@@ -1011,6 +1029,8 @@ export type OrderUncheckedCreateInput = {
   disputeReason?: string | null
   disputeOpenedBy?: string | null
   isFirstOrder?: boolean
+  photoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  workProofPhotoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
   lineItems?: Prisma.OrderLineItemUncheckedCreateNestedManyWithoutOrderInput
@@ -1068,6 +1088,8 @@ export type OrderUpdateInput = {
   disputeReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   disputeOpenedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isFirstOrder?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  photoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  workProofPhotoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   client?: Prisma.UserUpdateOneRequiredWithoutOrdersAsClientNestedInput
@@ -1133,6 +1155,8 @@ export type OrderUncheckedUpdateInput = {
   disputeReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   disputeOpenedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isFirstOrder?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  photoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  workProofPhotoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lineItems?: Prisma.OrderLineItemUncheckedUpdateManyWithoutOrderNestedInput
@@ -1194,6 +1218,8 @@ export type OrderCreateManyInput = {
   disputeReason?: string | null
   disputeOpenedBy?: string | null
   isFirstOrder?: boolean
+  photoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  workProofPhotoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -1245,6 +1271,8 @@ export type OrderUpdateManyMutationInput = {
   disputeReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   disputeOpenedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isFirstOrder?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  photoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  workProofPhotoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1300,6 +1328,8 @@ export type OrderUncheckedUpdateManyInput = {
   disputeReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   disputeOpenedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isFirstOrder?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  photoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  workProofPhotoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1365,6 +1395,8 @@ export type OrderCountOrderByAggregateInput = {
   disputeReason?: Prisma.SortOrder
   disputeOpenedBy?: Prisma.SortOrder
   isFirstOrder?: Prisma.SortOrder
+  photoUrlsJson?: Prisma.SortOrder
+  workProofPhotoUrlsJson?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -1837,6 +1869,8 @@ export type OrderCreateWithoutClientInput = {
   disputeReason?: string | null
   disputeOpenedBy?: string | null
   isFirstOrder?: boolean
+  photoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  workProofPhotoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
   proProfile?: Prisma.ProProfileCreateNestedOneWithoutOrdersInput
@@ -1900,6 +1934,8 @@ export type OrderUncheckedCreateWithoutClientInput = {
   disputeReason?: string | null
   disputeOpenedBy?: string | null
   isFirstOrder?: boolean
+  photoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  workProofPhotoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
   lineItems?: Prisma.OrderLineItemUncheckedCreateNestedManyWithoutOrderInput
@@ -1990,6 +2026,8 @@ export type OrderScalarWhereInput = {
   disputeReason?: Prisma.StringNullableFilter<"Order"> | string | null
   disputeOpenedBy?: Prisma.StringNullableFilter<"Order"> | string | null
   isFirstOrder?: Prisma.BoolFilter<"Order"> | boolean
+  photoUrlsJson?: Prisma.JsonNullableFilter<"Order">
+  workProofPhotoUrlsJson?: Prisma.JsonNullableFilter<"Order">
   createdAt?: Prisma.DateTimeFilter<"Order"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Order"> | Date | string
 }
@@ -2041,6 +2079,8 @@ export type OrderCreateWithoutProProfileInput = {
   disputeReason?: string | null
   disputeOpenedBy?: string | null
   isFirstOrder?: boolean
+  photoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  workProofPhotoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
   client: Prisma.UserCreateNestedOneWithoutOrdersAsClientInput
@@ -2104,6 +2144,8 @@ export type OrderUncheckedCreateWithoutProProfileInput = {
   disputeReason?: string | null
   disputeOpenedBy?: string | null
   isFirstOrder?: boolean
+  photoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  workProofPhotoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
   lineItems?: Prisma.OrderLineItemUncheckedCreateNestedManyWithoutOrderInput
@@ -2187,6 +2229,8 @@ export type OrderCreateWithoutLineItemsInput = {
   disputeReason?: string | null
   disputeOpenedBy?: string | null
   isFirstOrder?: boolean
+  photoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  workProofPhotoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
   client: Prisma.UserCreateNestedOneWithoutOrdersAsClientInput
@@ -2251,6 +2295,8 @@ export type OrderUncheckedCreateWithoutLineItemsInput = {
   disputeReason?: string | null
   disputeOpenedBy?: string | null
   isFirstOrder?: boolean
+  photoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  workProofPhotoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
   review?: Prisma.ReviewUncheckedCreateNestedOneWithoutOrderInput
@@ -2323,6 +2369,8 @@ export type OrderUpdateWithoutLineItemsInput = {
   disputeReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   disputeOpenedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isFirstOrder?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  photoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  workProofPhotoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   client?: Prisma.UserUpdateOneRequiredWithoutOrdersAsClientNestedInput
@@ -2387,6 +2435,8 @@ export type OrderUncheckedUpdateWithoutLineItemsInput = {
   disputeReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   disputeOpenedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isFirstOrder?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  photoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  workProofPhotoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   review?: Prisma.ReviewUncheckedUpdateOneWithoutOrderNestedInput
@@ -2443,6 +2493,8 @@ export type OrderCreateWithoutMessagesInput = {
   disputeReason?: string | null
   disputeOpenedBy?: string | null
   isFirstOrder?: boolean
+  photoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  workProofPhotoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
   client: Prisma.UserCreateNestedOneWithoutOrdersAsClientInput
@@ -2507,6 +2559,8 @@ export type OrderUncheckedCreateWithoutMessagesInput = {
   disputeReason?: string | null
   disputeOpenedBy?: string | null
   isFirstOrder?: boolean
+  photoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  workProofPhotoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
   lineItems?: Prisma.OrderLineItemUncheckedCreateNestedManyWithoutOrderInput
@@ -2579,6 +2633,8 @@ export type OrderUpdateWithoutMessagesInput = {
   disputeReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   disputeOpenedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isFirstOrder?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  photoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  workProofPhotoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   client?: Prisma.UserUpdateOneRequiredWithoutOrdersAsClientNestedInput
@@ -2643,6 +2699,8 @@ export type OrderUncheckedUpdateWithoutMessagesInput = {
   disputeReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   disputeOpenedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isFirstOrder?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  photoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  workProofPhotoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lineItems?: Prisma.OrderLineItemUncheckedUpdateManyWithoutOrderNestedInput
@@ -2699,6 +2757,8 @@ export type OrderCreateWithoutThreadStatesInput = {
   disputeReason?: string | null
   disputeOpenedBy?: string | null
   isFirstOrder?: boolean
+  photoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  workProofPhotoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
   client: Prisma.UserCreateNestedOneWithoutOrdersAsClientInput
@@ -2763,6 +2823,8 @@ export type OrderUncheckedCreateWithoutThreadStatesInput = {
   disputeReason?: string | null
   disputeOpenedBy?: string | null
   isFirstOrder?: boolean
+  photoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  workProofPhotoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
   lineItems?: Prisma.OrderLineItemUncheckedCreateNestedManyWithoutOrderInput
@@ -2835,6 +2897,8 @@ export type OrderUpdateWithoutThreadStatesInput = {
   disputeReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   disputeOpenedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isFirstOrder?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  photoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  workProofPhotoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   client?: Prisma.UserUpdateOneRequiredWithoutOrdersAsClientNestedInput
@@ -2899,6 +2963,8 @@ export type OrderUncheckedUpdateWithoutThreadStatesInput = {
   disputeReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   disputeOpenedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isFirstOrder?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  photoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  workProofPhotoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lineItems?: Prisma.OrderLineItemUncheckedUpdateManyWithoutOrderNestedInput
@@ -2955,6 +3021,8 @@ export type OrderCreateWithoutReviewInput = {
   disputeReason?: string | null
   disputeOpenedBy?: string | null
   isFirstOrder?: boolean
+  photoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  workProofPhotoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
   client: Prisma.UserCreateNestedOneWithoutOrdersAsClientInput
@@ -3019,6 +3087,8 @@ export type OrderUncheckedCreateWithoutReviewInput = {
   disputeReason?: string | null
   disputeOpenedBy?: string | null
   isFirstOrder?: boolean
+  photoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  workProofPhotoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
   lineItems?: Prisma.OrderLineItemUncheckedCreateNestedManyWithoutOrderInput
@@ -3091,6 +3161,8 @@ export type OrderUpdateWithoutReviewInput = {
   disputeReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   disputeOpenedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isFirstOrder?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  photoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  workProofPhotoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   client?: Prisma.UserUpdateOneRequiredWithoutOrdersAsClientNestedInput
@@ -3155,6 +3227,8 @@ export type OrderUncheckedUpdateWithoutReviewInput = {
   disputeReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   disputeOpenedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isFirstOrder?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  photoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  workProofPhotoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lineItems?: Prisma.OrderLineItemUncheckedUpdateManyWithoutOrderNestedInput
@@ -3211,6 +3285,8 @@ export type OrderCreateWithoutPaymentInput = {
   disputeReason?: string | null
   disputeOpenedBy?: string | null
   isFirstOrder?: boolean
+  photoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  workProofPhotoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
   client: Prisma.UserCreateNestedOneWithoutOrdersAsClientInput
@@ -3275,6 +3351,8 @@ export type OrderUncheckedCreateWithoutPaymentInput = {
   disputeReason?: string | null
   disputeOpenedBy?: string | null
   isFirstOrder?: boolean
+  photoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  workProofPhotoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
   lineItems?: Prisma.OrderLineItemUncheckedCreateNestedManyWithoutOrderInput
@@ -3347,6 +3425,8 @@ export type OrderUpdateWithoutPaymentInput = {
   disputeReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   disputeOpenedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isFirstOrder?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  photoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  workProofPhotoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   client?: Prisma.UserUpdateOneRequiredWithoutOrdersAsClientNestedInput
@@ -3411,6 +3491,8 @@ export type OrderUncheckedUpdateWithoutPaymentInput = {
   disputeReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   disputeOpenedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isFirstOrder?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  photoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  workProofPhotoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lineItems?: Prisma.OrderLineItemUncheckedUpdateManyWithoutOrderNestedInput
@@ -3467,6 +3549,8 @@ export type OrderCreateWithoutEarningInput = {
   disputeReason?: string | null
   disputeOpenedBy?: string | null
   isFirstOrder?: boolean
+  photoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  workProofPhotoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
   client: Prisma.UserCreateNestedOneWithoutOrdersAsClientInput
@@ -3531,6 +3615,8 @@ export type OrderUncheckedCreateWithoutEarningInput = {
   disputeReason?: string | null
   disputeOpenedBy?: string | null
   isFirstOrder?: boolean
+  photoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  workProofPhotoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
   lineItems?: Prisma.OrderLineItemUncheckedCreateNestedManyWithoutOrderInput
@@ -3603,6 +3689,8 @@ export type OrderUpdateWithoutEarningInput = {
   disputeReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   disputeOpenedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isFirstOrder?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  photoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  workProofPhotoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   client?: Prisma.UserUpdateOneRequiredWithoutOrdersAsClientNestedInput
@@ -3667,6 +3755,8 @@ export type OrderUncheckedUpdateWithoutEarningInput = {
   disputeReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   disputeOpenedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isFirstOrder?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  photoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  workProofPhotoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lineItems?: Prisma.OrderLineItemUncheckedUpdateManyWithoutOrderNestedInput
@@ -3723,6 +3813,8 @@ export type OrderCreateWithoutCategoryInput = {
   disputeReason?: string | null
   disputeOpenedBy?: string | null
   isFirstOrder?: boolean
+  photoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  workProofPhotoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
   client: Prisma.UserCreateNestedOneWithoutOrdersAsClientInput
@@ -3786,6 +3878,8 @@ export type OrderUncheckedCreateWithoutCategoryInput = {
   disputeReason?: string | null
   disputeOpenedBy?: string | null
   isFirstOrder?: boolean
+  photoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  workProofPhotoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
   lineItems?: Prisma.OrderLineItemUncheckedCreateNestedManyWithoutOrderInput
@@ -3869,6 +3963,8 @@ export type OrderCreateWithoutSubcategoryInput = {
   disputeReason?: string | null
   disputeOpenedBy?: string | null
   isFirstOrder?: boolean
+  photoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  workProofPhotoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
   client: Prisma.UserCreateNestedOneWithoutOrdersAsClientInput
@@ -3932,6 +4028,8 @@ export type OrderUncheckedCreateWithoutSubcategoryInput = {
   disputeReason?: string | null
   disputeOpenedBy?: string | null
   isFirstOrder?: boolean
+  photoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  workProofPhotoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
   lineItems?: Prisma.OrderLineItemUncheckedCreateNestedManyWithoutOrderInput
@@ -4018,6 +4116,8 @@ export type OrderCreateManyClientInput = {
   disputeReason?: string | null
   disputeOpenedBy?: string | null
   isFirstOrder?: boolean
+  photoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  workProofPhotoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -4069,6 +4169,8 @@ export type OrderUpdateWithoutClientInput = {
   disputeReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   disputeOpenedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isFirstOrder?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  photoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  workProofPhotoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   proProfile?: Prisma.ProProfileUpdateOneWithoutOrdersNestedInput
@@ -4132,6 +4234,8 @@ export type OrderUncheckedUpdateWithoutClientInput = {
   disputeReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   disputeOpenedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isFirstOrder?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  photoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  workProofPhotoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lineItems?: Prisma.OrderLineItemUncheckedUpdateManyWithoutOrderNestedInput
@@ -4192,6 +4296,8 @@ export type OrderUncheckedUpdateManyWithoutClientInput = {
   disputeReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   disputeOpenedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isFirstOrder?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  photoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  workProofPhotoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -4246,6 +4352,8 @@ export type OrderCreateManyProProfileInput = {
   disputeReason?: string | null
   disputeOpenedBy?: string | null
   isFirstOrder?: boolean
+  photoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  workProofPhotoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -4297,6 +4405,8 @@ export type OrderUpdateWithoutProProfileInput = {
   disputeReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   disputeOpenedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isFirstOrder?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  photoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  workProofPhotoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   client?: Prisma.UserUpdateOneRequiredWithoutOrdersAsClientNestedInput
@@ -4360,6 +4470,8 @@ export type OrderUncheckedUpdateWithoutProProfileInput = {
   disputeReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   disputeOpenedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isFirstOrder?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  photoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  workProofPhotoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lineItems?: Prisma.OrderLineItemUncheckedUpdateManyWithoutOrderNestedInput
@@ -4420,6 +4532,8 @@ export type OrderUncheckedUpdateManyWithoutProProfileInput = {
   disputeReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   disputeOpenedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isFirstOrder?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  photoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  workProofPhotoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -4474,6 +4588,8 @@ export type OrderCreateManyCategoryInput = {
   disputeReason?: string | null
   disputeOpenedBy?: string | null
   isFirstOrder?: boolean
+  photoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  workProofPhotoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -4525,6 +4641,8 @@ export type OrderUpdateWithoutCategoryInput = {
   disputeReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   disputeOpenedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isFirstOrder?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  photoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  workProofPhotoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   client?: Prisma.UserUpdateOneRequiredWithoutOrdersAsClientNestedInput
@@ -4588,6 +4706,8 @@ export type OrderUncheckedUpdateWithoutCategoryInput = {
   disputeReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   disputeOpenedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isFirstOrder?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  photoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  workProofPhotoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lineItems?: Prisma.OrderLineItemUncheckedUpdateManyWithoutOrderNestedInput
@@ -4648,6 +4768,8 @@ export type OrderUncheckedUpdateManyWithoutCategoryInput = {
   disputeReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   disputeOpenedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isFirstOrder?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  photoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  workProofPhotoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -4702,6 +4824,8 @@ export type OrderCreateManySubcategoryInput = {
   disputeReason?: string | null
   disputeOpenedBy?: string | null
   isFirstOrder?: boolean
+  photoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  workProofPhotoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -4753,6 +4877,8 @@ export type OrderUpdateWithoutSubcategoryInput = {
   disputeReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   disputeOpenedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isFirstOrder?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  photoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  workProofPhotoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   client?: Prisma.UserUpdateOneRequiredWithoutOrdersAsClientNestedInput
@@ -4816,6 +4942,8 @@ export type OrderUncheckedUpdateWithoutSubcategoryInput = {
   disputeReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   disputeOpenedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isFirstOrder?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  photoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  workProofPhotoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lineItems?: Prisma.OrderLineItemUncheckedUpdateManyWithoutOrderNestedInput
@@ -4876,6 +5004,8 @@ export type OrderUncheckedUpdateManyWithoutSubcategoryInput = {
   disputeReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   disputeOpenedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isFirstOrder?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  photoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  workProofPhotoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -4980,6 +5110,8 @@ export type OrderSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   disputeReason?: boolean
   disputeOpenedBy?: boolean
   isFirstOrder?: boolean
+  photoUrlsJson?: boolean
+  workProofPhotoUrlsJson?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   client?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -5046,6 +5178,8 @@ export type OrderSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   disputeReason?: boolean
   disputeOpenedBy?: boolean
   isFirstOrder?: boolean
+  photoUrlsJson?: boolean
+  workProofPhotoUrlsJson?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   client?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -5105,6 +5239,8 @@ export type OrderSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   disputeReason?: boolean
   disputeOpenedBy?: boolean
   isFirstOrder?: boolean
+  photoUrlsJson?: boolean
+  workProofPhotoUrlsJson?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   client?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -5164,11 +5300,13 @@ export type OrderSelectScalar = {
   disputeReason?: boolean
   disputeOpenedBy?: boolean
   isFirstOrder?: boolean
+  photoUrlsJson?: boolean
+  workProofPhotoUrlsJson?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type OrderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "displayId" | "clientUserId" | "proProfileId" | "categoryId" | "subcategoryId" | "categoryMetadataJson" | "title" | "description" | "addressText" | "addressLat" | "addressLng" | "scheduledWindowStartAt" | "scheduledWindowEndAt" | "status" | "acceptedAt" | "confirmedAt" | "startedAt" | "arrivedAt" | "completedAt" | "paidAt" | "canceledAt" | "cancelReason" | "pricingMode" | "hourlyRateSnapshotAmount" | "currency" | "minHoursSnapshot" | "quotedAmountCents" | "quotedAt" | "quoteMessage" | "quoteAcceptedAt" | "estimatedHours" | "finalHoursSubmitted" | "approvedHours" | "approvalMethod" | "approvalDeadlineAt" | "subtotalAmount" | "platformFeeAmount" | "taxAmount" | "totalAmount" | "totalsCalculatedAt" | "taxScheme" | "taxRate" | "taxIncluded" | "taxRegion" | "taxCalculatedAt" | "disputeStatus" | "disputeReason" | "disputeOpenedBy" | "isFirstOrder" | "createdAt" | "updatedAt", ExtArgs["result"]["order"]>
+export type OrderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "displayId" | "clientUserId" | "proProfileId" | "categoryId" | "subcategoryId" | "categoryMetadataJson" | "title" | "description" | "addressText" | "addressLat" | "addressLng" | "scheduledWindowStartAt" | "scheduledWindowEndAt" | "status" | "acceptedAt" | "confirmedAt" | "startedAt" | "arrivedAt" | "completedAt" | "paidAt" | "canceledAt" | "cancelReason" | "pricingMode" | "hourlyRateSnapshotAmount" | "currency" | "minHoursSnapshot" | "quotedAmountCents" | "quotedAt" | "quoteMessage" | "quoteAcceptedAt" | "estimatedHours" | "finalHoursSubmitted" | "approvedHours" | "approvalMethod" | "approvalDeadlineAt" | "subtotalAmount" | "platformFeeAmount" | "taxAmount" | "totalAmount" | "totalsCalculatedAt" | "taxScheme" | "taxRate" | "taxIncluded" | "taxRegion" | "taxCalculatedAt" | "disputeStatus" | "disputeReason" | "disputeOpenedBy" | "isFirstOrder" | "photoUrlsJson" | "workProofPhotoUrlsJson" | "createdAt" | "updatedAt", ExtArgs["result"]["order"]>
 export type OrderInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   client?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   proProfile?: boolean | Prisma.Order$proProfileArgs<ExtArgs>
@@ -5260,6 +5398,8 @@ export type $OrderPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     disputeReason: string | null
     disputeOpenedBy: string | null
     isFirstOrder: boolean
+    photoUrlsJson: runtime.JsonValue | null
+    workProofPhotoUrlsJson: runtime.JsonValue | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["order"]>
@@ -5745,6 +5885,8 @@ export interface OrderFieldRefs {
   readonly disputeReason: Prisma.FieldRef<"Order", 'String'>
   readonly disputeOpenedBy: Prisma.FieldRef<"Order", 'String'>
   readonly isFirstOrder: Prisma.FieldRef<"Order", 'Boolean'>
+  readonly photoUrlsJson: Prisma.FieldRef<"Order", 'Json'>
+  readonly workProofPhotoUrlsJson: Prisma.FieldRef<"Order", 'Json'>
   readonly createdAt: Prisma.FieldRef<"Order", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Order", 'DateTime'>
 }
