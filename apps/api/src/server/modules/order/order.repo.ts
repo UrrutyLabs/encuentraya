@@ -151,6 +151,18 @@ export interface OrderUpdateInput {
 }
 
 /**
+ * Filters for admin list orders
+ */
+export interface AdminListOrdersFilters {
+  status?: OrderStatus;
+  query?: string;
+  dateFrom?: Date;
+  dateTo?: Date;
+  limit?: number;
+  cursor?: string;
+}
+
+/**
  * Order repository interface
  * Handles all data access for orders
  */
@@ -161,6 +173,7 @@ export interface OrderRepository {
   findByClientUserId(clientUserId: string): Promise<OrderEntity[]>;
   findByProProfileId(proProfileId: string): Promise<OrderEntity[]>;
   findActiveByClientUserId(clientUserId: string): Promise<OrderEntity[]>;
+  findManyForAdmin(filters: AdminListOrdersFilters): Promise<OrderEntity[]>;
   countCompletedOrdersByProProfileId(proProfileId: string): Promise<number>;
   update(id: string, data: OrderUpdateInput): Promise<OrderEntity | null>;
   updateStatus(
@@ -271,6 +284,48 @@ export class OrderRepositoryImpl implements OrderRepository {
     });
 
     return orders.map(this.mapPrismaToDomain);
+  }
+
+  async findManyForAdmin(
+    filters: AdminListOrdersFilters
+  ): Promise<OrderEntity[]> {
+    const { status, query, dateFrom, dateTo, limit = 100, cursor } = filters;
+
+    const where: Prisma.OrderWhereInput = {};
+
+    if (status !== undefined) {
+      where.status = status as $Enums.OrderStatus;
+    }
+    if (dateFrom !== undefined || dateTo !== undefined) {
+      where.createdAt = {
+        ...(dateFrom !== undefined && { gte: dateFrom }),
+        ...(dateTo !== undefined && { lte: dateTo }),
+      };
+    }
+    if (query !== undefined && query.trim() !== "") {
+      const q = query.trim();
+      where.OR = [
+        { displayId: { contains: q, mode: "insensitive" } },
+        { id: q },
+      ];
+    }
+
+    const take = Math.min(Math.max(1, limit), 100);
+
+    const orders = await prisma.order.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+      take: take + 1,
+      ...(cursor
+        ? {
+            cursor: { id: cursor },
+            skip: 1,
+          }
+        : {}),
+    });
+
+    const items = orders.slice(0, take);
+    return items.map(this.mapPrismaToDomain);
   }
 
   async countCompletedOrdersByProProfileId(
