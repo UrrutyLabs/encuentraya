@@ -243,4 +243,41 @@ describe("useOnboarding", () => {
       [["auth", "me"]],
     ]);
   });
+
+  it("should call mutation with categoryRates payload (Phase 6 per-category rates)", async () => {
+    const mockMutateAsync = jest.fn().mockResolvedValue(undefined);
+    mockUseMutation.mockReturnValue({
+      mutateAsync: mockMutateAsync,
+      isPending: false,
+    });
+
+    const { result } = renderHook(() => useOnboarding());
+
+    const input: ProOnboardInput = {
+      name: "Jane Doe",
+      email: "jane@example.com",
+      phone: "099111222",
+      hourlyRate: 1,
+      categoryRates: [
+        { categoryId: "cat-hourly", hourlyRateCents: 5000 },
+        { categoryId: "cat-fixed", startingFromCents: 10000 },
+      ],
+      serviceArea: "Montevideo",
+    };
+
+    await act(async () => {
+      await result.current.submitOnboarding(input);
+    });
+
+    expect(mockMutateAsync).toHaveBeenCalledWith(input);
+    expect(mockMutateAsync.mock.calls[0][0].categoryRates).toHaveLength(2);
+    expect(mockMutateAsync.mock.calls[0][0].categoryRates).toContainEqual({
+      categoryId: "cat-hourly",
+      hourlyRateCents: 5000,
+    });
+    expect(mockMutateAsync.mock.calls[0][0].categoryRates).toContainEqual({
+      categoryId: "cat-fixed",
+      startingFromCents: 10000,
+    });
+  });
 });

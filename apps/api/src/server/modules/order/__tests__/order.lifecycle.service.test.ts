@@ -144,6 +144,10 @@ describe("OrderLifecycleService", () => {
       hourlyRateSnapshotAmount: 100,
       currency: "UYU",
       minHoursSnapshot: null,
+      quotedAmountCents: null,
+      quotedAt: null,
+      quoteMessage: null,
+      quoteAcceptedAt: null,
       estimatedHours: 2,
       finalHoursSubmitted: null,
       approvedHours: null,
@@ -584,18 +588,261 @@ describe("OrderLifecycleService", () => {
       });
     });
 
-    it("should throw error if final hours not submitted", async () => {
+    it("should throw error if final hours not submitted (hourly order)", async () => {
       const actor = createMockActor(Role.CLIENT, "client-1");
       const order = createMockOrder({
         status: OrderStatus.AWAITING_CLIENT_APPROVAL,
         clientUserId: "client-1",
         finalHoursSubmitted: null,
+        pricingMode: PricingMode.HOURLY,
       });
 
       mockOrderService.getOrderOrThrow.mockResolvedValue(order);
 
       await expect(service.approveHours(actor, "order-1")).rejects.toThrow(
         "Final hours must be submitted before approval"
+      );
+    });
+
+    it("should approve fixed-price order without final hours (submitCompletion flow)", async () => {
+      const actor = createMockActor(Role.CLIENT, "client-1");
+      const order = createMockOrder({
+        status: OrderStatus.AWAITING_CLIENT_APPROVAL,
+        clientUserId: "client-1",
+        pricingMode: PricingMode.FIXED,
+        finalHoursSubmitted: null,
+        quotedAmountCents: 50000,
+      });
+      const updatedOrder = createMockOrder({
+        ...order,
+        approvedHours: 0,
+        approvalMethod: ApprovalMethod.CLIENT_ACCEPTED,
+      });
+
+      mockOrderService.getOrderOrThrow.mockResolvedValue(order);
+      mockOrderRepository.update.mockResolvedValue({
+        ...order,
+        approvedHours: 0,
+        approvalMethod: "client_accepted",
+      } as OrderEntity);
+      mockOrderService.getOrderById.mockResolvedValue(updatedOrder);
+
+      const result = await service.approveHours(actor, "order-1");
+
+      expect(result.approvedHours).toBe(0);
+      expect(mockOrderRepository.update).toHaveBeenCalledWith("order-1", {
+        approvedHours: 0,
+        approvalMethod: "client_accepted",
+      });
+    });
+  });
+
+  describe("submitQuote", () => {
+    it("should submit quote successfully for fixed-price order", async () => {
+      const actor = createMockActor(Role.PRO, "pro-user-1");
+      const order = createMockOrder({
+        status: OrderStatus.ACCEPTED,
+        pricingMode: PricingMode.FIXED,
+        proProfileId: "pro-1",
+      });
+      const proProfile = createMockProProfile({
+        id: "pro-1",
+        userId: "pro-user-1",
+      });
+      const updatedOrder = createMockOrder({
+        ...order,
+        quotedAmountCents: 45000,
+        quotedAt: expect.any(Date),
+        quoteMessage: "Presupuesto por el trabajo completo",
+      });
+
+      mockOrderService.getOrderOrThrow.mockResolvedValue(order);
+      mockProRepository.findByUserId.mockResolvedValue(proProfile);
+      mockOrderRepository.update.mockResolvedValue({
+        ...order,
+        quotedAmountCents: 45000,
+      } as OrderEntity);
+      mockOrderService.getOrderById.mockResolvedValue(updatedOrder);
+
+      const result = await service.submitQuote(
+        actor,
+        "order-1",
+        45000,
+        "Presupuesto por el trabajo completo"
+      );
+
+      expect(result.quotedAmountCents).toBe(45000);
+      expect(mockOrderRepository.update).toHaveBeenCalledWith("order-1", {
+        quotedAmountCents: 45000,
+        quotedAt: expect.any(Date),
+        quoteMessage: "Presupuesto por el trabajo completo",
+      });
+    });
+
+    it("should throw if order is not in ACCEPTED status", async () => {
+      const actor = createMockActor(Role.PRO, "pro-user-1");
+      const order = createMockOrder({
+        status: OrderStatus.PENDING_PRO_CONFIRMATION,
+        pricingMode: PricingMode.FIXED,
+      });
+      mockOrderService.getOrderOrThrow.mockResolvedValue(order);
+
+      await expect(
+        service.submitQuote(actor, "order-1", 30000)
+      ).rejects.toThrow("must be in status accepted");
+    });
+
+    it("should throw if order is not fixed-price", async () => {
+      const actor = createMockActor(Role.PRO, "pro-user-1");
+      const order = createMockOrder({
+        status: OrderStatus.ACCEPTED,
+        pricingMode: PricingMode.HOURLY,
+      });
+      mockOrderService.getOrderOrThrow.mockResolvedValue(order);
+
+      await expect(
+        service.submitQuote(actor, "order-1", 30000)
+      ).rejects.toThrow("not a fixed-price order");
+    });
+
+    it("should throw if amount is zero or negative", async () => {
+      const actor = createMockActor(Role.PRO, "pro-user-1");
+      const order = createMockOrder({
+        status: OrderStatus.ACCEPTED,
+        pricingMode: PricingMode.FIXED,
+        proProfileId: "pro-1",
+      });
+      const proProfile = createMockProProfile({
+        id: "pro-1",
+        userId: "pro-user-1",
+      });
+      mockOrderService.getOrderOrThrow.mockResolvedValue(order);
+      mockProRepository.findByUserId.mockResolvedValue(proProfile);
+
+      await expect(service.submitQuote(actor, "order-1", 0)).rejects.toThrow(
+        "Quote amount must be greater than 0"
+      );
+    });
+  });
+
+  describe("acceptQuote", () => {
+    it("should accept quote successfully", async () => {
+      const actor = createMockActor(Role.CLIENT, "client-1");
+      const order = createMockOrder({
+        status: OrderStatus.ACCEPTED,
+        clientUserId: "client-1",
+        pricingMode: PricingMode.FIXED,
+        quotedAmountCents: 45000,
+      });
+      const updatedOrder = createMockOrder({
+        ...order,
+        quoteAcceptedAt: expect.any(Date),
+      });
+
+      mockOrderService.getOrderOrThrow.mockResolvedValue(order);
+      mockOrderRepository.update.mockResolvedValue({
+        ...order,
+        quoteAcceptedAt: new Date(),
+      } as OrderEntity);
+      mockOrderService.getOrderById.mockResolvedValue(updatedOrder);
+
+      const result = await service.acceptQuote(actor, "order-1");
+
+      expect(mockOrderRepository.update).toHaveBeenCalledWith("order-1", {
+        quoteAcceptedAt: expect.any(Date),
+      });
+    });
+
+    it("should throw if no quote submitted yet", async () => {
+      const actor = createMockActor(Role.CLIENT, "client-1");
+      const order = createMockOrder({
+        status: OrderStatus.ACCEPTED,
+        clientUserId: "client-1",
+        pricingMode: PricingMode.FIXED,
+        quotedAmountCents: null,
+      });
+      mockOrderService.getOrderOrThrow.mockResolvedValue(order);
+
+      await expect(service.acceptQuote(actor, "order-1")).rejects.toThrow(
+        "no quote to accept"
+      );
+    });
+
+    it("should throw if actor is not client", async () => {
+      const actor = createMockActor(Role.PRO, "pro-user-1");
+      const order = createMockOrder({
+        status: OrderStatus.ACCEPTED,
+        clientUserId: "client-1",
+        pricingMode: PricingMode.FIXED,
+        quotedAmountCents: 45000,
+      });
+      mockOrderService.getOrderOrThrow.mockResolvedValue(order);
+
+      await expect(service.acceptQuote(actor, "order-1")).rejects.toThrow();
+    });
+  });
+
+  describe("submitCompletion", () => {
+    it("should submit completion for fixed-price order (in_progress → awaiting_client_approval)", async () => {
+      const actor = createMockActor(Role.PRO, "pro-user-1");
+      const order = createMockOrder({
+        status: OrderStatus.IN_PROGRESS,
+        pricingMode: PricingMode.FIXED,
+        proProfileId: "pro-1",
+      });
+      const proProfile = createMockProProfile({
+        id: "pro-1",
+        userId: "pro-user-1",
+      });
+      const updatedOrder = createMockOrder({
+        ...order,
+        status: OrderStatus.AWAITING_CLIENT_APPROVAL,
+        completedAt: expect.any(Date),
+        finalHoursSubmitted: null,
+      });
+
+      mockOrderService.getOrderOrThrow.mockResolvedValue(order);
+      mockProRepository.findByUserId.mockResolvedValue(proProfile);
+      mockOrderRepository.update.mockResolvedValue({ ...order } as OrderEntity);
+      mockOrderService.updateOrderStatus.mockResolvedValue(updatedOrder);
+
+      const result = await service.submitCompletion(actor, "order-1");
+
+      expect(result.status).toBe(OrderStatus.AWAITING_CLIENT_APPROVAL);
+      expect(mockOrderRepository.update).toHaveBeenCalledWith("order-1", {
+        completedAt: expect.any(Date),
+        finalHoursSubmitted: null,
+      });
+      expect(mockOrderService.updateOrderStatus).toHaveBeenCalledWith(
+        "order-1",
+        OrderStatus.AWAITING_CLIENT_APPROVAL
+      );
+    });
+
+    it("should throw if order is hourly (use submitHours instead)", async () => {
+      const actor = createMockActor(Role.PRO, "pro-user-1");
+      const order = createMockOrder({
+        status: OrderStatus.IN_PROGRESS,
+        pricingMode: PricingMode.HOURLY,
+        proProfileId: "pro-1",
+      });
+      mockOrderService.getOrderOrThrow.mockResolvedValue(order);
+
+      await expect(service.submitCompletion(actor, "order-1")).rejects.toThrow(
+        "not a fixed-price order"
+      );
+    });
+
+    it("should throw if order is not in_progress", async () => {
+      const actor = createMockActor(Role.PRO, "pro-user-1");
+      const order = createMockOrder({
+        status: OrderStatus.ACCEPTED,
+        pricingMode: PricingMode.FIXED,
+      });
+      mockOrderService.getOrderOrThrow.mockResolvedValue(order);
+
+      await expect(service.submitCompletion(actor, "order-1")).rejects.toThrow(
+        "must be in progress"
       );
     });
   });

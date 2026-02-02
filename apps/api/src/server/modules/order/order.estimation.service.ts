@@ -96,4 +96,51 @@ export class OrderEstimationService {
       lineItems, // Amounts in minor units
     };
   }
+
+  /**
+   * Build cost breakdown from a quoted amount (fixed-price orders).
+   * Used for getById cost breakdown when order has quotedAmountCents.
+   */
+  estimateFromQuotedAmount(
+    quotedAmountCents: number,
+    currency: string = "UYU"
+  ): OrderEstimateOutput {
+    const laborAmount = roundMinorUnits(quotedAmountCents);
+    const platformFeeAmount = calculatePlatformFee(
+      laborAmount,
+      DEFAULT_PLATFORM_FEE_RATE
+    );
+    const taxableBase = laborAmount + platformFeeAmount;
+    const taxAmount = calculateTax(taxableBase, DEFAULT_TAX_RATE);
+    const subtotalAmount = laborAmount + platformFeeAmount;
+    const totalAmount = calculateTotal(subtotalAmount, taxAmount);
+    const lineItems = [
+      {
+        type: "labor" as const,
+        description: "Labor (presupuesto fijo)",
+        amount: laborAmount,
+      },
+      {
+        type: "platform_fee" as const,
+        description: `Tarifa de plataforma (${(DEFAULT_PLATFORM_FEE_RATE * 100).toFixed(0)}%)`,
+        amount: platformFeeAmount,
+      },
+      {
+        type: "tax" as const,
+        description: `IVA (${(DEFAULT_TAX_RATE * 100).toFixed(0)}%)`,
+        amount: taxAmount,
+      },
+    ];
+    return {
+      laborAmount,
+      platformFeeAmount,
+      platformFeeRate: DEFAULT_PLATFORM_FEE_RATE,
+      taxAmount,
+      taxRate: DEFAULT_TAX_RATE,
+      subtotalAmount,
+      totalAmount,
+      currency,
+      lineItems,
+    };
+  }
 }

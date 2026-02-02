@@ -56,3 +56,13 @@ export function useCancelOrder() {
 export function useForceOrderStatus() {
   return trpc.order.adminUpdateStatus.useMutation();
 }
+
+/**
+ * Hook to list chat messages for an order (admin only)
+ */
+export function useOrderChat(orderId: string, options?: { enabled?: boolean }) {
+  return trpc.chat.adminListByOrder.useQuery(
+    { orderId, limit: 100 },
+    { enabled: (options?.enabled ?? true) && !!orderId }
+  );
+}

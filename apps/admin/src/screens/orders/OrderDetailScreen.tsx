@@ -22,8 +22,11 @@ import { Text } from "@repo/ui";
 import { Badge } from "@repo/ui";
 import { formatCurrency, toMajorUnits } from "@repo/domain";
 import { OrderTimeline } from "@/components/orders/OrderTimeline";
+import { OrderDetailPhotos } from "@/components/orders/OrderDetailPhotos";
+import { OrderDetailChat } from "@/components/orders/OrderDetailChat";
 import { ProAuditHistory } from "@/components/pros/ProAuditHistory";
 import { OrderDetailSkeleton } from "@/components/presentational/OrderDetailSkeleton";
+import Link from "next/link";
 
 interface OrderDetailScreenProps {
   orderId: string;
@@ -124,7 +127,7 @@ export function OrderDetailScreen({ orderId }: OrderDetailScreenProps) {
   // All amounts are in minor units, convert to major units for display
   const displayAmountMinor = order.totalAmount
     ? order.totalAmount
-    : order.hourlyRateSnapshotAmount * order.estimatedHours;
+    : order.hourlyRateSnapshotAmount * (order.estimatedHours ?? 0);
   const displayAmount = toMajorUnits(displayAmountMinor);
 
   return (
@@ -153,6 +156,49 @@ export function OrderDetailScreen({ orderId }: OrderDetailScreenProps) {
           Resumen
         </Text>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {(order.title || order.description) && (
+            <>
+              {order.title && (
+                <div className="md:col-span-2">
+                  <Text variant="small" className="text-gray-600">
+                    Título
+                  </Text>
+                  <Text variant="body">{order.title}</Text>
+                </div>
+              )}
+              {order.description && (
+                <div className="md:col-span-2">
+                  <Text variant="small" className="text-gray-600">
+                    Descripción
+                  </Text>
+                  <Text variant="body" className="whitespace-pre-wrap">
+                    {order.description}
+                  </Text>
+                </div>
+              )}
+            </>
+          )}
+          <div>
+            <Text variant="small" className="text-gray-600">
+              Cliente (userId)
+            </Text>
+            <Text variant="body">{order.clientUserId}</Text>
+          </div>
+          {order.proProfileId && (
+            <div>
+              <Text variant="small" className="text-gray-600">
+                Pro
+              </Text>
+              <Text variant="body">
+                <Link
+                  href={`/admin/pros/${order.proProfileId}`}
+                  className="text-primary hover:underline"
+                >
+                  {order.proProfileId}
+                </Link>
+              </Text>
+            </div>
+          )}
           <div>
             <Text variant="small" className="text-gray-600">
               Categoría
@@ -246,6 +292,10 @@ export function OrderDetailScreen({ orderId }: OrderDetailScreenProps) {
           canceledAt={order.canceledAt}
         />
       </Card>
+
+      {/* Photos */}
+      <OrderDetailPhotos order={order} />
+      <OrderDetailChat orderId={order.id} />
 
       {/* Order audit history (e.g. contact info blocked, status forced) */}
       <ProAuditHistory

@@ -18,6 +18,7 @@
   "dependencies": {
     "@repo/content": "workspace:*",
     "@repo/domain": "workspace:*",
+    "@repo/upload": "workspace:*",
     "@repo/monitoring": "workspace:*",
     "@repo/react-query": "workspace:*",
     "@repo/trpc": "workspace:*",
@@ -27,6 +28,7 @@
     "@tanstack/react-query": "^5.80.3",
     "@trpc/client": "^11.8.1",
     "@trpc/react-query": "^11.8.1",
+    "browser-image-compression": "^2.0.2",
     "date-fns": "^4.1.0",
     "lucide-react": "^0.562.0",
     "next": "16.1.1",

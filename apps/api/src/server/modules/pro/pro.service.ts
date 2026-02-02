@@ -11,6 +11,7 @@ import type { ProPayoutProfileRepository } from "@modules/payout/proPayoutProfil
 import type { AuditService } from "@modules/audit/audit.service";
 import type { AvailabilityRepository } from "./availability.repo";
 import type { AvailabilityService } from "./availability.service";
+import type { CategoryRepository } from "@modules/category/category.repo";
 import { AuditEventType } from "@modules/audit/audit.repo";
 import type {
   Pro,
@@ -18,7 +19,10 @@ import type {
   ProSetAvailabilityInput,
   AvailabilitySlot,
   UpdateAvailabilitySlotsInput,
+  CategoryRateInput,
+  ProUpdateProfileInput,
 } from "@repo/domain";
+import { PricingMode } from "@repo/domain";
 import { Role, toMajorUnits } from "@repo/domain";
 import { TOKENS } from "@/server/container/tokens";
 import type { Actor } from "@infra/auth/roles";
@@ -48,19 +52,59 @@ export class ProService {
     @inject(TOKENS.AvailabilityService)
     private readonly availabilityService: AvailabilityService,
     @inject(TOKENS.AuditService)
-    private readonly auditService: AuditService
+    private readonly auditService: AuditService,
+    @inject(TOKENS.CategoryRepository)
+    private readonly categoryRepository: CategoryRepository
   ) {}
+
+  /**
+   * Validate categoryRates: each category must exist and have the correct rate by pricingMode (hourly → hourlyRateCents, fixed → startingFromCents).
+   */
+  private async validateCategoryRates(
+    categoryRates: CategoryRateInput[]
+  ): Promise<CategoryRateInput[]> {
+    for (const rate of categoryRates) {
+      const category = await this.categoryRepository.findById(rate.categoryId);
+      if (!category) {
+        throw new Error(`Category not found: ${rate.categoryId}`);
+      }
+      const pricingMode = (category.pricingMode ?? "hourly") as
+        | "hourly"
+        | "fixed";
+      if (pricingMode === PricingMode.HOURLY) {
+        if (rate.hourlyRateCents == null || rate.hourlyRateCents <= 0) {
+          throw new Error(
+            `Category ${category.name} (hourly) requires hourlyRateCents > 0`
+          );
+        }
+      } else {
+        if (rate.startingFromCents == null || rate.startingFromCents <= 0) {
+          throw new Error(
+            `Category ${category.name} (fixed) requires startingFromCents > 0`
+          );
+        }
+      }
+    }
+    return categoryRates;
+  }
   /**
    * Onboard a new pro
    * Business rules:
    * - User must be created first
+   * - When categoryRates provided: validate per-category rate by pricingMode; use categoryRates for junction. Else use categoryIds.
    */
   async onboardPro(input: ProOnboardInput): Promise<Pro> {
-    // Create user first
     const user = await this.userRepository.create(Role.PRO);
 
-    // Create pro profile
-    // hourlyRate is already in minor units (storage format)
+    const hasCategoryRates =
+      input.categoryRates && input.categoryRates.length > 0;
+    const categoryIds = hasCategoryRates
+      ? input.categoryRates!.map((r) => r.categoryId)
+      : (input.categoryIds ?? []);
+    const categoryRates = hasCategoryRates
+      ? await this.validateCategoryRates(input.categoryRates!)
+      : undefined;
+
     const proProfile = await this.proRepository.create({
       userId: user.id,
       displayName: input.name,
@@ -68,12 +112,12 @@ export class ProService {
       phone: input.phone,
       bio: input.bio,
       avatarUrl: input.avatarUrl,
-      hourlyRate: input.hourlyRate, // Already in minor units
-      categoryIds: input.categoryIds,
+      hourlyRate: input.hourlyRate,
+      categoryIds,
+      categoryRates,
       serviceArea: input.serviceArea,
     });
 
-    // Map to domain type
     return this.mapToDomain(proProfile);
   }
 
@@ -108,8 +152,15 @@ export class ProService {
       await this.userRepository.updateRole(userId, Role.PRO);
     }
 
-    // Create pro profile
-    // hourlyRate is already in minor units (storage format)
+    const hasCategoryRates =
+      input.categoryRates && input.categoryRates.length > 0;
+    const categoryIds = hasCategoryRates
+      ? input.categoryRates!.map((r) => r.categoryId)
+      : (input.categoryIds ?? []);
+    const categoryRates = hasCategoryRates
+      ? await this.validateCategoryRates(input.categoryRates!)
+      : undefined;
+
     const proProfile = await this.proRepository.create({
       userId,
       displayName: input.name,
@@ -117,24 +168,38 @@ export class ProService {
       phone: input.phone,
       bio: input.bio,
       avatarUrl: input.avatarUrl,
-      hourlyRate: input.hourlyRate, // Already in minor units
-      categoryIds: input.categoryIds,
+      hourlyRate: input.hourlyRate,
+      categoryIds,
+      categoryRates,
       serviceArea: input.serviceArea,
     });
 
-    // Map to domain type
     return this.mapToDomain(proProfile);
   }
 
   /**
    * Get pro by ID (for public access)
-   * Only returns pros with completed profiles (avatarUrl + bio)
+   * Only returns pros with completed profiles (avatarUrl + bio).
+   * When categoryId is provided, returns startingPriceForCategory for the hire column (category-level rate).
    */
-  async getProById(id: string): Promise<Pro | null> {
+  async getProById(id: string, categoryId?: string): Promise<Pro | null> {
     const proProfile = await this.proRepository.findById(id);
     if (!proProfile) return null;
     if (!proProfile.profileCompleted) return null;
-    return this.mapToDomain(proProfile, { maskName: true });
+    const pro = await this.mapToDomain(proProfile, { maskName: true });
+    if (categoryId && pro.categoryRelations) {
+      const rel = pro.categoryRelations.find(
+        (r) => r.categoryId === categoryId
+      );
+      if (rel) {
+        pro.startingPriceForCategory = {
+          hourlyRateCents: rel.hourlyRateCents ?? null,
+          startingFromCents: rel.startingFromCents ?? null,
+          pricingMode: rel.category.pricingMode ?? PricingMode.HOURLY,
+        };
+      }
+    }
+    return pro;
   }
 
   /**
@@ -275,7 +340,7 @@ export class ProService {
    */
   async updateProfile(
     userId: string,
-    input: Partial<ProOnboardInput>
+    input: ProUpdateProfileInput
   ): Promise<Pro> {
     const proProfile = await this.proRepository.findByUserId(userId);
     if (!proProfile) {
@@ -307,11 +372,15 @@ export class ProService {
     if (input.categoryIds !== undefined) {
       updateData.categoryIds = input.categoryIds;
     }
+    if (input.categoryRates !== undefined) {
+      updateData.categoryRates = await this.validateCategoryRates(
+        input.categoryRates
+      );
+    }
     if (input.serviceArea !== undefined) {
       updateData.serviceArea = input.serviceArea;
     }
 
-    // Update pro profile
     const updated = await this.proRepository.update(proProfile.id, updateData);
 
     if (!updated) {
@@ -663,6 +732,17 @@ export class ProService {
     // Convert hourlyRate from minor units (storage) to major units (API response)
     const hourlyRateMajor = toMajorUnits(entity.hourlyRate);
 
+    const categoryRelations = entity.categoryRelations?.map((rel) => ({
+      categoryId: rel.categoryId,
+      category: {
+        id: rel.category.id,
+        name: rel.category.name,
+        pricingMode: rel.category.pricingMode as PricingMode,
+      },
+      hourlyRateCents: rel.hourlyRateCents,
+      startingFromCents: rel.startingFromCents,
+    }));
+
     return {
       id: entity.id,
       name:
@@ -673,8 +753,9 @@ export class ProService {
       phone: entity.phone ?? undefined,
       bio: entity.bio ?? undefined,
       avatarUrl: entity.avatarUrl ?? undefined,
-      hourlyRate: hourlyRateMajor, // Return in major units for API compatibility
+      hourlyRate: hourlyRateMajor,
       categoryIds: entity.categoryIds,
+      categoryRelations,
       serviceArea: entity.serviceArea ?? undefined,
       rating,
       reviewCount,

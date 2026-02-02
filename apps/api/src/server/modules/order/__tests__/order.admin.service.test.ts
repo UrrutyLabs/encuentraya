@@ -29,10 +29,10 @@ describe("OrderAdminService", () => {
   let mockAuditService: ReturnType<typeof createMockAuditService>;
 
   function createMockOrderRepository(): {
-    findAll: ReturnType<typeof vi.fn>;
+    findManyForAdmin: ReturnType<typeof vi.fn>;
   } {
     return {
-      findAll: vi.fn(),
+      findManyForAdmin: vi.fn(),
     };
   }
 
@@ -87,6 +87,10 @@ describe("OrderAdminService", () => {
       hourlyRateSnapshotAmount: 100,
       currency: "UYU",
       minHoursSnapshot: null,
+      quotedAmountCents: null,
+      quotedAt: null,
+      quoteMessage: null,
+      quoteAcceptedAt: null,
       estimatedHours: 2,
       finalHoursSubmitted: null,
       approvedHours: null,
@@ -127,25 +131,69 @@ describe("OrderAdminService", () => {
   });
 
   describe("adminListOrders", () => {
-    it("should return empty array (filtering not yet implemented)", async () => {
+    it("should return orders from repository mapped to list shape", async () => {
+      const order = createMockOrder();
+      mockOrderRepository.findManyForAdmin.mockResolvedValue([
+        {
+          ...order,
+          id: "order-1",
+          displayId: "O0001",
+          createdAt: order.createdAt,
+          status: order.status,
+          clientUserId: order.clientUserId,
+          proProfileId: order.proProfileId,
+          categoryId: order.categoryId,
+          totalAmount: order.totalAmount,
+          currency: order.currency,
+        },
+      ]);
+
       const result = await service.adminListOrders();
 
-      expect(result).toEqual([]);
+      expect(mockOrderRepository.findManyForAdmin).toHaveBeenCalledWith({
+        status: undefined,
+        query: undefined,
+        dateFrom: undefined,
+        dateTo: undefined,
+        limit: 100,
+        cursor: undefined,
+      });
+      expect(result).toHaveLength(1);
+      expect(result[0]).toEqual({
+        id: "order-1",
+        displayId: "O0001",
+        createdAt: order.createdAt,
+        status: order.status,
+        clientUserId: "client-1",
+        proProfileId: "pro-1",
+        categoryId: "cat-plumbing",
+        totalAmount: order.totalAmount,
+        currency: "UYU",
+      });
     });
 
-    it("should accept filters parameter", async () => {
+    it("should pass filters to repository", async () => {
+      mockOrderRepository.findManyForAdmin.mockResolvedValue([]);
+
       const filters = {
         status: OrderStatusEnum.COMPLETED,
         query: "O0001",
-        dateFrom: new Date(),
-        dateTo: new Date(),
+        dateFrom: new Date("2025-01-01"),
+        dateTo: new Date("2025-01-31"),
         limit: 10,
         cursor: "cursor-1",
       };
 
-      const result = await service.adminListOrders(filters);
+      await service.adminListOrders(filters);
 
-      expect(result).toEqual([]);
+      expect(mockOrderRepository.findManyForAdmin).toHaveBeenCalledWith({
+        status: OrderStatusEnum.COMPLETED,
+        query: "O0001",
+        dateFrom: filters.dateFrom,
+        dateTo: filters.dateTo,
+        limit: 10,
+        cursor: "cursor-1",
+      });
     });
   });
 

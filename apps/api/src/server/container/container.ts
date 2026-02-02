@@ -15,6 +15,7 @@ import { registerCategoryModule } from "./modules/category.module";
 import { registerSubcategoryModule } from "./modules/subcategory.module";
 import { registerOrderModule } from "./modules/order.module";
 import { registerChatModule } from "./modules/chat.module";
+import { registerUploadModule } from "./modules/upload.module";
 
 /**
  * Setup and configure the dependency injection container
@@ -35,6 +36,7 @@ export function setupContainer(): DependencyContainer {
   registerReviewModule(tsyringeContainer);
   registerOrderModule(tsyringeContainer); // Depends on ProRepository for hourly rate snapshot
   registerChatModule(tsyringeContainer); // Depends on OrderRepository, ProRepository
+  registerUploadModule(tsyringeContainer); // Depends on OrderService, ProRepository
 
   // Register modules that depend on others
   registerNotificationModule(tsyringeContainer);

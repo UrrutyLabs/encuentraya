@@ -11,6 +11,7 @@ import type {
 import type { AuditService } from "@modules/audit/audit.service";
 import type { AvailabilityRepository } from "../availability.repo";
 import type { AvailabilityService } from "../availability.service";
+import type { CategoryRepository } from "@modules/category/category.repo";
 import { AuditEventType } from "@modules/audit/audit.repo";
 import type { ProOnboardInput, ProSetAvailabilityInput } from "@repo/domain";
 import { Role, toMinorUnits, toMajorUnits } from "@repo/domain";
@@ -30,6 +31,15 @@ describe("ProService", () => {
   >;
   let mockAvailabilityService: ReturnType<typeof createMockAvailabilityService>;
   let mockAuditService: ReturnType<typeof createMockAuditService>;
+  let mockCategoryRepository: ReturnType<typeof createMockCategoryRepository>;
+
+  function createMockCategoryRepository(): {
+    findById: ReturnType<typeof vi.fn>;
+  } {
+    return {
+      findById: vi.fn(),
+    };
+  }
 
   function createMockProRepository(): {
     create: ReturnType<typeof vi.fn>;
@@ -211,8 +221,8 @@ describe("ProService", () => {
     mockAvailabilityRepository = createMockAvailabilityRepository();
     mockAvailabilityService = createMockAvailabilityService();
     mockAuditService = createMockAuditService();
+    mockCategoryRepository = createMockCategoryRepository();
 
-    // Set default return values for availability repository
     mockAvailabilityRepository.findByProProfileId.mockResolvedValue([]);
 
     service = new ProService(
@@ -223,7 +233,8 @@ describe("ProService", () => {
       mockProPayoutProfileRepository as unknown as ProPayoutProfileRepository,
       mockAvailabilityRepository as unknown as AvailabilityRepository,
       mockAvailabilityService as unknown as AvailabilityService,
-      mockAuditService as unknown as AuditService
+      mockAuditService as unknown as AuditService,
+      mockCategoryRepository as unknown as CategoryRepository
     );
     vi.clearAllMocks();
 
@@ -336,6 +347,90 @@ describe("ProService", () => {
       expect(result).toMatchObject({
         bio: proProfile.bio,
       });
+    });
+
+    it("should create pro with categoryRates (hourly and fixed)", async () => {
+      const input: ProOnboardInput = {
+        name: "Test Pro",
+        email: "pro@example.com",
+        hourlyRate: 10000,
+        categoryRates: [
+          { categoryId: "cat-hourly", hourlyRateCents: 15000 },
+          { categoryId: "cat-fixed", startingFromCents: 50000 },
+        ],
+      };
+      const user = createMockUser();
+      const proProfile = createMockProProfile({
+        userId: user.id,
+        categoryIds: ["cat-hourly", "cat-fixed"],
+        categoryRelations: [
+          {
+            categoryId: "cat-hourly",
+            category: {
+              id: "cat-hourly",
+              name: "Hourly",
+              pricingMode: "hourly",
+            },
+            hourlyRateCents: 15000,
+            startingFromCents: null,
+          },
+          {
+            categoryId: "cat-fixed",
+            category: { id: "cat-fixed", name: "Fixed", pricingMode: "fixed" },
+            hourlyRateCents: null,
+            startingFromCents: 50000,
+          },
+        ],
+      });
+
+      mockUserRepository.create.mockResolvedValue(user);
+      mockCategoryRepository.findById
+        .mockResolvedValueOnce({
+          id: "cat-hourly",
+          name: "Hourly",
+          pricingMode: "hourly",
+        })
+        .mockResolvedValueOnce({
+          id: "cat-fixed",
+          name: "Fixed",
+          pricingMode: "fixed",
+        });
+      mockProRepository.create.mockResolvedValue(proProfile);
+      mockReviewRepository.findByProProfileId.mockResolvedValue([]);
+      mockAvailabilityService.getAvailabilitySlots.mockResolvedValue([]);
+
+      const result = await service.onboardPro(input);
+
+      expect(mockProRepository.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          categoryIds: ["cat-hourly", "cat-fixed"],
+          categoryRates: [
+            { categoryId: "cat-hourly", hourlyRateCents: 15000 },
+            { categoryId: "cat-fixed", startingFromCents: 50000 },
+          ],
+        })
+      );
+      expect(result.categoryRelations).toHaveLength(2);
+    });
+
+    it("should throw when categoryRates missing rate for hourly category", async () => {
+      const input: ProOnboardInput = {
+        name: "Test Pro",
+        email: "pro@example.com",
+        hourlyRate: 10000,
+        categoryRates: [{ categoryId: "cat-hourly", startingFromCents: 50000 }],
+      };
+      const user = createMockUser();
+      mockUserRepository.create.mockResolvedValue(user);
+      mockCategoryRepository.findById.mockResolvedValue({
+        id: "cat-hourly",
+        name: "Plomería",
+        pricingMode: "hourly",
+      });
+
+      await expect(service.onboardPro(input)).rejects.toThrow(
+        /hourlyRateCents > 0/
+      );
     });
   });
 
@@ -516,6 +611,40 @@ describe("ProService", () => {
 
       // Assert
       expect(result).toBeNull();
+    });
+
+    it("should return startingPriceForCategory when categoryId provided and pro has that category", async () => {
+      const proId = "pro-1";
+      const categoryId = "cat-plumbing";
+      const proProfile = createMockProProfile({
+        id: proId,
+        categoryIds: [categoryId],
+        categoryRelations: [
+          {
+            categoryId,
+            category: {
+              id: categoryId,
+              name: "Plumbing",
+              pricingMode: "hourly",
+            },
+            hourlyRateCents: 12000,
+            startingFromCents: null,
+          },
+        ],
+      });
+
+      mockProRepository.findById.mockResolvedValue(proProfile);
+      mockReviewRepository.findByProProfileId.mockResolvedValue([]);
+      mockAvailabilityService.getAvailabilitySlots.mockResolvedValue([]);
+
+      const result = await service.getProById(proId, categoryId);
+
+      expect(result).not.toBeNull();
+      expect(result?.startingPriceForCategory).toEqual({
+        hourlyRateCents: 12000,
+        startingFromCents: null,
+        pricingMode: "hourly",
+      });
     });
   });
 

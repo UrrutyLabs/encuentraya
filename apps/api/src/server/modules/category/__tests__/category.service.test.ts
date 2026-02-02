@@ -6,6 +6,7 @@ import type {
   CategoryCreateInput,
   CategoryUpdateInput,
 } from "@repo/domain";
+import { PricingMode, PaymentStrategy } from "@repo/domain";
 
 describe("CategoryService", () => {
   let service: CategoryService;
@@ -43,6 +44,8 @@ describe("CategoryService", () => {
       iconName: "Wrench",
       description: "Servicios de plomería",
       sortOrder: 0,
+      pricingMode: PricingMode.HOURLY,
+      paymentStrategy: PaymentStrategy.SINGLE_CAPTURE,
       isActive: true,
       deletedAt: null,
       configJson: null,
@@ -149,6 +152,37 @@ describe("CategoryService", () => {
       // Assert
       expect(result).toEqual(category);
       expect(mockRepository.findByKey).toHaveBeenCalledWith("PLUMBING", true);
+    });
+  });
+
+  describe("category pricingMode and paymentStrategy", () => {
+    it("should return category with pricingMode and paymentStrategy", async () => {
+      const category = createCategory({
+        id: "cat-1",
+        pricingMode: PricingMode.HOURLY,
+        paymentStrategy: PaymentStrategy.SINGLE_CAPTURE,
+      });
+      mockRepository.findById.mockResolvedValue(category);
+
+      const result = await service.getCategoryById("cat-1");
+
+      expect(result).toBeDefined();
+      expect(result?.pricingMode).toBe(PricingMode.HOURLY);
+      expect(result?.paymentStrategy).toBe(PaymentStrategy.SINGLE_CAPTURE);
+    });
+
+    it("should return category with pricingMode fixed", async () => {
+      const category = createCategory({
+        id: "cat-fixed",
+        pricingMode: PricingMode.FIXED,
+        paymentStrategy: PaymentStrategy.SINGLE_CAPTURE,
+      });
+      mockRepository.findById.mockResolvedValue(category);
+
+      const result = await service.getCategoryById("cat-fixed");
+
+      expect(result?.pricingMode).toBe(PricingMode.FIXED);
+      expect(result?.paymentStrategy).toBe(PaymentStrategy.SINGLE_CAPTURE);
     });
   });
 

@@ -18,7 +18,7 @@ This is a production-oriented MVP built with modern web and mobile technologies.
 
 - 🔍 Search professionals by category, location, and availability
 - 👤 View professional profiles with ratings and reviews
-- 📅 Create and manage bookings
+- 📅 Create and manage bookings (with optional photos of the job)
 - 💳 In-app payment processing
 - ⭐ Leave reviews after service completion
 
@@ -26,7 +26,7 @@ This is a production-oriented MVP built with modern web and mobile technologies.
 
 - 📱 Mobile app for managing jobs on the go
 - ⏰ Set availability and service areas
-- 📋 Receive and manage job requests
+- 📋 Receive and manage job requests (view client photos; add work proof photos on completion)
 - 💰 Track earnings and payouts
 - 📊 View booking history and statistics
 
@@ -168,6 +168,8 @@ pnpm format
 ## 📚 Documentation
 
 - **[Guidelines](./docs/GUIDELINES.md)** - Project guidelines and architecture rules
+- **[Order Flow](./docs/ORDER_FLOW.md)** - Order lifecycle, state machine, and transitions
+- **[Pricing and Order Strategy](./docs/PRICING_AND_ORDER_STRATEGY.md)** - How hourly vs fixed (quote) pricing works and how it relates to the order flow
 - **[Railway Deployment](./apps/api/docs/RAILWAY.md)** - API deployment on Railway
 - **[Authentication](./docs/AUTH_IMPLEMENTATION.md)** - Auth implementation details
 - **[Backend Best Practices](./docs/BE_BEST_PRACTICES.md)** - Backend development guidelines

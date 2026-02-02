@@ -107,16 +107,28 @@ export class PaymentService {
     }
 
     // Calculate amount from order (use totalAmount if finalized, otherwise estimate)
-    // For orders, we use the totalAmount if finalized, otherwise estimate from hourly rate
     // Payment amounts must be in MINOR units (e.g., 40260 cents)
     let amountEstimated: number;
     if (order.totalAmount !== null) {
-      // Order is finalized, use total amount (in minor units)
       amountEstimated = Math.round(order.totalAmount);
     } else {
-      // Order not finalized yet, estimate from hourly rate snapshot (in minor units)
-      const totalAmount = order.hourlyRateSnapshotAmount * order.estimatedHours;
-      amountEstimated = Math.round(totalAmount);
+      const pricingMode = (order.pricingMode ?? "hourly") as string;
+      if (pricingMode === "fixed") {
+        if (
+          order.quotedAmountCents == null ||
+          order.quotedAmountCents <= 0 ||
+          !order.quoteAcceptedAt
+        ) {
+          throw new Error(
+            "Quote must be submitted and accepted before authorizing payment for fixed-price orders"
+          );
+        }
+        amountEstimated = order.quotedAmountCents;
+      } else {
+        const totalAmount =
+          order.hourlyRateSnapshotAmount * (order.estimatedHours ?? 0);
+        amountEstimated = Math.round(totalAmount);
+      }
     }
 
     // Generate idempotency key

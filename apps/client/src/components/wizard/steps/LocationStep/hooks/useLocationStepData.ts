@@ -29,7 +29,12 @@ export function useLocationStepData(): UseLocationStepDataReturn {
     [state.address, rebookTemplate?.addressText]
   );
   const initialHours = useMemo(
-    () => state.hours || rebookTemplate?.estimatedHours.toString() || "",
+    () =>
+      state.hours ||
+      (rebookTemplate?.estimatedHours != null
+        ? rebookTemplate.estimatedHours.toString()
+        : "") ||
+      "",
     [state.hours, rebookTemplate?.estimatedHours]
   );
 

@@ -20,11 +20,21 @@ const mockCancelMutation = jest.fn();
 const mockMarkInProgressMutation = jest.fn();
 const mockMarkArrivedMutation = jest.fn();
 const mockSubmitHoursMutation = jest.fn();
+const mockSubmitQuoteMutation = jest.fn();
+const mockSubmitCompletionMutation = jest.fn();
 
 describe("useOrderActions", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     (useQueryClient as jest.Mock).mockReturnValue(mockQueryClient);
+    mockSubmitQuoteMutation.mockReturnValue({
+      mutateAsync: jest.fn(),
+      isPending: false,
+    });
+    mockSubmitCompletionMutation.mockReturnValue({
+      mutateAsync: jest.fn(),
+      isPending: false,
+    });
 
     (trpc as any).order = {
       accept: { useMutation: mockAcceptMutation },
@@ -32,6 +42,8 @@ describe("useOrderActions", () => {
       markInProgress: { useMutation: mockMarkInProgressMutation },
       markArrived: { useMutation: mockMarkArrivedMutation },
       submitHours: { useMutation: mockSubmitHoursMutation },
+      submitQuote: { useMutation: mockSubmitQuoteMutation },
+      submitCompletion: { useMutation: mockSubmitCompletionMutation },
     };
   });
 
@@ -57,6 +69,14 @@ describe("useOrderActions", () => {
         mutateAsync: jest.fn(),
         isPending: false,
       });
+      mockSubmitQuoteMutation.mockReturnValue({
+        mutateAsync: jest.fn(),
+        isPending: false,
+      });
+      mockSubmitCompletionMutation.mockReturnValue({
+        mutateAsync: jest.fn(),
+        isPending: false,
+      });
 
       const { result } = renderHook(() => useOrderActions());
 
@@ -65,11 +85,15 @@ describe("useOrderActions", () => {
       expect(typeof result.current.markOnMyWay).toBe("function");
       expect(typeof result.current.arriveOrder).toBe("function");
       expect(typeof result.current.completeOrder).toBe("function");
+      expect(typeof result.current.submitQuote).toBe("function");
+      expect(typeof result.current.submitCompletion).toBe("function");
       expect(result.current.isAccepting).toBe(false);
       expect(result.current.isRejecting).toBe(false);
       expect(result.current.isMarkingOnMyWay).toBe(false);
       expect(result.current.isArriving).toBe(false);
       expect(result.current.isCompleting).toBe(false);
+      expect(result.current.isSubmittingQuote).toBe(false);
+      expect(result.current.isSubmittingCompletion).toBe(false);
       expect(result.current.error).toBe(null);
     });
   });
@@ -499,6 +523,65 @@ describe("useOrderActions", () => {
       const { result } = renderHook(() => useOrderActions());
 
       expect(result.current.isCompleting).toBe(true);
+    });
+  });
+
+  describe("submitQuote (Phase 7)", () => {
+    it("should call submitQuote mutation with orderId, amountCents, and optional message", async () => {
+      const mockMutateAsync = jest.fn().mockResolvedValue(undefined);
+      mockSubmitQuoteMutation.mockReturnValue({
+        mutateAsync: mockMutateAsync,
+        isPending: false,
+      });
+
+      const { result } = renderHook(() => useOrderActions());
+
+      await act(async () => {
+        await result.current.submitQuote("order-1", 50000, "Mensaje opcional");
+      });
+
+      expect(mockMutateAsync).toHaveBeenCalledWith({
+        orderId: "order-1",
+        amountCents: 50000,
+        message: "Mensaje opcional",
+      });
+    });
+
+    it("should call submitQuote without message when not provided", async () => {
+      const mockMutateAsync = jest.fn().mockResolvedValue(undefined);
+      mockSubmitQuoteMutation.mockReturnValue({
+        mutateAsync: mockMutateAsync,
+        isPending: false,
+      });
+
+      const { result } = renderHook(() => useOrderActions());
+
+      await act(async () => {
+        await result.current.submitQuote("order-1", 10000);
+      });
+
+      expect(mockMutateAsync).toHaveBeenCalledWith({
+        orderId: "order-1",
+        amountCents: 10000,
+      });
+    });
+  });
+
+  describe("submitCompletion (Phase 7)", () => {
+    it("should call submitCompletion mutation with orderId only (no hours)", async () => {
+      const mockMutateAsync = jest.fn().mockResolvedValue(undefined);
+      mockSubmitCompletionMutation.mockReturnValue({
+        mutateAsync: mockMutateAsync,
+        isPending: false,
+      });
+
+      const { result } = renderHook(() => useOrderActions());
+
+      await act(async () => {
+        await result.current.submitCompletion("order-1");
+      });
+
+      expect(mockMutateAsync).toHaveBeenCalledWith({ orderId: "order-1" });
     });
   });
 

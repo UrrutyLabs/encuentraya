@@ -18,6 +18,7 @@ export interface CreateOrderInput {
   scheduledWindowStartAt: Date;
   scheduledWindowEndAt?: Date;
   estimatedHours: number;
+  photoUrls?: string[];
 }
 
 /**

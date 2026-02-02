@@ -81,14 +81,14 @@ export async function GET(request: NextRequest) {
         );
       }
 
-      // If user is CLIENT and no explicit next parameter, redirect to search
+      // If user is CLIENT and no explicit next parameter, redirect to home
       if (userRole === Role.CLIENT && !next) {
-        return NextResponse.redirect(new URL("/search", requestUrl.origin));
+        return NextResponse.redirect(new URL("/", requestUrl.origin));
       }
     }
   }
 
-  // Use explicit next parameter or default to search
-  const redirectTo = next || "/search";
+  // Use explicit next parameter or default to home
+  const redirectTo = next || "/";
   return NextResponse.redirect(new URL(redirectTo, requestUrl.origin));
 }

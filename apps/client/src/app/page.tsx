@@ -1,15 +1,18 @@
-"use client";
+import { Suspense } from "react";
+import { SearchScreen } from "@/screens/search/SearchScreen";
 
-import { useClientAuth } from "@/hooks/auth";
-import { LandingLoading } from "@/components/landing/LandingLoading";
-import { LandingScreen } from "@/screens/landing/LandingScreen";
+function HomePageFallback() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="animate-pulse text-muted-foreground">Cargando...</div>
+    </div>
+  );
+}
 
 export default function Home() {
-  const { isLoading } = useClientAuth();
-
-  if (isLoading) {
-    return <LandingLoading />;
-  }
-
-  return <LandingScreen />;
+  return (
+    <Suspense fallback={<HomePageFallback />}>
+      <SearchScreen />
+    </Suspense>
+  );
 }

@@ -5,6 +5,7 @@ import type {
   CategoryCreateInput,
   CategoryUpdateInput,
 } from "@repo/domain";
+import { PricingMode, PaymentStrategy } from "@repo/domain";
 import { Prisma } from "@infra/db/prisma";
 
 /**
@@ -102,6 +103,9 @@ export class CategoryRepositoryImpl implements CategoryRepository {
         iconName: input.iconName ?? null,
         description: input.description ?? null,
         sortOrder: input.sortOrder ?? 0,
+        pricingMode: (input.pricingMode ?? "hourly") as "hourly" | "fixed",
+        paymentStrategy: (input.paymentStrategy ??
+          "single_capture") as "single_capture",
         isActive: input.isActive ?? true,
         configJson: input.configJson
           ? (input.configJson as Prisma.InputJsonValue)
@@ -124,6 +128,8 @@ export class CategoryRepositoryImpl implements CategoryRepository {
         iconName: input.iconName ?? undefined,
         description: input.description ?? undefined,
         sortOrder: input.sortOrder,
+        pricingMode: input.pricingMode as "hourly" | "fixed" | undefined,
+        paymentStrategy: input.paymentStrategy as "single_capture" | undefined,
         isActive: input.isActive,
         configJson: input.configJson
           ? (input.configJson as Prisma.InputJsonValue)
@@ -164,25 +170,34 @@ export class CategoryRepositoryImpl implements CategoryRepository {
     iconName: string | null;
     description: string | null;
     sortOrder: number;
+    pricingMode?: string;
+    paymentStrategy?: string;
     isActive: boolean;
     deletedAt: Date | null;
     configJson: unknown;
     createdAt: Date;
     updatedAt: Date;
   }): Category {
+    const cat = prismaCategory as typeof prismaCategory & {
+      pricingMode?: string;
+      paymentStrategy?: string;
+    };
     return {
-      id: prismaCategory.id,
-      key: prismaCategory.key,
-      name: prismaCategory.name,
-      slug: prismaCategory.slug,
-      iconName: prismaCategory.iconName,
-      description: prismaCategory.description,
-      sortOrder: prismaCategory.sortOrder,
-      isActive: prismaCategory.isActive,
-      deletedAt: prismaCategory.deletedAt,
-      configJson: prismaCategory.configJson as Record<string, unknown> | null,
-      createdAt: prismaCategory.createdAt,
-      updatedAt: prismaCategory.updatedAt,
+      id: cat.id,
+      key: cat.key,
+      name: cat.name,
+      slug: cat.slug,
+      iconName: cat.iconName,
+      description: cat.description,
+      sortOrder: cat.sortOrder,
+      pricingMode: (cat.pricingMode ?? "hourly") as PricingMode,
+      paymentStrategy: (cat.paymentStrategy ??
+        "single_capture") as PaymentStrategy,
+      isActive: cat.isActive,
+      deletedAt: cat.deletedAt,
+      configJson: cat.configJson as Record<string, unknown> | null,
+      createdAt: cat.createdAt,
+      updatedAt: cat.updatedAt,
     };
   }
 }

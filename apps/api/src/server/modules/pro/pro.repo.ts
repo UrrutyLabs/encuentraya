@@ -2,7 +2,10 @@ import { injectable, inject } from "tsyringe";
 import { prisma } from "@infra/db/prisma";
 import { calculateProfileCompleted } from "./pro.calculations";
 import { TOKENS } from "@/server/container/tokens";
-import type { ProProfileCategoryRepository } from "./proProfileCategory.repo";
+import type {
+  ProProfileCategoryRepository,
+  CategoryRateItem,
+} from "./proProfileCategory.repo";
 import type { CategoryRepository } from "../category/category.repo";
 
 // Type representing what Prisma returns for ProProfile queries
@@ -12,6 +15,16 @@ type PrismaProProfile =
   | NonNullable<Awaited<ReturnType<typeof prisma.proProfile.create>>>
   | NonNullable<Awaited<ReturnType<typeof prisma.proProfile.update>>>
   | NonNullable<Awaited<ReturnType<typeof prisma.proProfile.findMany>>[0]>;
+
+/**
+ * Category relation with rate (for getById / categoryRelations)
+ */
+export interface ProCategoryRelation {
+  categoryId: string;
+  category: { id: string; name: string; pricingMode: string };
+  hourlyRateCents: number | null;
+  startingFromCents: number | null;
+}
 
 /**
  * ProProfile entity (plain object)
@@ -25,7 +38,8 @@ export interface ProProfileEntity {
   bio: string | null;
   avatarUrl: string | null;
   hourlyRate: number;
-  categoryIds: string[]; // FK to Category table via junction table
+  categoryIds: string[];
+  categoryRelations?: ProCategoryRelation[];
   serviceArea: string | null;
   status: "pending" | "active" | "suspended";
   profileCompleted: boolean;
@@ -47,7 +61,8 @@ export interface ProProfileCreateInput {
   bio?: string | null;
   avatarUrl?: string | null;
   hourlyRate: number;
-  categoryIds: string[]; // FK to Category table (required)
+  categoryIds: string[];
+  categoryRates?: CategoryRateItem[];
   serviceArea?: string;
 }
 
@@ -62,7 +77,8 @@ export interface ProProfileUpdateInput {
   bio?: string | null;
   avatarUrl?: string | null;
   hourlyRate?: number;
-  categoryIds?: string[]; // FK to Category table
+  categoryIds?: string[];
+  categoryRates?: CategoryRateItem[];
   serviceArea?: string | null;
   profileCompleted?: boolean;
   completedJobsCount?: number;
@@ -128,12 +144,17 @@ export class ProRepositoryImpl implements ProRepository {
       },
     });
 
-    // Create junction table records for categories
-    if (input.categoryIds.length > 0) {
-      await this.proProfileCategoryRepository.bulkCreate(
-        proProfile.id,
-        input.categoryIds
-      );
+    const categoryRates = input.categoryRates;
+    const categoryIds =
+      categoryRates && categoryRates.length > 0
+        ? categoryRates.map((r) => r.categoryId)
+        : input.categoryIds;
+    if (categoryIds.length > 0) {
+      const items: (string | CategoryRateItem)[] =
+        categoryRates && categoryRates.length > 0
+          ? categoryRates
+          : input.categoryIds;
+      await this.proProfileCategoryRepository.bulkCreate(proProfile.id, items);
     }
 
     // Fetch with relations to get categoryIds
@@ -354,16 +375,14 @@ export class ProRepositoryImpl implements ProRepository {
       return null;
     }
 
-    // Handle categoryIds update
-    if (data.categoryIds !== undefined) {
-      // Delete all existing category relations
+    if (data.categoryIds !== undefined || data.categoryRates !== undefined) {
       await this.proProfileCategoryRepository.deleteByProProfileId(id);
-      // Create new relations
-      if (data.categoryIds.length > 0) {
-        await this.proProfileCategoryRepository.bulkCreate(
-          id,
-          data.categoryIds
-        );
+      const categoryRates = data.categoryRates;
+      const categoryIds = data.categoryIds;
+      if (categoryRates && categoryRates.length > 0) {
+        await this.proProfileCategoryRepository.bulkCreate(id, categoryRates);
+      } else if (categoryIds && categoryIds.length > 0) {
+        await this.proProfileCategoryRepository.bulkCreate(id, categoryIds);
       }
     }
 
@@ -450,7 +469,7 @@ export class ProRepositoryImpl implements ProRepository {
   }
 
   /**
-   * Map Prisma ProProfile to domain entity (async to derive categories from categoryIds)
+   * Map Prisma ProProfile to domain entity (async to derive categories from categoryRelations)
    */
   private async mapPrismaToDomainAsync(
     prismaProProfile: NonNullable<PrismaProProfile> & {
@@ -458,17 +477,32 @@ export class ProRepositoryImpl implements ProRepository {
         id: string;
         proProfileId: string;
         categoryId: string;
+        hourlyRateCents: number | null;
+        startingFromCents: number | null;
         category?: {
           id: string;
           key: string;
+          name: string;
+          pricingMode: string;
         } | null;
       }>;
     }
   ): Promise<ProProfileEntity> {
     const p = prismaProProfile;
 
-    // Get categoryIds from junction table
     const categoryIds = p.categoryRelations?.map((rel) => rel.categoryId) ?? [];
+
+    const categoryRelations: ProCategoryRelation[] =
+      p.categoryRelations?.map((rel) => ({
+        categoryId: rel.categoryId,
+        category: {
+          id: rel.category!.id,
+          name: rel.category!.name,
+          pricingMode: String(rel.category!.pricingMode),
+        },
+        hourlyRateCents: rel.hourlyRateCents ?? null,
+        startingFromCents: rel.startingFromCents ?? null,
+      })) ?? [];
 
     return {
       id: p.id,
@@ -479,7 +513,8 @@ export class ProRepositoryImpl implements ProRepository {
       bio: p.bio ?? null,
       avatarUrl: p.avatarUrl ?? null,
       hourlyRate: p.hourlyRate,
-      categoryIds, // FK array
+      categoryIds,
+      categoryRelations,
       serviceArea: p.serviceArea ?? null,
       status: p.status as "pending" | "active" | "suspended",
       profileCompleted: p.profileCompleted,

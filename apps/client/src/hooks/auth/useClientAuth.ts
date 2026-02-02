@@ -7,7 +7,7 @@ import { Role } from "@repo/domain";
 /**
  * Hook to check if user is authenticated
  * Redirects based on role:
- * - CLIENT -> /search
+ * - CLIENT -> /
  * - PRO -> /pro
  * Returns loading state
  */

@@ -27,17 +27,26 @@ import {
   ApprovalMethod,
   type OrderCostBreakdown,
 } from "@repo/domain";
+import { photoUrlsSchema } from "@repo/upload";
 import { mapDomainErrorToTRPCError } from "@shared/errors/error-mapper";
-import type { OrderEstimateOutput } from "@repo/domain";
-import type { Order } from "@repo/domain";
+import type { OrderEstimateOutput, Order } from "@repo/domain";
 import type { ReceiptRepository } from "./receipt.repo";
 import { receiptEntityToOrderReceipt } from "./receipt.repo";
 
 /** Fallback estimate when estimation service cannot be called (e.g. no proProfileId). */
 function buildFallbackEstimate(order: Order): OrderEstimateOutput {
-  const laborAmount = Math.round(
-    order.hourlyRateSnapshotAmount * order.estimatedHours
-  );
+  const pricingMode = (order.pricingMode ?? "hourly") as string;
+  if (pricingMode === "fixed") {
+    if (order.quotedAmountCents != null && order.quotedAmountCents > 0) {
+      return orderEstimationService.estimateFromQuotedAmount(
+        order.quotedAmountCents,
+        order.currency
+      );
+    }
+    return buildNoQuoteEstimate(order.currency);
+  }
+  const hours = order.estimatedHours ?? 0;
+  const laborAmount = Math.round(order.hourlyRateSnapshotAmount * hours);
   return {
     laborAmount,
     platformFeeAmount: 0,
@@ -50,8 +59,29 @@ function buildFallbackEstimate(order: Order): OrderEstimateOutput {
     lineItems: [
       {
         type: "labor",
-        description: `Labor (${order.estimatedHours} horas)`,
+        description: `Labor (${hours} horas)`,
         amount: laborAmount,
+      },
+    ],
+  };
+}
+
+/** Estimate for fixed-price order when no quote has been submitted yet. */
+function buildNoQuoteEstimate(currency: string): OrderEstimateOutput {
+  return {
+    laborAmount: 0,
+    platformFeeAmount: 0,
+    platformFeeRate: 0,
+    taxAmount: 0,
+    taxRate: 0.22,
+    subtotalAmount: 0,
+    totalAmount: 0,
+    currency,
+    lineItems: [
+      {
+        type: "labor",
+        description: "Presupuesto pendiente",
+        amount: 0,
       },
     ],
   };
@@ -147,29 +177,35 @@ export const orderRouter = router({
               ...receiptEntityToOrderReceipt(receipt),
             };
           } else {
-            const estimation =
-              (order.proProfileId
+            costBreakdown = {
+              kind: "estimate",
+              ...buildFallbackEstimate(order),
+            };
+          }
+        } else {
+          const pricingMode = (order.pricingMode ?? "hourly") as string;
+          const isFixed = pricingMode === "fixed";
+          let estimation: OrderEstimateOutput;
+          if (isFixed) {
+            estimation =
+              order.quotedAmountCents != null && order.quotedAmountCents > 0
+                ? orderEstimationService.estimateFromQuotedAmount(
+                    order.quotedAmountCents,
+                    order.currency
+                  )
+                : buildNoQuoteEstimate(order.currency);
+          } else {
+            estimation =
+              (order.proProfileId && (order.estimatedHours ?? 0) > 0
                 ? await orderEstimationService
                     .estimateOrderCost({
                       proProfileId: order.proProfileId,
-                      estimatedHours: order.estimatedHours,
+                      estimatedHours: order.estimatedHours ?? 0,
                       categoryId: order.categoryId,
                     })
                     .catch(() => null)
                 : null) ?? buildFallbackEstimate(order);
-            costBreakdown = { kind: "estimate", ...estimation };
           }
-        } else {
-          const estimation =
-            (order.proProfileId
-              ? await orderEstimationService
-                  .estimateOrderCost({
-                    proProfileId: order.proProfileId,
-                    estimatedHours: order.estimatedHours,
-                    categoryId: order.categoryId,
-                  })
-                  .catch(() => null)
-              : null) ?? buildFallbackEstimate(order);
           costBreakdown = { kind: "estimate", ...estimation };
         }
 
@@ -315,6 +351,7 @@ export const orderRouter = router({
       z.object({
         orderId: z.string(),
         finalHours: z.number().positive(),
+        photoUrls: photoUrlsSchema.optional(),
       })
     )
     .output(orderSchema)
@@ -323,7 +360,8 @@ export const orderRouter = router({
         return await orderLifecycleService.submitHours(
           ctx.actor,
           input.orderId,
-          input.finalHours
+          input.finalHours,
+          { photoUrls: input.photoUrls }
         );
       } catch (error) {
         throw mapDomainErrorToTRPCError(error);
@@ -331,29 +369,100 @@ export const orderRouter = router({
     }),
 
   /**
-   * Client approves submitted hours
+   * Client approves submitted hours (or fixed-price completion)
    * This triggers finalization and payment capture
    * Transition: awaiting_client_approval → completed → paid
+   * For fixed-price orders, approvedHours is ignored; finalization uses quotedAmountCents.
    */
   approveHours: protectedProcedure
     .input(z.object({ orderId: z.string() }))
     .output(orderSchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        // First approve the hours
         const order = await orderLifecycleService.approveHours(
           ctx.actor,
           input.orderId
         );
 
-        // Then finalize the order (creates line items, calculates totals, captures payment)
+        const pricingMode = (order.pricingMode ?? "hourly") as string;
+        const isFixed = pricingMode === "fixed";
+        const approvedHoursForFinalization = isFixed
+          ? 0
+          : (order.finalHoursSubmitted ?? 0);
+
         const finalized = await orderFinalizationService.finalizeOrder(
           input.orderId,
-          order.finalHoursSubmitted!,
+          approvedHoursForFinalization,
           ApprovalMethod.CLIENT_ACCEPTED
         );
 
         return finalized;
+      } catch (error) {
+        throw mapDomainErrorToTRPCError(error);
+      }
+    }),
+
+  /**
+   * Pro submits a fixed-price quote (fixed orders only, status remains accepted)
+   */
+  submitQuote: proProcedure
+    .input(
+      z.object({
+        orderId: z.string(),
+        amountCents: z.number().int().positive(),
+        message: z.string().optional(),
+      })
+    )
+    .output(orderSchema)
+    .mutation(async ({ input, ctx }) => {
+      try {
+        return await orderLifecycleService.submitQuote(
+          ctx.actor,
+          input.orderId,
+          input.amountCents,
+          input.message
+        );
+      } catch (error) {
+        throw mapDomainErrorToTRPCError(error);
+      }
+    }),
+
+  /**
+   * Client accepts pro's fixed-price quote (fixed orders only)
+   */
+  acceptQuote: protectedProcedure
+    .input(z.object({ orderId: z.string() }))
+    .output(orderSchema)
+    .mutation(async ({ input, ctx }) => {
+      try {
+        return await orderLifecycleService.acceptQuote(
+          ctx.actor,
+          input.orderId
+        );
+      } catch (error) {
+        throw mapDomainErrorToTRPCError(error);
+      }
+    }),
+
+  /**
+   * Pro marks fixed-price job complete (no hours)
+   * Transition: in_progress → awaiting_client_approval. Fixed orders only.
+   */
+  submitCompletion: proProcedure
+    .input(
+      z.object({
+        orderId: z.string(),
+        photoUrls: photoUrlsSchema.optional(),
+      })
+    )
+    .output(orderSchema)
+    .mutation(async ({ input, ctx }) => {
+      try {
+        return await orderLifecycleService.submitCompletion(
+          ctx.actor,
+          input.orderId,
+          { photoUrls: input.photoUrls }
+        );
       } catch (error) {
         throw mapDomainErrorToTRPCError(error);
       }

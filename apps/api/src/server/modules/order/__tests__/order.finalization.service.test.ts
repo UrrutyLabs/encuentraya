@@ -139,6 +139,10 @@ describe("OrderFinalizationService", () => {
       hourlyRateSnapshotAmount: 10000, // 100 UYU/hour in minor units (cents)
       currency: "UYU",
       minHoursSnapshot: null,
+      quotedAmountCents: null,
+      quotedAt: null,
+      quoteMessage: null,
+      quoteAcceptedAt: null,
       estimatedHours: 2,
       finalHoursSubmitted: 3,
       approvedHours: null,
@@ -195,6 +199,10 @@ describe("OrderFinalizationService", () => {
       hourlyRateSnapshotAmount: 10000, // 100 UYU/hour in minor units (cents)
       currency: "UYU",
       minHoursSnapshot: null,
+      quotedAmountCents: null,
+      quotedAt: null,
+      quoteMessage: null,
+      quoteAcceptedAt: null,
       estimatedHours: 2,
       finalHoursSubmitted: 3,
       approvedHours: null,
@@ -433,6 +441,79 @@ describe("OrderFinalizationService", () => {
           expect.objectContaining({
             type: OrderLineItemType.TAX,
             amount: 7260, // 72.6 UYU in minor units (cents)
+          }),
+        ])
+      );
+    });
+
+    it("should finalize fixed-price order using quotedAmountCents as labor", async () => {
+      const quotedCents = 50000; // 500 UYU
+      const order = createMockOrder({
+        status: OrderStatus.AWAITING_CLIENT_APPROVAL,
+        pricingMode: PricingMode.FIXED,
+        quotedAmountCents: quotedCents,
+        finalHoursSubmitted: null,
+        hourlyRateSnapshotAmount: 0,
+      });
+      const updatedOrderEntity = createMockOrderEntity({
+        approvedHours: 0,
+        pricingMode: PricingMode.FIXED,
+        quotedAmountCents: quotedCents,
+        hourlyRateSnapshotAmount: 0,
+      });
+      const laborAmount = 50000;
+      const platformFeeAmount = 5000; // 10%
+      const taxAmount = Math.round((laborAmount + platformFeeAmount) * 0.22); // 12100
+      const laborItem = createMockOrderLineItem({
+        type: OrderLineItemType.LABOR,
+        description: "Labor (presupuesto fijo)",
+        amount: laborAmount,
+      });
+      const platformFeeItem = createMockOrderLineItem({
+        type: OrderLineItemType.PLATFORM_FEE,
+        amount: platformFeeAmount,
+      });
+      const taxItem = createMockOrderLineItem({
+        type: OrderLineItemType.TAX,
+        amount: taxAmount,
+      });
+      const finalizedOrder = createMockOrder({
+        status: OrderStatus.COMPLETED,
+      });
+
+      mockOrderService.getOrderOrThrow.mockResolvedValue(order);
+      mockOrderRepository.update.mockResolvedValue(updatedOrderEntity);
+      mockOrderLineItemRepository.replaceOrderLineItems.mockResolvedValue([]);
+      mockOrderLineItemRepository.findByOrderId.mockResolvedValue([
+        laborItem,
+        platformFeeItem,
+        taxItem,
+      ]);
+      mockOrderRepository.update.mockResolvedValueOnce(updatedOrderEntity);
+      mockOrderRepository.updateStatus.mockResolvedValue({
+        ...updatedOrderEntity,
+        status: OrderStatus.COMPLETED,
+      } as OrderEntity);
+      mockOrderService.getOrderOrThrow
+        .mockResolvedValueOnce(order)
+        .mockResolvedValueOnce(finalizedOrder);
+
+      const result = await service.finalizeOrder(
+        "order-1",
+        0,
+        ApprovalMethod.CLIENT_ACCEPTED
+      );
+
+      expect(result.status).toBe(OrderStatus.COMPLETED);
+      expect(
+        mockOrderLineItemRepository.replaceOrderLineItems
+      ).toHaveBeenCalledWith(
+        "order-1",
+        expect.arrayContaining([
+          expect.objectContaining({
+            type: OrderLineItemType.LABOR,
+            description: "Labor (presupuesto fijo)",
+            amount: 50000,
           }),
         ])
       );

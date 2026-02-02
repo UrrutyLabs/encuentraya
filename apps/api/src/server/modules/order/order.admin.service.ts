@@ -25,12 +25,10 @@ export class OrderAdminService {
 
   /**
    * Admin: List all orders with filters
-   * Note: Filtering not yet implemented - returns empty array
    */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async adminListOrders(filters?: {
     status?: OrderStatus;
-    query?: string; // Search by displayId or client/pro email
+    query?: string; // Search by displayId or id
     dateFrom?: Date;
     dateTo?: Date;
     limit?: number;
@@ -48,8 +46,26 @@ export class OrderAdminService {
       currency: string;
     }>
   > {
-    // Filtering not yet implemented - repository needs admin query methods
-    return [];
+    const entities = await this.orderRepository.findManyForAdmin({
+      status: filters?.status,
+      query: filters?.query,
+      dateFrom: filters?.dateFrom,
+      dateTo: filters?.dateTo,
+      limit: filters?.limit ?? 100,
+      cursor: filters?.cursor,
+    });
+
+    return entities.map((e) => ({
+      id: e.id,
+      displayId: e.displayId,
+      createdAt: e.createdAt,
+      status: e.status,
+      clientUserId: e.clientUserId,
+      proProfileId: e.proProfileId,
+      categoryId: e.categoryId,
+      totalAmount: e.totalAmount,
+      currency: e.currency,
+    }));
   }
 
   /**

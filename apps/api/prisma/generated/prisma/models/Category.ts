@@ -42,6 +42,8 @@ export type CategoryMinAggregateOutputType = {
   iconName: string | null
   description: string | null
   sortOrder: number | null
+  pricingMode: $Enums.PricingMode | null
+  paymentStrategy: $Enums.PaymentStrategy | null
   isActive: boolean | null
   deletedAt: Date | null
   createdAt: Date | null
@@ -56,6 +58,8 @@ export type CategoryMaxAggregateOutputType = {
   iconName: string | null
   description: string | null
   sortOrder: number | null
+  pricingMode: $Enums.PricingMode | null
+  paymentStrategy: $Enums.PaymentStrategy | null
   isActive: boolean | null
   deletedAt: Date | null
   createdAt: Date | null
@@ -70,6 +74,8 @@ export type CategoryCountAggregateOutputType = {
   iconName: number
   description: number
   sortOrder: number
+  pricingMode: number
+  paymentStrategy: number
   isActive: number
   deletedAt: number
   configJson: number
@@ -95,6 +101,8 @@ export type CategoryMinAggregateInputType = {
   iconName?: true
   description?: true
   sortOrder?: true
+  pricingMode?: true
+  paymentStrategy?: true
   isActive?: true
   deletedAt?: true
   createdAt?: true
@@ -109,6 +117,8 @@ export type CategoryMaxAggregateInputType = {
   iconName?: true
   description?: true
   sortOrder?: true
+  pricingMode?: true
+  paymentStrategy?: true
   isActive?: true
   deletedAt?: true
   createdAt?: true
@@ -123,6 +133,8 @@ export type CategoryCountAggregateInputType = {
   iconName?: true
   description?: true
   sortOrder?: true
+  pricingMode?: true
+  paymentStrategy?: true
   isActive?: true
   deletedAt?: true
   configJson?: true
@@ -225,6 +237,8 @@ export type CategoryGroupByOutputType = {
   iconName: string | null
   description: string | null
   sortOrder: number
+  pricingMode: $Enums.PricingMode
+  paymentStrategy: $Enums.PaymentStrategy
   isActive: boolean
   deletedAt: Date | null
   configJson: runtime.JsonValue | null
@@ -263,6 +277,8 @@ export type CategoryWhereInput = {
   iconName?: Prisma.StringNullableFilter<"Category"> | string | null
   description?: Prisma.StringNullableFilter<"Category"> | string | null
   sortOrder?: Prisma.IntFilter<"Category"> | number
+  pricingMode?: Prisma.EnumPricingModeFilter<"Category"> | $Enums.PricingMode
+  paymentStrategy?: Prisma.EnumPaymentStrategyFilter<"Category"> | $Enums.PaymentStrategy
   isActive?: Prisma.BoolFilter<"Category"> | boolean
   deletedAt?: Prisma.DateTimeNullableFilter<"Category"> | Date | string | null
   configJson?: Prisma.JsonNullableFilter<"Category">
@@ -281,6 +297,8 @@ export type CategoryOrderByWithRelationInput = {
   iconName?: Prisma.SortOrderInput | Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
+  pricingMode?: Prisma.SortOrder
+  paymentStrategy?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   configJson?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -302,6 +320,8 @@ export type CategoryWhereUniqueInput = Prisma.AtLeast<{
   iconName?: Prisma.StringNullableFilter<"Category"> | string | null
   description?: Prisma.StringNullableFilter<"Category"> | string | null
   sortOrder?: Prisma.IntFilter<"Category"> | number
+  pricingMode?: Prisma.EnumPricingModeFilter<"Category"> | $Enums.PricingMode
+  paymentStrategy?: Prisma.EnumPaymentStrategyFilter<"Category"> | $Enums.PaymentStrategy
   isActive?: Prisma.BoolFilter<"Category"> | boolean
   deletedAt?: Prisma.DateTimeNullableFilter<"Category"> | Date | string | null
   configJson?: Prisma.JsonNullableFilter<"Category">
@@ -320,6 +340,8 @@ export type CategoryOrderByWithAggregationInput = {
   iconName?: Prisma.SortOrderInput | Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
+  pricingMode?: Prisma.SortOrder
+  paymentStrategy?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   configJson?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -343,6 +365,8 @@ export type CategoryScalarWhereWithAggregatesInput = {
   iconName?: Prisma.StringNullableWithAggregatesFilter<"Category"> | string | null
   description?: Prisma.StringNullableWithAggregatesFilter<"Category"> | string | null
   sortOrder?: Prisma.IntWithAggregatesFilter<"Category"> | number
+  pricingMode?: Prisma.EnumPricingModeWithAggregatesFilter<"Category"> | $Enums.PricingMode
+  paymentStrategy?: Prisma.EnumPaymentStrategyWithAggregatesFilter<"Category"> | $Enums.PaymentStrategy
   isActive?: Prisma.BoolWithAggregatesFilter<"Category"> | boolean
   deletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Category"> | Date | string | null
   configJson?: Prisma.JsonNullableWithAggregatesFilter<"Category">
@@ -358,6 +382,8 @@ export type CategoryCreateInput = {
   iconName?: string | null
   description?: string | null
   sortOrder?: number
+  pricingMode?: $Enums.PricingMode
+  paymentStrategy?: $Enums.PaymentStrategy
   isActive?: boolean
   deletedAt?: Date | string | null
   configJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -376,6 +402,8 @@ export type CategoryUncheckedCreateInput = {
   iconName?: string | null
   description?: string | null
   sortOrder?: number
+  pricingMode?: $Enums.PricingMode
+  paymentStrategy?: $Enums.PaymentStrategy
   isActive?: boolean
   deletedAt?: Date | string | null
   configJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -394,6 +422,8 @@ export type CategoryUpdateInput = {
   iconName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  pricingMode?: Prisma.EnumPricingModeFieldUpdateOperationsInput | $Enums.PricingMode
+  paymentStrategy?: Prisma.EnumPaymentStrategyFieldUpdateOperationsInput | $Enums.PaymentStrategy
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   configJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -412,6 +442,8 @@ export type CategoryUncheckedUpdateInput = {
   iconName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  pricingMode?: Prisma.EnumPricingModeFieldUpdateOperationsInput | $Enums.PricingMode
+  paymentStrategy?: Prisma.EnumPaymentStrategyFieldUpdateOperationsInput | $Enums.PaymentStrategy
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   configJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -430,6 +462,8 @@ export type CategoryCreateManyInput = {
   iconName?: string | null
   description?: string | null
   sortOrder?: number
+  pricingMode?: $Enums.PricingMode
+  paymentStrategy?: $Enums.PaymentStrategy
   isActive?: boolean
   deletedAt?: Date | string | null
   configJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -445,6 +479,8 @@ export type CategoryUpdateManyMutationInput = {
   iconName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  pricingMode?: Prisma.EnumPricingModeFieldUpdateOperationsInput | $Enums.PricingMode
+  paymentStrategy?: Prisma.EnumPaymentStrategyFieldUpdateOperationsInput | $Enums.PaymentStrategy
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   configJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -460,6 +496,8 @@ export type CategoryUncheckedUpdateManyInput = {
   iconName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  pricingMode?: Prisma.EnumPricingModeFieldUpdateOperationsInput | $Enums.PricingMode
+  paymentStrategy?: Prisma.EnumPaymentStrategyFieldUpdateOperationsInput | $Enums.PaymentStrategy
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   configJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -480,6 +518,8 @@ export type CategoryCountOrderByAggregateInput = {
   iconName?: Prisma.SortOrder
   description?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
+  pricingMode?: Prisma.SortOrder
+  paymentStrategy?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
   configJson?: Prisma.SortOrder
@@ -499,6 +539,8 @@ export type CategoryMaxOrderByAggregateInput = {
   iconName?: Prisma.SortOrder
   description?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
+  pricingMode?: Prisma.SortOrder
+  paymentStrategy?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -513,6 +555,8 @@ export type CategoryMinOrderByAggregateInput = {
   iconName?: Prisma.SortOrder
   description?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
+  pricingMode?: Prisma.SortOrder
+  paymentStrategy?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -535,6 +579,10 @@ export type CategoryUpdateOneRequiredWithoutOrdersNestedInput = {
   upsert?: Prisma.CategoryUpsertWithoutOrdersInput
   connect?: Prisma.CategoryWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.CategoryUpdateToOneWithWhereWithoutOrdersInput, Prisma.CategoryUpdateWithoutOrdersInput>, Prisma.CategoryUncheckedUpdateWithoutOrdersInput>
+}
+
+export type EnumPaymentStrategyFieldUpdateOperationsInput = {
+  set?: $Enums.PaymentStrategy
 }
 
 export type CategoryCreateNestedOneWithoutSubcategoriesInput = {
@@ -573,6 +621,8 @@ export type CategoryCreateWithoutOrdersInput = {
   iconName?: string | null
   description?: string | null
   sortOrder?: number
+  pricingMode?: $Enums.PricingMode
+  paymentStrategy?: $Enums.PaymentStrategy
   isActive?: boolean
   deletedAt?: Date | string | null
   configJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -590,6 +640,8 @@ export type CategoryUncheckedCreateWithoutOrdersInput = {
   iconName?: string | null
   description?: string | null
   sortOrder?: number
+  pricingMode?: $Enums.PricingMode
+  paymentStrategy?: $Enums.PaymentStrategy
   isActive?: boolean
   deletedAt?: Date | string | null
   configJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -623,6 +675,8 @@ export type CategoryUpdateWithoutOrdersInput = {
   iconName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  pricingMode?: Prisma.EnumPricingModeFieldUpdateOperationsInput | $Enums.PricingMode
+  paymentStrategy?: Prisma.EnumPaymentStrategyFieldUpdateOperationsInput | $Enums.PaymentStrategy
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   configJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -640,6 +694,8 @@ export type CategoryUncheckedUpdateWithoutOrdersInput = {
   iconName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  pricingMode?: Prisma.EnumPricingModeFieldUpdateOperationsInput | $Enums.PricingMode
+  paymentStrategy?: Prisma.EnumPaymentStrategyFieldUpdateOperationsInput | $Enums.PaymentStrategy
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   configJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -657,6 +713,8 @@ export type CategoryCreateWithoutSubcategoriesInput = {
   iconName?: string | null
   description?: string | null
   sortOrder?: number
+  pricingMode?: $Enums.PricingMode
+  paymentStrategy?: $Enums.PaymentStrategy
   isActive?: boolean
   deletedAt?: Date | string | null
   configJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -674,6 +732,8 @@ export type CategoryUncheckedCreateWithoutSubcategoriesInput = {
   iconName?: string | null
   description?: string | null
   sortOrder?: number
+  pricingMode?: $Enums.PricingMode
+  paymentStrategy?: $Enums.PaymentStrategy
   isActive?: boolean
   deletedAt?: Date | string | null
   configJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -707,6 +767,8 @@ export type CategoryUpdateWithoutSubcategoriesInput = {
   iconName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  pricingMode?: Prisma.EnumPricingModeFieldUpdateOperationsInput | $Enums.PricingMode
+  paymentStrategy?: Prisma.EnumPaymentStrategyFieldUpdateOperationsInput | $Enums.PaymentStrategy
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   configJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -724,6 +786,8 @@ export type CategoryUncheckedUpdateWithoutSubcategoriesInput = {
   iconName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  pricingMode?: Prisma.EnumPricingModeFieldUpdateOperationsInput | $Enums.PricingMode
+  paymentStrategy?: Prisma.EnumPaymentStrategyFieldUpdateOperationsInput | $Enums.PaymentStrategy
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   configJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -741,6 +805,8 @@ export type CategoryCreateWithoutProProfilesInput = {
   iconName?: string | null
   description?: string | null
   sortOrder?: number
+  pricingMode?: $Enums.PricingMode
+  paymentStrategy?: $Enums.PaymentStrategy
   isActive?: boolean
   deletedAt?: Date | string | null
   configJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -758,6 +824,8 @@ export type CategoryUncheckedCreateWithoutProProfilesInput = {
   iconName?: string | null
   description?: string | null
   sortOrder?: number
+  pricingMode?: $Enums.PricingMode
+  paymentStrategy?: $Enums.PaymentStrategy
   isActive?: boolean
   deletedAt?: Date | string | null
   configJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -791,6 +859,8 @@ export type CategoryUpdateWithoutProProfilesInput = {
   iconName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  pricingMode?: Prisma.EnumPricingModeFieldUpdateOperationsInput | $Enums.PricingMode
+  paymentStrategy?: Prisma.EnumPaymentStrategyFieldUpdateOperationsInput | $Enums.PaymentStrategy
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   configJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -808,6 +878,8 @@ export type CategoryUncheckedUpdateWithoutProProfilesInput = {
   iconName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  pricingMode?: Prisma.EnumPricingModeFieldUpdateOperationsInput | $Enums.PricingMode
+  paymentStrategy?: Prisma.EnumPaymentStrategyFieldUpdateOperationsInput | $Enums.PaymentStrategy
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   configJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -874,6 +946,8 @@ export type CategorySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   iconName?: boolean
   description?: boolean
   sortOrder?: boolean
+  pricingMode?: boolean
+  paymentStrategy?: boolean
   isActive?: boolean
   deletedAt?: boolean
   configJson?: boolean
@@ -893,6 +967,8 @@ export type CategorySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   iconName?: boolean
   description?: boolean
   sortOrder?: boolean
+  pricingMode?: boolean
+  paymentStrategy?: boolean
   isActive?: boolean
   deletedAt?: boolean
   configJson?: boolean
@@ -908,6 +984,8 @@ export type CategorySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   iconName?: boolean
   description?: boolean
   sortOrder?: boolean
+  pricingMode?: boolean
+  paymentStrategy?: boolean
   isActive?: boolean
   deletedAt?: boolean
   configJson?: boolean
@@ -923,6 +1001,8 @@ export type CategorySelectScalar = {
   iconName?: boolean
   description?: boolean
   sortOrder?: boolean
+  pricingMode?: boolean
+  paymentStrategy?: boolean
   isActive?: boolean
   deletedAt?: boolean
   configJson?: boolean
@@ -930,7 +1010,7 @@ export type CategorySelectScalar = {
   updatedAt?: boolean
 }
 
-export type CategoryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "key" | "name" | "slug" | "iconName" | "description" | "sortOrder" | "isActive" | "deletedAt" | "configJson" | "createdAt" | "updatedAt", ExtArgs["result"]["category"]>
+export type CategoryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "key" | "name" | "slug" | "iconName" | "description" | "sortOrder" | "pricingMode" | "paymentStrategy" | "isActive" | "deletedAt" | "configJson" | "createdAt" | "updatedAt", ExtArgs["result"]["category"]>
 export type CategoryInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   subcategories?: boolean | Prisma.Category$subcategoriesArgs<ExtArgs>
   orders?: boolean | Prisma.Category$ordersArgs<ExtArgs>
@@ -955,6 +1035,8 @@ export type $CategoryPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     iconName: string | null
     description: string | null
     sortOrder: number
+    pricingMode: $Enums.PricingMode
+    paymentStrategy: $Enums.PaymentStrategy
     isActive: boolean
     deletedAt: Date | null
     configJson: runtime.JsonValue | null
@@ -1393,6 +1475,8 @@ export interface CategoryFieldRefs {
   readonly iconName: Prisma.FieldRef<"Category", 'String'>
   readonly description: Prisma.FieldRef<"Category", 'String'>
   readonly sortOrder: Prisma.FieldRef<"Category", 'Int'>
+  readonly pricingMode: Prisma.FieldRef<"Category", 'PricingMode'>
+  readonly paymentStrategy: Prisma.FieldRef<"Category", 'PaymentStrategy'>
   readonly isActive: Prisma.FieldRef<"Category", 'Boolean'>
   readonly deletedAt: Prisma.FieldRef<"Category", 'DateTime'>
   readonly configJson: Prisma.FieldRef<"Category", 'Json'>

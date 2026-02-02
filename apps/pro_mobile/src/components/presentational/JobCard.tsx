@@ -46,6 +46,15 @@ function JobCardComponent({ job, onPress, onChatPress }: JobCardProps) {
     [job.status]
   );
 
+  const quoteStatusLine = useMemo(() => {
+    if (job.pricingMode !== "fixed" || job.status !== OrderStatus.ACCEPTED) {
+      return null;
+    }
+    return (job.quotedAmountCents ?? 0) > 0
+      ? "Presupuesto enviado"
+      : "Enviar presupuesto";
+  }, [job.pricingMode, job.status, job.quotedAmountCents]);
+
   const formattedDate = useMemo(
     () =>
       new Intl.DateTimeFormat("es-UY", {
@@ -103,6 +112,11 @@ function JobCardComponent({ job, onPress, onChatPress }: JobCardProps) {
             <Badge variant={statusVariant} showIcon>
               {statusLabel}
             </Badge>
+            {quoteStatusLine ? (
+              <Text variant="small" style={styles.quoteStatusLine}>
+                {quoteStatusLine}
+              </Text>
+            ) : null}
             {job.isFirstOrder && job.status !== OrderStatus.COMPLETED && (
               <Badge variant="new">Nuevo Cliente</Badge>
             )}
@@ -197,6 +211,10 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
     gap: theme.spacing[2],
   },
+  quoteStatusLine: {
+    color: theme.colors.muted,
+    marginTop: -theme.spacing[1],
+  },
   description: {
     marginBottom: theme.spacing[2],
     color: theme.colors.muted,
@@ -240,10 +258,11 @@ const styles = StyleSheet.create({
 
 // Memoize component to prevent unnecessary re-renders
 export const JobCard = React.memo(JobCardComponent, (prevProps, nextProps) => {
-  // Only re-render if job ID or status changes, or onPress reference changes
   return (
     prevProps.job.id === nextProps.job.id &&
     prevProps.job.status === nextProps.job.status &&
+    prevProps.job.pricingMode === nextProps.job.pricingMode &&
+    prevProps.job.quotedAmountCents === nextProps.job.quotedAmountCents &&
     prevProps.job.isFirstOrder === nextProps.job.isFirstOrder &&
     prevProps.job.proProfileId === nextProps.job.proProfileId &&
     prevProps.onPress === nextProps.onPress &&

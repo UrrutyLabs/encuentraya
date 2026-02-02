@@ -43,8 +43,14 @@ export interface OrderEntity {
   currency: string;
   minHoursSnapshot: number | null;
 
-  // Hours
-  estimatedHours: number;
+  // Quote (fixed-price flow)
+  quotedAmountCents: number | null;
+  quotedAt: Date | null;
+  quoteMessage: string | null;
+  quoteAcceptedAt: Date | null;
+
+  // Hours (null for fixed orders)
+  estimatedHours: number | null;
   finalHoursSubmitted: number | null;
   approvedHours: number | null;
   approvalMethod: string | null; // ApprovalMethod enum value
@@ -71,6 +77,8 @@ export interface OrderEntity {
 
   // Metadata
   isFirstOrder: boolean;
+  photoUrlsJson?: unknown;
+  workProofPhotoUrlsJson?: unknown;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -91,12 +99,17 @@ export interface OrderCreateInput {
   addressLng?: number;
   scheduledWindowStartAt: Date;
   scheduledWindowEndAt?: Date;
-  estimatedHours: number;
+  estimatedHours?: number | null; // Optional/null for fixed
   pricingMode?: string; // PricingMode enum value, defaults to "hourly"
+  quotedAmountCents?: number | null;
+  quotedAt?: Date | null;
+  quoteMessage?: string | null;
+  quoteAcceptedAt?: Date | null;
   hourlyRateSnapshotAmount: number;
   currency?: string; // defaults to "UYU"
   minHoursSnapshot?: number;
   isFirstOrder?: boolean;
+  photoUrls?: string[]; // Order photos from wizard (storage URLs)
 }
 
 /**
@@ -110,16 +123,20 @@ export interface OrderUpdateInput {
   addressLng?: number | null;
   scheduledWindowStartAt?: Date;
   scheduledWindowEndAt?: Date | null;
-  estimatedHours?: number;
+  estimatedHours?: number | null;
   finalHoursSubmitted?: number | null;
   approvedHours?: number | null;
-  approvalMethod?: string | null; // ApprovalMethod enum value
+  approvalMethod?: string | null;
   approvalDeadlineAt?: Date | null;
   arrivedAt?: Date | null;
   completedAt?: Date | null;
   cancelReason?: string | null;
   disputeReason?: string | null;
   disputeOpenedBy?: string | null;
+  quotedAmountCents?: number | null;
+  quotedAt?: Date | null;
+  quoteMessage?: string | null;
+  quoteAcceptedAt?: Date | null;
   subtotalAmount?: number | null;
   platformFeeAmount?: number | null;
   taxAmount?: number | null;
@@ -130,6 +147,19 @@ export interface OrderUpdateInput {
   taxIncluded?: boolean;
   taxRegion?: string | null;
   taxCalculatedAt?: Date | null;
+  workProofPhotoUrlsJson?: unknown; // Array of storage URLs as JSON
+}
+
+/**
+ * Filters for admin list orders
+ */
+export interface AdminListOrdersFilters {
+  status?: OrderStatus;
+  query?: string;
+  dateFrom?: Date;
+  dateTo?: Date;
+  limit?: number;
+  cursor?: string;
 }
 
 /**
@@ -143,6 +173,7 @@ export interface OrderRepository {
   findByClientUserId(clientUserId: string): Promise<OrderEntity[]>;
   findByProProfileId(proProfileId: string): Promise<OrderEntity[]>;
   findActiveByClientUserId(clientUserId: string): Promise<OrderEntity[]>;
+  findManyForAdmin(filters: AdminListOrdersFilters): Promise<OrderEntity[]>;
   countCompletedOrdersByProProfileId(proProfileId: string): Promise<number>;
   update(id: string, data: OrderUpdateInput): Promise<OrderEntity | null>;
   updateStatus(
@@ -191,8 +222,11 @@ export class OrderRepositoryImpl implements OrderRepository {
         hourlyRateSnapshotAmount: input.hourlyRateSnapshotAmount,
         currency: input.currency ?? "UYU",
         minHoursSnapshot: input.minHoursSnapshot ?? null,
-        estimatedHours: input.estimatedHours,
+        estimatedHours: input.estimatedHours ?? null,
         isFirstOrder: input.isFirstOrder ?? false,
+        photoUrlsJson: input.photoUrls
+          ? (input.photoUrls as unknown as Prisma.InputJsonValue)
+          : undefined,
         status: $Enums.OrderStatus.pending_pro_confirmation,
       },
     });
@@ -252,6 +286,48 @@ export class OrderRepositoryImpl implements OrderRepository {
     return orders.map(this.mapPrismaToDomain);
   }
 
+  async findManyForAdmin(
+    filters: AdminListOrdersFilters
+  ): Promise<OrderEntity[]> {
+    const { status, query, dateFrom, dateTo, limit = 100, cursor } = filters;
+
+    const where: Prisma.OrderWhereInput = {};
+
+    if (status !== undefined) {
+      where.status = status as $Enums.OrderStatus;
+    }
+    if (dateFrom !== undefined || dateTo !== undefined) {
+      where.createdAt = {
+        ...(dateFrom !== undefined && { gte: dateFrom }),
+        ...(dateTo !== undefined && { lte: dateTo }),
+      };
+    }
+    if (query !== undefined && query.trim() !== "") {
+      const q = query.trim();
+      where.OR = [
+        { displayId: { contains: q, mode: "insensitive" } },
+        { id: q },
+      ];
+    }
+
+    const take = Math.min(Math.max(1, limit), 100);
+
+    const orders = await prisma.order.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+      take: take + 1,
+      ...(cursor
+        ? {
+            cursor: { id: cursor },
+            skip: 1,
+          }
+        : {}),
+    });
+
+    const items = orders.slice(0, take);
+    return items.map(this.mapPrismaToDomain);
+  }
+
   async countCompletedOrdersByProProfileId(
     proProfileId: string
   ): Promise<number> {
@@ -294,6 +370,13 @@ export class OrderRepositoryImpl implements OrderRepository {
     if (data.arrivedAt !== undefined) updateData.arrivedAt = data.arrivedAt;
     if (data.completedAt !== undefined)
       updateData.completedAt = data.completedAt;
+    if (data.quotedAmountCents !== undefined)
+      updateData.quotedAmountCents = data.quotedAmountCents;
+    if (data.quotedAt !== undefined) updateData.quotedAt = data.quotedAt;
+    if (data.quoteMessage !== undefined)
+      updateData.quoteMessage = data.quoteMessage;
+    if (data.quoteAcceptedAt !== undefined)
+      updateData.quoteAcceptedAt = data.quoteAcceptedAt;
     if (data.cancelReason !== undefined)
       updateData.cancelReason = data.cancelReason;
     if (data.disputeReason !== undefined)
@@ -316,6 +399,9 @@ export class OrderRepositoryImpl implements OrderRepository {
     if (data.taxRegion !== undefined) updateData.taxRegion = data.taxRegion;
     if (data.taxCalculatedAt !== undefined)
       updateData.taxCalculatedAt = data.taxCalculatedAt;
+    if (data.workProofPhotoUrlsJson !== undefined)
+      updateData.workProofPhotoUrlsJson =
+        data.workProofPhotoUrlsJson as Prisma.InputJsonValue;
 
     const order = await prisma.order.update({
       where: { id },
@@ -420,7 +506,11 @@ export class OrderRepositoryImpl implements OrderRepository {
       hourlyRateSnapshotAmount: p.hourlyRateSnapshotAmount,
       currency: p.currency,
       minHoursSnapshot: p.minHoursSnapshot,
-      estimatedHours: p.estimatedHours,
+      quotedAmountCents: p.quotedAmountCents ?? null,
+      quotedAt: p.quotedAt ?? null,
+      quoteMessage: p.quoteMessage ?? null,
+      quoteAcceptedAt: p.quoteAcceptedAt ?? null,
+      estimatedHours: p.estimatedHours ?? null,
       finalHoursSubmitted: p.finalHoursSubmitted,
       approvedHours: p.approvedHours,
       approvalMethod: p.approvalMethod ? String(p.approvalMethod) : null,
@@ -439,6 +529,10 @@ export class OrderRepositoryImpl implements OrderRepository {
       disputeReason: p.disputeReason,
       disputeOpenedBy: p.disputeOpenedBy,
       isFirstOrder: p.isFirstOrder,
+      ...(p.photoUrlsJson !== undefined && { photoUrlsJson: p.photoUrlsJson }),
+      ...(p.workProofPhotoUrlsJson !== undefined && {
+        workProofPhotoUrlsJson: p.workProofPhotoUrlsJson,
+      }),
       createdAt: p.createdAt,
       updatedAt: p.updatedAt,
     };

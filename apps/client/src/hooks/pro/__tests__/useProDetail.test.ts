@@ -28,11 +28,11 @@ describe("useProDetail", () => {
       const { result } = renderHook(() => useProDetail("pro-1"));
 
       expect(mockTrpcProGetById).toHaveBeenCalledWith(
-        { id: "pro-1" },
-        {
+        expect.objectContaining({ id: "pro-1" }),
+        expect.objectContaining({
           enabled: true,
           retry: false,
-        }
+        })
       );
 
       expect(result.current.pro).toEqual(mockPro);
@@ -82,11 +82,11 @@ describe("useProDetail", () => {
       renderHook(() => useProDetail(undefined));
 
       expect(mockTrpcProGetById).toHaveBeenCalledWith(
-        { id: undefined },
-        {
+        expect.objectContaining({ id: undefined }),
+        expect.objectContaining({
           enabled: false,
           retry: false,
-        }
+        })
       );
     });
 
@@ -100,11 +100,26 @@ describe("useProDetail", () => {
       renderHook(() => useProDetail(""));
 
       expect(mockTrpcProGetById).toHaveBeenCalledWith(
-        { id: "" },
-        {
+        expect.objectContaining({ id: "" }),
+        expect.objectContaining({
           enabled: false,
           retry: false,
-        }
+        })
+      );
+    });
+
+    it("should pass categoryId to query when provided", () => {
+      mockTrpcProGetById.mockReturnValue({
+        data: undefined,
+        isLoading: false,
+        error: null,
+      });
+
+      renderHook(() => useProDetail("pro-1", "cat-plumbing"));
+
+      expect(mockTrpcProGetById).toHaveBeenCalledWith(
+        expect.objectContaining({ id: "pro-1", categoryId: "cat-plumbing" }),
+        expect.any(Object)
       );
     });
   });

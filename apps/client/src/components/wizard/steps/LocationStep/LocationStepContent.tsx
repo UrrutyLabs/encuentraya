@@ -11,10 +11,12 @@ interface LocationStepContentProps {
   onAddressChange: (value: string) => void;
   onHoursChange: (value: string) => void;
   estimatedCost?: number;
+  /** When true, hide hours input and show message that pro will send quote */
+  isFixedPrice?: boolean;
 }
 
 /**
- * Presentational: Card with address + hours inputs + estimated cost display
+ * Presentational: Card with address + hours inputs (or fixed-price message) + estimated cost display
  */
 export function LocationStepContent({
   address,
@@ -22,6 +24,7 @@ export function LocationStepContent({
   onAddressChange,
   onHoursChange,
   estimatedCost,
+  isFixedPrice = false,
 }: LocationStepContentProps) {
   return (
     <Card className="p-4 md:p-6">
@@ -42,25 +45,34 @@ export function LocationStepContent({
           />
         </div>
 
-        {/* Hours */}
+        {/* Hours (hourly) or message (fixed-price) */}
         <div>
           <label className="flex items-center gap-2 text-sm font-medium text-text mb-2 md:mb-2">
             <Hourglass className="w-4 h-4 text-muted" />
-            Horas estimadas
+            {isFixedPrice ? "Presupuesto" : "Horas estimadas"}
           </label>
-          <Input
-            type="number"
-            min="0.5"
-            step="0.5"
-            value={hours}
-            onChange={(e) => onHoursChange(e.target.value)}
-            placeholder="Ej: 2.5"
-            required
-            className="text-base md:text-sm py-3 md:py-2"
-          />
-          <Text variant="small" className="text-muted mt-2">
-            Estimá cuántas horas necesitarás para completar el trabajo
-          </Text>
+          {isFixedPrice ? (
+            <Text variant="body" className="text-muted">
+              El profesional te enviará un presupuesto después de aceptar el
+              trabajo.
+            </Text>
+          ) : (
+            <>
+              <Input
+                type="number"
+                min="0.5"
+                step="0.5"
+                value={hours}
+                onChange={(e) => onHoursChange(e.target.value)}
+                placeholder="Ej: 2.5"
+                required
+                className="text-base md:text-sm py-3 md:py-2"
+              />
+              <Text variant="small" className="text-muted mt-2">
+                Estimá cuántas horas necesitarás para completar el trabajo
+              </Text>
+            </>
+          )}
         </div>
 
         {/* Estimated Cost */}

@@ -96,7 +96,7 @@ export const JobCard = memo(
     // Calculate display amount (all amounts are in minor units, convert to major for display)
     const displayAmountMinor = job.totalAmount
       ? job.totalAmount
-      : job.hourlyRateSnapshotAmount * job.estimatedHours;
+      : job.hourlyRateSnapshotAmount * (job.estimatedHours ?? 0);
     const displayAmount = toMajorUnits(displayAmountMinor);
 
     return (

@@ -18,6 +18,31 @@ Object.defineProperty(window, "matchMedia", {
   }),
 });
 
+// Mock IntersectionObserver (not available in jsdom)
+class MockIntersectionObserver implements IntersectionObserver {
+  readonly root: Element | Document | null = null;
+  readonly rootMargin: string = "";
+  readonly thresholds: ReadonlyArray<number> = [];
+
+  constructor(
+    public callback: IntersectionObserverCallback,
+    _options?: IntersectionObserverInit
+  ) {}
+
+  observe(_target: Element): void {}
+  unobserve(_target: Element): void {}
+  disconnect(): void {}
+  takeRecords(): IntersectionObserverEntry[] {
+    return [];
+  }
+}
+
+Object.defineProperty(window, "IntersectionObserver", {
+  writable: true,
+  configurable: true,
+  value: MockIntersectionObserver,
+});
+
 // Mock Next.js router
 vi.mock("next/navigation", () => ({
   useRouter: () => ({
@@ -71,11 +96,14 @@ const mockTrpcOrderListByClient = vi.fn();
 const mockTrpcOrderGetById = vi.fn();
 const mockTrpcOrderCreate = vi.fn();
 const mockTrpcOrderCancel = vi.fn();
+const mockTrpcOrderAcceptQuote = vi.fn();
+const mockTrpcOrderApproveHours = vi.fn();
 const mockTrpcReviewStatusByOrderIds = vi.fn();
 const mockTrpcReviewByOrder = vi.fn();
 const mockTrpcPaymentGetByOrder = vi.fn();
 const mockTrpcPaymentCreatePreauthForOrder = vi.fn();
 const mockTrpcContactSubmit = vi.fn();
+const mockTrpcUploadGetPresignedUploadUrl = vi.fn();
 const mockTrpcSubcategoryGetByCategory = vi.fn();
 const mockTrpcSubcategoryGetBySlug = vi.fn();
 const mockTrpcSubcategoryGetById = vi.fn();
@@ -221,10 +249,24 @@ vi.mock("@/lib/trpc/client", () => {
         cancel: {
           useMutation: (...args: unknown[]) => mockTrpcOrderCancel(...args),
         },
+        acceptQuote: {
+          useMutation: (...args: unknown[]) =>
+            mockTrpcOrderAcceptQuote(...args),
+        },
+        approveHours: {
+          useMutation: (...args: unknown[]) =>
+            mockTrpcOrderApproveHours(...args),
+        },
       },
       contact: {
         submit: {
           useMutation: (...args: unknown[]) => mockTrpcContactSubmit(...args),
+        },
+      },
+      upload: {
+        getPresignedUploadUrl: {
+          useMutation: (...args: unknown[]) =>
+            mockTrpcUploadGetPresignedUploadUrl(...args),
         },
       },
     },
@@ -254,11 +296,14 @@ export {
   mockTrpcOrderGetById,
   mockTrpcOrderCreate,
   mockTrpcOrderCancel,
+  mockTrpcOrderAcceptQuote,
+  mockTrpcOrderApproveHours,
   mockTrpcReviewStatusByOrderIds,
   mockTrpcReviewByOrder,
   mockTrpcPaymentGetByOrder,
   mockTrpcPaymentCreatePreauthForOrder,
   mockTrpcContactSubmit,
+  mockTrpcUploadGetPresignedUploadUrl,
   mockTrpcSubcategoryGetByCategory,
   mockTrpcSubcategoryGetBySlug,
   mockTrpcSubcategoryGetById,

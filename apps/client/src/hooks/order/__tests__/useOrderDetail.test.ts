@@ -354,4 +354,90 @@ describe("useOrderDetail", () => {
       expect(result.current.refetch).toBe(mockRefetch);
     });
   });
+
+  describe("fixed-price quote flow (Phase 5)", () => {
+    it("returns order with pricingMode, quotedAmountCents, quoteAcceptedAt for UI branching", () => {
+      const mockOrder = {
+        id: "order-1",
+        proProfileId: "pro-1",
+        status: OrderStatus.ACCEPTED,
+        pricingMode: "fixed" as const,
+        quotedAmountCents: 50000,
+        quoteAcceptedAt: null,
+      };
+
+      mockTrpcOrderGetById.mockReturnValue({
+        data: mockOrder,
+        isLoading: false,
+        error: null,
+        refetch: vi.fn(),
+      });
+
+      mockTrpcProGetById.mockReturnValue({
+        data: undefined,
+        isLoading: false,
+        error: null,
+      });
+
+      mockTrpcReviewByOrder.mockReturnValue({
+        data: undefined,
+        isLoading: false,
+        error: null,
+      });
+
+      mockTrpcPaymentGetByOrder.mockReturnValue({
+        data: undefined,
+        isLoading: false,
+        error: null,
+      });
+
+      const { result } = renderHook(() => useOrderDetail("order-1"));
+
+      expect(result.current.order).toEqual(mockOrder);
+      expect(result.current.order?.pricingMode).toBe("fixed");
+      expect(result.current.order?.quotedAmountCents).toBe(50000);
+      expect(result.current.order?.quoteAcceptedAt).toBeNull();
+    });
+
+    it("returns order with quoteAcceptedAt set after quote accepted", () => {
+      const acceptedAt = new Date("2025-01-15T12:00:00Z");
+      const mockOrder = {
+        id: "order-1",
+        proProfileId: "pro-1",
+        status: OrderStatus.ACCEPTED,
+        pricingMode: "fixed" as const,
+        quotedAmountCents: 50000,
+        quoteAcceptedAt: acceptedAt,
+      };
+
+      mockTrpcOrderGetById.mockReturnValue({
+        data: mockOrder,
+        isLoading: false,
+        error: null,
+        refetch: vi.fn(),
+      });
+
+      mockTrpcProGetById.mockReturnValue({
+        data: undefined,
+        isLoading: false,
+        error: null,
+      });
+
+      mockTrpcReviewByOrder.mockReturnValue({
+        data: undefined,
+        isLoading: false,
+        error: null,
+      });
+
+      mockTrpcPaymentGetByOrder.mockReturnValue({
+        data: undefined,
+        isLoading: false,
+        error: null,
+      });
+
+      const { result } = renderHook(() => useOrderDetail("order-1"));
+
+      expect(result.current.order?.quoteAcceptedAt).toEqual(acceptedAt);
+    });
+  });
 });

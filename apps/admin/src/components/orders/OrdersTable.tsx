@@ -77,7 +77,7 @@ export function OrdersTable({ orders, isLoading }: OrdersTableProps) {
   const getDisplayAmount = (order: Order) => {
     const amountMinor = order.totalAmount
       ? order.totalAmount
-      : order.hourlyRateSnapshotAmount * order.estimatedHours;
+      : order.hourlyRateSnapshotAmount * (order.estimatedHours ?? 0);
     return toMajorUnits(amountMinor);
   };
 

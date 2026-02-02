@@ -145,7 +145,7 @@ function SearchResultsContent() {
 
   const handleClearFilters = useCallback(() => {
     // Clear all filters and reset to base search page
-    router.push("/search");
+    router.push("/");
   }, [router]);
 
   // Generate suggestions based on active filters

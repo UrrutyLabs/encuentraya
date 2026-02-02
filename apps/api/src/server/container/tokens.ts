@@ -55,6 +55,8 @@ export const TOKENS = {
   OrderLifecycleService: "OrderLifecycleService",
   OrderAdminService: "OrderAdminService",
   ChatService: "ChatService",
+  UploadService: "UploadService",
+  IStorageService: "IStorageService",
 
   // Infrastructure
   Logger: "Logger",

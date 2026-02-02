@@ -106,6 +106,21 @@ export class ChatService {
   }
 
   /**
+   * List messages for an order (admin only). No participant check.
+   */
+  async listByOrderForAdmin(
+    orderId: string,
+    cursor: string | null,
+    limit: number
+  ): Promise<{ items: OrderMessageEntity[]; nextCursor: string | null }> {
+    return this.chatRepository.listByOrder({
+      orderId,
+      cursor: cursor ?? undefined,
+      limit: Math.min(limit || 100, 100),
+    });
+  }
+
+  /**
    * Send a text message. Only allowed when chat is open.
    * Notifies the other participant (PUSH for pro, EMAIL/WHATSAPP for client per policy).
    */
