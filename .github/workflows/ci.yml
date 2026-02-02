@@ -15,6 +15,7 @@ on:
       - "pnpm-lock.yaml"
   pull_request:
     branches:
+      - main
       - development
     paths:
       - "apps/api/**"
