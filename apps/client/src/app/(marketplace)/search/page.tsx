@@ -1,8 +1,9 @@
-import { SearchScreen } from "@/screens/search/SearchScreen";
+import { redirect } from "next/navigation";
 
-// Force dynamic rendering to prevent SSR issues with browser APIs
-export const dynamic = "force-dynamic";
-
+/**
+ * /search redirects to home (/) — home is the search experience.
+ * Results remain at /search/results.
+ */
 export default function SearchPage() {
-  return <SearchScreen />;
+  redirect("/");
 }

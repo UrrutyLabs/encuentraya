@@ -15,7 +15,7 @@ interface ProDownloadAppGuardProps {
  * Guard for pro download-app page
  * - Allows unauthenticated users (they just signed up, email not confirmed)
  * - Allows authenticated PRO users
- * - Redirects authenticated CLIENT users to /search
+ * - Redirects authenticated CLIENT users to /
  */
 export function ProDownloadAppGuard({ children }: ProDownloadAppGuardProps) {
   const router = useRouter();
@@ -30,7 +30,7 @@ export function ProDownloadAppGuard({ children }: ProDownloadAppGuardProps) {
 
     // If user is authenticated and has CLIENT role, redirect them
     if (user && role === Role.CLIENT) {
-      router.replace("/search");
+      router.replace("/");
       return;
     }
 

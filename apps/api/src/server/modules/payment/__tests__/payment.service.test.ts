@@ -210,6 +210,10 @@ describe("PaymentService", () => {
       hourlyRateSnapshotAmount: 100,
       currency: "UYU",
       minHoursSnapshot: null,
+      quotedAmountCents: null,
+      quotedAt: null,
+      quoteMessage: null,
+      quoteAcceptedAt: null,
       estimatedHours: 2,
       finalHoursSubmitted: null,
       approvedHours: null,
@@ -451,6 +455,91 @@ describe("PaymentService", () => {
         payment.id,
         { status: PaymentStatus.FAILED }
       );
+    });
+
+    it("should use quotedAmountCents for fixed-price order when quote accepted", async () => {
+      const actor = createMockActor(Role.CLIENT, "client-1");
+      const order = createMockOrder({
+        id: "order-1",
+        clientUserId: "client-1",
+        status: OrderStatus.ACCEPTED,
+        pricingMode: "fixed",
+        quotedAmountCents: 55000,
+        quoteAcceptedAt: new Date(),
+        estimatedHours: null,
+        hourlyRateSnapshotAmount: 0,
+      });
+      const payment = createMockPayment({
+        id: "payment-1",
+        orderId: "order-1",
+        status: PaymentStatus.REQUIRES_ACTION,
+        checkoutUrl: "https://checkout.example.com",
+      });
+
+      mockOrderRepository.findById.mockResolvedValue(order);
+      mockPaymentRepository.findByOrderId.mockResolvedValue(null);
+      mockPaymentRepository.create.mockResolvedValue(payment);
+      vi.mocked(mockClientProfileService.getProfile).mockResolvedValue({
+        id: "profile-1",
+        userId: "client-1",
+        firstName: null,
+        lastName: null,
+        email: null,
+        phone: null,
+        preferredContactMethod: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+      vi.mocked(mockProviderClient.createPreauth).mockResolvedValue({
+        providerReference: "mp-ref-123",
+        checkoutUrl: "https://checkout.example.com",
+        status: PaymentStatus.REQUIRES_ACTION,
+      });
+      mockPaymentRepository.updateStatusAndAmounts.mockResolvedValue({
+        ...payment,
+        status: PaymentStatus.REQUIRES_ACTION,
+        providerReference: "mp-ref-123",
+        checkoutUrl: "https://checkout.example.com",
+      });
+
+      const result = await service.createPreauthForOrder(actor, {
+        orderId: "order-1",
+      });
+
+      expect(result.paymentId).toBe("payment-1");
+      expect(mockPaymentRepository.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          amountEstimated: 55000,
+        })
+      );
+      const createPreauthCall = vi.mocked(mockProviderClient.createPreauth).mock
+        .calls[0]?.[0];
+      expect(createPreauthCall).toBeDefined();
+      expect(
+        createPreauthCall?.amount?.amount ?? createPreauthCall?.amount
+      ).toBe(55000);
+    });
+
+    it("should throw for fixed-price order when quote not accepted", async () => {
+      const actor = createMockActor(Role.CLIENT, "client-1");
+      const order = createMockOrder({
+        id: "order-1",
+        clientUserId: "client-1",
+        status: OrderStatus.ACCEPTED,
+        pricingMode: "fixed",
+        quotedAmountCents: 55000,
+        quoteAcceptedAt: null,
+      });
+
+      mockOrderRepository.findById.mockResolvedValue(order);
+      mockPaymentRepository.findByOrderId.mockResolvedValue(null);
+
+      await expect(
+        service.createPreauthForOrder(actor, { orderId: "order-1" })
+      ).rejects.toThrow(
+        "Quote must be submitted and accepted before authorizing payment for fixed-price orders"
+      );
+      expect(mockPaymentRepository.create).not.toHaveBeenCalled();
     });
   });
 

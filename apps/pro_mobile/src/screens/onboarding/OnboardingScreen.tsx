@@ -9,6 +9,7 @@ import { CategorySelector } from "@components/presentational/CategorySelector";
 import { theme } from "../../theme";
 import { useOnboarding, useAuth } from "@hooks/auth";
 import { Category, toMinorUnits } from "@repo/domain";
+import { CategoryRatesEditor } from "@components/presentational/CategoryRatesEditor";
 import { supabase } from "@lib/supabase/client";
 import { trpc } from "@lib/trpc/client";
 
@@ -20,11 +21,16 @@ export function OnboardingScreen() {
   const { data: categories = [], isLoading: isLoadingCategories } =
     trpc.category.getAll.useQuery();
 
+  const RATE_MAX_MAJOR = 999999;
+
   // Form state
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
-  const [hourlyRate, setHourlyRate] = useState("");
   const [selectedCategories, setSelectedCategories] = useState<Category[]>([]);
+  /** Display value per categoryId (major units as string) */
+  const [categoryRates, setCategoryRates] = useState<Record<string, string>>(
+    {}
+  );
   const [serviceArea, setServiceArea] = useState("");
 
   // Validation errors
@@ -41,15 +47,23 @@ export function OnboardingScreen() {
       newErrors.phone = "El teléfono es requerido";
     }
 
-    const hourlyRateNum = parseFloat(hourlyRate);
-    if (!hourlyRate.trim()) {
-      newErrors.hourlyRate = "La tarifa por hora es requerida";
-    } else if (isNaN(hourlyRateNum) || hourlyRateNum <= 0) {
-      newErrors.hourlyRate = "La tarifa debe ser un número mayor a 0";
-    }
-
     if (selectedCategories.length === 0) {
       newErrors.categories = "Seleccioná al menos una categoría";
+    }
+
+    for (const cat of selectedCategories) {
+      const raw = categoryRates[cat.id] ?? "";
+      const num = parseFloat(raw);
+      if (!raw.trim()) {
+        newErrors[cat.id] =
+          cat.pricingMode === "fixed"
+            ? "El precio desde es requerido"
+            : "La tarifa por hora es requerida";
+      } else if (isNaN(num) || num <= 0) {
+        newErrors[cat.id] = "Debe ser un número mayor a 0";
+      } else if (num > RATE_MAX_MAJOR) {
+        newErrors[cat.id] = `Máximo ${RATE_MAX_MAJOR}`;
+      }
     }
 
     setErrors(newErrors);
@@ -80,13 +94,32 @@ export function OnboardingScreen() {
       return;
     }
 
+    const categoryRatesPayload = selectedCategories.map((cat) => {
+      const raw = categoryRates[cat.id] ?? "";
+      const major = parseFloat(raw);
+      const minor = toMinorUnits(major);
+      if (cat.pricingMode === "fixed") {
+        return { categoryId: cat.id, startingFromCents: minor };
+      }
+      return { categoryId: cat.id, hourlyRateCents: minor };
+    });
+
+    const firstHourlyCategory = selectedCategories.find(
+      (c) => c.pricingMode !== "fixed"
+    );
+    const hourlyRateForApi =
+      firstHourlyCategory &&
+      (categoryRates[firstHourlyCategory.id] ?? "").trim()
+        ? toMinorUnits(parseFloat(categoryRates[firstHourlyCategory.id]))
+        : 1;
+
     try {
       await submitOnboarding({
         name: name.trim(),
         email: currentSession.user.email,
         phone: phone.trim() || undefined,
-        hourlyRate: toMinorUnits(parseFloat(hourlyRate)), // Convert to minor units for storage
-        categoryIds: selectedCategories.map((cat) => cat.id),
+        hourlyRate: hourlyRateForApi,
+        categoryRates: categoryRatesPayload,
         serviceArea: serviceArea.trim() || undefined,
       });
     } catch {
@@ -164,39 +197,20 @@ export function OnboardingScreen() {
           </View>
         )}
 
-        <Input
-          label="Tarifa por hora (UYU) *"
-          icon="dollar-sign"
-          value={hourlyRate}
-          onChangeText={(text) => {
-            setHourlyRate(text);
-            if (errors.hourlyRate) {
-              setErrors({ ...errors, hourlyRate: "" });
-            }
-          }}
-          placeholder="Ej: 1000"
-          keyboardType="numeric"
-          style={styles.input}
-        />
-        {errors.hourlyRate && (
-          <View style={styles.errorContainer}>
-            <Feather
-              name="alert-circle"
-              size={14}
-              color={theme.colors.danger}
-            />
-            <Text variant="small" style={styles.error}>
-              {errors.hourlyRate}
-            </Text>
-          </View>
-        )}
-
         <CategorySelector
           categories={categories}
           selected={selectedCategories}
           isLoading={isLoadingCategories}
           onSelectionChange={(categories) => {
             setSelectedCategories(categories);
+            setCategoryRates((prev) => {
+              const next = { ...prev };
+              const ids = new Set(categories.map((c) => c.id));
+              for (const id of Object.keys(next)) {
+                if (!ids.has(id)) delete next[id];
+              }
+              return next;
+            });
             if (errors.categories) {
               setErrors({ ...errors, categories: "" });
             }
@@ -214,6 +228,18 @@ export function OnboardingScreen() {
             </Text>
           </View>
         )}
+
+        <CategoryRatesEditor
+          selectedCategories={selectedCategories}
+          rates={categoryRates}
+          onRatesChange={(categoryId, value) => {
+            setCategoryRates((prev) => ({ ...prev, [categoryId]: value }));
+            if (errors[categoryId]) {
+              setErrors((e) => ({ ...e, [categoryId]: "" }));
+            }
+          }}
+          errors={errors}
+        />
 
         <Input
           label="Zona de servicio (opcional)"

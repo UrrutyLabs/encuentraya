@@ -20,14 +20,28 @@ export type ProProfileCategoryModel = runtime.Types.Result.DefaultSelection<Pris
 
 export type AggregateProProfileCategory = {
   _count: ProProfileCategoryCountAggregateOutputType | null
+  _avg: ProProfileCategoryAvgAggregateOutputType | null
+  _sum: ProProfileCategorySumAggregateOutputType | null
   _min: ProProfileCategoryMinAggregateOutputType | null
   _max: ProProfileCategoryMaxAggregateOutputType | null
+}
+
+export type ProProfileCategoryAvgAggregateOutputType = {
+  hourlyRateCents: number | null
+  startingFromCents: number | null
+}
+
+export type ProProfileCategorySumAggregateOutputType = {
+  hourlyRateCents: number | null
+  startingFromCents: number | null
 }
 
 export type ProProfileCategoryMinAggregateOutputType = {
   id: string | null
   proProfileId: string | null
   categoryId: string | null
+  hourlyRateCents: number | null
+  startingFromCents: number | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -36,6 +50,8 @@ export type ProProfileCategoryMaxAggregateOutputType = {
   id: string | null
   proProfileId: string | null
   categoryId: string | null
+  hourlyRateCents: number | null
+  startingFromCents: number | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -44,16 +60,30 @@ export type ProProfileCategoryCountAggregateOutputType = {
   id: number
   proProfileId: number
   categoryId: number
+  hourlyRateCents: number
+  startingFromCents: number
   createdAt: number
   updatedAt: number
   _all: number
 }
 
 
+export type ProProfileCategoryAvgAggregateInputType = {
+  hourlyRateCents?: true
+  startingFromCents?: true
+}
+
+export type ProProfileCategorySumAggregateInputType = {
+  hourlyRateCents?: true
+  startingFromCents?: true
+}
+
 export type ProProfileCategoryMinAggregateInputType = {
   id?: true
   proProfileId?: true
   categoryId?: true
+  hourlyRateCents?: true
+  startingFromCents?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -62,6 +92,8 @@ export type ProProfileCategoryMaxAggregateInputType = {
   id?: true
   proProfileId?: true
   categoryId?: true
+  hourlyRateCents?: true
+  startingFromCents?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -70,6 +102,8 @@ export type ProProfileCategoryCountAggregateInputType = {
   id?: true
   proProfileId?: true
   categoryId?: true
+  hourlyRateCents?: true
+  startingFromCents?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -113,6 +147,18 @@ export type ProProfileCategoryAggregateArgs<ExtArgs extends runtime.Types.Extens
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: ProProfileCategoryAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: ProProfileCategorySumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: ProProfileCategoryMinAggregateInputType
@@ -143,6 +189,8 @@ export type ProProfileCategoryGroupByArgs<ExtArgs extends runtime.Types.Extensio
   take?: number
   skip?: number
   _count?: ProProfileCategoryCountAggregateInputType | true
+  _avg?: ProProfileCategoryAvgAggregateInputType
+  _sum?: ProProfileCategorySumAggregateInputType
   _min?: ProProfileCategoryMinAggregateInputType
   _max?: ProProfileCategoryMaxAggregateInputType
 }
@@ -151,9 +199,13 @@ export type ProProfileCategoryGroupByOutputType = {
   id: string
   proProfileId: string
   categoryId: string
+  hourlyRateCents: number | null
+  startingFromCents: number | null
   createdAt: Date
   updatedAt: Date
   _count: ProProfileCategoryCountAggregateOutputType | null
+  _avg: ProProfileCategoryAvgAggregateOutputType | null
+  _sum: ProProfileCategorySumAggregateOutputType | null
   _min: ProProfileCategoryMinAggregateOutputType | null
   _max: ProProfileCategoryMaxAggregateOutputType | null
 }
@@ -180,6 +232,8 @@ export type ProProfileCategoryWhereInput = {
   id?: Prisma.StringFilter<"ProProfileCategory"> | string
   proProfileId?: Prisma.StringFilter<"ProProfileCategory"> | string
   categoryId?: Prisma.StringFilter<"ProProfileCategory"> | string
+  hourlyRateCents?: Prisma.IntNullableFilter<"ProProfileCategory"> | number | null
+  startingFromCents?: Prisma.IntNullableFilter<"ProProfileCategory"> | number | null
   createdAt?: Prisma.DateTimeFilter<"ProProfileCategory"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ProProfileCategory"> | Date | string
   proProfile?: Prisma.XOR<Prisma.ProProfileScalarRelationFilter, Prisma.ProProfileWhereInput>
@@ -190,6 +244,8 @@ export type ProProfileCategoryOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   proProfileId?: Prisma.SortOrder
   categoryId?: Prisma.SortOrder
+  hourlyRateCents?: Prisma.SortOrderInput | Prisma.SortOrder
+  startingFromCents?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   proProfile?: Prisma.ProProfileOrderByWithRelationInput
@@ -204,6 +260,8 @@ export type ProProfileCategoryWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.ProProfileCategoryWhereInput | Prisma.ProProfileCategoryWhereInput[]
   proProfileId?: Prisma.StringFilter<"ProProfileCategory"> | string
   categoryId?: Prisma.StringFilter<"ProProfileCategory"> | string
+  hourlyRateCents?: Prisma.IntNullableFilter<"ProProfileCategory"> | number | null
+  startingFromCents?: Prisma.IntNullableFilter<"ProProfileCategory"> | number | null
   createdAt?: Prisma.DateTimeFilter<"ProProfileCategory"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ProProfileCategory"> | Date | string
   proProfile?: Prisma.XOR<Prisma.ProProfileScalarRelationFilter, Prisma.ProProfileWhereInput>
@@ -214,11 +272,15 @@ export type ProProfileCategoryOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   proProfileId?: Prisma.SortOrder
   categoryId?: Prisma.SortOrder
+  hourlyRateCents?: Prisma.SortOrderInput | Prisma.SortOrder
+  startingFromCents?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.ProProfileCategoryCountOrderByAggregateInput
+  _avg?: Prisma.ProProfileCategoryAvgOrderByAggregateInput
   _max?: Prisma.ProProfileCategoryMaxOrderByAggregateInput
   _min?: Prisma.ProProfileCategoryMinOrderByAggregateInput
+  _sum?: Prisma.ProProfileCategorySumOrderByAggregateInput
 }
 
 export type ProProfileCategoryScalarWhereWithAggregatesInput = {
@@ -228,12 +290,16 @@ export type ProProfileCategoryScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"ProProfileCategory"> | string
   proProfileId?: Prisma.StringWithAggregatesFilter<"ProProfileCategory"> | string
   categoryId?: Prisma.StringWithAggregatesFilter<"ProProfileCategory"> | string
+  hourlyRateCents?: Prisma.IntNullableWithAggregatesFilter<"ProProfileCategory"> | number | null
+  startingFromCents?: Prisma.IntNullableWithAggregatesFilter<"ProProfileCategory"> | number | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"ProProfileCategory"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"ProProfileCategory"> | Date | string
 }
 
 export type ProProfileCategoryCreateInput = {
   id?: string
+  hourlyRateCents?: number | null
+  startingFromCents?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   proProfile: Prisma.ProProfileCreateNestedOneWithoutCategoryRelationsInput
@@ -244,12 +310,16 @@ export type ProProfileCategoryUncheckedCreateInput = {
   id?: string
   proProfileId: string
   categoryId: string
+  hourlyRateCents?: number | null
+  startingFromCents?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
 
 export type ProProfileCategoryUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  hourlyRateCents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  startingFromCents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   proProfile?: Prisma.ProProfileUpdateOneRequiredWithoutCategoryRelationsNestedInput
@@ -260,6 +330,8 @@ export type ProProfileCategoryUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   proProfileId?: Prisma.StringFieldUpdateOperationsInput | string
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
+  hourlyRateCents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  startingFromCents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -268,12 +340,16 @@ export type ProProfileCategoryCreateManyInput = {
   id?: string
   proProfileId: string
   categoryId: string
+  hourlyRateCents?: number | null
+  startingFromCents?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
 
 export type ProProfileCategoryUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  hourlyRateCents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  startingFromCents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -282,6 +358,8 @@ export type ProProfileCategoryUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   proProfileId?: Prisma.StringFieldUpdateOperationsInput | string
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
+  hourlyRateCents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  startingFromCents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -305,14 +383,23 @@ export type ProProfileCategoryCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   proProfileId?: Prisma.SortOrder
   categoryId?: Prisma.SortOrder
+  hourlyRateCents?: Prisma.SortOrder
+  startingFromCents?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type ProProfileCategoryAvgOrderByAggregateInput = {
+  hourlyRateCents?: Prisma.SortOrder
+  startingFromCents?: Prisma.SortOrder
 }
 
 export type ProProfileCategoryMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   proProfileId?: Prisma.SortOrder
   categoryId?: Prisma.SortOrder
+  hourlyRateCents?: Prisma.SortOrder
+  startingFromCents?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -321,8 +408,15 @@ export type ProProfileCategoryMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   proProfileId?: Prisma.SortOrder
   categoryId?: Prisma.SortOrder
+  hourlyRateCents?: Prisma.SortOrder
+  startingFromCents?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type ProProfileCategorySumOrderByAggregateInput = {
+  hourlyRateCents?: Prisma.SortOrder
+  startingFromCents?: Prisma.SortOrder
 }
 
 export type ProProfileCategoryCreateNestedManyWithoutProProfileInput = {
@@ -411,6 +505,8 @@ export type ProProfileCategoryUncheckedUpdateManyWithoutCategoryNestedInput = {
 
 export type ProProfileCategoryCreateWithoutProProfileInput = {
   id?: string
+  hourlyRateCents?: number | null
+  startingFromCents?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   category: Prisma.CategoryCreateNestedOneWithoutProProfilesInput
@@ -419,6 +515,8 @@ export type ProProfileCategoryCreateWithoutProProfileInput = {
 export type ProProfileCategoryUncheckedCreateWithoutProProfileInput = {
   id?: string
   categoryId: string
+  hourlyRateCents?: number | null
+  startingFromCents?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -456,12 +554,16 @@ export type ProProfileCategoryScalarWhereInput = {
   id?: Prisma.StringFilter<"ProProfileCategory"> | string
   proProfileId?: Prisma.StringFilter<"ProProfileCategory"> | string
   categoryId?: Prisma.StringFilter<"ProProfileCategory"> | string
+  hourlyRateCents?: Prisma.IntNullableFilter<"ProProfileCategory"> | number | null
+  startingFromCents?: Prisma.IntNullableFilter<"ProProfileCategory"> | number | null
   createdAt?: Prisma.DateTimeFilter<"ProProfileCategory"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ProProfileCategory"> | Date | string
 }
 
 export type ProProfileCategoryCreateWithoutCategoryInput = {
   id?: string
+  hourlyRateCents?: number | null
+  startingFromCents?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
   proProfile: Prisma.ProProfileCreateNestedOneWithoutCategoryRelationsInput
@@ -470,6 +572,8 @@ export type ProProfileCategoryCreateWithoutCategoryInput = {
 export type ProProfileCategoryUncheckedCreateWithoutCategoryInput = {
   id?: string
   proProfileId: string
+  hourlyRateCents?: number | null
+  startingFromCents?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -503,12 +607,16 @@ export type ProProfileCategoryUpdateManyWithWhereWithoutCategoryInput = {
 export type ProProfileCategoryCreateManyProProfileInput = {
   id?: string
   categoryId: string
+  hourlyRateCents?: number | null
+  startingFromCents?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
 
 export type ProProfileCategoryUpdateWithoutProProfileInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  hourlyRateCents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  startingFromCents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   category?: Prisma.CategoryUpdateOneRequiredWithoutProProfilesNestedInput
@@ -517,6 +625,8 @@ export type ProProfileCategoryUpdateWithoutProProfileInput = {
 export type ProProfileCategoryUncheckedUpdateWithoutProProfileInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
+  hourlyRateCents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  startingFromCents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -524,6 +634,8 @@ export type ProProfileCategoryUncheckedUpdateWithoutProProfileInput = {
 export type ProProfileCategoryUncheckedUpdateManyWithoutProProfileInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   categoryId?: Prisma.StringFieldUpdateOperationsInput | string
+  hourlyRateCents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  startingFromCents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -531,12 +643,16 @@ export type ProProfileCategoryUncheckedUpdateManyWithoutProProfileInput = {
 export type ProProfileCategoryCreateManyCategoryInput = {
   id?: string
   proProfileId: string
+  hourlyRateCents?: number | null
+  startingFromCents?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
 
 export type ProProfileCategoryUpdateWithoutCategoryInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  hourlyRateCents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  startingFromCents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   proProfile?: Prisma.ProProfileUpdateOneRequiredWithoutCategoryRelationsNestedInput
@@ -545,6 +661,8 @@ export type ProProfileCategoryUpdateWithoutCategoryInput = {
 export type ProProfileCategoryUncheckedUpdateWithoutCategoryInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   proProfileId?: Prisma.StringFieldUpdateOperationsInput | string
+  hourlyRateCents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  startingFromCents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -552,6 +670,8 @@ export type ProProfileCategoryUncheckedUpdateWithoutCategoryInput = {
 export type ProProfileCategoryUncheckedUpdateManyWithoutCategoryInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   proProfileId?: Prisma.StringFieldUpdateOperationsInput | string
+  hourlyRateCents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  startingFromCents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -562,6 +682,8 @@ export type ProProfileCategorySelect<ExtArgs extends runtime.Types.Extensions.In
   id?: boolean
   proProfileId?: boolean
   categoryId?: boolean
+  hourlyRateCents?: boolean
+  startingFromCents?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   proProfile?: boolean | Prisma.ProProfileDefaultArgs<ExtArgs>
@@ -572,6 +694,8 @@ export type ProProfileCategorySelectCreateManyAndReturn<ExtArgs extends runtime.
   id?: boolean
   proProfileId?: boolean
   categoryId?: boolean
+  hourlyRateCents?: boolean
+  startingFromCents?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   proProfile?: boolean | Prisma.ProProfileDefaultArgs<ExtArgs>
@@ -582,6 +706,8 @@ export type ProProfileCategorySelectUpdateManyAndReturn<ExtArgs extends runtime.
   id?: boolean
   proProfileId?: boolean
   categoryId?: boolean
+  hourlyRateCents?: boolean
+  startingFromCents?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   proProfile?: boolean | Prisma.ProProfileDefaultArgs<ExtArgs>
@@ -592,11 +718,13 @@ export type ProProfileCategorySelectScalar = {
   id?: boolean
   proProfileId?: boolean
   categoryId?: boolean
+  hourlyRateCents?: boolean
+  startingFromCents?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type ProProfileCategoryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "proProfileId" | "categoryId" | "createdAt" | "updatedAt", ExtArgs["result"]["proProfileCategory"]>
+export type ProProfileCategoryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "proProfileId" | "categoryId" | "hourlyRateCents" | "startingFromCents" | "createdAt" | "updatedAt", ExtArgs["result"]["proProfileCategory"]>
 export type ProProfileCategoryInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   proProfile?: boolean | Prisma.ProProfileDefaultArgs<ExtArgs>
   category?: boolean | Prisma.CategoryDefaultArgs<ExtArgs>
@@ -620,6 +748,8 @@ export type $ProProfileCategoryPayload<ExtArgs extends runtime.Types.Extensions.
     id: string
     proProfileId: string
     categoryId: string
+    hourlyRateCents: number | null
+    startingFromCents: number | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["proProfileCategory"]>
@@ -1050,6 +1180,8 @@ export interface ProProfileCategoryFieldRefs {
   readonly id: Prisma.FieldRef<"ProProfileCategory", 'String'>
   readonly proProfileId: Prisma.FieldRef<"ProProfileCategory", 'String'>
   readonly categoryId: Prisma.FieldRef<"ProProfileCategory", 'String'>
+  readonly hourlyRateCents: Prisma.FieldRef<"ProProfileCategory", 'Int'>
+  readonly startingFromCents: Prisma.FieldRef<"ProProfileCategory", 'Int'>
   readonly createdAt: Prisma.FieldRef<"ProProfileCategory", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"ProProfileCategory", 'DateTime'>
 }

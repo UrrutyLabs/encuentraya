@@ -19,7 +19,8 @@ export interface UseReviewStepDataReturn {
   formattedDate: string;
   formattedTime: string;
   formattedQuestionAnswers: FormattedQuestionAnswer[];
-  estimatedCost: number; // Fallback simple calculation
+  /** Fallback simple calculation; undefined for fixed-price (pro will send quote) */
+  estimatedCost: number | undefined;
   costEstimation: OrderEstimateOutput | null | undefined;
   isEstimatingCost: boolean;
   costEstimationError: unknown;
@@ -56,15 +57,17 @@ export function useReviewStepData(): UseReviewStepDataReturn {
     questionAnswers
   );
 
-  // Fallback simple calculation (for error states)
-  // Note: pro.hourlyRate is returned in major units from the API (for compatibility)
+  const isFixedPrice = category?.pricingMode === "fixed";
+  // Fallback simple calculation (for error states). Fixed-price: no estimate until quote.
   const estimatedCost = useMemo(() => {
+    if (isFixedPrice) return undefined;
     if (!pro || !state.hours) return 0;
     return parseFloat(state.hours) * pro.hourlyRate;
-  }, [pro, state.hours]);
+  }, [pro, state.hours, isFixedPrice]);
 
-  // Cost estimation from API
+  // Cost estimation from API (not used for fixed-price; pro will send quote)
   const estimationInput = useMemo(() => {
+    if (isFixedPrice) return null;
     if (!pro?.id || !state.hours || parseFloat(state.hours) <= 0) {
       return null;
     }
@@ -73,7 +76,7 @@ export function useReviewStepData(): UseReviewStepDataReturn {
       estimatedHours: parseFloat(state.hours),
       categoryId: category?.id,
     };
-  }, [pro, state.hours, category]);
+  }, [pro, state.hours, category, isFixedPrice]);
 
   const {
     data: costEstimation,

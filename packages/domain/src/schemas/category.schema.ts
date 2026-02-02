@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { pricingModeSchema, paymentStrategySchema } from "../enums";
 
 /**
  * Category schema - data-driven category from database
@@ -11,6 +12,8 @@ export const categorySchema = z.object({
   iconName: z.string().nullable(),
   description: z.string().nullable(),
   sortOrder: z.number().default(0),
+  pricingMode: pricingModeSchema.optional(), // Optional until API/DB return them
+  paymentStrategy: paymentStrategySchema.optional(),
   isActive: z.boolean().default(true),
   deletedAt: z.date().nullable(),
   configJson: z.record(z.unknown()).nullable(), // JSONB config
@@ -35,6 +38,8 @@ export const categoryCreateInputSchema = z.object({
   iconName: z.string().nullable().optional(),
   description: z.string().nullable().optional(),
   sortOrder: z.number().default(0),
+  pricingMode: pricingModeSchema.optional(),
+  paymentStrategy: paymentStrategySchema.optional(),
   isActive: z.boolean().default(true),
   configJson: z.record(z.unknown()).nullable().optional(),
 });
@@ -50,6 +55,8 @@ export const categoryUpdateInputSchema = z.object({
   iconName: z.string().nullable().optional(),
   description: z.string().nullable().optional(),
   sortOrder: z.number().optional(),
+  pricingMode: pricingModeSchema.optional(),
+  paymentStrategy: paymentStrategySchema.optional(),
   isActive: z.boolean().optional(),
   configJson: z.record(z.unknown()).nullable().optional(),
 });

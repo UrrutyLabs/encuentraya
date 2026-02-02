@@ -15,6 +15,7 @@ import { JobDetailPendingPro } from "./JobDetailPendingPro";
 import { JobDetailPaymentBanner } from "./JobDetailPaymentBanner";
 import { JobDetailProCard } from "./JobDetailProCard";
 import { JobDetailServiceDetails } from "./JobDetailServiceDetails";
+import { JobDetailPhotos } from "./JobDetailPhotos";
 import { JobDetailCostSummary } from "./JobDetailCostSummary";
 import { JobDetailActions } from "./JobDetailActions";
 import { JobDetailCompletedSection } from "./JobDetailCompletedSection";
@@ -116,6 +117,7 @@ export function JobDetailScreen() {
           )}
 
           <JobDetailServiceDetails job={job} categoryLabel={categoryLabel} />
+          <JobDetailPhotos job={job} />
           <JobDetailCostSummary job={job} />
 
           {canCancel && (

@@ -171,6 +171,10 @@ export class OrderService {
       hourlyRateSnapshotAmount: entity.hourlyRateSnapshotAmount,
       currency: entity.currency,
       minHoursSnapshot: entity.minHoursSnapshot,
+      quotedAmountCents: entity.quotedAmountCents,
+      quotedAt: entity.quotedAt,
+      quoteMessage: entity.quoteMessage,
+      quoteAcceptedAt: entity.quoteAcceptedAt,
       estimatedHours: entity.estimatedHours,
       finalHoursSubmitted: entity.finalHoursSubmitted,
       approvedHours: entity.approvedHours,
@@ -192,6 +196,12 @@ export class OrderService {
       disputeReason: entity.disputeReason,
       disputeOpenedBy: entity.disputeOpenedBy,
       isFirstOrder: entity.isFirstOrder,
+      photoUrls: Array.isArray(entity.photoUrlsJson)
+        ? (entity.photoUrlsJson as string[])
+        : undefined,
+      workProofPhotoUrls: Array.isArray(entity.workProofPhotoUrlsJson)
+        ? (entity.workProofPhotoUrlsJson as string[])
+        : undefined,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
     };

@@ -13,6 +13,7 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
+    "@repo/upload": "workspace:*",
     "zod": "^3.23.8"
   },
   "devDependencies": {
@@ -23,4 +24,3 @@
     "typescript": "5.9.2"
   }
 }
-

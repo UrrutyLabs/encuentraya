@@ -21,6 +21,8 @@ interface SearchBarProps {
   initialQuery?: string;
   /** If true, preserve existing query params when navigating */
   preserveParams?: boolean;
+  /** Visual size of the input */
+  size?: "default" | "large";
   /** Additional CSS classes */
   className?: string;
 }
@@ -28,6 +30,7 @@ interface SearchBarProps {
 export function SearchBar({
   initialQuery = "",
   preserveParams = false,
+  size = "default",
   className = "",
 }: SearchBarProps) {
   const router = useRouter();
@@ -69,6 +72,11 @@ export function SearchBar({
     [searchQuery, preserveParams, searchParams, router]
   );
 
+  const isLarge = size === "large";
+  const inputPadding = isLarge ? "!pl-11 !pr-5 !py-3.5" : "!pl-10 !pr-4 !py-2";
+  const inputText = isLarge ? "!text-base" : "!text-sm";
+  const iconSize = isLarge ? "w-5 h-5 left-3.5" : "w-4 h-4 left-3";
+
   return (
     <form
       onSubmit={handleSubmit}
@@ -77,7 +85,7 @@ export function SearchBar({
     >
       <div className="relative">
         <Search
-          className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted pointer-events-none z-10"
+          className={`absolute top-1/2 -translate-y-1/2 text-muted pointer-events-none z-10 ${iconSize}`}
           aria-hidden="true"
         />
         <Input
@@ -92,7 +100,7 @@ export function SearchBar({
             }
           }}
           placeholder="Describí lo que estás precisando"
-          className="!pl-10 !pr-4 py-2 text-sm border-2 border-border focus:border-border focus:outline-none !focus:ring-0 rounded-lg bg-surface shadow-sm focus:shadow-md transition-shadow"
+          className={`${inputPadding} ${inputText} border-2 border-border focus:border-border focus:outline-none !focus:ring-0 rounded-lg bg-surface shadow-sm focus:shadow-md transition-shadow`}
           aria-label="Buscar profesionales"
           autoComplete="off"
         />

@@ -47,7 +47,7 @@ export function LandingHero() {
             </Text>
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
               <Link
-                href="/search"
+                href="/"
                 className="animate-[fadeInUp_0.6s_ease-out_0.45s_both]"
               >
                 <Button

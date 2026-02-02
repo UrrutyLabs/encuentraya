@@ -1,126 +1,73 @@
 import { useState, useEffect } from "react";
-import { StyleSheet, ScrollView, Alert, View, TextInput } from "react-native";
+import {
+  StyleSheet,
+  ScrollView,
+  Alert,
+  View,
+  TextInput,
+  TouchableOpacity,
+} from "react-native";
 import { useRouter } from "expo-router";
 import { Feather } from "@expo/vector-icons";
 import { Card } from "@components/ui/Card";
 import { Button } from "@components/ui/Button";
 import { Text } from "@components/ui/Text";
 import { Input } from "@components/ui/Input";
-import { CategorySelector } from "@components/presentational/CategorySelector";
-import { trpc } from "@lib/trpc/client";
-import { useQueryClient } from "@hooks/shared";
-import { invalidateRelatedQueries } from "@lib/react-query/utils";
-import { Category, toMinorUnits } from "@repo/domain";
+import { useMyProProfile, useUpdateProfile } from "@hooks/pro";
 import { theme } from "../../theme";
 
 export function EditProfileScreen() {
   const router = useRouter();
-  const queryClient = useQueryClient();
+  const { data: pro, isLoading, refetch } = useMyProProfile();
+  const updateMutation = useUpdateProfile();
 
-  // Form state
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
-  const [hourlyRate, setHourlyRate] = useState("");
-  const [selectedCategories, setSelectedCategories] = useState<Category[]>([]);
   const [serviceArea, setServiceArea] = useState("");
   const [bio, setBio] = useState("");
 
-  // Fetch current pro profile
-  const {
-    data: pro,
-    isLoading,
-    refetch,
-  } = trpc.pro.getMyProfile.useQuery(undefined, {
-    retry: false,
-  });
-
-  // Fetch categories from API
-  const { data: categories = [], isLoading: isLoadingCategories } =
-    trpc.category.getAll.useQuery();
-
-  // Initialize form values when profile loads
   useEffect(() => {
-    if (pro && categories.length > 0) {
+    if (pro) {
       setName(pro.name || "");
       setPhone(pro.phone || "");
-      setHourlyRate(pro.hourlyRate?.toString() || "");
-      // Map categoryIds to Category objects
-      const selected = categories.filter((cat: Category) =>
-        pro.categoryIds?.includes(cat.id)
-      );
-      setSelectedCategories(selected);
       setServiceArea(pro.serviceArea || "");
       setBio(pro.bio || "");
     }
-  }, [pro, categories]);
+  }, [pro]);
 
-  // Update mutation
-  const updateMutation = trpc.pro.updateProfile.useMutation({
-    ...invalidateRelatedQueries(queryClient, [
-      [["pro", "getMyProfile"]],
-      [["pro", "getById"]], // Invalidate public profile queries too
-    ]),
-    onSuccess: async () => {
-      // Refetch to ensure we have the latest data before navigating back
-      await refetch();
-      Alert.alert("Guardado", "Tu perfil fue actualizado correctamente.", [
-        {
-          text: "OK",
-          onPress: () => router.back(),
-        },
-      ]);
-    },
-    onError: (error: { message?: string }) => {
-      Alert.alert(
-        "Error",
-        error.message ||
-          "No se pudo guardar el perfil. Por favor, intentá nuevamente."
-      );
-    },
-  });
-
-  const validateForm = (): boolean => {
+  const handleSave = () => {
     if (!name.trim()) {
       Alert.alert("Error", "El nombre es requerido");
       return false;
     }
-
     if (!phone.trim()) {
       Alert.alert("Error", "El teléfono es requerido");
       return false;
     }
 
-    const hourlyRateNum = parseFloat(hourlyRate);
-    if (!hourlyRate.trim()) {
-      Alert.alert("Error", "La tarifa por hora es requerida");
-      return false;
-    }
-    if (isNaN(hourlyRateNum) || hourlyRateNum <= 0) {
-      Alert.alert("Error", "La tarifa debe ser un número mayor a 0");
-      return false;
-    }
-
-    if (selectedCategories.length === 0) {
-      Alert.alert("Error", "Seleccioná al menos una categoría");
-      return false;
-    }
-
-    return true;
-  };
-
-  const handleSave = () => {
-    if (!validateForm()) {
-      return;
-    }
-
-    updateMutation.mutate({
-      name: name.trim(),
-      phone: phone.trim() || undefined,
-      hourlyRate: toMinorUnits(parseFloat(hourlyRate)), // Convert to minor units for storage
-      categoryIds: selectedCategories.map((c) => c.id),
-      serviceArea: serviceArea.trim() || undefined,
-      bio: bio.trim() || undefined,
-    });
+    updateMutation.mutate(
+      {
+        name: name.trim(),
+        phone: phone.trim() || undefined,
+        serviceArea: serviceArea.trim() || undefined,
+        bio: bio.trim() || undefined,
+      },
+      {
+        onSuccess: async () => {
+          await refetch();
+          Alert.alert("Guardado", "Tu perfil fue actualizado correctamente.", [
+            { text: "OK", onPress: () => router.back() },
+          ]);
+        },
+        onError: (error: { message?: string }) => {
+          Alert.alert(
+            "Error",
+            error.message ??
+              "No se pudo guardar el perfil. Por favor, intentá nuevamente."
+          );
+        },
+      }
+    );
   };
 
   if (isLoading) {
@@ -138,6 +85,8 @@ export function EditProfileScreen() {
       </ScrollView>
     );
   }
+
+  const categoryCount = pro?.categoryIds?.length ?? 0;
 
   return (
     <ScrollView
@@ -161,7 +110,6 @@ export function EditProfileScreen() {
           </Text>
         </View>
 
-        {/* Email - Read-only display at top */}
         <View style={styles.emailContainer}>
           <View style={styles.labelRow}>
             <Feather name="mail" size={14} color={theme.colors.muted} />
@@ -203,22 +151,26 @@ export function EditProfileScreen() {
           </Text>
         </View>
 
-        <Input
-          label="Tarifa por hora *"
-          icon="dollar-sign"
-          value={hourlyRate}
-          onChangeText={setHourlyRate}
-          placeholder="Ej: 1500"
-          keyboardType="numeric"
-          style={styles.input}
-        />
-
-        <CategorySelector
-          categories={categories}
-          selected={selectedCategories}
-          isLoading={isLoadingCategories}
-          onSelectionChange={setSelectedCategories}
-        />
+        <TouchableOpacity
+          onPress={() => router.push("/profile/categories")}
+          style={styles.linkRow}
+        >
+          <View style={styles.linkLeft}>
+            <Feather name="layers" size={20} color={theme.colors.text} />
+            <View style={styles.linkTextBlock}>
+              <Text variant="body" style={styles.linkText}>
+                Categorías de servicio
+              </Text>
+              {categoryCount > 0 && (
+                <Text variant="small" style={styles.linkHint}>
+                  {categoryCount}{" "}
+                  {categoryCount === 1 ? "categoría" : "categorías"}
+                </Text>
+              )}
+            </View>
+          </View>
+          <Feather name="chevron-right" size={20} color={theme.colors.muted} />
+        </TouchableOpacity>
 
         <Input
           label="Área de servicio (opcional)"
@@ -265,7 +217,6 @@ export function EditProfileScreen() {
         </View>
       </Card>
 
-      {/* Save Button */}
       <Button
         onPress={handleSave}
         disabled={updateMutation.isPending}
@@ -317,6 +268,27 @@ const styles = StyleSheet.create({
   },
   input: {
     marginBottom: theme.spacing[3],
+  },
+  linkRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: theme.spacing[3],
+  },
+  linkLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+  },
+  linkTextBlock: {
+    marginLeft: theme.spacing[2],
+  },
+  linkText: {
+    color: theme.colors.text,
+  },
+  linkHint: {
+    color: theme.colors.muted,
+    marginTop: theme.spacing[1],
   },
   bioDescription: {
     marginBottom: theme.spacing[2],

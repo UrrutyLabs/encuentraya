@@ -86,36 +86,43 @@ export function calculateTaxableBase(lineItems: OrderLineItemEntity[]): number {
 
 /**
  * Build line items for order finalization
- * Creates labor, platform_fee, and tax line items based on approved hours
+ * Creates labor, platform_fee, and tax line items.
+ * For hourly: labor = approvedHours * hourlyRate. For fixed: pass laborAmountCents (quoted amount).
  * All amounts are calculated and returned in MINOR UNITS
  *
  * @param order - Order entity (hourlyRateSnapshotAmount in minor units)
- * @param approvedHours - Approved hours for the order
+ * @param approvedHours - Approved hours (used for hourly; for fixed use 0, labor from laborAmountCents)
  * @param platformFeeRate - Platform fee rate (e.g., 0.1 for 10%)
  * @param taxRate - Tax rate (e.g., 0.22 for 22%)
- * @returns Line items with all amounts in minor units
+ * @param laborAmountCents - Optional override: when set (fixed-price), use as labor amount instead of approvedHours * rate
  */
 export function buildLineItemsForFinalization(
   order: OrderEntity,
   approvedHours: number,
   platformFeeRate: number = DEFAULT_PLATFORM_FEE_RATE,
-  taxRate: number = DEFAULT_TAX_RATE
+  taxRate: number = DEFAULT_TAX_RATE,
+  laborAmountCents?: number
 ): OrderLineItemCreateInput[] {
   const lineItems: OrderLineItemCreateInput[] = [];
 
-  // hourlyRateSnapshotAmount is already in minor units (storage format)
   const hourlyRateMinor = order.hourlyRateSnapshotAmount;
+  const laborAmount =
+    laborAmountCents != null
+      ? roundMinorUnits(laborAmountCents)
+      : roundMinorUnits(approvedHours * hourlyRateMinor);
+  const hourlyRateMajor = hourlyRateMinor / 100;
+  const laborDescription =
+    laborAmountCents != null
+      ? `Labor (presupuesto fijo)`
+      : `Labor (${approvedHours} horas × ${hourlyRateMajor.toFixed(0)} ${order.currency}/hora)`;
 
-  // 1. Labor line item (all amounts in minor units)
-  const laborAmount = roundMinorUnits(approvedHours * hourlyRateMinor);
-  const hourlyRateMajor = hourlyRateMinor / 100; // Convert to major for display in description
   lineItems.push({
     orderId: order.id,
     type: OrderLineItemType.LABOR,
-    description: `Labor (${approvedHours} horas × ${hourlyRateMajor.toFixed(0)} ${order.currency}/hora)`,
-    quantity: approvedHours,
-    unitAmount: hourlyRateMinor, // Store in minor units
-    amount: laborAmount, // Store in minor units
+    description: laborDescription,
+    quantity: laborAmountCents != null ? 1 : approvedHours,
+    unitAmount: laborAmountCents != null ? laborAmount : hourlyRateMinor,
+    amount: laborAmount,
     currency: order.currency,
     taxBehavior: TaxBehavior.TAXABLE,
   });

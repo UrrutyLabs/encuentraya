@@ -8,15 +8,16 @@ interface ReviewSectionSummaryProps {
   costEstimation: OrderEstimateOutput | null | undefined;
   isEstimatingCost: boolean;
   costEstimationError: unknown;
-  // Fallback values when estimation is not available
-  estimatedCost: number;
+  /** Fallback when estimation is not available; undefined for fixed-price */
+  estimatedCost: number | undefined;
   hourlyRate: number;
   hours: string;
+  isFixedPrice?: boolean;
 }
 
 /**
  * Section 3: Resumen / Costo estimado
- * Shows detailed cost breakdown with line items, taxes, and totals
+ * Shows detailed cost breakdown, or fixed-price message when isFixedPrice.
  * Note: No Card wrapper - wrapped by parent component
  */
 export function ReviewSectionSummary({
@@ -26,6 +27,7 @@ export function ReviewSectionSummary({
   estimatedCost,
   hourlyRate,
   hours,
+  isFixedPrice = false,
 }: ReviewSectionSummaryProps) {
   return (
     <section aria-labelledby="review-section-summary">
@@ -36,14 +38,21 @@ export function ReviewSectionSummary({
       >
         Resumen
       </Text>
-      <CostBreakdown
-        estimation={costEstimation}
-        isLoading={isEstimatingCost}
-        error={costEstimationError}
-        fallbackLaborAmount={estimatedCost}
-        fallbackHourlyRate={hourlyRate}
-        fallbackHours={hours}
-      />
+      {isFixedPrice ? (
+        <Text variant="body" className="text-muted">
+          El profesional te enviará un presupuesto después de aceptar el
+          trabajo.
+        </Text>
+      ) : (
+        <CostBreakdown
+          estimation={costEstimation}
+          isLoading={isEstimatingCost}
+          error={costEstimationError}
+          fallbackLaborAmount={estimatedCost ?? 0}
+          fallbackHourlyRate={hourlyRate}
+          fallbackHours={hours}
+        />
+      )}
     </section>
   );
 }

@@ -8,10 +8,13 @@ interface CostBreakdownProps {
   estimation: OrderEstimateOutput | null | undefined;
   isLoading: boolean;
   error: unknown;
-  /** Fallback when estimation is not available */
+  /** Fallback when estimation is not available (hourly: X h × $Y/h) */
   fallbackLaborAmount: number;
   fallbackHourlyRate: number;
   fallbackHours: string;
+  /** When set (fixed-price), fallback shows single "Costo estimado" amount only, no hourly line */
+  fallbackFixedAmount?: number;
+  fallbackCurrency?: string;
 }
 
 /**
@@ -25,6 +28,8 @@ export function CostBreakdown({
   fallbackLaborAmount,
   fallbackHourlyRate,
   fallbackHours,
+  fallbackFixedAmount,
+  fallbackCurrency = "UYU",
 }: CostBreakdownProps) {
   if (isLoading) {
     return (
@@ -40,6 +45,26 @@ export function CostBreakdown({
   }
 
   if (error || !estimation) {
+    if (fallbackFixedAmount != null) {
+      return (
+        <div className="space-y-3">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+            <div className="flex items-center gap-3">
+              <DollarSign
+                className="w-5 h-5 text-primary shrink-0"
+                aria-hidden
+              />
+              <Text variant="body" className="font-medium">
+                Costo estimado
+              </Text>
+            </div>
+            <Text variant="h2" className="text-primary shrink-0">
+              ${fallbackFixedAmount.toFixed(0)} {fallbackCurrency}
+            </Text>
+          </div>
+        </div>
+      );
+    }
     return (
       <div className="space-y-3">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">

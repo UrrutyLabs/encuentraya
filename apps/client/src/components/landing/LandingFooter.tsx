@@ -17,6 +17,12 @@ export function LandingFooter() {
           </div>
           <div className="flex gap-6">
             <Link
+              href="/#how-it-works"
+              className="text-muted hover:text-text transition-all duration-200 hover:scale-105 active:scale-95"
+            >
+              <Text variant="small">Cómo funciona</Text>
+            </Link>
+            <Link
               href="#"
               className="text-muted hover:text-text transition-all duration-200 hover:scale-105 active:scale-95"
             >

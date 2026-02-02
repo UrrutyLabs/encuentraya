@@ -3,7 +3,12 @@ import type { OrderRepository } from "./order.repo";
 import type { OrderLineItemRepository } from "./orderLineItem.repo";
 import type { ReceiptRepository } from "./receipt.repo";
 import type { Order } from "@repo/domain";
-import { OrderStatus, ApprovalMethod, PaymentStatus } from "@repo/domain";
+import {
+  OrderStatus,
+  ApprovalMethod,
+  PaymentStatus,
+  PricingMode,
+} from "@repo/domain";
 import { TOKENS } from "@/server/container";
 import {
   buildLineItemsForFinalization,
@@ -89,12 +94,27 @@ export class OrderFinalizationService {
     // Step 3: Create/replace final line items
     const platformFeeRate = DEFAULT_PLATFORM_FEE_RATE;
     const taxRate = updatedOrder.taxRate ?? DEFAULT_TAX_RATE;
+    const pricingMode = (updatedOrder.pricingMode ?? "hourly") as string;
+    const isFixed = pricingMode === PricingMode.FIXED;
+    if (
+      isFixed &&
+      (updatedOrder.quotedAmountCents == null ||
+        updatedOrder.quotedAmountCents <= 0)
+    ) {
+      throw new Error(
+        `Order ${orderId} is fixed-price but has no quoted amount. Cannot finalize.`
+      );
+    }
+    const laborAmountCents = isFixed
+      ? (updatedOrder.quotedAmountCents as number)
+      : undefined;
 
     const lineItems = buildLineItemsForFinalization(
       updatedOrder,
       approvedHours,
       platformFeeRate,
-      taxRate
+      taxRate,
+      laborAmountCents
     );
 
     // Replace all existing line items with new ones

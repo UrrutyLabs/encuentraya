@@ -50,7 +50,7 @@ function JobCreateContent() {
       return {
         categoryId: rebookTemplate.categoryId,
         address: rebookTemplate.addressText,
-        hours: rebookTemplate.estimatedHours.toString(),
+        hours: (rebookTemplate.estimatedHours ?? 0).toString(),
       };
     }
     return null;
@@ -181,7 +181,7 @@ function JobCreateContent() {
                 contratar.
               </Text>
               <div className="flex gap-2 justify-center">
-                <Link href="/search">
+                <Link href="/">
                   <Button variant="primary">Buscar profesionales</Button>
                 </Link>
                 <Link href="/my-jobs">
@@ -209,7 +209,7 @@ function JobCreateContent() {
                 Por favor, seleccioná un profesional desde la búsqueda.
               </Text>
               <button
-                onClick={() => router.push("/search")}
+                onClick={() => router.push("/")}
                 className="px-4 py-2 bg-primary text-white rounded-md hover:opacity-90"
               >
                 Ir a búsqueda
@@ -246,7 +246,7 @@ function JobCreateContent() {
                 El profesional seleccionado no existe o fue eliminado.
               </Text>
               <button
-                onClick={() => router.push("/search")}
+                onClick={() => router.push("/")}
                 className="px-4 py-2 bg-primary text-white rounded-md hover:opacity-90"
               >
                 Volver a búsqueda
@@ -297,7 +297,7 @@ function JobCreateContent() {
                 </div>
               </div>
               <div className="flex gap-2 mt-4">
-                <Link href="/search">
+                <Link href="/">
                   <Button variant="primary">Buscar otros profesionales</Button>
                 </Link>
                 <Link href="/my-jobs">

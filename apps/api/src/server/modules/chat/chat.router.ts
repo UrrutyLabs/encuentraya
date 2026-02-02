@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { router, protectedProcedure } from "@infra/trpc";
+import { router, protectedProcedure, adminProcedure } from "@infra/trpc";
 import { container, TOKENS } from "@/server/container";
 import { ChatService } from "./chat.service";
 import { mapDomainErrorToTRPCError } from "@shared/errors/error-mapper";
@@ -98,5 +98,27 @@ export const chatRouter = router({
       } catch (error) {
         throw mapDomainErrorToTRPCError(error);
       }
+    }),
+
+  adminListByOrder: adminProcedure
+    .input(
+      z.object({
+        orderId: z.string(),
+        cursor: z.string().nullable().optional(),
+        limit: z.number().min(1).max(100).optional(),
+      })
+    )
+    .output(
+      z.object({
+        items: z.array(orderMessageSchema),
+        nextCursor: z.string().nullable(),
+      })
+    )
+    .query(async ({ input }) => {
+      return await chatService.listByOrderForAdmin(
+        input.orderId,
+        input.cursor ?? null,
+        input.limit ?? 100
+      );
     }),
 });

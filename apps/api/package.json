@@ -24,6 +24,7 @@
     "@prisma/adapter-pg": "^7.2.0",
     "@prisma/client": "^7.2.0",
     "@repo/domain": "workspace:*",
+    "@repo/upload": "workspace:*",
     "@repo/monitoring": "workspace:*",
     "@repo/trpc": "workspace:*",
     "@sendgrid/mail": "^8.1.3",

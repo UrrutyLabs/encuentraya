@@ -18,12 +18,14 @@ interface UseReviewStepValidationReturn {
 
 /**
  * Encapsulates "can we show the main review content?" (incomplete vs loading vs ready).
+ * For fixed-price categories, hours are not required (pro will send quote).
  */
 export function useReviewStepValidation({
   state,
   category,
   pro,
 }: UseReviewStepValidationProps): UseReviewStepValidationReturn {
+  const isFixedPrice = category?.pricingMode === "fixed";
   const hasCompleteState = useMemo(
     () =>
       !!(
@@ -32,9 +34,17 @@ export function useReviewStepValidation({
         state.date &&
         state.time &&
         state.address &&
-        state.hours
+        (isFixedPrice || (state.hours && parseFloat(state.hours) > 0))
       ),
-    [state.proId, category, state.date, state.time, state.address, state.hours]
+    [
+      state.proId,
+      category,
+      state.date,
+      state.time,
+      state.address,
+      state.hours,
+      isFixedPrice,
+    ]
   );
 
   const isLoadingPro = useMemo(() => !!state.proId && !pro, [state.proId, pro]);

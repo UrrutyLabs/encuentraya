@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { photoUrlsSchema } from "@repo/upload";
 import {
   orderStatusSchema,
   orderLineItemTypeSchema,
@@ -77,12 +78,18 @@ export const orderSchema = z.object({
 
   // Pricing snapshots
   pricingMode: pricingModeSchema,
-  hourlyRateSnapshotAmount: z.number().positive(),
+  hourlyRateSnapshotAmount: z.number().nonnegative(), // 0 for fixed orders
   currency: z.string(),
   minHoursSnapshot: z.number().positive().nullable(),
 
-  // Hours
-  estimatedHours: z.number().positive(),
+  // Quote (fixed-price flow); optional for backward compat until API returns them
+  quotedAmountCents: z.number().int().positive().nullable().optional(),
+  quotedAt: z.date().nullable().optional(),
+  quoteMessage: z.string().nullable().optional(),
+  quoteAcceptedAt: z.date().nullable().optional(),
+
+  // Hours (optional for fixed; use 0 or null when pricingMode is fixed)
+  estimatedHours: z.number().nonnegative().nullable().optional(),
   finalHoursSubmitted: z.number().positive().nullable(),
   approvedHours: z.number().positive().nullable(),
   approvalMethod: approvalMethodSchema.nullable(),
@@ -109,6 +116,8 @@ export const orderSchema = z.object({
 
   // Metadata
   isFirstOrder: z.boolean(),
+  photoUrls: photoUrlsSchema.optional().nullable(),
+  workProofPhotoUrls: photoUrlsSchema.optional().nullable(),
   createdAt: z.date(),
   updatedAt: z.date(),
 
@@ -133,8 +142,10 @@ export const orderCreateInputSchema = z.object({
   addressLng: z.number().optional(),
   scheduledWindowStartAt: z.date(),
   scheduledWindowEndAt: z.date().optional(),
-  estimatedHours: z.number().positive(),
+  pricingMode: pricingModeSchema.optional(), // Set by backend from category; client may send for fixed
+  estimatedHours: z.number().nonnegative().optional(), // Optional/zero when pricingMode is fixed
   isFirstOrder: z.boolean().optional(),
+  photoUrls: photoUrlsSchema.optional(), // Order photos from create job wizard (storage URLs)
 });
 
 export type OrderCreateInput = z.infer<typeof orderCreateInputSchema>;

@@ -16,6 +16,7 @@ import { categoryRouter } from "@modules/category/category.router";
 import { subcategoryRouter } from "@modules/subcategory/subcategory.router";
 import { orderRouter } from "@modules/order/order.router";
 import { chatRouter } from "@modules/chat/chat.router";
+import { uploadRouter } from "@modules/upload/upload.router";
 
 export const appRouter = router({
   health: router({
@@ -42,6 +43,7 @@ export const appRouter = router({
   subcategory: subcategoryRouter,
   order: orderRouter,
   chat: chatRouter,
+  upload: uploadRouter,
   clientSearch: router({
     searchPros: searchRouter.searchPros,
   }),

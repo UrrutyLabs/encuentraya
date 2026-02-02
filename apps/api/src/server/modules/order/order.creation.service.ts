@@ -1,8 +1,10 @@
 import { injectable, inject } from "tsyringe";
 import type { OrderRepository } from "./order.repo";
 import type { ProRepository } from "@modules/pro/pro.repo";
+import type { ProProfileCategoryRepository } from "@modules/pro/proProfileCategory.repo";
 import type { OrderCreateInput, Order } from "@repo/domain";
-import { toMinorUnits } from "@repo/domain";
+import { PricingMode } from "@repo/domain";
+import { MAX_ORDER_PHOTOS } from "@repo/upload";
 import type { Actor } from "@infra/auth/roles";
 import { TOKENS } from "@/server/container";
 import type { ClientProfileService } from "@modules/user/clientProfile.service";
@@ -21,6 +23,8 @@ export class OrderCreationService {
     private readonly orderRepository: OrderRepository,
     @inject(TOKENS.ProRepository)
     private readonly proRepository: ProRepository,
+    @inject(TOKENS.ProProfileCategoryRepository)
+    private readonly proProfileCategoryRepository: ProProfileCategoryRepository,
     @inject(TOKENS.ClientProfileService)
     private readonly clientProfileService: ClientProfileService,
     @inject(TOKENS.OrderService)
@@ -71,11 +75,47 @@ export class OrderCreationService {
       throw new Error("Pro profile ID is required");
     }
 
-    // hourlyRateSnapshot is already in minor units (from pro.hourlyRate)
-    const hourlyRateSnapshotMinor = hourlyRateSnapshot;
+    const hourlyRateFromPro = hourlyRateSnapshot; // minor units
 
     if (!input.categoryId) {
       throw new Error("categoryId is required");
+    }
+
+    const category = await this.categoryRepository.findById(input.categoryId);
+    if (!category) {
+      throw new Error("Category not found");
+    }
+
+    const pricingMode = (category.pricingMode ?? "hourly") as
+      | "hourly"
+      | "fixed";
+    const isFixed = pricingMode === PricingMode.FIXED;
+
+    let hourlyRateSnapshotMinor: number;
+    let estimatedHours: number | null;
+
+    if (isFixed) {
+      hourlyRateSnapshotMinor = 0;
+      estimatedHours = input.estimatedHours ?? null;
+    } else {
+      if (input.proProfileId) {
+        const junction =
+          await this.proProfileCategoryRepository.findByProProfileAndCategory(
+            input.proProfileId,
+            input.categoryId
+          );
+        const junctionRateCents = junction?.hourlyRateCents ?? null;
+        hourlyRateSnapshotMinor =
+          junctionRateCents != null ? junctionRateCents : hourlyRateFromPro;
+      } else {
+        hourlyRateSnapshotMinor = hourlyRateFromPro;
+      }
+      estimatedHours = input.estimatedHours ?? 0;
+      if (estimatedHours <= 0) {
+        throw new Error(
+          "Estimated hours must be greater than 0 for hourly-priced categories"
+        );
+      }
     }
 
     // Validate subcategory belongs to category if both provided
@@ -90,34 +130,34 @@ export class OrderCreationService {
     let categoryMetadataJson: Record<string, unknown> | undefined =
       input.categoryMetadataJson;
     if (!categoryMetadataJson) {
-      const category = await this.categoryRepository.findById(input.categoryId);
-      if (category) {
-        categoryMetadataJson = {
-          categoryId: category.id,
-          categoryKey: category.key,
-          categoryName: category.name,
-        };
+      categoryMetadataJson = {
+        categoryId: category.id,
+        categoryKey: category.key,
+        categoryName: category.name,
+      };
 
-        if (input.subcategoryId) {
-          const subcategory = await this.subcategoryService.getSubcategoryById(
-            input.subcategoryId
-          );
-          if (subcategory) {
-            categoryMetadataJson.subcategoryId = subcategory.id;
-            categoryMetadataJson.subcategoryName = subcategory.name;
-          }
+      if (input.subcategoryId) {
+        const subcategory = await this.subcategoryService.getSubcategoryById(
+          input.subcategoryId
+        );
+        if (subcategory) {
+          categoryMetadataJson.subcategoryId = subcategory.id;
+          categoryMetadataJson.subcategoryName = subcategory.name;
         }
       }
     }
 
-    // Check if this is the client's first order
+    if (input.photoUrls && input.photoUrls.length > MAX_ORDER_PHOTOS) {
+      throw new Error(
+        `Order photos cannot exceed ${MAX_ORDER_PHOTOS}. Received ${input.photoUrls.length}.`
+      );
+    }
+
     const existingOrders = await this.orderRepository.findByClientUserId(
       actor.id
     );
     const isFirstOrder = existingOrders.length === 0;
 
-    // Create order via repository
-    // Store hourlyRateSnapshotAmount in minor units
     const orderEntity = await this.orderRepository.create({
       clientUserId: actor.id,
       proProfileId: input.proProfileId,
@@ -131,12 +171,13 @@ export class OrderCreationService {
       addressLng: input.addressLng,
       scheduledWindowStartAt: input.scheduledWindowStartAt,
       scheduledWindowEndAt: input.scheduledWindowEndAt,
-      estimatedHours: input.estimatedHours,
-      pricingMode: "hourly",
-      hourlyRateSnapshotAmount: hourlyRateSnapshotMinor, // Store in minor units
+      estimatedHours,
+      pricingMode: isFixed ? "fixed" : "hourly",
+      hourlyRateSnapshotAmount: hourlyRateSnapshotMinor,
       currency: "UYU",
       minHoursSnapshot: undefined,
       isFirstOrder,
+      photoUrls: input.photoUrls,
     });
 
     // Return domain object

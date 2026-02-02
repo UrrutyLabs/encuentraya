@@ -2,8 +2,9 @@ import { injectable, inject } from "tsyringe";
 import type { OrderRepository } from "./order.repo";
 import type { ProRepository } from "@modules/pro/pro.repo";
 import type { Order } from "@repo/domain";
-import { OrderStatus, PaymentStatus } from "@repo/domain";
+import { OrderStatus, PaymentStatus, PricingMode } from "@repo/domain";
 import type { Actor } from "@infra/auth/roles";
+import { MAX_WORK_PROOF_PHOTOS } from "@repo/upload";
 import { TOKENS } from "@/server/container";
 import { OrderService } from "./order.service";
 import type { PaymentServiceFactory } from "@modules/payment";
@@ -167,13 +168,156 @@ export class OrderLifecycleService {
   }
 
   /**
+   * Submit quote (pro sends fixed-price quote)
+   * Only for fixed-price orders in status accepted. Status remains accepted.
+   */
+  async submitQuote(
+    actor: Actor,
+    orderId: string,
+    amountCents: number,
+    message?: string
+  ): Promise<Order> {
+    const order = await this.orderService.getOrderOrThrow(orderId);
+
+    if (order.status !== OrderStatus.ACCEPTED) {
+      throw new Error(
+        `Order ${orderId} must be in status accepted to submit quote. Current: ${order.status}`
+      );
+    }
+
+    const pricingMode = (order.pricingMode ?? "hourly") as string;
+    if (pricingMode !== PricingMode.FIXED) {
+      throw new Error(
+        `Order ${orderId} is not a fixed-price order. Submit quote is only for fixed-price orders.`
+      );
+    }
+
+    await authorizeProAction(actor, order, "submit quote", this.proRepository);
+
+    if (amountCents <= 0) {
+      throw new Error("Quote amount must be greater than 0");
+    }
+
+    const updated = await this.orderRepository.update(orderId, {
+      quotedAmountCents: amountCents,
+      quotedAt: new Date(),
+      quoteMessage: message ?? null,
+    });
+
+    if (!updated) {
+      throw new Error(`Failed to update order ${orderId}`);
+    }
+
+    return this.orderService.getOrderById(orderId) as Promise<Order>;
+  }
+
+  /**
+   * Accept quote (client accepts pro's fixed-price quote)
+   * Only for fixed-price orders in status accepted with quote set. Status remains accepted.
+   */
+  async acceptQuote(actor: Actor, orderId: string): Promise<Order> {
+    const order = await this.orderService.getOrderOrThrow(orderId);
+
+    if (order.status !== OrderStatus.ACCEPTED) {
+      throw new Error(
+        `Order ${orderId} must be in status accepted to accept quote. Current: ${order.status}`
+      );
+    }
+
+    const pricingMode = (order.pricingMode ?? "hourly") as string;
+    if (pricingMode !== PricingMode.FIXED) {
+      throw new Error(
+        `Order ${orderId} is not a fixed-price order. Accept quote is only for fixed-price orders.`
+      );
+    }
+
+    if (order.quotedAmountCents == null || order.quotedAmountCents <= 0) {
+      throw new Error(
+        `Order ${orderId} has no quote to accept. Pro must submit a quote first.`
+      );
+    }
+
+    authorizeClientAction(actor, order, "accept quote");
+
+    const updated = await this.orderRepository.update(orderId, {
+      quoteAcceptedAt: new Date(),
+    });
+
+    if (!updated) {
+      throw new Error(`Failed to update order ${orderId}`);
+    }
+
+    return this.orderService.getOrderById(orderId) as Promise<Order>;
+  }
+
+  /**
+   * Submit completion (pro marks fixed-price job complete, no hours)
+   * Transition: in_progress → awaiting_client_approval
+   * Only for fixed-price orders.
+   */
+  async submitCompletion(
+    actor: Actor,
+    orderId: string,
+    options?: { photoUrls?: string[] }
+  ): Promise<Order> {
+    const order = await this.orderService.getOrderOrThrow(orderId);
+
+    if (order.status !== OrderStatus.IN_PROGRESS) {
+      throw new Error(
+        `Order ${orderId} must be in progress to submit completion. Current: ${order.status}`
+      );
+    }
+
+    const pricingMode = (order.pricingMode ?? "hourly") as string;
+    if (pricingMode !== PricingMode.FIXED) {
+      throw new Error(
+        `Order ${orderId} is not a fixed-price order. Use submitHours for hourly orders.`
+      );
+    }
+
+    await authorizeProAction(
+      actor,
+      order,
+      "submit completion",
+      this.proRepository
+    );
+
+    if (
+      options?.photoUrls &&
+      options.photoUrls.length > MAX_WORK_PROOF_PHOTOS
+    ) {
+      throw new Error(
+        `Work proof photos cannot exceed ${MAX_WORK_PROOF_PHOTOS}. Received ${options.photoUrls.length}.`
+      );
+    }
+
+    await this.orderRepository.update(orderId, {
+      completedAt: new Date(),
+      finalHoursSubmitted: null,
+      workProofPhotoUrlsJson: options?.photoUrls
+        ? (options.photoUrls as unknown)
+        : undefined,
+    });
+
+    const updated = await this.orderService.updateOrderStatus(
+      orderId,
+      OrderStatus.AWAITING_CLIENT_APPROVAL
+    );
+    if (!updated) {
+      throw new Error(`Failed to update order status: ${orderId}`);
+    }
+    return updated;
+  }
+
+  /**
    * Submit hours (pro completes work and submits final hours)
    * Transition: in_progress → awaiting_client_approval
    */
   async submitHours(
     actor: Actor,
     orderId: string,
-    finalHours: number
+    finalHours: number,
+    options?: { photoUrls?: string[] }
   ): Promise<Order> {
     const order = await this.orderService.getOrderOrThrow(orderId);
 
@@ -188,10 +332,22 @@ export class OrderLifecycleService {
       throw new Error("Final hours must be greater than 0");
     }
 
+    if (
+      options?.photoUrls &&
+      options.photoUrls.length > MAX_WORK_PROOF_PHOTOS
+    ) {
+      throw new Error(
+        `Work proof photos cannot exceed ${MAX_WORK_PROOF_PHOTOS}. Received ${options.photoUrls.length}.`
+      );
+    }
+
     // Update order with final hours and set status to awaiting_client_approval
     await this.orderRepository.update(orderId, {
       finalHoursSubmitted: finalHours,
       completedAt: new Date(),
+      workProofPhotoUrlsJson: options?.photoUrls
+        ? (options.photoUrls as unknown)
+        : undefined,
     });
 
     const updated = await this.orderService.updateOrderStatus(
@@ -219,15 +375,18 @@ export class OrderLifecycleService {
     // Authorization: Client must own order, or actor must be admin
     authorizeClientAction(actor, order, "approve hours");
 
-    // Verify final hours are submitted
-    if (!order.finalHoursSubmitted) {
+    const pricingMode = (order.pricingMode ?? "hourly") as string;
+    const isFixed = pricingMode === PricingMode.FIXED;
+
+    // For hourly orders: require final hours submitted. For fixed: no hours (pro used submitCompletion).
+    if (!isFixed && !order.finalHoursSubmitted) {
       throw new Error("Final hours must be submitted before approval");
     }
 
-    // Finalization will be handled by OrderFinalizationService
-    // This method just approves the hours - finalization happens separately
+    // Finalization will be handled by OrderFinalizationService (uses quotedAmountCents for fixed)
+    const approvedHours = isFixed ? 0 : (order.finalHoursSubmitted as number);
     await this.orderRepository.update(orderId, {
-      approvedHours: order.finalHoursSubmitted,
+      approvedHours,
       approvalMethod: "client_accepted",
     });
 

@@ -6,3 +6,5 @@ export { useRebookTemplate } from "./useRebookTemplate";
 export { useReviewForm } from "./useReviewForm";
 export { useCheckout } from "./useCheckout";
 export { useAvailableOrderTimes } from "./useAvailableOrderTimes";
+export { useAcceptQuote } from "./useAcceptQuote";
+export { useApproveHours } from "./useApproveHours";
