@@ -295,8 +295,6 @@ export function OrderDetailScreen({ orderId }: OrderDetailScreenProps) {
 
       {/* Photos */}
       <OrderDetailPhotos order={order} />
-
-      {/* Chat */}
       <OrderDetailChat orderId={order.id} />
 
       {/* Order audit history (e.g. contact info blocked, status forced) */}
