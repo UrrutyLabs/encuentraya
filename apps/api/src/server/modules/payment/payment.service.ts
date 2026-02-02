@@ -174,6 +174,7 @@ export class PaymentService {
       // Call provider to create preauth
       const preauthResult = await this.providerClient.createPreauth({
         orderId: input.orderId,
+        displayOrderId: order.displayId,
         clientUserId: actor.id,
         proProfileId: order.proProfileId,
         amount: {

@@ -13,6 +13,7 @@ export interface Money {
  */
 export interface CreatePreauthInput {
   orderId: string; // Changed from bookingId
+  displayOrderId: string;
   clientUserId: string;
   proProfileId: string | null;
   amount: Money;

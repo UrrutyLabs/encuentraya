@@ -88,7 +88,7 @@ export class MercadoPagoClient implements PaymentProviderClient {
       process.env.API_URL ||
       process.env.NEXT_PUBLIC_API_URL ||
       (process.env.NODE_ENV === "production"
-        ? "https://api.encuentraya.com" // Update with your production API URL
+        ? "https://api.urrutylabs.com" // Update with your production API URL
         : "http://localhost:3002"); // API runs on port 3002 in development
     const notificationUrl = `${apiBaseUrl}/api/webhooks/mercadopago`;
 
@@ -107,7 +107,7 @@ export class MercadoPagoClient implements PaymentProviderClient {
     // Build item with optional category_id
     const item: Record<string, unknown> = {
       id: input.orderId, // Required by SDK
-      title: `Orden #${input.orderId}`,
+      title: `Orden #${input.displayOrderId}`,
       description: `Pago de orden de servicio`,
       quantity: 1,
       unit_price: amountInMajorUnits,
@@ -275,7 +275,11 @@ export class MercadoPagoClient implements PaymentProviderClient {
 
       // Build manifest string according to Mercado Pago documentation
       // Format: "id:{data.id};request-id:{x-request-id};ts:{ts};"
-      const manifest = `id:${dataId};request-id:${xRequestId};ts:${ts};`;
+      // If data.id is alphanumeric, it must be sent in lowercase (per MP docs)
+      const dataIdForManifest = /^[a-zA-Z0-9]+$/.test(dataId)
+        ? dataId.toLowerCase()
+        : dataId;
+      const manifest = `id:${dataIdForManifest};request-id:${xRequestId};ts:${ts};`;
 
       // Create expected signature: HMAC-SHA256 of manifest with secret
       const expectedSignature = crypto
@@ -300,21 +304,42 @@ export class MercadoPagoClient implements PaymentProviderClient {
    * Includes signature verification for security
    *
    * Mercado Pago webhook format:
-   * - Query params: data.id={payment_id}&type=payment
+   * - Query params (optional): data.id={payment_id}&type=payment — when configured via "Your integrations"
+   * - When URL is from notification_url (preference), MP often sends only the body without query params
    * - Headers: x-signature, x-request-id
-   * - Body: JSON with payment event details
+   * - Body: JSON with type, data.id, action, etc.
    */
   async parseWebhook(request: Request): Promise<ProviderWebhookEvent | null> {
     try {
-      // Get raw body (needed for parsing, but signature uses manifest string)
       const rawBody = await request.clone().text();
       const signature = request.headers.get("x-signature");
       const xRequestId = request.headers.get("x-request-id");
-
-      // Extract data.id from query parameters (required for signature verification)
       const url = new URL(request.url);
-      const dataId = url.searchParams.get("data.id");
-      const type = url.searchParams.get("type");
+
+      // Parse body first so we can use it when query params are missing (e.g. notification_url flow)
+      let body: Record<string, unknown> | null = null;
+      try {
+        body = rawBody
+          ? (JSON.parse(rawBody) as Record<string, unknown>)
+          : null;
+      } catch {
+        body = null;
+      }
+
+      // Resolve data.id and type: prefer query params, fallback to body (per MP docs)
+      const dataIdFromQuery = url.searchParams.get("data.id");
+      const typeFromQuery = url.searchParams.get("type");
+      const dataIdFromBody =
+        body?.data != null &&
+        typeof body.data === "object" &&
+        body.data !== null &&
+        "id" in body.data
+          ? String((body.data as { id: unknown }).id)
+          : null;
+      const typeFromBody = body?.type != null ? String(body.type) : null;
+
+      const dataId = dataIdFromQuery ?? dataIdFromBody;
+      const type = typeFromQuery ?? typeFromBody;
 
       // Verify this is a payment webhook
       if (type !== "payment" || !dataId) {
@@ -327,25 +352,13 @@ export class MercadoPagoClient implements PaymentProviderClient {
         return null; // Reject webhook with invalid signature
       }
 
-      const body = JSON.parse(rawBody);
-
-      // MP webhook structure:
-      // {
-      //   "action": "payment.updated",
-      //   "api_version": "v1",
-      //   "data": { "id": "123456789" },
-      //   "date_created": "2024-01-11T12:00:00Z",
-      //   "id": 123456,
-      //   "live_mode": false,
-      //   "type": "payment",
-      //   "user_id": "123456"
-      // }
-
-      if (body.type !== "payment" || !body.data?.id) {
-        return null; // Not a payment webhook or invalid structure
+      // Require body for paymentId, action, and raw payload
+      const data = body?.data as { id: string | number } | undefined;
+      if (!body || body.type !== "payment" || !data?.id) {
+        return null; // Invalid body structure
       }
 
-      const paymentId = body.data.id;
+      const paymentId = String(data.id);
 
       // Fetch full payment details to get status and external_reference (orderId)
       const paymentDetails = await this.fetchPaymentDetails(paymentId);
@@ -353,10 +366,13 @@ export class MercadoPagoClient implements PaymentProviderClient {
         return null;
       }
 
+      const eventType =
+        typeof body.action === "string" ? body.action : "payment.updated";
+
       return {
         provider: PaymentProvider.MERCADO_PAGO,
         providerReference: paymentId,
-        eventType: body.action || "payment.updated",
+        eventType,
         raw: body,
       };
     } catch (error) {
