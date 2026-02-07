@@ -263,6 +263,10 @@ export class MercadoPagoClient implements PaymentProviderClient {
       return false; // No signature provided
     }
 
+    console.log("dataId", dataId);
+    console.log("xRequestId", xRequestId);
+    console.log("signature", signature);
+
     try {
       // Extract signature components
       // Format: "ts={timestamp},v1={signature}"
@@ -282,6 +286,9 @@ export class MercadoPagoClient implements PaymentProviderClient {
         return false;
       }
 
+      console.log("v1Signature", v1Signature);
+      console.log("ts", ts);
+
       // Build manifest string according to Mercado Pago documentation
       // Format: "id:{data.id};request-id:{x-request-id};ts:{ts};"
       // If data.id is alphanumeric, it must be sent in lowercase (per MP docs)
@@ -290,11 +297,15 @@ export class MercadoPagoClient implements PaymentProviderClient {
         : dataId;
       const manifest = `id:${dataIdForManifest};request-id:${xRequestId};ts:${ts};`;
 
+      console.log("manifest", manifest);
+
       // Create expected signature: HMAC-SHA256 of manifest with secret
       const expectedSignature = crypto
         .createHmac("sha256", this.webhookSecret)
         .update(manifest)
         .digest("hex");
+
+      console.log("expectedSignature", expectedSignature);
 
       // Compare signatures using constant-time comparison to prevent timing attacks
       const receivedBuf = Buffer.from(v1Signature, "utf8");
@@ -382,21 +393,12 @@ export class MercadoPagoClient implements PaymentProviderClient {
         return null; // Invalid body structure
       }
 
-      const mercadoPagoPaymentId = body?.id as string | undefined;
-
-      if (!mercadoPagoPaymentId) {
-        return null;
-      }
-
-      console.log("mercadoPagoPaymentId", mercadoPagoPaymentId);
-
       const paymentId = String(data.id);
 
       console.log("paymentId", paymentId);
 
       // Fetch full payment details to get status and external_reference (orderId)
-      const paymentDetails =
-        await this.fetchPaymentDetails(mercadoPagoPaymentId);
+      const paymentDetails = await this.fetchPaymentDetails(paymentId);
       if (!paymentDetails) {
         return null;
       }
@@ -557,14 +559,14 @@ export class MercadoPagoClient implements PaymentProviderClient {
   /**
    * Fetch payment details from Mercado Pago API using SDK
    */
-  private async fetchPaymentDetails(mercadoPagoId: string): Promise<{
+  private async fetchPaymentDetails(paymentId: string): Promise<{
     status: string;
     transaction_amount?: number;
     external_reference?: string;
   } | null> {
     try {
       // Use SDK to fetch payment
-      const payment = await this.payment.get({ id: mercadoPagoId });
+      const payment = await this.payment.get({ id: paymentId });
       logger.info({ payment }, "payment");
       return {
         status: payment.status || "",
