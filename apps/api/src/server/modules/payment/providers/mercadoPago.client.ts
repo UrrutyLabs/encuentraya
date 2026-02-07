@@ -297,10 +297,12 @@ export class MercadoPagoClient implements PaymentProviderClient {
         .digest("hex");
 
       // Compare signatures using constant-time comparison to prevent timing attacks
-      return crypto.timingSafeEqual(
-        Buffer.from(v1Signature),
-        Buffer.from(expectedSignature)
-      );
+      const receivedBuf = Buffer.from(v1Signature, "utf8");
+      const expectedBuf = Buffer.from(expectedSignature, "utf8");
+      if (receivedBuf.length !== expectedBuf.length) {
+        return false;
+      }
+      return crypto.timingSafeEqual(receivedBuf, expectedBuf);
     } catch (error) {
       console.error("Error verifying webhook signature:", error);
       return false;
