@@ -176,22 +176,40 @@ This option is useful when you don't need automatic webhooks and prefer manual t
    - Mercado Pago will use dashboard-configured URL (if any)
 
 4. **Manually simulate webhooks:**
-   - Use Mercado Pago MCP server `simulate_webhook` tool
+   - Use Mercado Pago MCP server `simulate_webhook` tool (see below)
    - Or use Mercado Pago dashboard → Webhooks → Simulate
-   - Point to `http://localhost:3002/api/webhooks/mercadopago`
 
-#### Using Mercado Pago MCP Simulator
+#### Using Mercado Pago MCP to simulate a webhook
 
-If you have the Mercado Pago MCP server configured:
+The Mercado Pago MCP server (configured in `.cursor/mcp.json` as `mercadopago-mcp-server`) exposes a **`simulate_webhook`** tool. It sends a real HTTP POST from Mercado Pago's servers to the URL you provide, so **`url_callback` must be a publicly reachable URL** (e.g. your ngrok HTTPS URL). `http://localhost:3002` will not work because Mercado Pago cannot reach your machine.
 
-```bash
-# Use the simulate_webhook tool
-# Parameters:
-# - topic: "payment"
-# - resource_id: "123456789" (payment ID from test payment)
-# - url_callback: "http://localhost:3002/api/webhooks/mercadopago"
-# - callback_env_production: false (for test mode)
-```
+**Prerequisites:**
+
+- ngrok running and forwarding to port 3002
+- API server running (`pnpm dev` in `apps/api`)
+- A **payment ID** from a test payment (create a test preference, pay with test credentials, or use a known test payment ID)
+
+**`simulate_webhook` parameters:**
+
+| Parameter                 | Required | Description                                                                                                                              |
+| ------------------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `resource_id`             | Yes      | ID of the resource to simulate (e.g. a payment ID).                                                                                      |
+| `topic`                   | No       | Topic of the notification. Default: `"payment"`.                                                                                         |
+| `url_callback`            | No       | URL that will receive the simulated POST. If omitted, MP uses the URL configured in the dashboard. For local dev, set to your ngrok URL. |
+| `callback_env_production` | No       | `true` = production environment, `false` = sandbox. Default: `false`.                                                                    |
+
+**Example: simulate a payment webhook to your local API via ngrok**
+
+1. Start ngrok: `ngrok http 3002`
+2. Copy your HTTPS URL (e.g. `https://abc123-def456.ngrok-free.app`)
+3. In **Cursor Chat** (or any client where the Mercado Pago MCP is connected), ask the assistant to run the tool, for example:
+
+   > Use the Mercado Pago MCP **simulate_webhook** tool to send a payment webhook to my local API. Parameters: topic `payment`, resource_id `123456789` (replace with your test payment ID), url_callback `https://YOUR-NGROK-URL.ngrok-free.app/api/webhooks/mercadopago`, callback_env_production `false`.
+
+4. Replace `YOUR-NGROK-URL` and `123456789` with your ngrok host and a real payment ID.
+5. Check ngrok inspector (http://127.0.0.1:4040) and your API logs for the incoming webhook.
+
+**Note:** If you omit `url_callback`, the simulation is sent to the webhook URL configured in [Your integrations](https://www.mercadopago.com.ar/developers/panel/app) → Webhooks. For local testing you must pass your ngrok URL.
 
 ---
 
@@ -248,7 +266,9 @@ echo 'MERCADOPAGO_WEBHOOK_URL=https://abc123.ngrok.io' >> apps/api/.env.local
 4. Check API logs - should show webhook processing
 5. Verify payment status updated in your database
 
-### Workflow 2: Manual Webhook Testing
+### Workflow 2: Manual Webhook Testing (MCP + ngrok)
+
+Mercado Pago's `simulate_webhook` tool sends the request from their servers, so your endpoint must be reachable from the internet. Use ngrok and pass the ngrok URL as `url_callback`.
 
 **Terminal 1 - API Server:**
 
@@ -257,15 +277,23 @@ cd apps/api
 pnpm dev
 ```
 
+**Terminal 2 - ngrok:**
+
+```bash
+ngrok http 3002
+# Copy the HTTPS URL, e.g. https://abc123.ngrok-free.app
+```
+
 **Test Steps:**
 
-1. Create a test payment (get payment ID)
-2. Use Mercado Pago MCP `simulate_webhook` tool:
-   - `topic`: "payment"
-   - `resource_id`: "{payment_id}"
-   - `url_callback`: "http://localhost:3002/api/webhooks/mercadopago"
-3. Check API logs for webhook processing
-4. Verify payment status updated
+1. Create a test payment and note the **payment ID** (or use an existing test payment ID).
+2. In Cursor, use the Mercado Pago MCP **simulate_webhook** tool with:
+   - `topic`: `"payment"`
+   - `resource_id`: your payment ID
+   - `url_callback`: `"https://YOUR-NGROK-URL/api/webhooks/mercadopago"` (replace with your ngrok HTTPS URL)
+   - `callback_env_production`: `false`
+3. Check ngrok inspector (http://127.0.0.1:4040) and API logs for the webhook POST.
+4. Verify payment status updated in your app.
 
 ### Workflow 3: Testing with Test Users
 
@@ -597,11 +625,11 @@ ngrok api tunnels list
 4. Restart API server
 5. Monitor webhooks via ngrok inspector
 
-**For manual testing:**
+**For manual testing (MCP simulate_webhook):**
 
-1. Don't set `MERCADOPAGO_WEBHOOK_URL`
-2. Use Mercado Pago MCP `simulate_webhook` tool
-3. Point simulator to `http://localhost:3002/api/webhooks/mercadopago`
+1. Start ngrok and your API (simulate_webhook sends from MP servers, so you need a public URL).
+2. Use Mercado Pago MCP `simulate_webhook` with `url_callback` set to `https://YOUR-NGROK-URL/api/webhooks/mercadopago` and `resource_id` set to a test payment ID.
+3. Check ngrok inspector and API logs for the webhook.
 
 **Remember:**
 

@@ -8,6 +8,7 @@ import type {
   ProviderPaymentStatus,
 } from "../provider";
 import crypto from "crypto";
+import { logger } from "@/server/infrastructure/utils/logger";
 
 /**
  * Mercado Pago payment provider client using official SDK
@@ -83,6 +84,10 @@ export class MercadoPagoClient implements PaymentProviderClient {
     const pendingUrl = `${clientBaseUrl}/payment/pending`;
     const failureUrl = `${clientBaseUrl}/payment/failure`;
 
+    logger.info({ successUrl }, "successUrl");
+    logger.info({ pendingUrl }, "pendingUrl");
+    logger.info({ failureUrl }, "failureUrl");
+
     // Build webhook notification URL (API endpoint)
     const apiBaseUrl =
       process.env.API_URL ||
@@ -91,6 +96,8 @@ export class MercadoPagoClient implements PaymentProviderClient {
         ? "https://api.urrutylabs.com" // Update with your production API URL
         : "http://localhost:3002"); // API runs on port 3002 in development
     const notificationUrl = `${apiBaseUrl}/api/webhooks/mercadopago`;
+
+    logger.info({ notificationUrl }, "notificationUrl");
 
     // Build payer object if information is available
     const payer: Record<string, unknown> = {};
@@ -173,6 +180,8 @@ export class MercadoPagoClient implements PaymentProviderClient {
           };
         },
       });
+
+      logger.info({ preference }, "preference");
 
       // Map MP preference status to our PaymentStatus
       // Preferences are created in "pending" state until user completes payment
@@ -316,6 +325,9 @@ export class MercadoPagoClient implements PaymentProviderClient {
       const xRequestId = request.headers.get("x-request-id");
       const url = new URL(request.url);
 
+      console.log("HOLA");
+      console.log("rawBody", rawBody);
+
       // Parse body first so we can use it when query params are missing (e.g. notification_url flow)
       let body: Record<string, unknown> | null = null;
       try {
@@ -348,20 +360,33 @@ export class MercadoPagoClient implements PaymentProviderClient {
 
       // Verify webhook signature using manifest string format
       if (!this.verifyWebhookSignature(dataId, xRequestId || "", signature)) {
-        console.error("Invalid webhook signature");
+        logger.warn("Invalid webhook signature");
         return null; // Reject webhook with invalid signature
       }
 
-      // Require body for paymentId, action, and raw payload
+      logger.info({ body }, "body");
+
+      // Per MP docs: data.id = payment ID (for GET /v1/payments/{id}); body.id = notification ID
       const data = body?.data as { id: string | number } | undefined;
       if (!body || body.type !== "payment" || !data?.id) {
         return null; // Invalid body structure
       }
 
+      const mercadoPagoPaymentId = body?.id as string | undefined;
+
+      if (!mercadoPagoPaymentId) {
+        return null;
+      }
+
+      console.log("mercadoPagoPaymentId", mercadoPagoPaymentId);
+
       const paymentId = String(data.id);
 
+      console.log("paymentId", paymentId);
+
       // Fetch full payment details to get status and external_reference (orderId)
-      const paymentDetails = await this.fetchPaymentDetails(paymentId);
+      const paymentDetails =
+        await this.fetchPaymentDetails(mercadoPagoPaymentId);
       if (!paymentDetails) {
         return null;
       }
@@ -374,9 +399,10 @@ export class MercadoPagoClient implements PaymentProviderClient {
         providerReference: paymentId,
         eventType,
         raw: body,
+        orderId: paymentDetails.external_reference ?? undefined,
       };
     } catch (error) {
-      console.error("Error parsing Mercado Pago webhook:", error);
+      logger.error({ err: error }, "Error parsing Mercado Pago webhook");
       return null;
     }
   }
@@ -521,12 +547,15 @@ export class MercadoPagoClient implements PaymentProviderClient {
   /**
    * Fetch payment details from Mercado Pago API using SDK
    */
-  private async fetchPaymentDetails(
-    paymentId: string
-  ): Promise<{ status: string; transaction_amount?: number } | null> {
+  private async fetchPaymentDetails(mercadoPagoId: string): Promise<{
+    status: string;
+    transaction_amount?: number;
+    external_reference?: string;
+  } | null> {
     try {
       // Use SDK to fetch payment
-      const payment = await this.payment.get({ id: paymentId });
+      const payment = await this.payment.get({ id: mercadoPagoId });
+      logger.info({ payment }, "payment");
       return {
         status: payment.status || "",
         transaction_amount: payment.transaction_amount,

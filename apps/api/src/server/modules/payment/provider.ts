@@ -43,9 +43,11 @@ export interface CreatePreauthResult {
  */
 export interface ProviderWebhookEvent {
   provider: PaymentProvider;
-  providerReference: string;
+  providerReference: string; // Provider's payment ID (e.g. MP payment id for API calls)
   eventType: string; // e.g., "payment.created", "payment.authorized"
   raw: unknown; // Original provider payload
+  /** Optional order id from provider (e.g. external_reference) for lookup when providerReference was preference id */
+  orderId?: string;
 }
 
 /**

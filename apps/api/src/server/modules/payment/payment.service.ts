@@ -3,7 +3,7 @@ import type { PaymentRepository } from "./payment.repo";
 import type { PaymentEventRepository } from "./paymentEvent.repo";
 import type { OrderRepository } from "@modules/order/order.repo";
 import type { ProRepository } from "@modules/pro/pro.repo";
-import type { PaymentProviderClient } from "./provider";
+import type { PaymentProviderClient, ProviderWebhookEvent } from "./provider";
 import type { Actor } from "@infra/auth/roles";
 import {
   PaymentProvider,
@@ -222,17 +222,24 @@ export class PaymentService {
    * - Payment FAILED/CANCELLED: Order stays in ACCEPTED (client can retry or cancel)
    * - Payment REFUNDED: Order status unchanged (already completed/cancelled)
    */
-  async handleProviderWebhook(event: {
-    provider: PaymentProvider;
-    providerReference: string;
-    eventType: string;
-    raw: unknown;
-  }): Promise<void> {
-    // Find payment by provider reference
-    const payment = await this.paymentRepository.findByProviderReference(
+  async handleProviderWebhook(event: ProviderWebhookEvent): Promise<void> {
+    // Find payment by provider reference (e.g. MP payment id)
+    let payment = await this.paymentRepository.findByProviderReference(
       event.provider,
       event.providerReference
     );
+
+    // First webhook: our row may still have preference id as providerReference; find by orderId and update
+    if (!payment && event.orderId) {
+      const byOrder = await this.paymentRepository.findByOrderId(event.orderId);
+      if (byOrder && byOrder.provider === event.provider) {
+        await this.paymentRepository.setProviderReference(
+          byOrder.id,
+          event.providerReference
+        );
+        payment = await this.paymentRepository.findById(byOrder.id);
+      }
+    }
 
     if (!payment) {
       // Log but don't throw - webhook might be for a payment we don't have
