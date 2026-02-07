@@ -327,6 +327,9 @@ export class MercadoPagoClient implements PaymentProviderClient {
 
       console.log("HOLA");
       console.log("rawBody", rawBody);
+      console.log("signature", signature);
+      console.log("xRequestId", xRequestId);
+      console.log("url", url);
 
       // Parse body first so we can use it when query params are missing (e.g. notification_url flow)
       let body: Record<string, unknown> | null = null;
