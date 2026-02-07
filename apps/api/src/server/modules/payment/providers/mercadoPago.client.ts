@@ -343,6 +343,8 @@ export class MercadoPagoClient implements PaymentProviderClient {
         body = null;
       }
 
+      console.log("body", body);
+
       // Resolve data.id and type: prefer query params, fallback to body (per MP docs)
       const dataIdFromQuery = url.searchParams.get("data.id");
       const typeFromQuery = url.searchParams.get("type");
@@ -357,6 +359,9 @@ export class MercadoPagoClient implements PaymentProviderClient {
 
       const dataId = dataIdFromQuery ?? dataIdFromBody;
       const type = typeFromQuery ?? typeFromBody;
+
+      console.log("dataId", dataId);
+      console.log("type", type);
 
       // Verify this is a payment webhook
       if (type !== "payment" || !dataId) {
