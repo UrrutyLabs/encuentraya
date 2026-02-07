@@ -239,88 +239,6 @@ export class MercadoPagoClient implements PaymentProviderClient {
   }
 
   /**
-   * Verify webhook signature using X-Signature header
-   * Mercado Pago signs webhooks using HMAC-SHA256 with the webhook secret
-   *
-   * According to Mercado Pago documentation, the signature is calculated using a manifest string:
-   * manifest = "id:{data.id};request-id:{x-request-id};ts:{ts};"
-   * signature = HMAC-SHA256(manifest, webhook_secret)
-   */
-  private verifyWebhookSignature(
-    dataId: string,
-    xRequestId: string,
-    signature: string | null
-  ): boolean {
-    // If no secret configured, skip verification (not recommended for production)
-    if (!this.webhookSecret) {
-      console.warn(
-        "MERCADOPAGO_WEBHOOK_SECRET not configured. Webhook signature verification skipped."
-      );
-      return true; // Allow in development, but log warning
-    }
-
-    if (!signature) {
-      return false; // No signature provided
-    }
-
-    console.log("dataId", dataId);
-    console.log("xRequestId", xRequestId);
-    console.log("signature", signature);
-
-    try {
-      // Extract signature components
-      // Format: "ts={timestamp},v1={signature}"
-      const signatureParts = signature.split(",");
-      const signatureMap: Record<string, string> = {};
-      signatureParts.forEach((part) => {
-        const [key, value] = part.split("=");
-        if (key && value) {
-          signatureMap[key.trim()] = value.trim();
-        }
-      });
-
-      const v1Signature = signatureMap.v1;
-      const ts = signatureMap.ts;
-
-      if (!v1Signature || !ts) {
-        return false;
-      }
-
-      console.log("v1Signature", v1Signature);
-      console.log("ts", ts);
-
-      // Build manifest string according to Mercado Pago documentation
-      // Format: "id:{data.id};request-id:{x-request-id};ts:{ts};"
-      // If data.id is alphanumeric, it must be sent in lowercase (per MP docs)
-      const dataIdForManifest = /^[a-zA-Z0-9]+$/.test(dataId)
-        ? dataId.toLowerCase()
-        : dataId;
-      const manifest = `id:${dataIdForManifest};request-id:${xRequestId};ts:${ts};`;
-
-      console.log("manifest", manifest);
-
-      // Create expected signature: HMAC-SHA256 of manifest with secret
-      const expectedSignature = crypto
-        .createHmac("sha256", this.webhookSecret)
-        .update(manifest)
-        .digest("hex");
-
-      console.log("expectedSignature", expectedSignature);
-
-      // Compare signatures using constant-time comparison to prevent timing attacks
-      const receivedBuf = Buffer.from(v1Signature, "utf8");
-      const expectedBuf = Buffer.from(expectedSignature, "utf8");
-      if (receivedBuf.length !== expectedBuf.length) {
-        return false;
-      }
-      return crypto.timingSafeEqual(receivedBuf, expectedBuf);
-    } catch (error) {
-      console.error("Error verifying webhook signature:", error);
-      return false;
-    }
-  }
-
-  /**
    * Parse and validate webhook payload from Mercado Pago
    * MP sends webhooks with payment updates
    * Includes signature verification for security
@@ -553,6 +471,94 @@ export class MercadoPagoClient implements PaymentProviderClient {
         );
       }
       throw new Error("Failed to refund Mercado Pago payment: Unknown error");
+    }
+  }
+
+  /**
+   * Verify webhook signature using X-Signature header
+   * Mercado Pago signs webhooks using HMAC-SHA256 with the webhook secret
+   *
+   * According to Mercado Pago documentation, the signature is calculated using a manifest string:
+   * manifest = "id:{data.id};request-id:{x-request-id};ts:{ts};"
+   * signature = HMAC-SHA256(manifest, webhook_secret)
+   */
+  private verifyWebhookSignature(
+    dataId: string,
+    xRequestId: string,
+    signature: string | null
+  ): boolean {
+    // If no secret configured, skip verification (not recommended for production)
+    if (!this.webhookSecret) {
+      console.warn(
+        "MERCADOPAGO_WEBHOOK_SECRET not configured. Webhook signature verification skipped."
+      );
+      return true; // Allow in development, but log warning
+    }
+
+    if (!signature) {
+      return false; // No signature provided
+    }
+
+    console.log("dataId", dataId);
+    console.log("xRequestId", xRequestId);
+    console.log("signature", signature);
+
+    try {
+      // Extract signature components
+      // Format: "ts={timestamp},v1={signature}"
+      const signatureParts = signature.split(",");
+      const signatureMap: Record<string, string> = {};
+      signatureParts.forEach((part) => {
+        const [key, value] = part.split("=");
+        if (key && value) {
+          signatureMap[key.trim()] = value.trim();
+        }
+      });
+
+      const v1Signature = signatureMap.v1;
+      const ts = signatureMap.ts;
+
+      if (!v1Signature || !ts) {
+        return false;
+      }
+
+      console.log("v1Signature", v1Signature);
+      console.log("ts", ts);
+
+      // Build manifest string according to Mercado Pago documentation
+      // Format: "id:{data.id};request-id:{x-request-id};ts:{ts};"
+      // If data.id is alphanumeric, it must be sent in lowercase (per MP docs)
+      const dataIdForManifest = /^[a-zA-Z0-9]+$/.test(dataId)
+        ? dataId.toLowerCase()
+        : dataId;
+      const manifest = `id:${dataIdForManifest};request-id:${xRequestId};ts:${ts};`;
+
+      console.log("manifest", manifest);
+
+      // Create expected signature: HMAC-SHA256 of manifest with secret
+      const expectedSignature = crypto
+        .createHmac("sha256", this.webhookSecret)
+        .update(manifest)
+        .digest("hex");
+
+      console.log("expectedSignature", expectedSignature);
+
+      // Compare signatures using constant-time comparison to prevent timing attacks
+      const receivedBuf = Buffer.from(v1Signature, "utf8");
+      console.log("receivedBuf", receivedBuf);
+      const expectedBuf = Buffer.from(expectedSignature, "utf8");
+      console.log("expectedBuf", expectedBuf);
+      if (receivedBuf.length !== expectedBuf.length) {
+        return false;
+      }
+      console.log(
+        "crypto.timingSafeEqual",
+        crypto.timingSafeEqual(receivedBuf, expectedBuf)
+      );
+      return crypto.timingSafeEqual(receivedBuf, expectedBuf);
+    } catch (error) {
+      console.error("Error verifying webhook signature:", error);
+      return false;
     }
   }
 
