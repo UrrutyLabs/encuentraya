@@ -17,6 +17,7 @@ interface SubcategoryFormData {
   displayOrder: number;
   isActive: boolean;
   configJson?: Record<string, unknown> | null;
+  searchKeywords?: string[];
 }
 
 interface SubcategoryFormProps {
@@ -49,9 +50,21 @@ export function SubcategoryForm({
   );
   const [isActive, setIsActive] = useState(subcategory?.isActive ?? true);
   const [configJson, setConfigJson] = useState<Record<string, unknown> | null>(
-    null
-  ); // Note: configJson not in current domain schema
+    subcategory?.configJson ?? null
+  );
+  const [searchKeywordsInput, setSearchKeywordsInput] = useState(
+    subcategory?.searchKeywords?.join(", ") ?? ""
+  );
   const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
+
+  const parsedSearchKeywords = useMemo(
+    () =>
+      searchKeywordsInput
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean),
+    [searchKeywordsInput]
+  );
 
   // Auto-generate slug from name if not editing
   // Use derived state that updates when name changes
@@ -79,7 +92,8 @@ export function SubcategoryForm({
       isActive,
       ...(imageUrl && { imageUrl }),
       ...(description && { description }),
-      ...(configJson && { configJson }),
+      ...(configJson !== undefined && configJson !== null && { configJson }),
+      searchKeywords: parsedSearchKeywords,
     };
 
     onSubmit(formData);
@@ -92,7 +106,11 @@ export function SubcategoryForm({
     imageUrl !== (subcategory?.imageUrl || "") ||
     description !== (subcategory?.description || "") ||
     displayOrder !== (subcategory?.displayOrder || 0) ||
-    isActive !== (subcategory?.isActive ?? true);
+    isActive !== (subcategory?.isActive ?? true) ||
+    JSON.stringify(configJson ?? null) !==
+      JSON.stringify(subcategory?.configJson ?? null) ||
+    JSON.stringify(parsedSearchKeywords) !==
+      JSON.stringify(subcategory?.searchKeywords ?? []);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -210,6 +228,23 @@ export function SubcategoryForm({
             <span className="ml-2 text-sm text-gray-700">Activa</span>
           </label>
         </div>
+      </div>
+
+      {/* Search keywords */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Palabras clave de búsqueda
+        </label>
+        <Text variant="xs" className="text-gray-500 mb-2">
+          Separadas por coma. Se usan para mejorar la búsqueda de esta
+          subcategoría.
+        </Text>
+        <Input
+          type="text"
+          value={searchKeywordsInput}
+          onChange={(e) => setSearchKeywordsInput(e.target.value)}
+          placeholder="desatascos, cañerías, tapado"
+        />
       </div>
 
       {/* Config JSON Editor */}

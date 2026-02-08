@@ -1,13 +1,19 @@
 import { DependencyContainer } from "tsyringe";
 import { TOKENS } from "../tokens";
+import { SearchCategoryRepository } from "@modules/search/searchCategory.repo";
 import { SearchService } from "@modules/search/search.service";
 
 /**
  * Register Search module dependencies
- * Depends on: ProService
+ * Depends on: ProService, AvailabilityService, SearchCategoryRepository
  */
 export function registerSearchModule(container: DependencyContainer): void {
-  // Register service (auto-resolves dependencies)
+  container.register<SearchCategoryRepository>(
+    TOKENS.SearchCategoryRepository,
+    {
+      useClass: SearchCategoryRepository,
+    }
+  );
   container.register<SearchService>(TOKENS.SearchService, {
     useClass: SearchService,
   });

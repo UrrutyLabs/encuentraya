@@ -1,13 +1,25 @@
 import { router, publicProcedure } from "@infra/trpc";
 import { container, TOKENS } from "@/server/container";
 import { SearchService } from "./search.service";
-import { clientSearchProsInputSchema } from "@repo/domain";
+import {
+  clientSearchProsInputSchema,
+  searchCategoriesAndSubcategoriesInputSchema,
+} from "@repo/domain";
 import { TRPCError } from "@trpc/server";
 
 // Resolve service from container
 const searchService = container.resolve<SearchService>(TOKENS.SearchService);
 
 export const searchRouter = router({
+  searchCategoriesAndSubcategories: publicProcedure
+    .input(searchCategoriesAndSubcategoriesInputSchema)
+    .query(async ({ input }) => {
+      return searchService.searchCategoriesAndSubcategories(
+        input.q,
+        input.limit
+      );
+    }),
+
   searchPros: publicProcedure
     .input(clientSearchProsInputSchema)
     .query(async ({ input }) => {
@@ -81,6 +93,7 @@ export const searchRouter = router({
         return await searchService.searchPros({
           categoryId: input.categoryId,
           subcategory: input.subcategory,
+          q: input.q,
           date: input.date,
           timeWindow: input.timeWindow,
         });

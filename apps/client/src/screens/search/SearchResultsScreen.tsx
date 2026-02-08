@@ -102,17 +102,17 @@ function SearchResultsContent() {
     return values;
   }, [searchParams]);
 
-  // Memoize filters
+  // When q is in URL (text search), pass it so API resolves to category/subcategory.
+  // When category/subcategory are in URL (from typeahead or category picker), use those.
   const filters = useMemo(
     () => ({
       categoryId: category?.id,
       subcategory: subcategorySlug,
+      q: searchQuery.trim() || undefined,
       date: date || undefined,
       timeWindow: (timeWindow || undefined) as TimeWindow | undefined,
-      // Note: searchQuery is not yet supported by API
-      // It's kept in URL for future use
     }),
-    [category, subcategorySlug, date, timeWindow]
+    [category?.id, subcategorySlug, searchQuery, date, timeWindow]
   );
 
   const { pros: allPros, isLoading, error } = useSearchPros(filters);
@@ -220,6 +220,11 @@ function SearchResultsContent() {
                 />
               ) : (
                 <>
+                  {searchQuery.trim() && (
+                    <Text variant="small" className="mb-1 text-muted" as="p">
+                      Resultados para «{searchQuery.trim()}»
+                    </Text>
+                  )}
                   <Text variant="h2" className="mb-4 md:mb-6 text-text">
                     {pros.length}{" "}
                     {pros.length === 1

@@ -121,6 +121,12 @@ vi.mock("@/lib/trpc/client", () => {
         searchPros: {
           useQuery: (...args: unknown[]) => mockTrpcClientSearchPros(...args),
         },
+        searchCategoriesAndSubcategories: {
+          useQuery: vi.fn(() => ({
+            data: { categories: [], subcategories: [] },
+            isFetching: false,
+          })),
+        },
       },
       category: {
         getAll: {

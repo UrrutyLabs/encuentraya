@@ -65,6 +65,10 @@ export {
 // Client schemas
 export {
   clientSearchProsInputSchema,
+  searchCategoriesAndSubcategoriesInputSchema,
+  searchCategoriesAndSubcategoriesOutputSchema,
+  categorySuggestionSchema,
+  subcategorySuggestionSchema,
   timeWindowSchema,
   preferredContactMethodSchema,
   clientSignupInputSchema,
@@ -75,6 +79,10 @@ export {
   resetPasswordInputSchema,
   resetPasswordWithOtpInputSchema,
   type ClientSearchProsInput,
+  type SearchCategoriesAndSubcategoriesInput,
+  type SearchCategoriesAndSubcategoriesOutput,
+  type CategorySuggestion,
+  type SubcategorySuggestion,
   type TimeWindow,
   type PreferredContactMethod,
   type ClientSignupInput,

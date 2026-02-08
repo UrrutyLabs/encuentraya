@@ -75,6 +75,8 @@ export class SubcategoryService {
     description?: string | null;
     displayOrder?: number;
     isActive?: boolean;
+    configJson?: Record<string, unknown> | null;
+    searchKeywords?: string[];
   }): Promise<Subcategory> {
     // Check if subcategory with same slug already exists in this category
     const existing = await this.subcategoryRepository.findBySlugAndCategoryId(
@@ -96,6 +98,8 @@ export class SubcategoryService {
       description: input.description,
       displayOrder: input.displayOrder ?? 0,
       isActive: input.isActive ?? true,
+      configJson: input.configJson,
+      searchKeywords: input.searchKeywords,
     });
 
     return this.mapEntityToDomain(entity);
@@ -114,6 +118,8 @@ export class SubcategoryService {
       description: string | null;
       displayOrder: number;
       isActive: boolean;
+      configJson: Record<string, unknown> | null;
+      searchKeywords: string[];
     }>
   ): Promise<Subcategory | null> {
     // If slug is being updated, check for conflicts
@@ -187,6 +193,8 @@ export class SubcategoryService {
       description: entity.description,
       displayOrder: entity.displayOrder,
       isActive: entity.isActive,
+      configJson: entity.configJson,
+      searchKeywords: entity.searchKeywords,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
     };

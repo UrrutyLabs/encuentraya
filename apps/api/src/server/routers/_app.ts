@@ -46,6 +46,8 @@ export const appRouter = router({
   upload: uploadRouter,
   clientSearch: router({
     searchPros: searchRouter.searchPros,
+    searchCategoriesAndSubcategories:
+      searchRouter.searchCategoriesAndSubcategories,
   }),
 });
 

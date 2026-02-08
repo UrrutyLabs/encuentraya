@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card } from "@repo/ui";
 import { Button } from "@repo/ui";
@@ -7,8 +8,10 @@ import { Text } from "@repo/ui";
 import { Badge } from "@repo/ui";
 import { useSubcategory } from "@/hooks/useSubcategories";
 import { useCategory } from "@/hooks/useCategories";
+import { useDeleteSubcategory } from "@/hooks/useSubcategoryMutations";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { SubcategoryDetailSkeleton } from "@/components/presentational/SubcategoryDetailSkeleton";
+import { ConfirmModal } from "@/components/modals/ConfirmModal";
 
 interface SubcategoryDetailScreenProps {
   subcategoryId: string;
@@ -18,10 +21,12 @@ export function SubcategoryDetailScreen({
   subcategoryId,
 }: SubcategoryDetailScreenProps) {
   const router = useRouter();
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const { data: subcategory, isLoading } = useSubcategory(subcategoryId);
   const { data: category } = useCategory(subcategory?.categoryId || "", {
     includeDeleted: true,
   });
+  const deleteSubcategory = useDeleteSubcategory();
 
   const formatDate = (date: Date) => {
     return new Date(date).toLocaleDateString("es-UY", {
@@ -73,6 +78,13 @@ export function SubcategoryDetailScreen({
         <div className="flex items-center gap-2">
           <Button variant="ghost" onClick={() => router.back()}>
             Volver
+          </Button>
+          <Button
+            variant="danger"
+            onClick={() => setShowDeleteModal(true)}
+            disabled={deleteSubcategory.isPending}
+          >
+            {deleteSubcategory.isPending ? "Eliminando..." : "Eliminar"}
           </Button>
           <Button
             onClick={() =>
@@ -155,8 +167,54 @@ export function SubcategoryDetailScreen({
             </Text>
             <Text variant="body">{formatDate(subcategory.updatedAt)}</Text>
           </div>
+          {(subcategory.searchKeywords?.length ?? 0) > 0 && (
+            <div className="md:col-span-2">
+              <Text variant="small" className="text-gray-600">
+                Palabras clave de búsqueda
+              </Text>
+              <div className="flex flex-wrap gap-1 mt-1">
+                {subcategory.searchKeywords.map((kw) => (
+                  <Badge key={kw} variant="info">
+                    {kw}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          )}
+          {subcategory.configJson &&
+            Object.keys(subcategory.configJson).length > 0 && (
+              <div className="md:col-span-2">
+                <Text variant="small" className="text-gray-600">
+                  Configuración JSON
+                </Text>
+                <pre className="mt-1 p-3 bg-gray-50 rounded text-sm overflow-x-auto">
+                  {JSON.stringify(subcategory.configJson, null, 2)}
+                </pre>
+              </div>
+            )}
         </div>
       </Card>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <ConfirmModal
+          title="Eliminar subcategoría"
+          message="¿Estás seguro de que querés eliminar esta subcategoría? Esta acción es permanente y no se puede deshacer."
+          confirmLabel="Eliminar"
+          variant="danger"
+          onConfirm={async () => {
+            try {
+              await deleteSubcategory.mutateAsync({ id: subcategoryId });
+              setShowDeleteModal(false);
+              router.push("/admin/subcategories");
+            } catch (e) {
+              console.error(e);
+            }
+          }}
+          onCancel={() => setShowDeleteModal(false)}
+          isPending={deleteSubcategory.isPending}
+        />
+      )}
     </div>
   );
 }

@@ -668,12 +668,16 @@ model Category {
   configJson       Json?            // Category-level UI defaults
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
+  fts              Unsupported("tsvector")? // FTS; maintained by DB trigger, GIN index in migration
+  searchable_text  Unsupported("text")                 // Trigram search; trigger + GIN(gin_trgm_ops) in migration only
 
   // Relations
   subcategories Subcategory[]
   orders        Order[]
   proProfiles   ProProfileCategory[]
 
+  @@index([fts], type: Gin) // GIN for full-text search on tsvector
+  @@index([searchable_text(ops: raw("gin_trgm_ops"))], type: Gin, map: "idx_categories_searchable_text_gin")
   @@index([isActive, sortOrder])
   @@index([deletedAt])
   @@map("categories")
@@ -693,6 +697,8 @@ model Subcategory {
   searchKeywords String[] @default([]) // Search keywords for this subcategory
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  fts             Unsupported("tsvector")? // FTS; maintained by DB trigger, GIN index in migration
+  searchable_text Unsupported("text")                  // Trigram search; trigger + GIN(gin_trgm_ops) in migration only
 
   // Relations
   category    Category  @relation(fields: [categoryId], references: [id], onDelete: Restrict)
@@ -700,6 +706,8 @@ model Subcategory {
 
   @@unique([categoryId, slug]) // Unique slug within category
   @@unique([categoryId, key]) // Unique key within category
+  @@index([fts], type: Gin) // GIN for full-text search on tsvector
+  @@index([searchable_text(ops: raw("gin_trgm_ops"))], type: Gin, map: "idx_subcategories_searchable_text_gin")
   @@index([categoryId])
   @@index([slug])
   @@index([isActive])

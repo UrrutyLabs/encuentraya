@@ -5,6 +5,7 @@ import { Card } from "@repo/ui";
 import { Text } from "@repo/ui";
 import { SubcategoryForm } from "@/components/subcategories/SubcategoryForm";
 import { useSubcategory } from "@/hooks/useSubcategories";
+import { useUpdateSubcategory } from "@/hooks/useSubcategoryMutations";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { SubcategoryDetailSkeleton } from "@/components/presentational/SubcategoryDetailSkeleton";
 
@@ -17,6 +18,7 @@ export function SubcategoryEditScreen({
 }: SubcategoryEditScreenProps) {
   const router = useRouter();
   const { data: subcategory, isLoading } = useSubcategory(subcategoryId);
+  const updateSubcategory = useUpdateSubcategory();
 
   const handleSubmit = async (data: {
     name: string;
@@ -27,12 +29,27 @@ export function SubcategoryEditScreen({
     displayOrder: number;
     isActive: boolean;
     configJson?: Record<string, unknown> | null;
+    searchKeywords?: string[];
   }) => {
-    // TODO: Implement when subcategory.update endpoint is available
-    alert(
-      "La actualización de subcategorías aún no está implementada. Por favor, espera a que se agreguen los endpoints de API."
-    );
-    console.log("Would update subcategory:", subcategoryId, data);
+    try {
+      await updateSubcategory.mutateAsync({
+        id: subcategoryId,
+        data: {
+          name: data.name,
+          slug: data.slug,
+          imageUrl: data.imageUrl ?? null,
+          description: data.description ?? null,
+          displayOrder: data.displayOrder,
+          isActive: data.isActive,
+          configJson: data.configJson ?? null,
+          searchKeywords: data.searchKeywords ?? [],
+        },
+      });
+      router.push(`/admin/subcategories/${subcategoryId}`);
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
   };
 
   const handleCancel = () => {
@@ -65,19 +82,12 @@ export function SubcategoryEditScreen({
       />
       <Text variant="h1">Editar Subcategoría</Text>
 
-      <Card className="p-6 border-warning/20 bg-warning/5">
-        <Text variant="body" className="text-warning mb-4">
-          ⚠️ La actualización de subcategorías aún no está disponible. Los
-          endpoints de API deben ser implementados primero.
-        </Text>
-      </Card>
-
       <Card className="p-6">
         <SubcategoryForm
           subcategory={subcategory}
           onSubmit={handleSubmit}
           onCancel={handleCancel}
-          isLoading={false}
+          isLoading={updateSubcategory.isPending}
         />
       </Card>
     </div>

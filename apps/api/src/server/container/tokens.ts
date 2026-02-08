@@ -22,6 +22,7 @@ export const TOKENS = {
   AuditLogRepository: "AuditLogRepository",
   CategoryRepository: "CategoryRepository",
   SubcategoryRepository: "SubcategoryRepository",
+  SearchCategoryRepository: "SearchCategoryRepository",
   ProProfileCategoryRepository: "ProProfileCategoryRepository",
   OrderRepository: "OrderRepository",
   OrderLineItemRepository: "OrderLineItemRepository",

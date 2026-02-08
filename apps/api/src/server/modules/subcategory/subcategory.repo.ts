@@ -1,5 +1,6 @@
+import { randomUUID } from "node:crypto";
 import { injectable } from "tsyringe";
-import { prisma } from "@infra/db/prisma";
+import { prisma, Prisma } from "@infra/db/prisma";
 
 /**
  * Subcategory entity (plain object)
@@ -31,6 +32,8 @@ export interface SubcategoryCreateInput {
   description?: string | null;
   displayOrder?: number;
   isActive?: boolean;
+  configJson?: Record<string, unknown> | null;
+  searchKeywords?: string[];
 }
 
 /**
@@ -111,19 +114,44 @@ export class SubcategoryRepositoryImpl implements SubcategoryRepository {
   }
 
   async create(input: SubcategoryCreateInput): Promise<SubcategoryEntity> {
-    const subcategory = await prisma.subcategory.create({
-      data: {
-        name: input.name,
-        slug: input.slug,
-        categoryId: input.categoryId,
-        imageUrl: input.imageUrl ?? null,
-        description: input.description ?? null,
-        displayOrder: input.displayOrder ?? 0,
-        isActive: input.isActive ?? true,
-      },
-    });
-
-    return this.mapPrismaToDomain(subcategory);
+    const id = randomUUID();
+    const configJson =
+      input.configJson != null ? JSON.stringify(input.configJson) : null;
+    const searchKeywords = input.searchKeywords ?? [];
+    const rows = await prisma.$queryRawUnsafe<
+      Array<{
+        id: string;
+        name: string;
+        slug: string;
+        categoryId: string;
+        key: string | null;
+        imageUrl: string | null;
+        description: string | null;
+        displayOrder: number;
+        isActive: boolean;
+        configJson: unknown;
+        searchKeywords: string[];
+        createdAt: Date;
+        updatedAt: Date;
+      }>
+    >(
+      `INSERT INTO subcategories (id, name, slug, "categoryId", key, imageUrl, description, "displayOrder", "isActive", "configJson", "searchKeywords")
+       VALUES ($1, $2, $3, $4, NULL, $5, $6, $7, $8, $9::jsonb, $10::text[])
+       RETURNING id, name, slug, "categoryId", key, imageUrl, description, "displayOrder", "isActive", "configJson", "searchKeywords", "createdAt", "updatedAt"`,
+      id,
+      input.name,
+      input.slug,
+      input.categoryId,
+      input.imageUrl ?? null,
+      input.description ?? null,
+      input.displayOrder ?? 0,
+      input.isActive ?? true,
+      configJson,
+      searchKeywords
+    );
+    const row = rows[0];
+    if (!row) throw new Error("Subcategory create failed: no row returned");
+    return this.mapPrismaToDomain(row);
   }
 
   async update(
@@ -138,6 +166,8 @@ export class SubcategoryRepositoryImpl implements SubcategoryRepository {
       description?: string | null;
       displayOrder?: number;
       isActive?: boolean;
+      configJson?: Prisma.NullableJsonNullValueInput | Prisma.InputJsonValue;
+      searchKeywords?: string[];
     } = {};
 
     if (data.name !== undefined) updateData.name = data.name;
@@ -150,6 +180,13 @@ export class SubcategoryRepositoryImpl implements SubcategoryRepository {
     if (data.displayOrder !== undefined)
       updateData.displayOrder = data.displayOrder;
     if (data.isActive !== undefined) updateData.isActive = data.isActive;
+    if (data.configJson !== undefined)
+      updateData.configJson =
+        data.configJson == null
+          ? Prisma.JsonNull
+          : (data.configJson as Prisma.InputJsonValue);
+    if (data.searchKeywords !== undefined)
+      updateData.searchKeywords = data.searchKeywords;
 
     const updated = await prisma.subcategory.update({
       where: { id },

@@ -2,12 +2,24 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { SearchService } from "../search.service";
 import type { ProService } from "@modules/pro/pro.service";
 import type { AvailabilityService } from "@modules/pro/availability.service";
+import type { SearchCategoryRepository } from "../searchCategory.repo";
 import type { Pro } from "@repo/domain";
 
 describe("SearchService", () => {
   let service: SearchService;
   let mockProService: ReturnType<typeof createMockProService>;
   let mockAvailabilityService: ReturnType<typeof createMockAvailabilityService>;
+  let mockSearchCategoryRepository: ReturnType<
+    typeof createMockSearchCategoryRepository
+  >;
+
+  function createMockSearchCategoryRepository(): {
+    resolveQuery: ReturnType<typeof vi.fn>;
+  } {
+    return {
+      resolveQuery: vi.fn().mockResolvedValue(null),
+    };
+  }
 
   function createMockProService(): {
     searchPros: ReturnType<typeof vi.fn>;
@@ -59,10 +71,12 @@ describe("SearchService", () => {
   beforeEach(() => {
     mockProService = createMockProService();
     mockAvailabilityService = createMockAvailabilityService();
+    mockSearchCategoryRepository = createMockSearchCategoryRepository();
 
     service = new SearchService(
       mockProService as unknown as ProService,
-      mockAvailabilityService as unknown as AvailabilityService
+      mockAvailabilityService as unknown as AvailabilityService,
+      mockSearchCategoryRepository as unknown as SearchCategoryRepository
     );
     vi.clearAllMocks();
   });
@@ -312,7 +326,7 @@ describe("SearchService", () => {
       ).not.toHaveBeenCalled();
     });
 
-    it("should ignore subcategory filter (for future use)", async () => {
+    it("should ignore subcategory filter for proService (only categoryId is passed)", async () => {
       // Arrange
       const pros = [
         createMockPro({ id: "pro-1", categoryIds: ["cat-plumbing"] }),
@@ -323,7 +337,7 @@ describe("SearchService", () => {
       // Act
       const result = await service.searchPros({
         categoryId: "cat-plumbing",
-        subcategory: "drain-cleaning", // Should be ignored for now
+        subcategory: "drain-cleaning",
       });
 
       // Assert
@@ -331,6 +345,41 @@ describe("SearchService", () => {
         categoryId: "cat-plumbing",
       });
       expect(result).toEqual(pros);
+    });
+
+    it("should resolve q to categoryId and subcategory when q is provided", async () => {
+      // Arrange
+      const pros = [
+        createMockPro({ id: "pro-1", categoryIds: ["cat-plumbing"] }),
+      ];
+      mockSearchCategoryRepository.resolveQuery.mockResolvedValue({
+        categoryId: "cat-plumbing",
+        subcategorySlug: "fugas-goteras",
+      });
+      mockProService.searchPros.mockResolvedValue(pros);
+
+      // Act
+      const result = await service.searchPros({
+        q: "plomero fugas",
+      });
+
+      // Assert
+      expect(mockSearchCategoryRepository.resolveQuery).toHaveBeenCalledWith(
+        "plomero fugas"
+      );
+      expect(mockProService.searchPros).toHaveBeenCalledWith({
+        categoryId: "cat-plumbing",
+      });
+      expect(result).toEqual(pros);
+    });
+
+    it("should not resolve when q is blank", async () => {
+      mockProService.searchPros.mockResolvedValue([]);
+
+      await service.searchPros({ q: "   " });
+
+      expect(mockSearchCategoryRepository.resolveQuery).not.toHaveBeenCalled();
+      expect(mockProService.searchPros).toHaveBeenCalledWith({});
     });
 
     it("should handle multiple pros with mixed availability", async () => {

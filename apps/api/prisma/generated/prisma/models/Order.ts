@@ -1738,20 +1738,6 @@ export type OrderUpdateOneRequiredWithoutEarningNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.OrderUpdateToOneWithWhereWithoutEarningInput, Prisma.OrderUpdateWithoutEarningInput>, Prisma.OrderUncheckedUpdateWithoutEarningInput>
 }
 
-export type OrderCreateNestedManyWithoutCategoryInput = {
-  create?: Prisma.XOR<Prisma.OrderCreateWithoutCategoryInput, Prisma.OrderUncheckedCreateWithoutCategoryInput> | Prisma.OrderCreateWithoutCategoryInput[] | Prisma.OrderUncheckedCreateWithoutCategoryInput[]
-  connectOrCreate?: Prisma.OrderCreateOrConnectWithoutCategoryInput | Prisma.OrderCreateOrConnectWithoutCategoryInput[]
-  createMany?: Prisma.OrderCreateManyCategoryInputEnvelope
-  connect?: Prisma.OrderWhereUniqueInput | Prisma.OrderWhereUniqueInput[]
-}
-
-export type OrderUncheckedCreateNestedManyWithoutCategoryInput = {
-  create?: Prisma.XOR<Prisma.OrderCreateWithoutCategoryInput, Prisma.OrderUncheckedCreateWithoutCategoryInput> | Prisma.OrderCreateWithoutCategoryInput[] | Prisma.OrderUncheckedCreateWithoutCategoryInput[]
-  connectOrCreate?: Prisma.OrderCreateOrConnectWithoutCategoryInput | Prisma.OrderCreateOrConnectWithoutCategoryInput[]
-  createMany?: Prisma.OrderCreateManyCategoryInputEnvelope
-  connect?: Prisma.OrderWhereUniqueInput | Prisma.OrderWhereUniqueInput[]
-}
-
 export type OrderUpdateManyWithoutCategoryNestedInput = {
   create?: Prisma.XOR<Prisma.OrderCreateWithoutCategoryInput, Prisma.OrderUncheckedCreateWithoutCategoryInput> | Prisma.OrderCreateWithoutCategoryInput[] | Prisma.OrderUncheckedCreateWithoutCategoryInput[]
   connectOrCreate?: Prisma.OrderCreateOrConnectWithoutCategoryInput | Prisma.OrderCreateOrConnectWithoutCategoryInput[]
@@ -1778,20 +1764,6 @@ export type OrderUncheckedUpdateManyWithoutCategoryNestedInput = {
   update?: Prisma.OrderUpdateWithWhereUniqueWithoutCategoryInput | Prisma.OrderUpdateWithWhereUniqueWithoutCategoryInput[]
   updateMany?: Prisma.OrderUpdateManyWithWhereWithoutCategoryInput | Prisma.OrderUpdateManyWithWhereWithoutCategoryInput[]
   deleteMany?: Prisma.OrderScalarWhereInput | Prisma.OrderScalarWhereInput[]
-}
-
-export type OrderCreateNestedManyWithoutSubcategoryInput = {
-  create?: Prisma.XOR<Prisma.OrderCreateWithoutSubcategoryInput, Prisma.OrderUncheckedCreateWithoutSubcategoryInput> | Prisma.OrderCreateWithoutSubcategoryInput[] | Prisma.OrderUncheckedCreateWithoutSubcategoryInput[]
-  connectOrCreate?: Prisma.OrderCreateOrConnectWithoutSubcategoryInput | Prisma.OrderCreateOrConnectWithoutSubcategoryInput[]
-  createMany?: Prisma.OrderCreateManySubcategoryInputEnvelope
-  connect?: Prisma.OrderWhereUniqueInput | Prisma.OrderWhereUniqueInput[]
-}
-
-export type OrderUncheckedCreateNestedManyWithoutSubcategoryInput = {
-  create?: Prisma.XOR<Prisma.OrderCreateWithoutSubcategoryInput, Prisma.OrderUncheckedCreateWithoutSubcategoryInput> | Prisma.OrderCreateWithoutSubcategoryInput[] | Prisma.OrderUncheckedCreateWithoutSubcategoryInput[]
-  connectOrCreate?: Prisma.OrderCreateOrConnectWithoutSubcategoryInput | Prisma.OrderCreateOrConnectWithoutSubcategoryInput[]
-  createMany?: Prisma.OrderCreateManySubcategoryInputEnvelope
-  connect?: Prisma.OrderWhereUniqueInput | Prisma.OrderWhereUniqueInput[]
 }
 
 export type OrderUpdateManyWithoutSubcategoryNestedInput = {
@@ -3895,15 +3867,15 @@ export type OrderCreateOrConnectWithoutCategoryInput = {
   create: Prisma.XOR<Prisma.OrderCreateWithoutCategoryInput, Prisma.OrderUncheckedCreateWithoutCategoryInput>
 }
 
-export type OrderCreateManyCategoryInputEnvelope = {
-  data: Prisma.OrderCreateManyCategoryInput | Prisma.OrderCreateManyCategoryInput[]
-  skipDuplicates?: boolean
-}
-
 export type OrderUpsertWithWhereUniqueWithoutCategoryInput = {
   where: Prisma.OrderWhereUniqueInput
   update: Prisma.XOR<Prisma.OrderUpdateWithoutCategoryInput, Prisma.OrderUncheckedUpdateWithoutCategoryInput>
   create: Prisma.XOR<Prisma.OrderCreateWithoutCategoryInput, Prisma.OrderUncheckedCreateWithoutCategoryInput>
+}
+
+export type OrderCreateManyCategoryInputEnvelope = {
+  data: Prisma.OrderCreateManyCategoryInput | Prisma.OrderCreateManyCategoryInput[]
+  skipDuplicates?: boolean
 }
 
 export type OrderUpdateWithWhereUniqueWithoutCategoryInput = {
@@ -4045,15 +4017,15 @@ export type OrderCreateOrConnectWithoutSubcategoryInput = {
   create: Prisma.XOR<Prisma.OrderCreateWithoutSubcategoryInput, Prisma.OrderUncheckedCreateWithoutSubcategoryInput>
 }
 
-export type OrderCreateManySubcategoryInputEnvelope = {
-  data: Prisma.OrderCreateManySubcategoryInput | Prisma.OrderCreateManySubcategoryInput[]
-  skipDuplicates?: boolean
-}
-
 export type OrderUpsertWithWhereUniqueWithoutSubcategoryInput = {
   where: Prisma.OrderWhereUniqueInput
   update: Prisma.XOR<Prisma.OrderUpdateWithoutSubcategoryInput, Prisma.OrderUncheckedUpdateWithoutSubcategoryInput>
   create: Prisma.XOR<Prisma.OrderCreateWithoutSubcategoryInput, Prisma.OrderUncheckedCreateWithoutSubcategoryInput>
+}
+
+export type OrderCreateManySubcategoryInputEnvelope = {
+  data: Prisma.OrderCreateManySubcategoryInput | Prisma.OrderCreateManySubcategoryInput[]
+  skipDuplicates?: boolean
 }
 
 export type OrderUpdateWithWhereUniqueWithoutSubcategoryInput = {
@@ -4538,62 +4510,6 @@ export type OrderUncheckedUpdateManyWithoutProProfileInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
-export type OrderCreateManyCategoryInput = {
-  id?: string
-  displayId: string
-  clientUserId: string
-  proProfileId?: string | null
-  subcategoryId?: string | null
-  categoryMetadataJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  title?: string | null
-  description?: string | null
-  addressText: string
-  addressLat?: number | null
-  addressLng?: number | null
-  scheduledWindowStartAt: Date | string
-  scheduledWindowEndAt?: Date | string | null
-  status?: $Enums.OrderStatus
-  acceptedAt?: Date | string | null
-  confirmedAt?: Date | string | null
-  startedAt?: Date | string | null
-  arrivedAt?: Date | string | null
-  completedAt?: Date | string | null
-  paidAt?: Date | string | null
-  canceledAt?: Date | string | null
-  cancelReason?: string | null
-  pricingMode?: $Enums.PricingMode
-  hourlyRateSnapshotAmount: number
-  currency?: string
-  minHoursSnapshot?: number | null
-  quotedAmountCents?: number | null
-  quotedAt?: Date | string | null
-  quoteMessage?: string | null
-  quoteAcceptedAt?: Date | string | null
-  estimatedHours?: number | null
-  finalHoursSubmitted?: number | null
-  approvedHours?: number | null
-  approvalMethod?: $Enums.ApprovalMethod | null
-  approvalDeadlineAt?: Date | string | null
-  subtotalAmount?: number | null
-  platformFeeAmount?: number | null
-  taxAmount?: number | null
-  totalAmount?: number | null
-  totalsCalculatedAt?: Date | string | null
-  taxScheme?: string | null
-  taxRate?: number | null
-  taxIncluded?: boolean
-  taxRegion?: string | null
-  taxCalculatedAt?: Date | string | null
-  disputeStatus?: $Enums.DisputeStatus
-  disputeReason?: string | null
-  disputeOpenedBy?: string | null
-  isFirstOrder?: boolean
-  photoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  workProofPhotoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  createdAt?: Date | string
-  updatedAt?: Date | string
-}
-
 export type OrderUpdateWithoutCategoryInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   displayId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -4718,6 +4634,62 @@ export type OrderUncheckedUpdateWithoutCategoryInput = {
   threadStates?: Prisma.OrderThreadStateUncheckedUpdateManyWithoutOrderNestedInput
 }
 
+export type OrderCreateManyCategoryInput = {
+  id?: string
+  displayId: string
+  clientUserId: string
+  proProfileId?: string | null
+  subcategoryId?: string | null
+  categoryMetadataJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  title?: string | null
+  description?: string | null
+  addressText: string
+  addressLat?: number | null
+  addressLng?: number | null
+  scheduledWindowStartAt: Date | string
+  scheduledWindowEndAt?: Date | string | null
+  status?: $Enums.OrderStatus
+  acceptedAt?: Date | string | null
+  confirmedAt?: Date | string | null
+  startedAt?: Date | string | null
+  arrivedAt?: Date | string | null
+  completedAt?: Date | string | null
+  paidAt?: Date | string | null
+  canceledAt?: Date | string | null
+  cancelReason?: string | null
+  pricingMode?: $Enums.PricingMode
+  hourlyRateSnapshotAmount: number
+  currency?: string
+  minHoursSnapshot?: number | null
+  quotedAmountCents?: number | null
+  quotedAt?: Date | string | null
+  quoteMessage?: string | null
+  quoteAcceptedAt?: Date | string | null
+  estimatedHours?: number | null
+  finalHoursSubmitted?: number | null
+  approvedHours?: number | null
+  approvalMethod?: $Enums.ApprovalMethod | null
+  approvalDeadlineAt?: Date | string | null
+  subtotalAmount?: number | null
+  platformFeeAmount?: number | null
+  taxAmount?: number | null
+  totalAmount?: number | null
+  totalsCalculatedAt?: Date | string | null
+  taxScheme?: string | null
+  taxRate?: number | null
+  taxIncluded?: boolean
+  taxRegion?: string | null
+  taxCalculatedAt?: Date | string | null
+  disputeStatus?: $Enums.DisputeStatus
+  disputeReason?: string | null
+  disputeOpenedBy?: string | null
+  isFirstOrder?: boolean
+  photoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  workProofPhotoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
 export type OrderUncheckedUpdateManyWithoutCategoryInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   displayId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -4772,62 +4744,6 @@ export type OrderUncheckedUpdateManyWithoutCategoryInput = {
   workProofPhotoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-}
-
-export type OrderCreateManySubcategoryInput = {
-  id?: string
-  displayId: string
-  clientUserId: string
-  proProfileId?: string | null
-  categoryId: string
-  categoryMetadataJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  title?: string | null
-  description?: string | null
-  addressText: string
-  addressLat?: number | null
-  addressLng?: number | null
-  scheduledWindowStartAt: Date | string
-  scheduledWindowEndAt?: Date | string | null
-  status?: $Enums.OrderStatus
-  acceptedAt?: Date | string | null
-  confirmedAt?: Date | string | null
-  startedAt?: Date | string | null
-  arrivedAt?: Date | string | null
-  completedAt?: Date | string | null
-  paidAt?: Date | string | null
-  canceledAt?: Date | string | null
-  cancelReason?: string | null
-  pricingMode?: $Enums.PricingMode
-  hourlyRateSnapshotAmount: number
-  currency?: string
-  minHoursSnapshot?: number | null
-  quotedAmountCents?: number | null
-  quotedAt?: Date | string | null
-  quoteMessage?: string | null
-  quoteAcceptedAt?: Date | string | null
-  estimatedHours?: number | null
-  finalHoursSubmitted?: number | null
-  approvedHours?: number | null
-  approvalMethod?: $Enums.ApprovalMethod | null
-  approvalDeadlineAt?: Date | string | null
-  subtotalAmount?: number | null
-  platformFeeAmount?: number | null
-  taxAmount?: number | null
-  totalAmount?: number | null
-  totalsCalculatedAt?: Date | string | null
-  taxScheme?: string | null
-  taxRate?: number | null
-  taxIncluded?: boolean
-  taxRegion?: string | null
-  taxCalculatedAt?: Date | string | null
-  disputeStatus?: $Enums.DisputeStatus
-  disputeReason?: string | null
-  disputeOpenedBy?: string | null
-  isFirstOrder?: boolean
-  photoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  workProofPhotoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  createdAt?: Date | string
-  updatedAt?: Date | string
 }
 
 export type OrderUpdateWithoutSubcategoryInput = {
@@ -4952,6 +4868,62 @@ export type OrderUncheckedUpdateWithoutSubcategoryInput = {
   earning?: Prisma.EarningUncheckedUpdateOneWithoutOrderNestedInput
   messages?: Prisma.OrderMessageUncheckedUpdateManyWithoutOrderNestedInput
   threadStates?: Prisma.OrderThreadStateUncheckedUpdateManyWithoutOrderNestedInput
+}
+
+export type OrderCreateManySubcategoryInput = {
+  id?: string
+  displayId: string
+  clientUserId: string
+  proProfileId?: string | null
+  categoryId: string
+  categoryMetadataJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  title?: string | null
+  description?: string | null
+  addressText: string
+  addressLat?: number | null
+  addressLng?: number | null
+  scheduledWindowStartAt: Date | string
+  scheduledWindowEndAt?: Date | string | null
+  status?: $Enums.OrderStatus
+  acceptedAt?: Date | string | null
+  confirmedAt?: Date | string | null
+  startedAt?: Date | string | null
+  arrivedAt?: Date | string | null
+  completedAt?: Date | string | null
+  paidAt?: Date | string | null
+  canceledAt?: Date | string | null
+  cancelReason?: string | null
+  pricingMode?: $Enums.PricingMode
+  hourlyRateSnapshotAmount: number
+  currency?: string
+  minHoursSnapshot?: number | null
+  quotedAmountCents?: number | null
+  quotedAt?: Date | string | null
+  quoteMessage?: string | null
+  quoteAcceptedAt?: Date | string | null
+  estimatedHours?: number | null
+  finalHoursSubmitted?: number | null
+  approvedHours?: number | null
+  approvalMethod?: $Enums.ApprovalMethod | null
+  approvalDeadlineAt?: Date | string | null
+  subtotalAmount?: number | null
+  platformFeeAmount?: number | null
+  taxAmount?: number | null
+  totalAmount?: number | null
+  totalsCalculatedAt?: Date | string | null
+  taxScheme?: string | null
+  taxRate?: number | null
+  taxIncluded?: boolean
+  taxRegion?: string | null
+  taxCalculatedAt?: Date | string | null
+  disputeStatus?: $Enums.DisputeStatus
+  disputeReason?: string | null
+  disputeOpenedBy?: string | null
+  isFirstOrder?: boolean
+  photoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  workProofPhotoUrlsJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  updatedAt?: Date | string
 }
 
 export type OrderUncheckedUpdateManyWithoutSubcategoryInput = {

@@ -5,11 +5,13 @@ import { Card } from "@repo/ui";
 import { Text } from "@repo/ui";
 import { SubcategoryForm } from "@/components/subcategories/SubcategoryForm";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
+import { useCreateSubcategory } from "@/hooks/useSubcategoryMutations";
 
 export function SubcategoryCreateScreen() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const categoryId = searchParams.get("categoryId") || undefined;
+  const createSubcategory = useCreateSubcategory();
 
   const handleSubmit = async (data: {
     name: string;
@@ -20,12 +22,25 @@ export function SubcategoryCreateScreen() {
     displayOrder: number;
     isActive: boolean;
     configJson?: Record<string, unknown> | null;
+    searchKeywords?: string[];
   }) => {
-    // TODO: Implement when subcategory.create endpoint is available
-    alert(
-      "La creación de subcategorías aún no está implementada. Por favor, espera a que se agreguen los endpoints de API."
-    );
-    console.log("Would create subcategory:", data);
+    try {
+      const created = await createSubcategory.mutateAsync({
+        name: data.name,
+        slug: data.slug,
+        categoryId: data.categoryId,
+        imageUrl: data.imageUrl ?? null,
+        description: data.description ?? null,
+        displayOrder: data.displayOrder,
+        isActive: data.isActive,
+        configJson: data.configJson ?? null,
+        searchKeywords: data.searchKeywords ?? [],
+      });
+      router.push(`/admin/subcategories/${created.id}`);
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
   };
 
   const handleCancel = () => {
@@ -42,19 +57,12 @@ export function SubcategoryCreateScreen() {
       />
       <Text variant="h1">Crear Subcategoría</Text>
 
-      <Card className="p-6 border-warning/20 bg-warning/5">
-        <Text variant="body" className="text-warning mb-4">
-          ⚠️ La creación de subcategorías aún no está disponible. Los endpoints
-          de API deben ser implementados primero.
-        </Text>
-      </Card>
-
       <Card className="p-6">
         <SubcategoryForm
           initialCategoryId={categoryId}
           onSubmit={handleSubmit}
           onCancel={handleCancel}
-          isLoading={false}
+          isLoading={createSubcategory.isPending}
         />
       </Card>
     </div>

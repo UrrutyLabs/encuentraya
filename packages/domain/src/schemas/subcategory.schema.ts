@@ -13,6 +13,8 @@ export const subcategorySchema = z.object({
   description: z.string().nullable(),
   displayOrder: z.number(),
   isActive: z.boolean(),
+  configJson: z.record(z.unknown()).nullable(),
+  searchKeywords: z.array(z.string()),
   createdAt: z.date(),
   updatedAt: z.date(),
 });
@@ -30,6 +32,8 @@ export const subcategoryCreateInputSchema = z.object({
   description: z.string().nullable().optional(),
   displayOrder: z.number().default(0),
   isActive: z.boolean().default(true),
+  configJson: z.record(z.unknown()).nullable().optional(),
+  searchKeywords: z.array(z.string()).optional(),
 });
 
 export type SubcategoryCreateInput = z.infer<
@@ -47,6 +51,8 @@ export const subcategoryUpdateInputSchema = z.object({
   description: z.string().nullable().optional(),
   displayOrder: z.number().optional(),
   isActive: z.boolean().optional(),
+  configJson: z.record(z.unknown()).nullable().optional(),
+  searchKeywords: z.array(z.string()).optional(),
 });
 
 export type SubcategoryUpdateInput = z.infer<

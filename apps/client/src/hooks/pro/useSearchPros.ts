@@ -3,10 +3,10 @@ import type { TimeWindow } from "@repo/domain";
 
 interface SearchFilters {
   categoryId?: string; // FK to Category table
-  subcategory?: string; // Subcategory slug (for future API support)
+  subcategory?: string; // Subcategory slug
+  q?: string; // Free-text query; resolved server-side to category/subcategory
   date?: string;
   timeWindow?: TimeWindow;
-  searchQuery?: string; // For future API support, currently not used
 }
 
 export function useSearchPros(filters: SearchFilters) {
@@ -18,10 +18,9 @@ export function useSearchPros(filters: SearchFilters) {
     {
       categoryId: filters.categoryId,
       subcategory: filters.subcategory,
+      q: filters.q,
       date: filters.date ? new Date(filters.date) : undefined,
       timeWindow: filters.timeWindow,
-      // Note: searchQuery is not yet supported by API
-      // It's included in the interface for future use
     },
     {
       refetchOnWindowFocus: false,

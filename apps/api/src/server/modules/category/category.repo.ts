@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { injectable } from "tsyringe";
 import { prisma } from "@infra/db/prisma";
 import type {
@@ -95,25 +96,45 @@ export class CategoryRepositoryImpl implements CategoryRepository {
   }
 
   async create(input: CategoryCreateInput): Promise<Category> {
-    const category = await prisma.category.create({
-      data: {
-        key: input.key,
-        name: input.name,
-        slug: input.slug,
-        iconName: input.iconName ?? null,
-        description: input.description ?? null,
-        sortOrder: input.sortOrder ?? 0,
-        pricingMode: (input.pricingMode ?? "hourly") as "hourly" | "fixed",
-        paymentStrategy: (input.paymentStrategy ??
-          "single_capture") as "single_capture",
-        isActive: input.isActive ?? true,
-        configJson: input.configJson
-          ? (input.configJson as Prisma.InputJsonValue)
-          : undefined,
-      },
-    });
-
-    return this.mapPrismaToDomain(category);
+    const id = randomUUID();
+    const configJson =
+      input.configJson != null ? JSON.stringify(input.configJson) : null;
+    const rows = await prisma.$queryRawUnsafe<
+      Array<{
+        id: string;
+        key: string;
+        name: string;
+        slug: string;
+        iconName: string | null;
+        description: string | null;
+        sortOrder: number;
+        pricingMode: string;
+        paymentStrategy: string;
+        isActive: boolean;
+        deletedAt: Date | null;
+        configJson: unknown;
+        createdAt: Date;
+        updatedAt: Date;
+      }>
+    >(
+      `INSERT INTO categories (id, key, name, slug, "iconName", description, "sortOrder", "pricingMode", "paymentStrategy", "isActive", "configJson")
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11::jsonb)
+       RETURNING id, key, name, slug, "iconName", description, "sortOrder", "pricingMode", "paymentStrategy", "isActive", "deletedAt", "configJson", "createdAt", "updatedAt"`,
+      id,
+      input.key,
+      input.name,
+      input.slug,
+      input.iconName ?? null,
+      input.description ?? null,
+      input.sortOrder ?? 0,
+      input.pricingMode ?? "hourly",
+      input.paymentStrategy ?? "single_capture",
+      input.isActive ?? true,
+      configJson
+    );
+    const row = rows[0];
+    if (!row) throw new Error("Category create failed: no row returned");
+    return this.mapPrismaToDomain(row);
   }
 
   async update(
