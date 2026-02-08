@@ -19,7 +19,11 @@ export function ReviewComment({ review }: ReviewCommentProps) {
       {/* Top row: Avatar + Commenter name | days ago (right-aligned) */}
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
-          <Avatar name={clientName} size="sm" />
+          <Avatar
+            avatarUrl={review.clientAvatarUrl}
+            name={clientName}
+            size="sm"
+          />
           <Text variant="body" className="text-text font-medium">
             {clientName}
           </Text>

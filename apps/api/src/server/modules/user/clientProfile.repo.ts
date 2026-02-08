@@ -11,6 +11,7 @@ export interface ClientProfileEntity {
   lastName: string | null;
   email: string | null;
   phone: string | null;
+  avatarUrl: string | null;
   preferredContactMethod: "EMAIL" | "WHATSAPP" | "PHONE" | null;
   createdAt: Date;
   updatedAt: Date;
@@ -29,6 +30,7 @@ export interface ClientProfileRepository {
       lastName?: string | null;
       email?: string | null;
       phone?: string | null;
+      avatarUrl?: string | null;
       preferredContactMethod?: "EMAIL" | "WHATSAPP" | "PHONE" | null;
     }
   ): Promise<ClientProfileEntity>;
@@ -39,6 +41,7 @@ export interface ClientProfileRepository {
       lastName?: string | null;
       email?: string | null;
       phone?: string | null;
+      avatarUrl?: string | null;
       preferredContactMethod?: "EMAIL" | "WHATSAPP" | "PHONE" | null;
     }
   ): Promise<ClientProfileEntity>;
@@ -64,6 +67,7 @@ export class ClientProfileRepositoryImpl implements ClientProfileRepository {
       lastName?: string | null;
       email?: string | null;
       phone?: string | null;
+      avatarUrl?: string | null;
       preferredContactMethod?: "EMAIL" | "WHATSAPP" | "PHONE" | null;
     }
   ): Promise<ClientProfileEntity> {
@@ -74,6 +78,7 @@ export class ClientProfileRepositoryImpl implements ClientProfileRepository {
         lastName: data?.lastName ?? null,
         email: data?.email ?? null,
         phone: data?.phone ?? null,
+        avatarUrl: data?.avatarUrl ?? null,
         preferredContactMethod: data?.preferredContactMethod ?? null,
       },
     });
@@ -88,6 +93,7 @@ export class ClientProfileRepositoryImpl implements ClientProfileRepository {
       lastName?: string | null;
       email?: string | null;
       phone?: string | null;
+      avatarUrl?: string | null;
       preferredContactMethod?: "EMAIL" | "WHATSAPP" | "PHONE" | null;
     }
   ): Promise<ClientProfileEntity> {
@@ -99,6 +105,7 @@ export class ClientProfileRepositoryImpl implements ClientProfileRepository {
         lastName: data?.lastName ?? null,
         email: data?.email ?? null,
         phone: data?.phone ?? null,
+        avatarUrl: data?.avatarUrl ?? null,
         preferredContactMethod: data?.preferredContactMethod ?? null,
       },
       update: {
@@ -106,6 +113,7 @@ export class ClientProfileRepositoryImpl implements ClientProfileRepository {
         lastName: data?.lastName ?? undefined,
         email: data?.email ?? undefined,
         phone: data?.phone ?? undefined,
+        avatarUrl: data?.avatarUrl ?? undefined,
         preferredContactMethod: data?.preferredContactMethod ?? undefined,
       },
     });
@@ -120,6 +128,7 @@ export class ClientProfileRepositoryImpl implements ClientProfileRepository {
     lastName: string | null;
     email: string | null;
     phone: string | null;
+    avatarUrl: string | null;
     preferredContactMethod: string | null;
     createdAt: Date;
     updatedAt: Date;
@@ -131,6 +140,7 @@ export class ClientProfileRepositoryImpl implements ClientProfileRepository {
       lastName: prismaProfile.lastName,
       email: prismaProfile.email,
       phone: prismaProfile.phone,
+      avatarUrl: prismaProfile.avatarUrl,
       preferredContactMethod: prismaProfile.preferredContactMethod as
         | "EMAIL"
         | "WHATSAPP"

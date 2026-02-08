@@ -130,6 +130,7 @@ export const ClientProfileScalarFieldEnum = {
   lastName: 'lastName',
   email: 'email',
   phone: 'phone',
+  avatarUrl: 'avatarUrl',
   preferredContactMethod: 'preferredContactMethod',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -455,7 +456,8 @@ export const CategoryScalarFieldEnum = {
   deletedAt: 'deletedAt',
   configJson: 'configJson',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  searchable_text: 'searchable_text'
 } as const
 
 export type CategoryScalarFieldEnum = (typeof CategoryScalarFieldEnum)[keyof typeof CategoryScalarFieldEnum]
@@ -474,7 +476,8 @@ export const SubcategoryScalarFieldEnum = {
   configJson: 'configJson',
   searchKeywords: 'searchKeywords',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  searchable_text: 'searchable_text'
 } as const
 
 export type SubcategoryScalarFieldEnum = (typeof SubcategoryScalarFieldEnum)[keyof typeof SubcategoryScalarFieldEnum]

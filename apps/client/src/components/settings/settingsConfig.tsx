@@ -23,6 +23,7 @@ type ProfileData = {
   firstName?: string | null;
   lastName?: string | null;
   phone?: string | null;
+  avatarUrl?: string | null;
   preferredContactMethod?: "EMAIL" | "WHATSAPP" | "PHONE" | null;
   createdAt?: Date;
   updatedAt?: Date;
@@ -98,6 +99,7 @@ export const settingsSections: SettingsSectionConfig[] = [
       firstName: profile?.firstName,
       lastName: profile?.lastName,
       phone: formState.phone || "",
+      avatarUrl: profile?.avatarUrl,
       preferredContactMethod: formState.preferredContactMethod || "",
       onPhoneChange: formHandlers.setPhone,
       onPreferredContactMethodChange: formHandlers.setPreferredContactMethod,

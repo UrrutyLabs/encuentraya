@@ -461,6 +461,20 @@ export type ProProfileCategoryUncheckedUpdateManyWithoutProProfileNestedInput = 
   deleteMany?: Prisma.ProProfileCategoryScalarWhereInput | Prisma.ProProfileCategoryScalarWhereInput[]
 }
 
+export type ProProfileCategoryCreateNestedManyWithoutCategoryInput = {
+  create?: Prisma.XOR<Prisma.ProProfileCategoryCreateWithoutCategoryInput, Prisma.ProProfileCategoryUncheckedCreateWithoutCategoryInput> | Prisma.ProProfileCategoryCreateWithoutCategoryInput[] | Prisma.ProProfileCategoryUncheckedCreateWithoutCategoryInput[]
+  connectOrCreate?: Prisma.ProProfileCategoryCreateOrConnectWithoutCategoryInput | Prisma.ProProfileCategoryCreateOrConnectWithoutCategoryInput[]
+  createMany?: Prisma.ProProfileCategoryCreateManyCategoryInputEnvelope
+  connect?: Prisma.ProProfileCategoryWhereUniqueInput | Prisma.ProProfileCategoryWhereUniqueInput[]
+}
+
+export type ProProfileCategoryUncheckedCreateNestedManyWithoutCategoryInput = {
+  create?: Prisma.XOR<Prisma.ProProfileCategoryCreateWithoutCategoryInput, Prisma.ProProfileCategoryUncheckedCreateWithoutCategoryInput> | Prisma.ProProfileCategoryCreateWithoutCategoryInput[] | Prisma.ProProfileCategoryUncheckedCreateWithoutCategoryInput[]
+  connectOrCreate?: Prisma.ProProfileCategoryCreateOrConnectWithoutCategoryInput | Prisma.ProProfileCategoryCreateOrConnectWithoutCategoryInput[]
+  createMany?: Prisma.ProProfileCategoryCreateManyCategoryInputEnvelope
+  connect?: Prisma.ProProfileCategoryWhereUniqueInput | Prisma.ProProfileCategoryWhereUniqueInput[]
+}
+
 export type ProProfileCategoryUpdateManyWithoutCategoryNestedInput = {
   create?: Prisma.XOR<Prisma.ProProfileCategoryCreateWithoutCategoryInput, Prisma.ProProfileCategoryUncheckedCreateWithoutCategoryInput> | Prisma.ProProfileCategoryCreateWithoutCategoryInput[] | Prisma.ProProfileCategoryUncheckedCreateWithoutCategoryInput[]
   connectOrCreate?: Prisma.ProProfileCategoryCreateOrConnectWithoutCategoryInput | Prisma.ProProfileCategoryCreateOrConnectWithoutCategoryInput[]
@@ -569,15 +583,15 @@ export type ProProfileCategoryCreateOrConnectWithoutCategoryInput = {
   create: Prisma.XOR<Prisma.ProProfileCategoryCreateWithoutCategoryInput, Prisma.ProProfileCategoryUncheckedCreateWithoutCategoryInput>
 }
 
+export type ProProfileCategoryCreateManyCategoryInputEnvelope = {
+  data: Prisma.ProProfileCategoryCreateManyCategoryInput | Prisma.ProProfileCategoryCreateManyCategoryInput[]
+  skipDuplicates?: boolean
+}
+
 export type ProProfileCategoryUpsertWithWhereUniqueWithoutCategoryInput = {
   where: Prisma.ProProfileCategoryWhereUniqueInput
   update: Prisma.XOR<Prisma.ProProfileCategoryUpdateWithoutCategoryInput, Prisma.ProProfileCategoryUncheckedUpdateWithoutCategoryInput>
   create: Prisma.XOR<Prisma.ProProfileCategoryCreateWithoutCategoryInput, Prisma.ProProfileCategoryUncheckedCreateWithoutCategoryInput>
-}
-
-export type ProProfileCategoryCreateManyCategoryInputEnvelope = {
-  data: Prisma.ProProfileCategoryCreateManyCategoryInput | Prisma.ProProfileCategoryCreateManyCategoryInput[]
-  skipDuplicates?: boolean
 }
 
 export type ProProfileCategoryUpdateWithWhereUniqueWithoutCategoryInput = {
@@ -626,6 +640,15 @@ export type ProProfileCategoryUncheckedUpdateManyWithoutProProfileInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
+export type ProProfileCategoryCreateManyCategoryInput = {
+  id?: string
+  proProfileId: string
+  hourlyRateCents?: number | null
+  startingFromCents?: number | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
 export type ProProfileCategoryUpdateWithoutCategoryInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   hourlyRateCents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -642,15 +665,6 @@ export type ProProfileCategoryUncheckedUpdateWithoutCategoryInput = {
   startingFromCents?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-}
-
-export type ProProfileCategoryCreateManyCategoryInput = {
-  id?: string
-  proProfileId: string
-  hourlyRateCents?: number | null
-  startingFromCents?: number | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
 }
 
 export type ProProfileCategoryUncheckedUpdateManyWithoutCategoryInput = {

@@ -59,14 +59,20 @@ export class UploadService {
     const filename = `${uploadId}.${ext}`;
 
     let path: string;
+    let bucket: string | undefined;
 
     if (parsed.purpose === "order_photo") {
       if (actor.role !== Role.CLIENT) {
         throw new Error("Only clients can request order_photo upload URLs");
       }
+      if (!parsed.orderId) {
+        throw new Error("orderId is required for order_photo");
+      }
       path = `order-photos/pending/${actor.id}/${filename}`;
-    } else {
-      // work_proof
+    } else if (parsed.purpose === "work_proof") {
+      if (!parsed.orderId) {
+        throw new Error("orderId is required for work_proof");
+      }
       const order = await this.orderService.getOrderOrThrow(parsed.orderId);
       await authorizeProAction(
         actor,
@@ -75,17 +81,41 @@ export class UploadService {
         this.proRepository
       );
       path = `work-proof/${parsed.orderId}/${filename}`;
+    } else if (parsed.purpose === "pro_avatar") {
+      if (actor.role !== Role.PRO) {
+        throw new Error("Only pros can request pro_avatar upload URLs");
+      }
+      path = `pro/${actor.id}/${filename}`;
+      bucket = "avatars";
+    } else {
+      // client_avatar
+      if (actor.role !== Role.CLIENT) {
+        throw new Error("Only clients can request client_avatar upload URLs");
+      }
+      path = `client/${actor.id}/${filename}`;
+      bucket = "avatars";
     }
+
+    console.log("START CREATE PRESIGNED UPLOAD URL");
 
     const result = await this.storageService.createPresignedUploadUrl({
       path,
       contentType: parsed.contentType,
       expiresInSeconds: 3600,
+      bucket,
     });
 
-    return {
+    console.log("END CREATE PRESIGNED UPLOAD URL");
+
+    const response: PresignedUploadResponse = {
       uploadUrl: result.uploadUrl,
-      storageUrl: result.storageUrl,
     };
+    if (result.storagePath !== undefined) {
+      response.storagePath = result.storagePath;
+    }
+    if (result.storageUrl !== undefined) {
+      response.storageUrl = result.storageUrl;
+    }
+    return response;
   }
 }

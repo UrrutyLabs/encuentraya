@@ -3,6 +3,7 @@ import type { ReviewRepository } from "./review.repo";
 import type { OrderRepository } from "@modules/order/order.repo";
 import type { ProRepository } from "@modules/pro/pro.repo";
 import type { ProService } from "@modules/pro/pro.service";
+import type { AvatarUrlService } from "@modules/avatar/avatar-url.service";
 import type {
   ReviewCreateInput,
   ReviewCreateOutput,
@@ -53,7 +54,9 @@ export class ReviewService {
     @inject(TOKENS.ProRepository)
     private readonly proRepository: ProRepository,
     @inject(TOKENS.ProService)
-    private readonly proService: ProService
+    private readonly proService: ProService,
+    @inject(TOKENS.AvatarUrlService)
+    private readonly avatarUrlService: AvatarUrlService
   ) {}
   /**
    * Create a review for a completed order
@@ -223,15 +226,25 @@ export class ReviewService {
       cursor
     );
 
-    // Map to domain type
-    return reviews.map((review) => ({
-      id: review.id,
-      orderId: review.orderId,
-      rating: review.rating,
-      comment: review.comment,
-      createdAt: review.createdAt,
-      clientDisplayName: review.clientDisplayName,
-    }));
+    // Resolve client avatar URLs in parallel, then map to domain type
+    const withAvatars = await Promise.all(
+      reviews.map(async (review) => {
+        const clientAvatarUrl = await this.avatarUrlService.resolveClientAvatar(
+          review.clientUserId,
+          review.clientAvatarPath
+        );
+        return {
+          id: review.id,
+          orderId: review.orderId,
+          rating: review.rating,
+          comment: review.comment,
+          createdAt: review.createdAt,
+          clientDisplayName: review.clientDisplayName,
+          clientAvatarUrl,
+        };
+      })
+    );
+    return withAvatars;
   }
 
   /**

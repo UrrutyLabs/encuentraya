@@ -1,10 +1,23 @@
-import { Mail, Phone, User, Calendar, MessageCircle } from "lucide-react";
+"use client";
+
+import { useRef } from "react";
+import {
+  Mail,
+  Phone,
+  User,
+  Calendar,
+  MessageCircle,
+  Camera,
+} from "lucide-react";
 import { Card } from "@repo/ui";
 import { Text } from "@repo/ui";
 import { Input } from "@repo/ui";
 import { Select } from "@repo/ui";
+import { Button } from "@repo/ui";
+import { Avatar } from "@repo/ui";
 import { formatDateLong } from "@/utils/date";
 import type { PreferredContactMethod } from "@repo/domain";
+import { useUploadClientAvatar } from "@/hooks/upload";
 
 const PREFERRED_CONTACT_LABELS: Record<string, string> = {
   EMAIL: "Email",
@@ -17,6 +30,7 @@ interface SettingsProfileSectionProps {
   firstName?: string | null;
   lastName?: string | null;
   phone: string;
+  avatarUrl?: string | null;
   preferredContactMethod?: PreferredContactMethod | "";
   onPhoneChange: (value: string) => void;
   onPreferredContactMethodChange?: (value: PreferredContactMethod | "") => void;
@@ -28,20 +42,64 @@ export function SettingsProfileSection({
   firstName,
   lastName,
   phone,
+  avatarUrl,
   preferredContactMethod = "",
   onPhoneChange,
   onPreferredContactMethodChange,
   createdAt,
 }: SettingsProfileSectionProps) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { uploadAvatar, isUploading, error } = useUploadClientAvatar();
   const displayName = [firstName, lastName].filter(Boolean).join(" ") || null;
   const preferredContactLabel = preferredContactMethod
     ? (PREFERRED_CONTACT_LABELS[preferredContactMethod] ??
       preferredContactMethod)
     : null;
 
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      await uploadAvatar(file);
+    } finally {
+      e.target.value = "";
+    }
+  };
+
   return (
     <Card className="p-6">
       <div className="space-y-6">
+        {/* Avatar + Cambiar foto */}
+        <div className="flex flex-col items-center gap-3">
+          <Avatar
+            avatarUrl={avatarUrl ?? undefined}
+            name={displayName ?? "Usuario"}
+            size="xl"
+          />
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            className="hidden"
+            onChange={handleFileChange}
+            disabled={isUploading}
+          />
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={isUploading}
+          >
+            <Camera className="w-4 h-4 mr-1.5" />
+            {isUploading ? "Subiendo..." : "Cambiar foto"}
+          </Button>
+          {error && (
+            <Text variant="xs" className="text-destructive">
+              {error.message}
+            </Text>
+          )}
+        </div>
+
         {/* Nombre (read-only) */}
         <div className="space-y-2">
           <div className="flex items-center gap-2">

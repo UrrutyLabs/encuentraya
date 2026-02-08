@@ -3,6 +3,7 @@ import { TOKENS } from "../tokens";
 import type { IStorageService } from "@modules/upload/storage.types";
 import { SupabaseStorageService } from "@modules/upload/supabase-storage.service";
 import { UploadService } from "@modules/upload/upload.service";
+import { AvatarUrlService } from "@modules/avatar/avatar-url.service";
 
 /**
  * Register Upload module dependencies.
@@ -17,5 +18,9 @@ export function registerUploadModule(container: DependencyContainer): void {
 
   container.register<UploadService>(TOKENS.UploadService, {
     useClass: UploadService,
+  });
+
+  container.register<AvatarUrlService>(TOKENS.AvatarUrlService, {
+    useClass: AvatarUrlService,
   });
 }

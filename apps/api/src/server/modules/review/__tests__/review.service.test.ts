@@ -4,6 +4,7 @@ import type { ReviewRepository } from "../review.repo";
 import type { OrderRepository, OrderEntity } from "@modules/order/order.repo";
 import type { ProRepository, ProProfileEntity } from "@modules/pro/pro.repo";
 import type { ProService } from "@modules/pro/pro.service";
+import type { AvatarUrlService } from "@modules/avatar/avatar-url.service";
 import type { ReviewCreateInput } from "@repo/domain";
 import { OrderStatus, Role } from "@repo/domain";
 import type { Actor } from "@infra/auth/roles";
@@ -20,6 +21,15 @@ describe("ReviewService", () => {
   let mockOrderRepository: ReturnType<typeof createMockOrderRepository>;
   let mockProRepository: ReturnType<typeof createMockProRepository>;
   let mockProService: ReturnType<typeof createMockProService>;
+  let mockAvatarUrlService: ReturnType<typeof createMockAvatarUrlService>;
+
+  function createMockAvatarUrlService(): {
+    resolveClientAvatar: ReturnType<typeof vi.fn>;
+  } {
+    return {
+      resolveClientAvatar: vi.fn().mockResolvedValue(undefined),
+    };
+  }
 
   function createMockReviewRepository(): {
     create: ReturnType<typeof vi.fn>;
@@ -178,11 +188,13 @@ describe("ReviewService", () => {
     mockOrderRepository = createMockOrderRepository();
     mockProRepository = createMockProRepository();
     mockProService = createMockProService();
+    mockAvatarUrlService = createMockAvatarUrlService();
     service = new ReviewService(
       mockReviewRepository as unknown as ReviewRepository,
       mockOrderRepository as unknown as OrderRepository,
       mockProRepository as unknown as ProRepository,
-      mockProService as unknown as ProService
+      mockProService as unknown as ProService,
+      mockAvatarUrlService as unknown as AvatarUrlService
     );
   });
 

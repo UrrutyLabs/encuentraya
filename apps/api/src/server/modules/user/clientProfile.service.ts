@@ -1,5 +1,8 @@
 import { injectable, inject } from "tsyringe";
 import type { ClientProfileRepository } from "./clientProfile.repo";
+import type { IAvatarCache } from "@modules/avatar/avatar-cache.types";
+import { AVATAR_USE_REDIS_CACHE } from "@modules/avatar/avatar-config";
+import { avatarCacheKeyClient } from "@modules/avatar/avatar-cache";
 import { TOKENS } from "@/server/container/tokens";
 
 /**
@@ -10,7 +13,9 @@ import { TOKENS } from "@/server/container/tokens";
 export class ClientProfileService {
   constructor(
     @inject(TOKENS.ClientProfileRepository)
-    private readonly clientProfileRepository: ClientProfileRepository
+    private readonly clientProfileRepository: ClientProfileRepository,
+    @inject(TOKENS.IAvatarCache)
+    private readonly avatarCache: IAvatarCache
   ) {}
 
   /**
@@ -25,6 +30,7 @@ export class ClientProfileService {
     lastName: string | null;
     email: string | null;
     phone: string | null;
+    avatarUrl: string | null;
     preferredContactMethod: "EMAIL" | "WHATSAPP" | "PHONE" | null;
     createdAt: Date;
     updatedAt: Date;
@@ -50,6 +56,7 @@ export class ClientProfileService {
     lastName: string | null;
     email: string | null;
     phone: string | null;
+    avatarUrl: string | null;
     preferredContactMethod: "EMAIL" | "WHATSAPP" | "PHONE" | null;
     createdAt: Date;
     updatedAt: Date;
@@ -72,6 +79,7 @@ export class ClientProfileService {
     lastName: string | null;
     email: string | null;
     phone: string | null;
+    avatarUrl: string | null;
     preferredContactMethod: "EMAIL" | "WHATSAPP" | "PHONE" | null;
     createdAt: Date;
     updatedAt: Date;
@@ -81,6 +89,7 @@ export class ClientProfileService {
 
   /**
    * Update client profile
+   * When avatarUrl is set, it must be a storage path from client_avatar upload (client/{userId}/...).
    */
   async updateProfile(
     userId: string,
@@ -89,6 +98,7 @@ export class ClientProfileService {
       firstName?: string | null;
       lastName?: string | null;
       phone?: string | null;
+      avatarUrl?: string | null;
       preferredContactMethod?: "EMAIL" | "WHATSAPP" | "PHONE" | null;
     }
   ): Promise<{
@@ -98,11 +108,34 @@ export class ClientProfileService {
     lastName: string | null;
     email: string | null;
     phone: string | null;
+    avatarUrl: string | null;
     preferredContactMethod: "EMAIL" | "WHATSAPP" | "PHONE" | null;
     createdAt: Date;
     updatedAt: Date;
   }> {
-    return await this.clientProfileRepository.upsertForUser(userId, data);
+    if (
+      data.avatarUrl !== undefined &&
+      data.avatarUrl !== null &&
+      data.avatarUrl !== ""
+    ) {
+      const isLegacyUrl =
+        data.avatarUrl.startsWith("http://") ||
+        data.avatarUrl.startsWith("https://");
+      const prefix = `client/${userId}/`;
+      if (!isLegacyUrl && !data.avatarUrl.startsWith(prefix)) {
+        throw new Error(
+          `avatarUrl must be a storage path starting with ${prefix} (from avatar upload)`
+        );
+      }
+    }
+    const profile = await this.clientProfileRepository.upsertForUser(
+      userId,
+      data
+    );
+    if (data.avatarUrl !== undefined && AVATAR_USE_REDIS_CACHE) {
+      await this.avatarCache.invalidate(avatarCacheKeyClient(userId));
+    }
+    return profile;
   }
 
   /**
@@ -116,6 +149,7 @@ export class ClientProfileService {
     lastName: string | null;
     email: string | null;
     phone: string | null;
+    avatarUrl: string | null;
     preferredContactMethod: "EMAIL" | "WHATSAPP" | "PHONE" | null;
     createdAt: Date;
     updatedAt: Date;
@@ -125,6 +159,7 @@ export class ClientProfileService {
       firstName: null,
       lastName: null,
       phone: null,
+      avatarUrl: null,
       preferredContactMethod: null,
     });
   }

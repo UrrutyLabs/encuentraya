@@ -10,6 +10,7 @@ import { Text } from "@repo/ui";
 import { Container } from "./Container";
 import { useAuth } from "@/hooks/auth";
 import { useUserRole } from "@/hooks/auth";
+import { useClientProfile } from "@/hooks/client";
 import { Role } from "@repo/domain";
 import { JOB_LABELS } from "@/utils/jobLabels";
 import { logger } from "@/lib/logger";
@@ -26,10 +27,14 @@ export function DesktopNavigation({
   const router = useRouter();
   const { signOut, user } = useAuth();
   const { role } = useUserRole();
+  const { profile: clientProfile } = useClientProfile({
+    enabled: !!user && role === Role.CLIENT,
+  });
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   const isAuthenticated = !!user;
+  const avatarUrl = role === Role.CLIENT ? clientProfile?.avatarUrl : null;
 
   const homeLink = useMemo(() => {
     if (!isAuthenticated) {
@@ -123,10 +128,18 @@ export function DesktopNavigation({
             <div className="relative" ref={menuRef}>
               <button
                 onClick={() => setShowMenu(!showMenu)}
-                className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors"
+                className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors overflow-hidden"
                 aria-label="Menú de usuario"
               >
-                <User className="w-4 h-4 text-primary" />
+                {avatarUrl ? (
+                  <img
+                    src={avatarUrl}
+                    alt=""
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <User className="w-4 h-4 text-primary" />
+                )}
               </button>
               {showMenu && (
                 <div className="absolute right-0 mt-2 w-48 bg-surface border border-border rounded-md shadow-lg z-50">

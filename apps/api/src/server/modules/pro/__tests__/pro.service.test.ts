@@ -12,6 +12,8 @@ import type { AuditService } from "@modules/audit/audit.service";
 import type { AvailabilityRepository } from "../availability.repo";
 import type { AvailabilityService } from "../availability.service";
 import type { CategoryRepository } from "@modules/category/category.repo";
+import type { AvatarUrlService } from "@modules/avatar/avatar-url.service";
+import type { IAvatarCache } from "@modules/avatar/avatar-cache.types";
 import { AuditEventType } from "@modules/audit/audit.repo";
 import type { ProOnboardInput, ProSetAvailabilityInput } from "@repo/domain";
 import { Role, toMinorUnits, toMajorUnits } from "@repo/domain";
@@ -32,6 +34,24 @@ describe("ProService", () => {
   let mockAvailabilityService: ReturnType<typeof createMockAvailabilityService>;
   let mockAuditService: ReturnType<typeof createMockAuditService>;
   let mockCategoryRepository: ReturnType<typeof createMockCategoryRepository>;
+  let mockAvatarUrlService: ReturnType<typeof createMockAvatarUrlService>;
+  let mockAvatarCache: ReturnType<typeof createMockAvatarCache>;
+
+  function createMockAvatarCache(): {
+    invalidate: ReturnType<typeof vi.fn>;
+  } {
+    return {
+      invalidate: vi.fn().mockResolvedValue(undefined),
+    };
+  }
+
+  function createMockAvatarUrlService(): {
+    resolveProAvatar: ReturnType<typeof vi.fn>;
+  } {
+    return {
+      resolveProAvatar: vi.fn().mockResolvedValue(undefined),
+    };
+  }
 
   function createMockCategoryRepository(): {
     findById: ReturnType<typeof vi.fn>;
@@ -222,6 +242,8 @@ describe("ProService", () => {
     mockAvailabilityService = createMockAvailabilityService();
     mockAuditService = createMockAuditService();
     mockCategoryRepository = createMockCategoryRepository();
+    mockAvatarUrlService = createMockAvatarUrlService();
+    mockAvatarCache = createMockAvatarCache();
 
     mockAvailabilityRepository.findByProProfileId.mockResolvedValue([]);
 
@@ -234,7 +256,9 @@ describe("ProService", () => {
       mockAvailabilityRepository as unknown as AvailabilityRepository,
       mockAvailabilityService as unknown as AvailabilityService,
       mockAuditService as unknown as AuditService,
-      mockCategoryRepository as unknown as CategoryRepository
+      mockCategoryRepository as unknown as CategoryRepository,
+      mockAvatarUrlService as unknown as AvatarUrlService,
+      mockAvatarCache as unknown as IAvatarCache
     );
     vi.clearAllMocks();
 

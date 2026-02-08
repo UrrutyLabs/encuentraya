@@ -8,6 +8,7 @@ export interface SettingsAccountSectionProps {
   firstName?: string | null;
   lastName?: string | null;
   phone: string;
+  avatarUrl?: string | null;
   createdAt?: Date;
   onPhoneChange: (value: string) => void;
   // Notification preferences (in profile + dedicated card)
@@ -24,6 +25,7 @@ export function SettingsAccountSection({
   firstName,
   lastName,
   phone,
+  avatarUrl,
   createdAt,
   onPhoneChange,
   preferredContactMethod,
@@ -36,6 +38,7 @@ export function SettingsAccountSection({
         firstName={firstName}
         lastName={lastName}
         phone={phone}
+        avatarUrl={avatarUrl}
         preferredContactMethod={preferredContactMethod}
         onPhoneChange={onPhoneChange}
         onPreferredContactMethodChange={onPreferredContactMethodChange}

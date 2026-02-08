@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   StyleSheet,
   ScrollView,
@@ -6,25 +6,73 @@ import {
   View,
   TextInput,
   TouchableOpacity,
+  Image,
 } from "react-native";
 import { useRouter } from "expo-router";
+import * as ImagePicker from "expo-image-picker";
+import * as ImageManipulator from "expo-image-manipulator";
 import { Feather } from "@expo/vector-icons";
 import { Card } from "@components/ui/Card";
 import { Button } from "@components/ui/Button";
 import { Text } from "@components/ui/Text";
 import { Input } from "@components/ui/Input";
 import { useMyProProfile, useUpdateProfile } from "@hooks/pro";
+import { useUploadProAvatar } from "@hooks/upload";
 import { theme } from "../../theme";
+
+const AVATAR_SIZE = 96;
 
 export function EditProfileScreen() {
   const router = useRouter();
   const { data: pro, isLoading, refetch } = useMyProProfile();
   const updateMutation = useUpdateProfile();
+  const {
+    uploadAvatar,
+    isUploading: isUploadingAvatar,
+    error: avatarError,
+  } = useUploadProAvatar();
 
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [serviceArea, setServiceArea] = useState("");
   const [bio, setBio] = useState("");
+
+  const handleChangePhoto = useCallback(async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== "granted") {
+      Alert.alert(
+        "Permiso necesario",
+        "Se necesita acceso a la galería para elegir una foto."
+      );
+      return;
+    }
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+    if (result.canceled || !result.assets?.length) return;
+    const asset = result.assets[0];
+    try {
+      const { uri } = await ImageManipulator.manipulateAsync(
+        asset.uri,
+        [{ resize: { width: 512 } }],
+        {
+          compress: 0.8,
+          format: ImageManipulator.SaveFormat.JPEG,
+        }
+      );
+      await uploadAvatar(uri, "image/jpeg");
+      await refetch();
+      Alert.alert("Listo", "Tu foto de perfil fue actualizada.");
+    } catch (err) {
+      Alert.alert(
+        "Error",
+        err instanceof Error ? err.message : "No se pudo subir la foto."
+      );
+    }
+  }, [uploadAvatar, refetch]);
 
   useEffect(() => {
     if (pro) {
@@ -100,6 +148,43 @@ export function EditProfileScreen() {
           Editar perfil
         </Text>
       </View>
+
+      {/* Avatar */}
+      <Card style={styles.card}>
+        <View style={styles.avatarSection}>
+          <View style={styles.avatarRow}>
+            {pro?.avatarUrl ? (
+              <Image
+                source={{ uri: pro.avatarUrl }}
+                style={styles.avatarImage}
+              />
+            ) : (
+              <View style={[styles.avatarImage, styles.avatarPlaceholder]}>
+                <Feather
+                  name="user"
+                  size={AVATAR_SIZE / 2}
+                  color={theme.colors.muted}
+                />
+              </View>
+            )}
+            <View style={styles.avatarActions}>
+              <Button
+                onPress={handleChangePhoto}
+                disabled={isUploadingAvatar}
+                variant="secondary"
+                style={styles.changePhotoButton}
+              >
+                {isUploadingAvatar ? "Subiendo..." : "Cambiar foto"}
+              </Button>
+              {avatarError && (
+                <Text variant="xs" style={styles.avatarError}>
+                  {avatarError.message}
+                </Text>
+              )}
+            </View>
+          </View>
+        </View>
+      </Card>
 
       {/* Personal Information */}
       <Card style={styles.card}>
@@ -340,5 +425,33 @@ const styles = StyleSheet.create({
   saveButton: {
     width: "100%",
     marginTop: theme.spacing[2],
+  },
+  avatarSection: {
+    marginBottom: theme.spacing[2],
+  },
+  avatarRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: theme.spacing[4],
+  },
+  avatarImage: {
+    width: AVATAR_SIZE,
+    height: AVATAR_SIZE,
+    borderRadius: AVATAR_SIZE / 2,
+    backgroundColor: theme.colors.muted,
+  },
+  avatarPlaceholder: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  avatarActions: {
+    flex: 1,
+  },
+  changePhotoButton: {
+    alignSelf: "flex-start",
+  },
+  avatarError: {
+    color: theme.colors.danger,
+    marginTop: theme.spacing[1],
   },
 });

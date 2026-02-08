@@ -23,11 +23,27 @@ import {
 
 function createMockStorageService(): {
   createPresignedUploadUrl: ReturnType<typeof vi.fn>;
+  createSignedDownloadUrl: ReturnType<typeof vi.fn>;
 } {
   return {
-    createPresignedUploadUrl: vi.fn().mockResolvedValue({
-      uploadUrl: "https://storage.example.com/signed-upload?token=abc",
-      storageUrl: "https://storage.example.com/public/bucket/path/to/file.jpg",
+    createPresignedUploadUrl: vi
+      .fn()
+      .mockImplementation((params: { path: string; bucket?: string }) => {
+        if (params.bucket === "avatars") {
+          return Promise.resolve({
+            uploadUrl:
+              "https://storage.example.com/avatars/signed-upload?token=abc",
+            storagePath: params.path,
+          });
+        }
+        return Promise.resolve({
+          uploadUrl: "https://storage.example.com/signed-upload?token=abc",
+          storageUrl:
+            "https://storage.example.com/public/bucket/path/to/file.jpg",
+        });
+      }),
+    createSignedDownloadUrl: vi.fn().mockResolvedValue({
+      url: "https://storage.example.com/avatars/signed?token=xyz",
     }),
   };
 }
@@ -281,6 +297,84 @@ describe("UploadService", () => {
         await expect(
           service.createPresignedUploadUrl(actor, input)
         ).rejects.toThrow("Invalid contentType");
+
+        expect(mockStorage.createPresignedUploadUrl).not.toHaveBeenCalled();
+      });
+    });
+
+    describe("pro_avatar", () => {
+      it("returns uploadUrl and storagePath when pro requests pro_avatar", async () => {
+        const actor = createProActor();
+        const input = {
+          purpose: "pro_avatar" as const,
+          contentType: "image/jpeg",
+          extension: "jpg",
+        };
+
+        const result = await service.createPresignedUploadUrl(actor, input);
+
+        expect(result.uploadUrl).toBeDefined();
+        expect(result.storagePath).toBeDefined();
+        expect(result.storagePath).toMatch(/^pro\/user-pro-1\//);
+        expect(result.storagePath).toMatch(/\.jpg$/);
+        expect(mockStorage.createPresignedUploadUrl).toHaveBeenCalledWith(
+          expect.objectContaining({
+            contentType: "image/jpeg",
+            bucket: "avatars",
+          })
+        );
+        const call = mockStorage.createPresignedUploadUrl.mock.calls[0][0];
+        expect(call.path).toMatch(/^pro\/user-pro-1\//);
+      });
+
+      it("throws when client requests pro_avatar", async () => {
+        const actor = createClientActor();
+        const input = {
+          purpose: "pro_avatar" as const,
+          contentType: "image/jpeg",
+        };
+
+        await expect(
+          service.createPresignedUploadUrl(actor, input)
+        ).rejects.toThrow("Only pros can request pro_avatar upload URLs");
+
+        expect(mockStorage.createPresignedUploadUrl).not.toHaveBeenCalled();
+      });
+    });
+
+    describe("client_avatar", () => {
+      it("returns uploadUrl and storagePath when client requests client_avatar", async () => {
+        const actor = createClientActor();
+        const input = {
+          purpose: "client_avatar" as const,
+          contentType: "image/png",
+          extension: "png",
+        };
+
+        const result = await service.createPresignedUploadUrl(actor, input);
+
+        expect(result.uploadUrl).toBeDefined();
+        expect(result.storagePath).toBeDefined();
+        expect(result.storagePath).toMatch(/^client\/user-client-1\//);
+        expect(result.storagePath).toMatch(/\.png$/);
+        expect(mockStorage.createPresignedUploadUrl).toHaveBeenCalledWith(
+          expect.objectContaining({
+            contentType: "image/png",
+            bucket: "avatars",
+          })
+        );
+      });
+
+      it("throws when pro requests client_avatar", async () => {
+        const actor = createProActor();
+        const input = {
+          purpose: "client_avatar" as const,
+          contentType: "image/jpeg",
+        };
+
+        await expect(
+          service.createPresignedUploadUrl(actor, input)
+        ).rejects.toThrow("Only clients can request client_avatar upload URLs");
 
         expect(mockStorage.createPresignedUploadUrl).not.toHaveBeenCalled();
       });

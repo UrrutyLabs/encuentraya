@@ -11,7 +11,7 @@ import { Button } from "@repo/ui";
 import { Tabs } from "@repo/ui";
 import { SidebarMenu } from "@repo/ui";
 import { AppShell } from "@/components/presentational/AppShell";
-import { useSettingsForm, useSettingsStats } from "@/hooks/client";
+import { useSettingsForm } from "@/hooks/client";
 import {
   settingsSections,
   getSettingsTabs,
@@ -41,7 +41,6 @@ export function SettingsScreen() {
     error,
   } = useSettingsForm();
 
-  const { stats: clientStats } = useSettingsStats();
   const { signOut } = useAuth();
 
   const isLoading = isLoadingProfile;
@@ -191,7 +190,6 @@ export function SettingsScreen() {
     formHandlers,
     securityHandlers,
     helpHandlers,
-    clientStats,
   });
 
   const isEditableTab = currentSection.isEditable;

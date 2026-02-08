@@ -12,6 +12,10 @@ import type { AuditService } from "@modules/audit/audit.service";
 import type { AvailabilityRepository } from "./availability.repo";
 import type { AvailabilityService } from "./availability.service";
 import type { CategoryRepository } from "@modules/category/category.repo";
+import type { AvatarUrlService } from "@modules/avatar/avatar-url.service";
+import type { IAvatarCache } from "@modules/avatar/avatar-cache.types";
+import { AVATAR_USE_REDIS_CACHE } from "@modules/avatar/avatar-config";
+import { avatarCacheKeyPro } from "@modules/avatar/avatar-cache";
 import { AuditEventType } from "@modules/audit/audit.repo";
 import type {
   Pro,
@@ -54,7 +58,11 @@ export class ProService {
     @inject(TOKENS.AuditService)
     private readonly auditService: AuditService,
     @inject(TOKENS.CategoryRepository)
-    private readonly categoryRepository: CategoryRepository
+    private readonly categoryRepository: CategoryRepository,
+    @inject(TOKENS.AvatarUrlService)
+    private readonly avatarUrlService: AvatarUrlService,
+    @inject(TOKENS.IAvatarCache)
+    private readonly avatarCache: IAvatarCache
   ) {}
 
   /**
@@ -363,6 +371,17 @@ export class ProService {
       updateData.bio = input.bio;
     }
     if (input.avatarUrl !== undefined) {
+      if (input.avatarUrl !== null && input.avatarUrl !== "") {
+        const isLegacyUrl =
+          input.avatarUrl.startsWith("http://") ||
+          input.avatarUrl.startsWith("https://");
+        const prefix = `pro/${userId}/`;
+        if (!isLegacyUrl && !input.avatarUrl.startsWith(prefix)) {
+          throw new Error(
+            `avatarUrl must be a storage path starting with ${prefix} (from avatar upload)`
+          );
+        }
+      }
       updateData.avatarUrl = input.avatarUrl;
     }
     if (input.hourlyRate !== undefined) {
@@ -385,6 +404,10 @@ export class ProService {
 
     if (!updated) {
       throw new Error("Failed to update pro profile");
+    }
+
+    if (updateData.avatarUrl !== undefined && AVATAR_USE_REDIS_CACHE) {
+      await this.avatarCache.invalidate(avatarCacheKeyPro(proProfile.id));
     }
 
     return this.mapToDomain(updated);
@@ -752,7 +775,10 @@ export class ProService {
       email: entity.email,
       phone: entity.phone ?? undefined,
       bio: entity.bio ?? undefined,
-      avatarUrl: entity.avatarUrl ?? undefined,
+      avatarUrl: await this.avatarUrlService.resolveProAvatar(
+        entity.id,
+        entity.avatarUrl
+      ),
       hourlyRate: hourlyRateMajor,
       categoryIds: entity.categoryIds,
       categoryRelations,

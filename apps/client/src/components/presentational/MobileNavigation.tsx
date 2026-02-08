@@ -9,6 +9,7 @@ import { Button } from "@repo/ui";
 import { Text } from "@repo/ui";
 import { useAuth } from "@/hooks/auth";
 import { useUserRole } from "@/hooks/auth";
+import { useClientProfile } from "@/hooks/client";
 import { Role } from "@repo/domain";
 import { JOB_LABELS } from "@/utils/jobLabels";
 import { logger } from "@/lib/logger";
@@ -28,9 +29,13 @@ export function MobileNavigation({
   const router = useRouter();
   const { signOut, user } = useAuth();
   const { role } = useUserRole();
+  const { profile: clientProfile } = useClientProfile({
+    enabled: !!user && role === Role.CLIENT,
+  });
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const isAuthenticated = !!user;
+  const avatarUrl = role === Role.CLIENT ? clientProfile?.avatarUrl : null;
 
   const homeLink = !isAuthenticated
     ? "/"
@@ -86,10 +91,18 @@ export function MobileNavigation({
 
             <button
               onClick={() => setIsDrawerOpen(true)}
-              className="min-w-[44px] min-h-[44px] w-11 h-11 flex items-center justify-center rounded-lg hover:bg-surface/80 active:bg-surface/60 transition-colors touch-manipulation"
+              className="min-w-[44px] min-h-[44px] w-11 h-11 flex items-center justify-center rounded-full overflow-hidden bg-primary/10 hover:bg-primary/20 active:bg-primary/30 transition-colors touch-manipulation"
               aria-label="Abrir menú"
             >
-              <Menu className="w-5 h-5 text-text" />
+              {avatarUrl ? (
+                <img
+                  src={avatarUrl}
+                  alt=""
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <Menu className="w-5 h-5 text-text" />
+              )}
             </button>
           </div>
         </div>
@@ -112,8 +125,16 @@ export function MobileNavigation({
               {/* User Info */}
               <div className="px-4 py-3 border-b border-border">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                    <User className="w-5 h-5 text-primary" />
+                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden shrink-0">
+                    {avatarUrl ? (
+                      <img
+                        src={avatarUrl}
+                        alt=""
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <User className="w-5 h-5 text-primary" />
+                    )}
                   </div>
                   <div className="flex-1 min-w-0">
                     <Text variant="body" className="font-medium">

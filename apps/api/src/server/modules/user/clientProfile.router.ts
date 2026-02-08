@@ -1,27 +1,36 @@
 import { router, protectedProcedure } from "@infra/trpc";
 import { container, TOKENS } from "@/server/container";
 import { ClientProfileService } from "./clientProfile.service";
+import type { AvatarUrlService } from "@modules/avatar/avatar-url.service";
 import { clientProfileUpdateInputSchema } from "@repo/domain";
 import { TRPCError } from "@trpc/server";
 
-// Resolve service from container
 const clientProfileService = container.resolve<ClientProfileService>(
   TOKENS.ClientProfileService
+);
+const avatarUrlService = container.resolve<AvatarUrlService>(
+  TOKENS.AvatarUrlService
 );
 
 export const clientProfileRouter = router({
   get: protectedProcedure.query(async ({ ctx }) => {
     try {
-      const profile = await clientProfileService.getProfileByUserId(
-        ctx.actor.id
-      );
+      let profile = await clientProfileService.getProfileByUserId(ctx.actor.id);
       if (!profile) {
-        // Ensure profile exists
-        return await clientProfileService.ensureClientProfileExists(
+        profile = await clientProfileService.ensureClientProfileExists(
           ctx.actor.id
         );
       }
-      return profile;
+      // Resolve avatar path to signed URL for display
+      const avatarUrl =
+        profile.avatarUrl != null
+          ? await avatarUrlService.resolveClientAvatar(
+              ctx.actor.id,
+              profile.avatarUrl
+            )
+          : undefined;
+
+      return { ...profile, avatarUrl: avatarUrl ?? profile.avatarUrl ?? null };
     } catch (error) {
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",

@@ -1,10 +1,20 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { ClientProfileService } from "../clientProfile.service";
 import type { ClientProfileEntity } from "../clientProfile.repo";
+import type { IAvatarCache } from "@modules/avatar/avatar-cache.types";
 
 describe("ClientProfileService", () => {
   let service: ClientProfileService;
   let mockRepository: ReturnType<typeof createMockRepository>;
+  let mockAvatarCache: ReturnType<typeof createMockAvatarCache>;
+
+  function createMockAvatarCache(): {
+    invalidate: ReturnType<typeof vi.fn>;
+  } {
+    return {
+      invalidate: vi.fn().mockResolvedValue(undefined),
+    };
+  }
 
   function createMockRepository(): {
     findByUserId: ReturnType<typeof vi.fn>;
@@ -28,6 +38,7 @@ describe("ClientProfileService", () => {
       lastName: null,
       email: null,
       phone: null,
+      avatarUrl: null,
       preferredContactMethod: null,
       createdAt: new Date("2024-01-01"),
       updatedAt: new Date("2024-01-01"),
@@ -37,8 +48,10 @@ describe("ClientProfileService", () => {
 
   beforeEach(() => {
     mockRepository = createMockRepository();
+    mockAvatarCache = createMockAvatarCache();
     service = new ClientProfileService(
-      mockRepository as unknown as import("../clientProfile.repo").ClientProfileRepository
+      mockRepository as unknown as import("../clientProfile.repo").ClientProfileRepository,
+      mockAvatarCache as unknown as IAvatarCache
     );
   });
 

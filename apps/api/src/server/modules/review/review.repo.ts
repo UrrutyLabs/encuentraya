@@ -30,6 +30,8 @@ export interface ReviewCreateInput {
  */
 export interface ReviewWithClientEntity extends ReviewEntity {
   clientDisplayName?: string; // Formatted as "FirstName L."
+  /** Storage path for client avatar (resolved to signed URL in service) */
+  clientAvatarPath?: string | null;
 }
 
 /**
@@ -175,6 +177,7 @@ export class ReviewRepositoryImpl implements ReviewRepository {
       clientProfile: {
         firstName: string | null;
         lastName: string | null;
+        avatarUrl: string | null;
       } | null;
     };
   }): ReviewWithClientEntity {
@@ -182,6 +185,7 @@ export class ReviewRepositoryImpl implements ReviewRepository {
 
     // Format client display name: "FirstName L." (first letter of surname)
     let clientDisplayName: string | undefined;
+    let clientAvatarPath: string | null | undefined;
     if (prismaReview.client?.clientProfile) {
       const profile = prismaReview.client.clientProfile;
       const firstName = profile.firstName?.trim() || "";
@@ -196,6 +200,7 @@ export class ReviewRepositoryImpl implements ReviewRepository {
       } else {
         clientDisplayName = "Cliente";
       }
+      clientAvatarPath = profile.avatarUrl ?? undefined;
     } else {
       clientDisplayName = "Cliente";
     }
@@ -203,6 +208,7 @@ export class ReviewRepositoryImpl implements ReviewRepository {
     return {
       ...baseEntity,
       clientDisplayName,
+      clientAvatarPath,
     };
   }
 }

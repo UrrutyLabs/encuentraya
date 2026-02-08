@@ -236,6 +236,7 @@ model ClientProfile {
   lastName              String?
   email                 String?
   phone                 String?
+  avatarUrl             String?
   preferredContactMethod PreferredContactMethod?
   createdAt             DateTime               @default(now())
   updatedAt             DateTime               @updatedAt
@@ -669,7 +670,7 @@ model Category {
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
   fts              Unsupported("tsvector")? // FTS; maintained by DB trigger, GIN index in migration
-  searchable_text  Unsupported("text")                 // Trigram search; trigger + GIN(gin_trgm_ops) in migration only
+  searchable_text  String?                 // Trigram search; trigger + GIN(gin_trgm_ops) in migration only
 
   // Relations
   subcategories Subcategory[]
@@ -698,7 +699,7 @@ model Subcategory {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   fts             Unsupported("tsvector")? // FTS; maintained by DB trigger, GIN index in migration
-  searchable_text Unsupported("text")                  // Trigram search; trigger + GIN(gin_trgm_ops) in migration only
+  searchable_text String?                  // Trigram search; trigger + GIN(gin_trgm_ops) in migration only
 
   // Relations
   category    Category  @relation(fields: [categoryId], references: [id], onDelete: Restrict)

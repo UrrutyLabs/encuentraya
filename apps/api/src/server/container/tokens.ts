@@ -58,6 +58,8 @@ export const TOKENS = {
   ChatService: "ChatService",
   UploadService: "UploadService",
   IStorageService: "IStorageService",
+  IAvatarCache: "IAvatarCache",
+  AvatarUrlService: "AvatarUrlService",
 
   // Infrastructure
   Logger: "Logger",
