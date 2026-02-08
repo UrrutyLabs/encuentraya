@@ -106,6 +106,8 @@ export type ClientSignupInput = z.infer<typeof clientSignupInputSchema>;
 export const clientProfileUpdateInputSchema = z.object({
   phone: z.string().optional().nullable(),
   preferredContactMethod: preferredContactMethodSchema.optional().nullable(),
+  /** Storage path from client_avatar presigned upload (e.g. "client/{userId}/{file}.jpg"). Server validates prefix. */
+  avatarUrl: z.string().min(1).optional().nullable(),
 });
 
 export type ClientProfileUpdateInput = z.infer<

@@ -98,6 +98,12 @@ export const proSignupInputSchema = z.object({
 
 export type ProSignupInput = z.infer<typeof proSignupInputSchema>;
 
+/** avatarUrl: full URL (legacy) or storage path pro/{userId}/{filename} from avatar upload */
+const avatarUrlInputSchema = z
+  .union([z.string().url(), z.string().regex(/^pro\/.+/), z.literal("")])
+  .optional()
+  .nullable();
+
 const proOnboardInputShape = z.object({
   name: z.string().min(1),
   email: z.string().email(),
@@ -107,7 +113,7 @@ const proOnboardInputShape = z.object({
   categoryRates: z.array(categoryRateInputSchema).optional(),
   serviceArea: z.string().optional(),
   bio: z.string().optional(),
-  avatarUrl: z.string().url().optional(),
+  avatarUrl: avatarUrlInputSchema,
 });
 
 /**

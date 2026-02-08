@@ -10,6 +10,7 @@ export const reviewSchema = z.object({
   comment: z.string().nullable(),
   createdAt: z.date(),
   clientDisplayName: z.string().optional(), // Format: "FirstName L." (first letter of surname)
+  clientAvatarUrl: z.string().url().optional(), // Signed URL for client profile picture (reviews list)
 });
 
 export type Review = z.infer<typeof reviewSchema>;
