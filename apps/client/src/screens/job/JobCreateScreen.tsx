@@ -14,7 +14,7 @@ import { AlertCircle } from "lucide-react";
 import { Text } from "@repo/ui";
 import { Card } from "@repo/ui";
 import { Button } from "@repo/ui";
-import { Navigation } from "@/components/presentational/Navigation";
+import { AppShell } from "@/components/presentational/AppShell";
 import { WhatsAppPromptCard } from "@/components/presentational/WhatsAppPromptCard";
 import { JobForm } from "@/components/forms/JobForm";
 import { JobCreateSkeleton } from "@/components/presentational/JobCreateSkeleton";
@@ -168,8 +168,7 @@ function JobCreateContent() {
   // Handle rebook error
   if (rebookFrom && rebookError) {
     return (
-      <div className="min-h-screen bg-bg">
-        <Navigation showLogin={false} showProfile={true} />
+      <AppShell showLogin={false}>
         <div className="px-4 py-8">
           <div className="max-w-4xl mx-auto">
             <Card className="p-8 text-center">
@@ -191,14 +190,13 @@ function JobCreateContent() {
             </Card>
           </div>
         </div>
-      </div>
+      </AppShell>
     );
   }
 
   if (!effectiveProId) {
     return (
-      <div className="min-h-screen bg-bg">
-        <Navigation showLogin={false} showProfile={true} />
+      <AppShell showLogin={false}>
         <div className="px-4 py-8">
           <div className="max-w-4xl mx-auto">
             <Card className="p-8 text-center">
@@ -217,25 +215,23 @@ function JobCreateContent() {
             </Card>
           </div>
         </div>
-      </div>
+      </AppShell>
     );
   }
 
   if (isLoadingRebook || isLoadingPro) {
     return (
-      <div className="min-h-screen bg-bg">
-        <Navigation showLogin={false} showProfile={true} />
+      <AppShell showLogin={false}>
         <div className="px-4 py-8">
           <JobCreateSkeleton />
         </div>
-      </div>
+      </AppShell>
     );
   }
 
   if (!pro) {
     return (
-      <div className="min-h-screen bg-bg">
-        <Navigation showLogin={false} showProfile={true} />
+      <AppShell showLogin={false}>
         <div className="px-4 py-8">
           <div className="max-w-4xl mx-auto">
             <Card className="p-8 text-center">
@@ -254,7 +250,7 @@ function JobCreateContent() {
             </Card>
           </div>
         </div>
-      </div>
+      </AppShell>
     );
   }
 
@@ -267,8 +263,7 @@ function JobCreateContent() {
     rebookFrom && pro && (pro.isSuspended || !pro.isApproved);
 
   return (
-    <div className="min-h-screen bg-bg">
-      <Navigation showLogin={false} showProfile={true} />
+    <AppShell showLogin={false}>
       <div className="px-4 py-8">
         <div className="max-w-4xl mx-auto">
           <Text variant="h1" className="mb-2 text-primary">
@@ -343,7 +338,7 @@ function JobCreateContent() {
           )}
         </div>
       </div>
-    </div>
+    </AppShell>
   );
 }
 
@@ -351,12 +346,11 @@ export function JobCreateScreen() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-bg">
-          <Navigation showLogin={false} showProfile={true} />
+        <AppShell showLogin={false}>
           <div className="px-4 py-8">
             <JobCreateSkeleton />
           </div>
-        </div>
+        </AppShell>
       }
     >
       <JobCreateContent />

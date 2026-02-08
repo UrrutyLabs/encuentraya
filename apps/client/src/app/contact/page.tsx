@@ -1,13 +1,12 @@
 "use client";
 
 import { ContactScreen } from "@/screens/contact/ContactScreen";
-import { Navigation } from "@/components/presentational/Navigation";
+import { AppShell } from "@/components/presentational/AppShell";
 
 export default function ContactPage() {
   return (
-    <div className="min-h-screen bg-bg">
-      <Navigation showLogin={true} showProfile={true} />
+    <AppShell showLogin={true}>
       <ContactScreen />
-    </div>
+    </AppShell>
   );
 }

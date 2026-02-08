@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { Navigation } from "@/components/presentational/Navigation";
+import { AppShell } from "@/components/presentational/AppShell";
 import { StickySearchBar } from "@/components/presentational/StickySearchBar";
 import { Container } from "@/components/presentational/Container";
 import { SearchHero } from "@/components/search/SearchHero";
@@ -40,30 +40,39 @@ export function SearchScreen() {
     null
   );
   const [showSearchInHeader, setShowSearchInHeader] = useState(false);
-  const howItWorksRef = useRef<HTMLElement>(null);
+  const subcategoriesRef = useRef<HTMLDivElement | null>(null);
   const isFirstIntersectionRef = useRef(true);
   const isMobile = useMediaQuery("(max-width: 767px)");
 
-  // Show search bar in sticky header only when scrolling into "Cómo Funciona"
+  // Show sticky search bar when the subcategories block has left the viewport
+  // (inverted from observing "how it works": we show when subcategories are gone).
+  // Hysteresis: show when subcategories fully out (ratio 0), hide when back in view (ratio >= 0.1).
   useEffect(() => {
-    const section = howItWorksRef.current;
+    if (!selectedCategory) {
+      isFirstIntersectionRef.current = true;
+      queueMicrotask(() => setShowSearchInHeader(false));
+      return;
+    }
+    const section = subcategoriesRef.current;
     if (!section) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        // Ignore first callback to avoid flash on reload (layout may report wrong intersection)
         if (isFirstIntersectionRef.current) {
           isFirstIntersectionRef.current = false;
-          setShowSearchInHeader(false);
+          setShowSearchInHeader(!entry.isIntersecting);
           return;
         }
-        setShowSearchInHeader(entry.isIntersecting);
+        // Show bar when subcategories leave viewport, hide when they're back in view
+        const ratio = entry.intersectionRatio;
+        if (ratio === 0) setShowSearchInHeader(true);
+        else if (ratio >= 0.1) setShowSearchInHeader(false);
       },
-      { threshold: 0, rootMargin: "0px" }
+      { threshold: [0, 0.05, 0.1], rootMargin: "0px" }
     );
     observer.observe(section);
     return () => observer.disconnect();
-  }, []);
+  }, [selectedCategory]);
 
   // Set default selected category to first category when categories load
   useEffect(() => {
@@ -105,11 +114,7 @@ export function SearchScreen() {
   );
 
   return (
-    <div className="min-h-screen bg-bg">
-      {/* Main nav scrolls away with the page (not sticky) */}
-      <Navigation showLogin={true} showProfile={true} />
-
-      {/* Sticky search-only bar appears when scrolling into "Cómo Funciona" */}
+    <AppShell showLogin={true}>
       {showSearchInHeader && <StickySearchBar />}
 
       <div className="px-4 py-6 md:py-12">
@@ -119,19 +124,20 @@ export function SearchScreen() {
             <SearchHero />
           </div>
 
-          {/* Category Carousel - Centered horizontal list */}
-          <div className="mb-8 md:mb-12 animate-[fadeIn_0.6s_ease-out_0.15s_both]">
+          {/* Category tabs - just above subcategories */}
+          <div className="animate-[fadeIn_0.6s_ease-out_0.15s_both]">
             <CategoryCarousel
               selectedCategory={selectedCategory}
               onCategoryClick={handleCategoryClick}
             />
           </div>
 
-          {/* Subcategory Grid - Shows when category is selected */}
+          {/* Subcategory Grid - directly below category tabs */}
           {selectedCategory && (
             <div
+              ref={subcategoriesRef}
               id="subcategories"
-              className="mt-8 md:mt-12 animate-[fadeIn_0.6s_ease-out_0.3s_both]"
+              className="mt-4 animate-[fadeIn_0.6s_ease-out_0.3s_both]"
             >
               <SubcategoryGrid
                 category={selectedCategory}
@@ -142,14 +148,16 @@ export function SearchScreen() {
         </Container>
       </div>
 
-      {/* About: How it works, Why us, For professionals */}
-      <section ref={howItWorksRef} id="how-it-works" aria-label="Cómo funciona">
+      <section id="how-it-works" aria-label="Cómo funciona">
         <LandingHowItWorks />
+      </section>
+      <section id="why-us" aria-label="Por qué EncuentraYa">
         <LandingWhyEncuentraYa />
+      </section>
+      <section id="for-professionals" aria-label="Para profesionales">
         <LandingForProfessionals />
       </section>
-
       <LandingFooter />
-    </div>
+    </AppShell>
   );
 }

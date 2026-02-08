@@ -1,4 +1,4 @@
-import { Lock, Trash2 } from "lucide-react";
+import { Lock, LogOut, Trash2 } from "lucide-react";
 import { Card } from "@repo/ui";
 import { Text } from "@repo/ui";
 import { Button } from "@repo/ui";
@@ -6,15 +6,30 @@ import { Button } from "@repo/ui";
 interface SettingsSecuritySectionProps {
   onChangePasswordClick?: () => void;
   onDeleteAccountClick?: () => void;
+  onSignOutClick?: () => void;
 }
 
 export function SettingsSecuritySection({
   onChangePasswordClick,
   onDeleteAccountClick,
+  onSignOutClick,
 }: SettingsSecuritySectionProps) {
   return (
     <Card className="p-6">
       <div className="space-y-4">
+        {onSignOutClick && (
+          <Button
+            variant="ghost"
+            onClick={onSignOutClick}
+            className="w-full justify-start flex items-center gap-2"
+          >
+            <LogOut className="w-4 h-4" />
+            <Text variant="body" className="text-text">
+              Cerrar sesión
+            </Text>
+          </Button>
+        )}
+
         {onChangePasswordClick && (
           <Button
             variant="ghost"
@@ -41,7 +56,7 @@ export function SettingsSecuritySection({
           </Button>
         )}
 
-        {!onChangePasswordClick && !onDeleteAccountClick && (
+        {!onChangePasswordClick && !onDeleteAccountClick && !onSignOutClick && (
           <Text variant="body" className="text-muted text-center py-4">
             Las opciones de seguridad estarán disponibles próximamente
           </Text>

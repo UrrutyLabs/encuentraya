@@ -3,13 +3,15 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Settings, Save, X, Loader2, AlertCircle } from "lucide-react";
+import { useAuth } from "@/hooks/auth";
+import { logger } from "@/lib/logger";
 import { Text } from "@repo/ui";
 import { Card } from "@repo/ui";
 import { Button } from "@repo/ui";
 import { Tabs } from "@repo/ui";
 import { SidebarMenu } from "@repo/ui";
-import { Navigation } from "@/components/presentational/Navigation";
-import { useSettingsForm } from "@/hooks/client";
+import { AppShell } from "@/components/presentational/AppShell";
+import { useSettingsForm, useSettingsStats } from "@/hooks/client";
 import {
   settingsSections,
   getSettingsTabs,
@@ -20,7 +22,7 @@ import { ChangePasswordModal, DeleteAccountModal } from "@/components/settings";
 
 export function SettingsScreen() {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<string>("personalData");
+  const [activeTab, setActiveTab] = useState<string>("account");
   const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] =
     useState(false);
   const [isDeleteAccountModalOpen, setIsDeleteAccountModalOpen] =
@@ -38,6 +40,9 @@ export function SettingsScreen() {
     isPending,
     error,
   } = useSettingsForm();
+
+  const { stats: clientStats } = useSettingsStats();
+  const { signOut } = useAuth();
 
   const isLoading = isLoadingProfile;
 
@@ -67,8 +72,26 @@ export function SettingsScreen() {
       onDeleteAccountClick: () => {
         setIsDeleteAccountModalOpen(true);
       },
+      onSignOutClick: async () => {
+        try {
+          const { error } = await signOut();
+          if (error) {
+            logger.error(
+              "Error signing out",
+              error instanceof Error ? error : new Error(String(error))
+            );
+          }
+          router.push("/");
+        } catch (err) {
+          logger.error(
+            "Error signing out",
+            err instanceof Error ? err : new Error(String(err))
+          );
+          router.push("/");
+        }
+      },
     }),
-    []
+    [signOut, router]
   );
 
   // Help handlers (MVP - basic implementations)
@@ -112,7 +135,7 @@ export function SettingsScreen() {
   const validActiveTab = useMemo(() => {
     const section = getSectionByTabId(settingsSections, activeTab, profile);
     if (section) return activeTab;
-    return tabs[0]?.id || "personalData";
+    return tabs[0]?.id || "account";
   }, [activeTab, profile, tabs]);
 
   const sidebarItems = useMemo(
@@ -127,8 +150,7 @@ export function SettingsScreen() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-bg">
-        <Navigation showLogin={false} showProfile={true} />
+      <AppShell showLogin={false}>
         <div className="px-4 py-8">
           <div className="max-w-7xl mx-auto">
             <div className="flex items-center gap-2 mb-6">
@@ -140,7 +162,7 @@ export function SettingsScreen() {
             <SettingsSkeleton />
           </div>
         </div>
-      </div>
+      </AppShell>
     );
   }
 
@@ -150,8 +172,7 @@ export function SettingsScreen() {
 
   if (!currentSection) {
     return (
-      <div className="min-h-screen bg-bg">
-        <Navigation showLogin={false} showProfile={true} />
+      <AppShell showLogin={false}>
         <div className="px-4 py-8">
           <div className="max-w-4xl mx-auto">
             <Text variant="h1" className="text-primary">
@@ -159,7 +180,7 @@ export function SettingsScreen() {
             </Text>
           </div>
         </div>
-      </div>
+      </AppShell>
     );
   }
 
@@ -170,6 +191,7 @@ export function SettingsScreen() {
     formHandlers,
     securityHandlers,
     helpHandlers,
+    clientStats,
   });
 
   const isEditableTab = currentSection.isEditable;
@@ -234,8 +256,7 @@ export function SettingsScreen() {
   );
 
   return (
-    <div className="min-h-screen bg-bg">
-      <Navigation showLogin={false} showProfile={true} />
+    <AppShell showLogin={false}>
       <div className="px-4 py-4 md:py-8">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
@@ -281,6 +302,6 @@ export function SettingsScreen() {
         isOpen={isDeleteAccountModalOpen}
         onClose={() => setIsDeleteAccountModalOpen(false)}
       />
-    </div>
+    </AppShell>
   );
 }

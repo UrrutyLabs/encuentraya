@@ -15,7 +15,7 @@ export function StickySearchBar() {
       role="banner"
     >
       <Container maxWidth="full" className="flex justify-center">
-        <div className="w-full max-w-xl">
+        <div className="w-full max-w-4xl">
           <SearchBar preserveParams={false} size="large" />
         </div>
       </Container>

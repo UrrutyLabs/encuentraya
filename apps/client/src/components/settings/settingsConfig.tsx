@@ -1,6 +1,5 @@
 import {
   User,
-  Bell,
   Shield,
   CreditCard,
   HelpCircle,
@@ -9,8 +8,7 @@ import {
 import type { ComponentType } from "react";
 import type { PreferredContactMethod } from "@repo/domain";
 import {
-  SettingsProfileSection,
-  SettingsNotificationsSection,
+  SettingsAccountSection,
   SettingsSecuritySection,
   SettingsPaymentsSection,
   SettingsHelpSection,
@@ -43,6 +41,7 @@ type FormHandlers = {
 type SecurityHandlers = {
   onChangePasswordClick?: () => void;
   onDeleteAccountClick?: () => void;
+  onSignOutClick?: () => void;
 };
 
 type HelpHandlers = {
@@ -87,11 +86,11 @@ function asSectionComponent(component: any): AnyComponent {
  */
 export const settingsSections: SettingsSectionConfig[] = [
   {
-    id: "profile",
-    tabId: "personalData",
-    title: "Información Personal",
+    id: "account",
+    tabId: "account",
+    title: "Mi cuenta",
     icon: User,
-    component: asSectionComponent(SettingsProfileSection),
+    component: asSectionComponent(SettingsAccountSection),
     isEditable: true,
     visible: ({ profile }) => !!profile,
     getProps: ({ profile, formState, formHandlers }) => ({
@@ -99,21 +98,10 @@ export const settingsSections: SettingsSectionConfig[] = [
       firstName: profile?.firstName,
       lastName: profile?.lastName,
       phone: formState.phone || "",
-      createdAt: profile?.createdAt,
+      preferredContactMethod: formState.preferredContactMethod || "",
       onPhoneChange: formHandlers.setPhone,
-    }),
-  },
-  {
-    id: "notifications",
-    tabId: "notifications",
-    title: "Preferencias de Notificación",
-    icon: Bell,
-    component: asSectionComponent(SettingsNotificationsSection),
-    isEditable: true,
-    visible: () => true, // Always visible
-    getProps: ({ formState, formHandlers }) => ({
-      preferredContactMethod: formState.preferredContactMethod,
       onPreferredContactMethodChange: formHandlers.setPreferredContactMethod,
+      createdAt: profile?.createdAt,
     }),
   },
   {
@@ -127,6 +115,7 @@ export const settingsSections: SettingsSectionConfig[] = [
     getProps: ({ securityHandlers }) => ({
       onChangePasswordClick: securityHandlers?.onChangePasswordClick,
       onDeleteAccountClick: securityHandlers?.onDeleteAccountClick,
+      onSignOutClick: securityHandlers?.onSignOutClick,
     }),
   },
   {

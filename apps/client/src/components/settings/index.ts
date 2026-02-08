@@ -1,6 +1,6 @@
 export { SettingsProfileSection } from "./SettingsProfileSection";
 export { SettingsNotificationsSection } from "./SettingsNotificationsSection";
-export { SettingsStatsSection } from "./SettingsStatsSection";
+export { SettingsAccountSection } from "./SettingsAccountSection";
 export { SettingsSecuritySection } from "./SettingsSecuritySection";
 export { SettingsPaymentsSection } from "./SettingsPaymentsSection";
 export { SettingsHelpSection } from "./SettingsHelpSection";

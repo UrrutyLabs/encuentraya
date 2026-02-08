@@ -6,32 +6,16 @@ import { Text } from "@repo/ui";
 import type { Category } from "@repo/domain";
 
 /**
- * CategoryCard Component
+ * CategoryTab Component
  *
- * Displays a single category with icon and label.
- * Highlights when selected and triggers onClick callback.
- *
- * @example
- * ```tsx
- * <CategoryCard
- *   category={categoryObject}
- *   icon={Wrench}
- *   label="Plomería"
- *   isSelected={true}
- *   onClick={handleCategoryClick}
- * />
- * ```
+ * Tab-style category: icon above label, active state = underline + bold.
+ * No card background; used in a horizontal tab bar above subcategories.
  */
 interface CategoryCardProps {
-  /** The category object from API */
   category: Category;
-  /** Lucide icon component */
   icon: LucideIcon;
-  /** Display label for the category */
   label: string;
-  /** Whether this category is currently selected */
   isSelected: boolean;
-  /** Callback when category is clicked */
   onClick: (category: Category) => void;
 }
 
@@ -46,7 +30,6 @@ export const CategoryCard = memo(function CategoryCard({
     <button
       onClick={() => onClick(category)}
       onKeyDown={(e) => {
-        // Handle Enter and Space keys
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
           onClick(category);
@@ -54,27 +37,16 @@ export const CategoryCard = memo(function CategoryCard({
       }}
       aria-pressed={isSelected}
       aria-label={`${label}${isSelected ? " (seleccionado)" : ""}`}
-      className={`flex flex-col items-center gap-2 px-6 py-3 md:px-6 md:py-4 w-[120px] md:w-[140px] min-h-[44px] md:min-h-0 rounded-lg transition-all touch-manipulation shrink-0 ${
+      className={`flex flex-col items-center gap-1.5 px-4 py-2.5 md:px-5 md:py-3 shrink-0 border-b-2 transition-all touch-manipulation cursor-pointer ${
         isSelected
-          ? "bg-primary/10 border-2 border-primary"
-          : "bg-surface border-2 border-transparent hover:bg-surface/80 hover:border-border"
+          ? "border-primary text-primary -mb-px"
+          : "border-transparent text-neutral-500 hover:text-primary/80 hover:border-border"
       }`}
     >
-      {/* Icon */}
-      <div
-        className={`w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center transition-all ${
-          isSelected
-            ? "bg-primary text-white scale-110"
-            : "bg-primary/10 text-primary"
-        }`}
-      >
-        <Icon className="w-6 h-6 md:w-7 md:h-7" />
-      </div>
-
-      {/* Category Name */}
+      <Icon className="w-5 h-5 md:w-6 md:h-6 text-current" />
       <Text
-        variant="small"
-        className={`font-medium ${isSelected ? "text-primary" : "text-text"}`}
+        variant="body"
+        className={`text-base md:text-lg text-neutral-500 text-center whitespace-nowrap ${isSelected ? "font-bold" : "font-medium"}`}
       >
         {label}
       </Text>

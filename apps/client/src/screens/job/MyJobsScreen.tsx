@@ -3,7 +3,7 @@
 import { useMemo, useCallback } from "react";
 import { Calendar, History } from "lucide-react";
 import { Text, Card } from "@repo/ui";
-import { Navigation } from "@/components/presentational/Navigation";
+import { AppShell } from "@/components/presentational/AppShell";
 import { JobCard } from "@/components/presentational/JobCard";
 import { EmptyState } from "@/components/presentational/EmptyState";
 import { MyJobsSkeleton } from "@/components/presentational/MyJobsSkeleton";
@@ -50,8 +50,7 @@ export function MyJobsScreen() {
   }, [orders]);
 
   return (
-    <div className="min-h-screen bg-bg">
-      <Navigation showLogin={false} showProfile={true} />
+    <AppShell showLogin={false}>
       <div className="px-4 py-4 md:py-8">
         <div className="max-w-4xl mx-auto">
           <Text variant="h1" className="mb-6 md:mb-8 text-primary">
@@ -121,6 +120,6 @@ export function MyJobsScreen() {
           )}
         </div>
       </div>
-    </div>
+    </AppShell>
   );
 }

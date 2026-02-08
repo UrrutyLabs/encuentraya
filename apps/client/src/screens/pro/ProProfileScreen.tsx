@@ -1,14 +1,15 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { AlertCircle, ArrowLeft } from "lucide-react";
 import { Text } from "@repo/ui";
 import { Card } from "@repo/ui";
 import { Button } from "@repo/ui";
-import { Navigation } from "@/components/presentational/Navigation";
+import { AppShell } from "@/components/presentational/AppShell";
 import { SearchBar } from "@/components/search/SearchBar";
+import { useSetMobileHeader } from "@/contexts/MobileHeaderContext";
 import { ProProfileSkeleton } from "@/components/presentational/ProProfileSkeleton";
 import { AuthPromptModal } from "@/components/auth/AuthPromptModal";
 import { Breadcrumbs } from "@/components/presentational/Breadcrumbs";
@@ -48,6 +49,18 @@ export function ProProfileScreen() {
   const { pro, isLoading, error } = useProDetail(proId, category?.id);
   const { user, loading: authLoading } = useAuth();
   const { categories } = useCategories();
+  const setHeader = useSetMobileHeader();
+
+  useEffect(() => {
+    if (pro?.name) {
+      setHeader?.setTitle(pro.name);
+      setHeader?.setBackHref("/");
+    }
+    return () => {
+      setHeader?.setTitle(null);
+      setHeader?.setBackHref(null);
+    };
+  }, [pro?.name, setHeader]);
 
   // Map categoryIds to Category objects for display
   const proCategories = useMemo(
@@ -142,31 +155,27 @@ export function ProProfileScreen() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-bg">
-        <Navigation
-          showLogin={false}
-          showProfile={true}
-          centerContent={
-            <SearchBar initialQuery={searchQuery} preserveParams={true} />
-          }
-        />
+      <AppShell
+        showLogin={false}
+        centerContent={
+          <SearchBar initialQuery={searchQuery} preserveParams={true} />
+        }
+      >
         <div className="px-4 py-4 md:py-8">
           <ProProfileSkeleton />
         </div>
-      </div>
+      </AppShell>
     );
   }
 
   if (error || !pro) {
     return (
-      <div className="min-h-screen bg-bg">
-        <Navigation
-          showLogin={false}
-          showProfile={true}
-          centerContent={
-            <SearchBar initialQuery={searchQuery} preserveParams={true} />
-          }
-        />
+      <AppShell
+        showLogin={false}
+        centerContent={
+          <SearchBar initialQuery={searchQuery} preserveParams={true} />
+        }
+      >
         <div className="px-4 py-8">
           <div className="max-w-4xl mx-auto">
             <Card className="p-8 text-center">
@@ -189,19 +198,17 @@ export function ProProfileScreen() {
             </Card>
           </div>
         </div>
-      </div>
+      </AppShell>
     );
   }
 
   return (
-    <div className="min-h-screen bg-bg">
-      <Navigation
-        showLogin={true}
-        showProfile={true}
-        centerContent={
-          <SearchBar initialQuery={searchQuery} preserveParams={true} />
-        }
-      />
+    <AppShell
+      showLogin={true}
+      centerContent={
+        <SearchBar initialQuery={searchQuery} preserveParams={true} />
+      }
+    >
       <div className="px-4 py-4 md:py-8 pb-24 lg:pb-4 md:pb-8">
         <div className="max-w-7xl mx-auto">
           {/* Breadcrumbs */}
@@ -323,6 +330,6 @@ export function ProProfileScreen() {
         title="Iniciá sesión para contratar"
         message="Necesitás iniciar sesión para contratar un servicio con este profesional."
       />
-    </div>
+    </AppShell>
   );
 }

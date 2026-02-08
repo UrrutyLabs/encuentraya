@@ -1,7 +1,7 @@
 import { Loader2 } from "lucide-react";
 import { Card } from "@repo/ui";
 import { Text } from "@repo/ui";
-import { Navigation } from "@/components/presentational/Navigation";
+import { AppShell } from "@/components/presentational/AppShell";
 
 interface AuthLoadingStateProps {
   maxWidth?: string;
@@ -15,8 +15,7 @@ export function AuthLoadingState({
   maxWidth = "max-w-4xl",
 }: AuthLoadingStateProps) {
   return (
-    <div className="min-h-screen bg-bg">
-      <Navigation showLogin={false} showProfile={true} />
+    <AppShell showLogin={false}>
       <div className="px-4 py-8">
         <div className={`${maxWidth} mx-auto`}>
           <Card className="p-8 text-center">
@@ -29,6 +28,6 @@ export function AuthLoadingState({
           </Card>
         </div>
       </div>
-    </div>
+    </AppShell>
   );
 }

@@ -16,7 +16,7 @@ import { trpc } from "@/lib/trpc/client";
 import { Text } from "@repo/ui";
 import { Card } from "@repo/ui";
 import { Button } from "@repo/ui";
-import { Navigation } from "@/components/presentational/Navigation";
+import { AppShell } from "@/components/presentational/AppShell";
 import { WhatsAppPromptCard } from "@/components/presentational/WhatsAppPromptCard";
 import { CheckoutSkeleton } from "@/components/presentational/CheckoutSkeleton";
 import { useClientProfile } from "@/hooks/client";
@@ -87,8 +87,7 @@ function CheckoutContent() {
   // Missing orderId
   if (!orderId) {
     return (
-      <div className="min-h-screen bg-bg">
-        <Navigation showLogin={false} showProfile={true} />
+      <AppShell showLogin={false}>
         <div className="px-4 py-4 md:py-8">
           <div className="max-w-4xl mx-auto">
             <Card className="p-6 md:p-8 text-center">
@@ -108,7 +107,7 @@ function CheckoutContent() {
             </Card>
           </div>
         </div>
-      </div>
+      </AppShell>
     );
   }
 
@@ -116,12 +115,11 @@ function CheckoutContent() {
   const isLoading = isLoadingOrder || isLoadingPayment;
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-bg">
-        <Navigation showLogin={false} showProfile={true} />
+      <AppShell showLogin={false}>
         <div className="px-4 py-4 md:py-8">
           <CheckoutSkeleton />
         </div>
-      </div>
+      </AppShell>
     );
   }
 
@@ -133,8 +131,7 @@ function CheckoutContent() {
 
   if (isAuthorized) {
     return (
-      <div className="min-h-screen bg-bg">
-        <Navigation showLogin={false} showProfile={true} />
+      <AppShell showLogin={false}>
         <div className="px-4 py-4 md:py-8">
           <div className="max-w-4xl mx-auto">
             <Card className="p-8">
@@ -153,15 +150,14 @@ function CheckoutContent() {
             </Card>
           </div>
         </div>
-      </div>
+      </AppShell>
     );
   }
 
   // Validate order status - payment can only be authorized when order is ACCEPTED
   if (order && order.status !== OrderStatus.ACCEPTED) {
     return (
-      <div className="min-h-screen bg-bg">
-        <Navigation showLogin={false} showProfile={true} />
+      <AppShell showLogin={false}>
         <div className="px-4 py-4 md:py-8">
           <div className="max-w-4xl mx-auto">
             <Card className="p-6 md:p-8">
@@ -198,7 +194,7 @@ function CheckoutContent() {
             </Card>
           </div>
         </div>
-      </div>
+      </AppShell>
     );
   }
 
@@ -233,8 +229,7 @@ function CheckoutContent() {
   const currency = payment?.currency || job?.currency || "UYU";
 
   return (
-    <div className="min-h-screen bg-bg">
-      <Navigation showLogin={false} showProfile={true} />
+    <AppShell showLogin={false}>
       <div className="px-4 py-8">
         <div className="max-w-4xl mx-auto">
           <Text variant="h1" className="mb-6 text-primary">
@@ -367,7 +362,7 @@ function CheckoutContent() {
           </div>
         </div>
       </div>
-    </div>
+    </AppShell>
   );
 }
 
@@ -375,12 +370,11 @@ export function CheckoutScreen() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-bg">
-          <Navigation showLogin={false} showProfile={true} />
+        <AppShell showLogin={false}>
           <div className="px-4 py-4 md:py-8">
             <CheckoutSkeleton />
           </div>
-        </div>
+        </AppShell>
       }
     >
       <CheckoutContent />

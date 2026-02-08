@@ -1,3 +1,4 @@
+import React from "react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { SearchScreen } from "../SearchScreen";
@@ -6,8 +7,8 @@ import { useRouter } from "next/navigation";
 const mockUseSubcategoriesByCategoryId = vi.fn();
 
 vi.mock("next/navigation");
-vi.mock("@/components/presentational/Navigation", () => ({
-  Navigation: () => <nav>Navigation</nav>,
+vi.mock("@/components/presentational/AppShell", () => ({
+  AppShell: ({ children }: { children?: React.ReactNode }) => <>{children}</>,
 }));
 vi.mock("@/hooks/category", () => ({
   useCategories: () => ({

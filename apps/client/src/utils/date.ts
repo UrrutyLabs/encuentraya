@@ -19,6 +19,18 @@ export function formatDate(date: Date): string {
 }
 
 /**
+ * Format date only: day, long month, year (e.g. "30 enero 2025")
+ * Use for display of membership date, last updated, etc.
+ */
+export function formatDateLong(date: Date): string {
+  return new Intl.DateTimeFormat("es-UY", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(date);
+}
+
+/**
  * Format date short: day, short month, year (e.g. "30 ene. 2025")
  */
 export function formatDateShort(date: Date): string {

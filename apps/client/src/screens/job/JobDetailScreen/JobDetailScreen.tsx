@@ -1,8 +1,10 @@
 "use client";
 
+import { useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Navigation } from "@/components/presentational/Navigation";
+import { AppShell } from "@/components/presentational/AppShell";
 import { JobDetailSkeleton } from "@/components/presentational/JobDetailSkeleton";
+import { useSetMobileHeader } from "@/contexts/MobileHeaderContext";
 import { OrderStatus, type OrderDetailView } from "@repo/domain";
 import { useOrderDetail } from "@/hooks/order";
 import { useCancelOrder } from "@/hooks/order";
@@ -33,6 +35,18 @@ export function JobDetailScreen() {
   const { category } = useCategory(order?.categoryId);
 
   const job: OrderDetailView | undefined = order ?? undefined;
+  const setHeader = useSetMobileHeader();
+
+  useEffect(() => {
+    if (job?.displayId) {
+      setHeader?.setTitle(`Trabajo #${job.displayId}`);
+      setHeader?.setBackHref("/my-jobs");
+    }
+    return () => {
+      setHeader?.setTitle(null);
+      setHeader?.setBackHref(null);
+    };
+  }, [job?.displayId, setHeader]);
 
   const canCancel =
     job &&
@@ -61,23 +75,21 @@ export function JobDetailScreen() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-bg">
-        <Navigation showLogin={false} showProfile={true} />
+      <AppShell showLogin={false}>
         <div className="px-4 py-4 md:py-8">
           <JobDetailSkeleton />
         </div>
-      </div>
+      </AppShell>
     );
   }
 
   if (error || !job) {
     return (
-      <div className="min-h-screen bg-bg">
-        <Navigation showLogin={false} showProfile={true} />
+      <AppShell showLogin={false}>
         <div className="px-4 py-4 md:py-8">
           <JobDetailNotFound />
         </div>
-      </div>
+      </AppShell>
     );
   }
 
@@ -88,8 +100,7 @@ export function JobDetailScreen() {
   const isProSuspended = pro?.isSuspended ?? false;
 
   return (
-    <div className="min-h-screen bg-bg">
-      <Navigation showLogin={false} showProfile={true} />
+    <AppShell showLogin={false}>
       <div className="px-4 py-4 md:py-8">
         <div className="max-w-4xl mx-auto">
           <JobDetailHeader
@@ -142,6 +153,6 @@ export function JobDetailScreen() {
           )}
         </div>
       </div>
-    </div>
+    </AppShell>
   );
 }

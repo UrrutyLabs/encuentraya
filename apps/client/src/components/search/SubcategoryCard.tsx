@@ -33,13 +33,11 @@ export const SubcategoryCard = memo(function SubcategoryCard({
 
   return (
     <Card
-      className="overflow-hidden hover:shadow-md active:shadow-lg transition-shadow cursor-pointer touch-manipulation"
+      className="overflow-hidden hover:shadow-md active:shadow-lg transition-all duration-200 hover:scale-105 cursor-pointer touch-manipulation relative w-full aspect-[4/5]"
       onClick={() => onClick(subcategory)}
     >
-      {/* Image */}
-      <div
-        className={`relative w-full aspect-video bg-linear-to-br ${placeholderColor} overflow-hidden`}
-      >
+      {/* Image fills the entire card */}
+      <div className={`absolute inset-0 bg-linear-to-br ${placeholderColor}`}>
         {!imageError && subcategory.imageUrl ? (
           <Image
             src={subcategory.imageUrl}
@@ -59,9 +57,15 @@ export const SubcategoryCard = memo(function SubcategoryCard({
         )}
       </div>
 
-      {/* Name */}
-      <div className="p-3 md:p-4">
-        <Text variant="body" className="font-medium text-text text-center">
+      {/* Name overlay: white, bottom left */}
+      <div
+        className="absolute bottom-0 left-0 right-0 p-3 md:p-4 bg-linear-to-t from-black/70 via-black/40 to-transparent pointer-events-none"
+        aria-hidden
+      >
+        <Text
+          variant="body"
+          className="text-lg md:text-xl font-bold text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]"
+        >
           {subcategory.name}
         </Text>
       </div>

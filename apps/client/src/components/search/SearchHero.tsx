@@ -68,14 +68,14 @@ export function SearchHero({
   );
 
   return (
-    <div className="w-full max-w-2xl mx-auto mb-8 md:mb-12">
+    <div className="w-full max-w-4xl mx-auto mb-8 md:mb-12">
       <HeroTitle className="mb-6 md:mb-8 px-8">
-        ¿Qué hacemos por vos hoy?
+        ¿Qué necesitás encontrar hoy?
       </HeroTitle>
       <form onSubmit={handleSubmit} className="relative" role="search">
         <div className="relative">
           <Search
-            className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted pointer-events-none z-10"
+            className="absolute left-5 top-1/2 -translate-y-1/2 w-6 h-6 text-muted pointer-events-none z-10"
             aria-hidden="true"
           />
           <Input
@@ -90,7 +90,7 @@ export function SearchHero({
               }
             }}
             placeholder="Describí lo que estás precisando"
-            className="px-0! pl-12! pr-4! py-4 md:py-3 text-lg md:text-base border-2 border-border focus:border-border focus:outline-none focus:ring-0 rounded-xl md:rounded-lg bg-surface shadow-md focus:shadow-lg transition-shadow"
+            className="px-0! pl-14! pr-5! py-5 md:py-4 text-xl md:text-lg border-2 border-border focus:border-border focus:outline-none focus:ring-0 rounded-xl md:rounded-lg bg-surface shadow-md focus:shadow-lg transition-shadow"
             aria-label="Buscar profesionales"
             autoComplete="off"
           />

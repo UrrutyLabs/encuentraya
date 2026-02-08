@@ -10,7 +10,7 @@ import {
 } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Text } from "@repo/ui";
-import { Navigation } from "@/components/presentational/Navigation";
+import { AppShell } from "@/components/presentational/AppShell";
 import { SearchBar } from "@/components/search/SearchBar";
 import { ActiveFilters } from "@/components/search/ActiveFilters";
 import { ProList } from "@/components/search/ProList";
@@ -171,15 +171,12 @@ function SearchResultsContent() {
   }, [category, date, timeWindow, searchQuery]);
 
   return (
-    <div className="min-h-screen bg-bg">
-      <Navigation
-        showLogin={true}
-        showProfile={true}
-        centerContent={
-          <SearchBar initialQuery={searchQuery} preserveParams={true} />
-        }
-      />
-
+    <AppShell
+      showLogin={true}
+      centerContent={
+        <SearchBar initialQuery={searchQuery} preserveParams={true} />
+      }
+    >
       <div className="px-4 py-4 md:py-8">
         {/* Active Filters */}
         <ActiveFilters onFilterRemove={handleFilterRemove} />
@@ -240,7 +237,7 @@ function SearchResultsContent() {
           </div>
         </div>
       </div>
-    </div>
+    </AppShell>
   );
 }
 
@@ -248,15 +245,14 @@ export function SearchResultsScreen() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-bg">
-          <Navigation showLogin={true} showProfile={true} />
+        <AppShell showLogin={true}>
           <div className="px-4 py-4 md:py-8">
             <div className="max-w-6xl mx-auto">
               <div className="h-16 bg-surface border border-border rounded-lg animate-pulse mb-4" />
               <ProList pros={[]} isLoading={true} />
             </div>
           </div>
-        </div>
+        </AppShell>
       }
     >
       <SearchResultsContent />

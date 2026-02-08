@@ -8,6 +8,15 @@ const nextConfig: NextConfig = {
     "@repo/monitoring",
     "@repo/content",
   ],
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "**.supabase.co",
+        pathname: "/storage/v1/object/public/**",
+      },
+    ],
+  },
 };
 
 // Wrap Next.js config with Sentry

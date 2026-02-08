@@ -11,7 +11,7 @@ export function Select({
   children,
   ...props
 }: SelectProps) {
-  const selectClasses = `w-full px-3 py-2 border border-border rounded-md bg-surface text-text focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent ${className}`;
+  const selectClasses = `w-full px-3 py-2 border border-border rounded-md bg-surface text-text focus:outline-none focus:ring-0 focus:border-border ${className}`;
 
   if (label) {
     return (

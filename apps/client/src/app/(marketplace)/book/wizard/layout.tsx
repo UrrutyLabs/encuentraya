@@ -2,7 +2,7 @@
 
 import { ReactNode, Suspense } from "react";
 import { usePathname } from "next/navigation";
-import { Navigation } from "@/components/presentational/Navigation";
+import { AppShell } from "@/components/presentational/AppShell";
 import { WizardLayout } from "@/components/wizard/WizardLayout";
 import { JobCreateSkeleton } from "@/components/presentational/JobCreateSkeleton";
 import { PhotoUrlsProvider } from "@/contexts/PhotoUrlsContext";
@@ -32,8 +32,7 @@ export default function BookWizardLayout({ children }: BookWizardLayoutProps) {
   const currentStep = stepMap[pathname] || 1;
 
   return (
-    <div className="min-h-screen bg-bg">
-      <Navigation showLogin={false} showProfile={true} />
+    <AppShell showLogin={false}>
       <Suspense fallback={<JobCreateSkeleton />}>
         <PhotoUrlsProvider>
           <WizardLayout currentStep={currentStep} stepLabels={STEP_LABELS}>
@@ -41,6 +40,6 @@ export default function BookWizardLayout({ children }: BookWizardLayoutProps) {
           </WizardLayout>
         </PhotoUrlsProvider>
       </Suspense>
-    </div>
+    </AppShell>
   );
 }

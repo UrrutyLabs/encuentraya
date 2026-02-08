@@ -14,8 +14,9 @@ export function LandingHowItWorks() {
       <div className="max-w-6xl mx-auto">
         <div ref={titleRef}>
           <Text
-            variant="h2"
-            className={`text-center mb-12 text-text transition-all duration-600 ${
+            as="h1"
+            variant="h1"
+            className={`text-center mb-12 text-text text-3xl md:text-4xl font-bold transition-all duration-600 ${
               titleVisible ? "animate-[fadeInDown_0.6s_ease-out]" : "opacity-0"
             }`}
           >

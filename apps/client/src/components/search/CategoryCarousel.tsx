@@ -93,38 +93,34 @@ export const CategoryCarousel = memo(function CategoryCarousel({
     }
   }, [categories, isLoading]);
 
-  // Show loading skeleton while categories are loading
+  // Show loading skeleton while categories are loading (tab style)
   if (isLoading) {
     return (
-      <div className="w-full flex justify-center">
-        {/* Mobile: Horizontal Scroll Skeleton */}
-        <div className="md:hidden w-full overflow-x-auto pb-4 -mx-4 px-4 scrollbar-hide">
-          <div className="flex gap-3">
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => (
+      <div className="w-full border-b border-border">
+        <div className="md:hidden w-full overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
+          <div className="flex gap-1">
+            {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
               <div
                 key={i}
-                className="flex flex-col items-center gap-2 px-6 py-3 w-[120px] min-h-[100px] bg-surface border-2 border-transparent rounded-lg animate-pulse shrink-0"
+                className="flex flex-col items-center gap-1.5 px-4 py-2.5 animate-pulse shrink-0"
               >
-                <div className="w-12 h-12 rounded-full bg-muted/30" />
-                <div className="h-4 bg-muted/30 rounded w-16" />
+                <div className="w-5 h-5 rounded bg-muted/30" />
+                <div className="h-3 bg-muted/30 rounded w-14" />
               </div>
             ))}
           </div>
         </div>
-        {/* Desktop: Horizontal Scroll Skeleton with Arrows */}
-        <div className="hidden md:block relative w-full">
-          <div className="overflow-x-auto scrollbar-hide pb-4">
-            <div className="flex gap-4 px-2">
-              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => (
-                <div
-                  key={i}
-                  className="flex flex-col items-center gap-2 px-6 py-4 w-[140px] min-h-[120px] bg-surface border-2 border-transparent rounded-lg animate-pulse shrink-0"
-                >
-                  <div className="w-14 h-14 rounded-full bg-muted/30" />
-                  <div className="h-4 bg-muted/30 rounded w-20" />
-                </div>
-              ))}
-            </div>
+        <div className="hidden md:block w-full">
+          <div className="flex gap-1 pb-2">
+            {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+              <div
+                key={i}
+                className="flex flex-col items-center gap-1.5 px-5 py-3 animate-pulse shrink-0"
+              >
+                <div className="w-6 h-6 rounded bg-muted/30" />
+                <div className="h-3 bg-muted/30 rounded w-16" />
+              </div>
+            ))}
           </div>
         </div>
       </div>
@@ -137,28 +133,30 @@ export const CategoryCarousel = memo(function CategoryCarousel({
   }
 
   return (
-    <div className="w-full flex justify-center">
-      {/* Mobile: Horizontal Scroll */}
-      <div className="md:hidden w-full overflow-x-auto pb-4 -mx-4 px-4 scrollbar-hide">
-        <div className="flex gap-3">
-          {categories.map((category) => {
-            const Icon = getCategoryIcon(category);
-            const label = getCategoryLabel(category);
-            return (
-              <CategoryCard
-                key={category.id}
-                category={category}
-                icon={Icon}
-                label={label}
-                isSelected={selectedCategory?.id === category.id}
-                onClick={onCategoryClick}
-              />
-            );
-          })}
+    <div className="w-full border-b border-border">
+      {/* Mobile: Horizontal scroll with optional right arrow */}
+      <div className="md:hidden relative w-full">
+        <div className="overflow-x-auto -mx-4 px-4 scrollbar-hide">
+          <div className="flex gap-1">
+            {categories.map((category) => {
+              const Icon = getCategoryIcon(category);
+              const label = getCategoryLabel(category);
+              return (
+                <CategoryCard
+                  key={category.id}
+                  category={category}
+                  icon={Icon}
+                  label={label}
+                  isSelected={selectedCategory?.id === category.id}
+                  onClick={onCategoryClick}
+                />
+              );
+            })}
+          </div>
         </div>
       </div>
 
-      {/* Desktop: Horizontal Scroll with Arrows */}
+      {/* Desktop: Horizontal scroll with arrows */}
       <div className="hidden md:block relative w-full">
         {showLeftArrow && (
           <button
@@ -171,10 +169,10 @@ export const CategoryCarousel = memo(function CategoryCarousel({
         )}
         <div
           ref={scrollContainerRef}
-          className="overflow-x-auto scrollbar-hide pb-4"
+          className="overflow-x-auto scrollbar-hide"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
-          <div className="flex gap-4 px-2">
+          <div className="flex gap-1 px-2">
             {categories.map((category) => {
               const Icon = getCategoryIcon(category);
               const label = getCategoryLabel(category);

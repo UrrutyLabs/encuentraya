@@ -6,7 +6,7 @@ import { Star, AlertCircle, CheckCircle, ArrowLeft } from "lucide-react";
 import { Text } from "@repo/ui";
 import { Card } from "@repo/ui";
 import { Button } from "@repo/ui";
-import { Navigation } from "@/components/presentational/Navigation";
+import { AppShell } from "@/components/presentational/AppShell";
 import { ReviewForm } from "@/components/forms/ReviewForm";
 import { ReviewCreateSkeleton } from "@/components/presentational/ReviewCreateSkeleton";
 import { useReviewForm } from "@/hooks/order";
@@ -53,19 +53,17 @@ export function ReviewCreateScreen() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-bg">
-        <Navigation showLogin={false} showProfile={true} />
+      <AppShell showLogin={false}>
         <div className="px-4 py-4 md:py-8">
           <ReviewCreateSkeleton />
         </div>
-      </div>
+      </AppShell>
     );
   }
 
   if (!job) {
     return (
-      <div className="min-h-screen bg-bg">
-        <Navigation showLogin={false} showProfile={true} />
+      <AppShell showLogin={false}>
         <div className="px-4 py-4 md:py-8">
           <div className="max-w-4xl mx-auto">
             <Card className="p-8 text-center">
@@ -87,15 +85,14 @@ export function ReviewCreateScreen() {
             </Card>
           </div>
         </div>
-      </div>
+      </AppShell>
     );
   }
 
   // Gating: Check if review can be created
   if (job && !canCreateReview) {
     return (
-      <div className="min-h-screen bg-bg">
-        <Navigation showLogin={false} showProfile={true} />
+      <AppShell showLogin={false}>
         <div className="px-4 py-4 md:py-8">
           <div className="max-w-4xl mx-auto">
             <div className="flex items-center gap-2 mb-6">
@@ -112,15 +109,14 @@ export function ReviewCreateScreen() {
             </Card>
           </div>
         </div>
-      </div>
+      </AppShell>
     );
   }
 
   // Gating: Check if review already exists
   if (existingReview) {
     return (
-      <div className="min-h-screen bg-bg">
-        <Navigation showLogin={false} showProfile={true} />
+      <AppShell showLogin={false}>
         <div className="px-4 py-4 md:py-8">
           <div className="max-w-4xl mx-auto">
             <div className="flex items-center gap-2 mb-6">
@@ -137,13 +133,12 @@ export function ReviewCreateScreen() {
             </Card>
           </div>
         </div>
-      </div>
+      </AppShell>
     );
   }
 
   return (
-    <div className="min-h-screen bg-bg">
-      <Navigation showLogin={false} showProfile={true} />
+    <AppShell showLogin={false}>
       <div className="px-4 py-8">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center gap-2 mb-6">
@@ -171,6 +166,6 @@ export function ReviewCreateScreen() {
           </Card>
         </div>
       </div>
-    </div>
+    </AppShell>
   );
 }

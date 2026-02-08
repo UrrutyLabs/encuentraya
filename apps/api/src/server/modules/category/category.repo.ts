@@ -87,7 +87,7 @@ export class CategoryRepositoryImpl implements CategoryRepository {
 
   async findAll(includeDeleted = false): Promise<Category[]> {
     const categories = await prisma.category.findMany({
-      where: includeDeleted ? {} : { deletedAt: null },
+      where: includeDeleted ? {} : { deletedAt: null, isActive: true },
       orderBy: [{ isActive: "desc" }, { sortOrder: "asc" }],
     });
 
