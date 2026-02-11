@@ -183,6 +183,12 @@ describe("ProService", () => {
       hourlyRate: 10000, // 100 UYU/hour in minor units (cents)
       categoryIds: ["cat-plumbing"],
       serviceArea: "Test Area",
+      baseCountryCode: null,
+      baseLatitude: null,
+      baseLongitude: null,
+      basePostalCode: null,
+      baseAddressLine: null,
+      serviceRadiusKm: 10,
       status: "active",
       profileCompleted: true,
       completedJobsCount: 0,
@@ -247,6 +253,12 @@ describe("ProService", () => {
 
     mockAvailabilityRepository.findByProProfileId.mockResolvedValue([]);
 
+    const mockIdeGeocoding = {
+      getCandidates: vi.fn().mockResolvedValue([]),
+      geocodeAddress: vi.fn().mockResolvedValue(null),
+      reverseGeocode: vi.fn().mockResolvedValue(null),
+      getLocalidadesByDepartment: vi.fn().mockResolvedValue([]),
+    };
     service = new ProService(
       mockProRepository as unknown as ProRepository,
       mockReviewRepository as unknown as ReviewRepository,
@@ -258,7 +270,8 @@ describe("ProService", () => {
       mockAuditService as unknown as AuditService,
       mockCategoryRepository as unknown as CategoryRepository,
       mockAvatarUrlService as unknown as AvatarUrlService,
-      mockAvatarCache as unknown as IAvatarCache
+      mockAvatarCache as unknown as IAvatarCache,
+      mockIdeGeocoding as unknown as import("@modules/location/ide-geocoding.types").IIdeUyGeocodingProvider
     );
     vi.clearAllMocks();
 
@@ -277,7 +290,6 @@ describe("ProService", () => {
         phone: "+1234567890",
         hourlyRate: 10000, // 100 UYU/hour in minor units (cents)
         categoryIds: ["cat-plumbing"],
-        serviceArea: "Test Area",
       };
       const user = createMockUser();
       const proProfile = createMockProProfile({
@@ -287,7 +299,6 @@ describe("ProService", () => {
         phone: input.phone,
         hourlyRate: input.hourlyRate, // Already in minor units
         categoryIds: input.categoryIds,
-        serviceArea: input.serviceArea,
       });
 
       mockUserRepository.create.mockResolvedValue(user);
@@ -300,16 +311,18 @@ describe("ProService", () => {
 
       // Assert
       expect(mockUserRepository.create).toHaveBeenCalledWith(Role.PRO);
-      expect(mockProRepository.create).toHaveBeenCalledWith({
-        userId: user.id,
-        displayName: input.name,
-        email: input.email,
-        phone: input.phone,
-        bio: undefined,
-        hourlyRate: input.hourlyRate, // Already in minor units
-        categoryIds: input.categoryIds,
-        serviceArea: input.serviceArea,
-      });
+      expect(mockProRepository.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          userId: user.id,
+          displayName: input.name,
+          email: input.email,
+          phone: input.phone,
+          bio: undefined,
+          hourlyRate: input.hourlyRate, // Already in minor units
+          categoryIds: input.categoryIds,
+          serviceRadiusKm: 10,
+        })
+      );
       expect(result).toMatchObject({
         id: proProfile.id,
         name: proProfile.displayName,
@@ -334,7 +347,6 @@ describe("ProService", () => {
         phone: "+1234567890",
         hourlyRate: 10000, // 100 UYU/hour in minor units (cents)
         categoryIds: ["cat-plumbing"],
-        serviceArea: "Test Area",
         bio: "Optional bio text",
       };
       const user = createMockUser();
@@ -346,7 +358,6 @@ describe("ProService", () => {
         bio: input.bio,
         hourlyRate: input.hourlyRate, // Already in minor units
         categoryIds: input.categoryIds,
-        serviceArea: input.serviceArea,
       });
 
       mockUserRepository.create.mockResolvedValue(user);
@@ -358,16 +369,17 @@ describe("ProService", () => {
       const result = await service.onboardPro(input);
 
       // Assert
-      expect(mockProRepository.create).toHaveBeenCalledWith({
-        userId: user.id,
-        displayName: input.name,
-        email: input.email,
-        phone: input.phone,
-        bio: input.bio,
-        hourlyRate: input.hourlyRate, // Already in minor units
-        categoryIds: input.categoryIds,
-        serviceArea: input.serviceArea,
-      });
+      expect(mockProRepository.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          userId: user.id,
+          displayName: input.name,
+          email: input.email,
+          phone: input.phone,
+          bio: input.bio,
+          hourlyRate: input.hourlyRate, // Already in minor units
+          categoryIds: input.categoryIds,
+        })
+      );
       expect(result).toMatchObject({
         bio: proProfile.bio,
       });
@@ -468,7 +480,6 @@ describe("ProService", () => {
         phone: "+1234567890",
         hourlyRate: 10000, // 100 UYU/hour in minor units (cents)
         categoryIds: ["cat-plumbing"],
-        serviceArea: "Test Area",
       };
       const existingPro = createMockProProfile({ userId });
 
@@ -499,7 +510,6 @@ describe("ProService", () => {
         phone: "+1234567890",
         hourlyRate: 10000, // 100 UYU/hour in minor units (cents)
         categoryIds: ["cat-plumbing"],
-        serviceArea: "Test Area",
       };
       const user = createMockUser({ id: userId, role: Role.PRO });
       const proProfile = createMockProProfile({ userId });
@@ -517,16 +527,17 @@ describe("ProService", () => {
       expect(mockProRepository.findByUserId).toHaveBeenCalledWith(userId);
       expect(mockUserRepository.findById).toHaveBeenCalledWith(userId);
       expect(mockUserRepository.updateRole).not.toHaveBeenCalled();
-      expect(mockProRepository.create).toHaveBeenCalledWith({
-        userId,
-        displayName: input.name,
-        email: input.email,
-        phone: input.phone,
-        bio: input.bio ?? undefined,
-        hourlyRate: input.hourlyRate, // Already in minor units
-        categoryIds: input.categoryIds,
-        serviceArea: input.serviceArea,
-      });
+      expect(mockProRepository.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          userId,
+          displayName: input.name,
+          email: input.email,
+          phone: input.phone,
+          bio: input.bio ?? undefined,
+          hourlyRate: input.hourlyRate, // Already in minor units
+          categoryIds: input.categoryIds,
+        })
+      );
       expect(result).toMatchObject({
         id: proProfile.id,
         name: proProfile.displayName,
@@ -543,7 +554,6 @@ describe("ProService", () => {
         phone: "+1234567890",
         hourlyRate: 10000, // 100 UYU/hour in minor units (cents)
         categoryIds: ["cat-plumbing"],
-        serviceArea: "Test Area",
       };
       const user = createMockUser({ id: userId, role: Role.CLIENT });
       const updatedUser = createMockUser({ id: userId, role: Role.PRO });
@@ -579,7 +589,6 @@ describe("ProService", () => {
         phone: "+1234567890",
         hourlyRate: 10000, // 100 UYU/hour in minor units (cents)
         categoryIds: ["cat-plumbing"],
-        serviceArea: "Test Area",
       };
 
       mockProRepository.findByUserId.mockResolvedValue(null);

@@ -1,4 +1,11 @@
 export { useAppState } from "./useAppState";
+export { useClickOutside } from "./useClickOutside";
+export {
+  useGeolocation,
+  type GeolocationPosition,
+  type UseGeolocationOptions,
+  type UseGeolocationReturn,
+} from "./useGeolocation";
 export { useQueryClient } from "./useQueryClient";
 export { useSmartPolling } from "./useSmartPolling";
 export { useTodayDate } from "./useTodayDate";

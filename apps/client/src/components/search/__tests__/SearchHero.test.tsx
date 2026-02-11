@@ -89,7 +89,9 @@ describe("SearchHero", () => {
     });
 
     it("should preserve params when preserveParams is true", async () => {
-      mockGet.mockReturnValue("PLUMBING");
+      mockGet.mockImplementation((key: string) =>
+        key === "category" ? "PLUMBING" : ""
+      );
       mockToString.mockReturnValue("category=PLUMBING");
       render(<SearchHero preserveParams={true} />);
       const input = screen.getByPlaceholderText(
@@ -110,7 +112,9 @@ describe("SearchHero", () => {
 
   describe("URL sync", () => {
     it("should sync with URL when preserveParams is true", async () => {
-      mockGet.mockReturnValue("plumber");
+      mockGet.mockImplementation((key: string) =>
+        key === "q" ? "plumber" : ""
+      );
       const { rerender } = render(<SearchHero preserveParams={true} />);
       const input = screen.getByPlaceholderText(
         "Describí lo que estás precisando"
@@ -120,7 +124,9 @@ describe("SearchHero", () => {
         expect(input.value).toBe("plumber");
       });
 
-      mockGet.mockReturnValue("electrician");
+      mockGet.mockImplementation((key: string) =>
+        key === "q" ? "electrician" : ""
+      );
       // Create a new mock searchParams object to trigger useEffect
       (useSearchParams as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
         get: mockGet,
@@ -134,7 +140,7 @@ describe("SearchHero", () => {
     });
 
     it("should not sync with URL when preserveParams is false", () => {
-      mockGet.mockReturnValue("plumber");
+      mockGet.mockImplementation(() => "plumber");
       render(<SearchHero preserveParams={false} initialQuery="initial" />);
       const input = screen.getByPlaceholderText(
         "Describí lo que estás precisando"

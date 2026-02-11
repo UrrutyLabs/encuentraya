@@ -18,7 +18,11 @@ import { Text } from "@components/ui/Text";
 import { Input } from "@components/ui/Input";
 import { useMyProProfile, useUpdateProfile } from "@hooks/pro";
 import { useUploadProAvatar } from "@hooks/upload";
+import { useAddressSuggestions } from "@hooks/location";
 import { theme } from "../../theme";
+
+const RADIUS_OPTIONS_KM = [5, 10, 15, 25, 50] as const;
+const DEFAULT_RADIUS_KM = 10;
 
 const AVATAR_SIZE = 96;
 
@@ -34,8 +38,14 @@ export function EditProfileScreen() {
 
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
-  const [serviceArea, setServiceArea] = useState("");
   const [bio, setBio] = useState("");
+  const [baseAddress, setBaseAddress] = useState("");
+  const [serviceRadiusKm, setServiceRadiusKm] = useState(DEFAULT_RADIUS_KM);
+  const [showAddressSuggestions, setShowAddressSuggestions] = useState(false);
+
+  const addressSuggestions = useAddressSuggestions(
+    showAddressSuggestions ? baseAddress : ""
+  );
 
   const handleChangePhoto = useCallback(async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -78,8 +88,9 @@ export function EditProfileScreen() {
     if (pro) {
       setName(pro.name || "");
       setPhone(pro.phone || "");
-      setServiceArea(pro.serviceArea || "");
       setBio(pro.bio || "");
+      setBaseAddress(pro.baseAddressLine ?? "");
+      setServiceRadiusKm(pro.serviceRadiusKm ?? DEFAULT_RADIUS_KM);
     }
   }, [pro]);
 
@@ -97,8 +108,9 @@ export function EditProfileScreen() {
       {
         name: name.trim(),
         phone: phone.trim() || undefined,
-        serviceArea: serviceArea.trim() || undefined,
         bio: bio.trim() || undefined,
+        baseAddress: baseAddress.trim() || undefined,
+        serviceRadiusKm,
       },
       {
         onSuccess: async () => {
@@ -257,14 +269,102 @@ export function EditProfileScreen() {
           <Feather name="chevron-right" size={20} color={theme.colors.muted} />
         </TouchableOpacity>
 
-        <Input
-          label="Área de servicio (opcional)"
-          icon="map-pin"
-          value={serviceArea}
-          onChangeText={setServiceArea}
-          placeholder="Ej: Montevideo Centro"
-          style={styles.input}
-        />
+        {pro?.serviceArea ? (
+          <View style={styles.readOnlyRow}>
+            <Feather name="map-pin" size={20} color={theme.colors.muted} />
+            <Text variant="small" style={styles.readOnlyLabel}>
+              Zona mostrada en resultados: {pro.serviceArea}
+            </Text>
+          </View>
+        ) : null}
+      </Card>
+
+      {/* Zona de trabajo y ubicación */}
+      <Card style={styles.card}>
+        <View style={styles.sectionHeader}>
+          <Feather name="map-pin" size={20} color={theme.colors.primary} />
+          <Text variant="h2" style={styles.sectionTitle}>
+            Zona de trabajo y ubicación
+          </Text>
+        </View>
+        <Text variant="small" style={styles.locationHint}>
+          Tu dirección base y radio de servicio determinan en qué búsquedas
+          aparecés (clientes dentro del radio te verán).
+        </Text>
+
+        <Text variant="small" style={[styles.label, styles.labelTop]}>
+          Radio de servicio (km)
+        </Text>
+        <View style={styles.radiusRow}>
+          {RADIUS_OPTIONS_KM.map((km) => {
+            const isSelected = serviceRadiusKm === km;
+            return (
+              <TouchableOpacity
+                key={km}
+                onPress={() => setServiceRadiusKm(km)}
+                style={[
+                  styles.radiusChip,
+                  isSelected && styles.radiusChipSelected,
+                ]}
+              >
+                <Text
+                  variant="small"
+                  style={[
+                    styles.radiusChipText,
+                    isSelected && styles.radiusChipTextSelected,
+                  ]}
+                >
+                  {km} km
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+
+        <Text variant="small" style={[styles.label, styles.labelTop]}>
+          Dirección base
+        </Text>
+        <View style={styles.addressContainer}>
+          <Input
+            value={baseAddress}
+            onChangeText={(text) => {
+              setBaseAddress(text);
+              setShowAddressSuggestions(true);
+            }}
+            onBlur={() => setShowAddressSuggestions(false)}
+            placeholder="Ej: Bvar. España 1234, Montevideo"
+            style={styles.input}
+          />
+          {showAddressSuggestions &&
+            addressSuggestions.suggestions.length > 0 &&
+            baseAddress.trim().length >= 2 && (
+              <View style={styles.suggestionsList}>
+                {addressSuggestions.suggestions.slice(0, 5).map((s) => (
+                  <TouchableOpacity
+                    key={s.id ?? s.label}
+                    onPress={() => {
+                      setBaseAddress(s.label);
+                      setShowAddressSuggestions(false);
+                    }}
+                    style={styles.suggestionItem}
+                  >
+                    <Feather
+                      name="map-pin"
+                      size={14}
+                      color={theme.colors.muted}
+                    />
+                    <Text
+                      variant="small"
+                      style={styles.suggestionText}
+                      numberOfLines={1}
+                    >
+                      {s.label}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )}
+        </View>
       </Card>
 
       {/* Bio */}
@@ -419,6 +519,18 @@ const styles = StyleSheet.create({
     marginLeft: theme.spacing[1],
     color: theme.colors.muted,
   },
+  labelTop: {
+    marginTop: theme.spacing[2],
+  },
+  readOnlyRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: theme.spacing[2],
+  },
+  readOnlyLabel: {
+    marginLeft: theme.spacing[2],
+    color: theme.colors.muted,
+  },
   emailValue: {
     color: theme.colors.text,
   },
@@ -453,5 +565,59 @@ const styles = StyleSheet.create({
   avatarError: {
     color: theme.colors.danger,
     marginTop: theme.spacing[1],
+  },
+  locationHint: {
+    color: theme.colors.muted,
+    marginBottom: theme.spacing[3],
+  },
+  radiusRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: theme.spacing[2],
+    marginBottom: theme.spacing[3],
+  },
+  radiusChip: {
+    paddingHorizontal: theme.spacing[3],
+    paddingVertical: theme.spacing[2],
+    borderRadius: theme.radius.md,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surface,
+  },
+  radiusChipSelected: {
+    borderColor: theme.colors.primary,
+    backgroundColor: theme.colors.primary + "20",
+  },
+  radiusChipText: {
+    color: theme.colors.text,
+  },
+  radiusChipTextSelected: {
+    color: theme.colors.primary,
+    fontWeight: "600",
+  },
+  addressContainer: {
+    marginBottom: theme.spacing[2],
+  },
+  suggestionsList: {
+    marginTop: -theme.spacing[2],
+    marginBottom: theme.spacing[2],
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderRadius: theme.radius.md,
+    backgroundColor: theme.colors.surface,
+    maxHeight: 180,
+  },
+  suggestionItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: theme.spacing[2],
+    paddingHorizontal: theme.spacing[3],
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border,
+  },
+  suggestionText: {
+    marginLeft: theme.spacing[2],
+    flex: 1,
+    color: theme.colors.text,
   },
 });

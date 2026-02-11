@@ -96,6 +96,7 @@ export const searchRouter = router({
           q: input.q,
           date: input.date,
           timeWindow: input.timeWindow,
+          location: input.location?.trim() || undefined,
         });
       } catch (error) {
         // Re-throw TRPCError as-is

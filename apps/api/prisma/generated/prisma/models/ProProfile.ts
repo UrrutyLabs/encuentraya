@@ -28,12 +28,18 @@ export type AggregateProProfile = {
 
 export type ProProfileAvgAggregateOutputType = {
   hourlyRate: number | null
+  serviceRadiusKm: number | null
+  baseLatitude: number | null
+  baseLongitude: number | null
   completedJobsCount: number | null
   responseTimeMinutes: number | null
 }
 
 export type ProProfileSumAggregateOutputType = {
   hourlyRate: number | null
+  serviceRadiusKm: number | null
+  baseLatitude: number | null
+  baseLongitude: number | null
   completedJobsCount: number | null
   responseTimeMinutes: number | null
 }
@@ -48,6 +54,12 @@ export type ProProfileMinAggregateOutputType = {
   avatarUrl: string | null
   hourlyRate: number | null
   serviceArea: string | null
+  serviceRadiusKm: number | null
+  baseCountryCode: string | null
+  baseLatitude: number | null
+  baseLongitude: number | null
+  basePostalCode: string | null
+  baseAddressLine: string | null
   status: $Enums.ProStatus | null
   profileCompleted: boolean | null
   completedJobsCount: number | null
@@ -67,6 +79,12 @@ export type ProProfileMaxAggregateOutputType = {
   avatarUrl: string | null
   hourlyRate: number | null
   serviceArea: string | null
+  serviceRadiusKm: number | null
+  baseCountryCode: string | null
+  baseLatitude: number | null
+  baseLongitude: number | null
+  basePostalCode: string | null
+  baseAddressLine: string | null
   status: $Enums.ProStatus | null
   profileCompleted: boolean | null
   completedJobsCount: number | null
@@ -86,6 +104,12 @@ export type ProProfileCountAggregateOutputType = {
   avatarUrl: number
   hourlyRate: number
   serviceArea: number
+  serviceRadiusKm: number
+  baseCountryCode: number
+  baseLatitude: number
+  baseLongitude: number
+  basePostalCode: number
+  baseAddressLine: number
   status: number
   profileCompleted: number
   completedJobsCount: number
@@ -99,12 +123,18 @@ export type ProProfileCountAggregateOutputType = {
 
 export type ProProfileAvgAggregateInputType = {
   hourlyRate?: true
+  serviceRadiusKm?: true
+  baseLatitude?: true
+  baseLongitude?: true
   completedJobsCount?: true
   responseTimeMinutes?: true
 }
 
 export type ProProfileSumAggregateInputType = {
   hourlyRate?: true
+  serviceRadiusKm?: true
+  baseLatitude?: true
+  baseLongitude?: true
   completedJobsCount?: true
   responseTimeMinutes?: true
 }
@@ -119,6 +149,12 @@ export type ProProfileMinAggregateInputType = {
   avatarUrl?: true
   hourlyRate?: true
   serviceArea?: true
+  serviceRadiusKm?: true
+  baseCountryCode?: true
+  baseLatitude?: true
+  baseLongitude?: true
+  basePostalCode?: true
+  baseAddressLine?: true
   status?: true
   profileCompleted?: true
   completedJobsCount?: true
@@ -138,6 +174,12 @@ export type ProProfileMaxAggregateInputType = {
   avatarUrl?: true
   hourlyRate?: true
   serviceArea?: true
+  serviceRadiusKm?: true
+  baseCountryCode?: true
+  baseLatitude?: true
+  baseLongitude?: true
+  basePostalCode?: true
+  baseAddressLine?: true
   status?: true
   profileCompleted?: true
   completedJobsCount?: true
@@ -157,6 +199,12 @@ export type ProProfileCountAggregateInputType = {
   avatarUrl?: true
   hourlyRate?: true
   serviceArea?: true
+  serviceRadiusKm?: true
+  baseCountryCode?: true
+  baseLatitude?: true
+  baseLongitude?: true
+  basePostalCode?: true
+  baseAddressLine?: true
   status?: true
   profileCompleted?: true
   completedJobsCount?: true
@@ -263,6 +311,12 @@ export type ProProfileGroupByOutputType = {
   avatarUrl: string | null
   hourlyRate: number
   serviceArea: string | null
+  serviceRadiusKm: number
+  baseCountryCode: string | null
+  baseLatitude: number | null
+  baseLongitude: number | null
+  basePostalCode: string | null
+  baseAddressLine: string | null
   status: $Enums.ProStatus
   profileCompleted: boolean
   completedJobsCount: number
@@ -305,6 +359,12 @@ export type ProProfileWhereInput = {
   avatarUrl?: Prisma.StringNullableFilter<"ProProfile"> | string | null
   hourlyRate?: Prisma.FloatFilter<"ProProfile"> | number
   serviceArea?: Prisma.StringNullableFilter<"ProProfile"> | string | null
+  serviceRadiusKm?: Prisma.IntFilter<"ProProfile"> | number
+  baseCountryCode?: Prisma.StringNullableFilter<"ProProfile"> | string | null
+  baseLatitude?: Prisma.FloatNullableFilter<"ProProfile"> | number | null
+  baseLongitude?: Prisma.FloatNullableFilter<"ProProfile"> | number | null
+  basePostalCode?: Prisma.StringNullableFilter<"ProProfile"> | string | null
+  baseAddressLine?: Prisma.StringNullableFilter<"ProProfile"> | string | null
   status?: Prisma.EnumProStatusFilter<"ProProfile"> | $Enums.ProStatus
   profileCompleted?: Prisma.BoolFilter<"ProProfile"> | boolean
   completedJobsCount?: Prisma.IntFilter<"ProProfile"> | number
@@ -333,6 +393,12 @@ export type ProProfileOrderByWithRelationInput = {
   avatarUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   hourlyRate?: Prisma.SortOrder
   serviceArea?: Prisma.SortOrderInput | Prisma.SortOrder
+  serviceRadiusKm?: Prisma.SortOrder
+  baseCountryCode?: Prisma.SortOrderInput | Prisma.SortOrder
+  baseLatitude?: Prisma.SortOrderInput | Prisma.SortOrder
+  baseLongitude?: Prisma.SortOrderInput | Prisma.SortOrder
+  basePostalCode?: Prisma.SortOrderInput | Prisma.SortOrder
+  baseAddressLine?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   profileCompleted?: Prisma.SortOrder
   completedJobsCount?: Prisma.SortOrder
@@ -364,6 +430,12 @@ export type ProProfileWhereUniqueInput = Prisma.AtLeast<{
   avatarUrl?: Prisma.StringNullableFilter<"ProProfile"> | string | null
   hourlyRate?: Prisma.FloatFilter<"ProProfile"> | number
   serviceArea?: Prisma.StringNullableFilter<"ProProfile"> | string | null
+  serviceRadiusKm?: Prisma.IntFilter<"ProProfile"> | number
+  baseCountryCode?: Prisma.StringNullableFilter<"ProProfile"> | string | null
+  baseLatitude?: Prisma.FloatNullableFilter<"ProProfile"> | number | null
+  baseLongitude?: Prisma.FloatNullableFilter<"ProProfile"> | number | null
+  basePostalCode?: Prisma.StringNullableFilter<"ProProfile"> | string | null
+  baseAddressLine?: Prisma.StringNullableFilter<"ProProfile"> | string | null
   status?: Prisma.EnumProStatusFilter<"ProProfile"> | $Enums.ProStatus
   profileCompleted?: Prisma.BoolFilter<"ProProfile"> | boolean
   completedJobsCount?: Prisma.IntFilter<"ProProfile"> | number
@@ -392,6 +464,12 @@ export type ProProfileOrderByWithAggregationInput = {
   avatarUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   hourlyRate?: Prisma.SortOrder
   serviceArea?: Prisma.SortOrderInput | Prisma.SortOrder
+  serviceRadiusKm?: Prisma.SortOrder
+  baseCountryCode?: Prisma.SortOrderInput | Prisma.SortOrder
+  baseLatitude?: Prisma.SortOrderInput | Prisma.SortOrder
+  baseLongitude?: Prisma.SortOrderInput | Prisma.SortOrder
+  basePostalCode?: Prisma.SortOrderInput | Prisma.SortOrder
+  baseAddressLine?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   profileCompleted?: Prisma.SortOrder
   completedJobsCount?: Prisma.SortOrder
@@ -419,6 +497,12 @@ export type ProProfileScalarWhereWithAggregatesInput = {
   avatarUrl?: Prisma.StringNullableWithAggregatesFilter<"ProProfile"> | string | null
   hourlyRate?: Prisma.FloatWithAggregatesFilter<"ProProfile"> | number
   serviceArea?: Prisma.StringNullableWithAggregatesFilter<"ProProfile"> | string | null
+  serviceRadiusKm?: Prisma.IntWithAggregatesFilter<"ProProfile"> | number
+  baseCountryCode?: Prisma.StringNullableWithAggregatesFilter<"ProProfile"> | string | null
+  baseLatitude?: Prisma.FloatNullableWithAggregatesFilter<"ProProfile"> | number | null
+  baseLongitude?: Prisma.FloatNullableWithAggregatesFilter<"ProProfile"> | number | null
+  basePostalCode?: Prisma.StringNullableWithAggregatesFilter<"ProProfile"> | string | null
+  baseAddressLine?: Prisma.StringNullableWithAggregatesFilter<"ProProfile"> | string | null
   status?: Prisma.EnumProStatusWithAggregatesFilter<"ProProfile"> | $Enums.ProStatus
   profileCompleted?: Prisma.BoolWithAggregatesFilter<"ProProfile"> | boolean
   completedJobsCount?: Prisma.IntWithAggregatesFilter<"ProProfile"> | number
@@ -437,6 +521,12 @@ export type ProProfileCreateInput = {
   avatarUrl?: string | null
   hourlyRate: number
   serviceArea?: string | null
+  serviceRadiusKm?: number
+  baseCountryCode?: string | null
+  baseLatitude?: number | null
+  baseLongitude?: number | null
+  basePostalCode?: string | null
+  baseAddressLine?: string | null
   status?: $Enums.ProStatus
   profileCompleted?: boolean
   completedJobsCount?: number
@@ -465,6 +555,12 @@ export type ProProfileUncheckedCreateInput = {
   avatarUrl?: string | null
   hourlyRate: number
   serviceArea?: string | null
+  serviceRadiusKm?: number
+  baseCountryCode?: string | null
+  baseLatitude?: number | null
+  baseLongitude?: number | null
+  basePostalCode?: string | null
+  baseAddressLine?: string | null
   status?: $Enums.ProStatus
   profileCompleted?: boolean
   completedJobsCount?: number
@@ -491,6 +587,12 @@ export type ProProfileUpdateInput = {
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hourlyRate?: Prisma.FloatFieldUpdateOperationsInput | number
   serviceArea?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  serviceRadiusKm?: Prisma.IntFieldUpdateOperationsInput | number
+  baseCountryCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baseLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  baseLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  basePostalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baseAddressLine?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProStatusFieldUpdateOperationsInput | $Enums.ProStatus
   profileCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   completedJobsCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -519,6 +621,12 @@ export type ProProfileUncheckedUpdateInput = {
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hourlyRate?: Prisma.FloatFieldUpdateOperationsInput | number
   serviceArea?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  serviceRadiusKm?: Prisma.IntFieldUpdateOperationsInput | number
+  baseCountryCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baseLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  baseLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  basePostalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baseAddressLine?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProStatusFieldUpdateOperationsInput | $Enums.ProStatus
   profileCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   completedJobsCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -546,6 +654,12 @@ export type ProProfileCreateManyInput = {
   avatarUrl?: string | null
   hourlyRate: number
   serviceArea?: string | null
+  serviceRadiusKm?: number
+  baseCountryCode?: string | null
+  baseLatitude?: number | null
+  baseLongitude?: number | null
+  basePostalCode?: string | null
+  baseAddressLine?: string | null
   status?: $Enums.ProStatus
   profileCompleted?: boolean
   completedJobsCount?: number
@@ -564,6 +678,12 @@ export type ProProfileUpdateManyMutationInput = {
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hourlyRate?: Prisma.FloatFieldUpdateOperationsInput | number
   serviceArea?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  serviceRadiusKm?: Prisma.IntFieldUpdateOperationsInput | number
+  baseCountryCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baseLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  baseLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  basePostalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baseAddressLine?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProStatusFieldUpdateOperationsInput | $Enums.ProStatus
   profileCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   completedJobsCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -583,6 +703,12 @@ export type ProProfileUncheckedUpdateManyInput = {
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hourlyRate?: Prisma.FloatFieldUpdateOperationsInput | number
   serviceArea?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  serviceRadiusKm?: Prisma.IntFieldUpdateOperationsInput | number
+  baseCountryCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baseLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  baseLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  basePostalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baseAddressLine?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProStatusFieldUpdateOperationsInput | $Enums.ProStatus
   profileCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   completedJobsCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -607,6 +733,12 @@ export type ProProfileCountOrderByAggregateInput = {
   avatarUrl?: Prisma.SortOrder
   hourlyRate?: Prisma.SortOrder
   serviceArea?: Prisma.SortOrder
+  serviceRadiusKm?: Prisma.SortOrder
+  baseCountryCode?: Prisma.SortOrder
+  baseLatitude?: Prisma.SortOrder
+  baseLongitude?: Prisma.SortOrder
+  basePostalCode?: Prisma.SortOrder
+  baseAddressLine?: Prisma.SortOrder
   status?: Prisma.SortOrder
   profileCompleted?: Prisma.SortOrder
   completedJobsCount?: Prisma.SortOrder
@@ -618,6 +750,9 @@ export type ProProfileCountOrderByAggregateInput = {
 
 export type ProProfileAvgOrderByAggregateInput = {
   hourlyRate?: Prisma.SortOrder
+  serviceRadiusKm?: Prisma.SortOrder
+  baseLatitude?: Prisma.SortOrder
+  baseLongitude?: Prisma.SortOrder
   completedJobsCount?: Prisma.SortOrder
   responseTimeMinutes?: Prisma.SortOrder
 }
@@ -632,6 +767,12 @@ export type ProProfileMaxOrderByAggregateInput = {
   avatarUrl?: Prisma.SortOrder
   hourlyRate?: Prisma.SortOrder
   serviceArea?: Prisma.SortOrder
+  serviceRadiusKm?: Prisma.SortOrder
+  baseCountryCode?: Prisma.SortOrder
+  baseLatitude?: Prisma.SortOrder
+  baseLongitude?: Prisma.SortOrder
+  basePostalCode?: Prisma.SortOrder
+  baseAddressLine?: Prisma.SortOrder
   status?: Prisma.SortOrder
   profileCompleted?: Prisma.SortOrder
   completedJobsCount?: Prisma.SortOrder
@@ -651,6 +792,12 @@ export type ProProfileMinOrderByAggregateInput = {
   avatarUrl?: Prisma.SortOrder
   hourlyRate?: Prisma.SortOrder
   serviceArea?: Prisma.SortOrder
+  serviceRadiusKm?: Prisma.SortOrder
+  baseCountryCode?: Prisma.SortOrder
+  baseLatitude?: Prisma.SortOrder
+  baseLongitude?: Prisma.SortOrder
+  basePostalCode?: Prisma.SortOrder
+  baseAddressLine?: Prisma.SortOrder
   status?: Prisma.SortOrder
   profileCompleted?: Prisma.SortOrder
   completedJobsCount?: Prisma.SortOrder
@@ -662,6 +809,9 @@ export type ProProfileMinOrderByAggregateInput = {
 
 export type ProProfileSumOrderByAggregateInput = {
   hourlyRate?: Prisma.SortOrder
+  serviceRadiusKm?: Prisma.SortOrder
+  baseLatitude?: Prisma.SortOrder
+  baseLongitude?: Prisma.SortOrder
   completedJobsCount?: Prisma.SortOrder
   responseTimeMinutes?: Prisma.SortOrder
 }
@@ -715,20 +865,28 @@ export type FloatFieldUpdateOperationsInput = {
   divide?: number
 }
 
-export type EnumProStatusFieldUpdateOperationsInput = {
-  set?: $Enums.ProStatus
-}
-
-export type BoolFieldUpdateOperationsInput = {
-  set?: boolean
-}
-
 export type IntFieldUpdateOperationsInput = {
   set?: number
   increment?: number
   decrement?: number
   multiply?: number
   divide?: number
+}
+
+export type NullableFloatFieldUpdateOperationsInput = {
+  set?: number | null
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
+export type EnumProStatusFieldUpdateOperationsInput = {
+  set?: $Enums.ProStatus
+}
+
+export type BoolFieldUpdateOperationsInput = {
+  set?: boolean
 }
 
 export type NullableIntFieldUpdateOperationsInput = {
@@ -864,6 +1022,12 @@ export type ProProfileCreateWithoutUserInput = {
   avatarUrl?: string | null
   hourlyRate: number
   serviceArea?: string | null
+  serviceRadiusKm?: number
+  baseCountryCode?: string | null
+  baseLatitude?: number | null
+  baseLongitude?: number | null
+  basePostalCode?: string | null
+  baseAddressLine?: string | null
   status?: $Enums.ProStatus
   profileCompleted?: boolean
   completedJobsCount?: number
@@ -890,6 +1054,12 @@ export type ProProfileUncheckedCreateWithoutUserInput = {
   avatarUrl?: string | null
   hourlyRate: number
   serviceArea?: string | null
+  serviceRadiusKm?: number
+  baseCountryCode?: string | null
+  baseLatitude?: number | null
+  baseLongitude?: number | null
+  basePostalCode?: string | null
+  baseAddressLine?: string | null
   status?: $Enums.ProStatus
   profileCompleted?: boolean
   completedJobsCount?: number
@@ -932,6 +1102,12 @@ export type ProProfileUpdateWithoutUserInput = {
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hourlyRate?: Prisma.FloatFieldUpdateOperationsInput | number
   serviceArea?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  serviceRadiusKm?: Prisma.IntFieldUpdateOperationsInput | number
+  baseCountryCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baseLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  baseLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  basePostalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baseAddressLine?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProStatusFieldUpdateOperationsInput | $Enums.ProStatus
   profileCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   completedJobsCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -958,6 +1134,12 @@ export type ProProfileUncheckedUpdateWithoutUserInput = {
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hourlyRate?: Prisma.FloatFieldUpdateOperationsInput | number
   serviceArea?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  serviceRadiusKm?: Prisma.IntFieldUpdateOperationsInput | number
+  baseCountryCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baseLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  baseLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  basePostalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baseAddressLine?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProStatusFieldUpdateOperationsInput | $Enums.ProStatus
   profileCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   completedJobsCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -984,6 +1166,12 @@ export type ProProfileCreateWithoutAvailabilityInput = {
   avatarUrl?: string | null
   hourlyRate: number
   serviceArea?: string | null
+  serviceRadiusKm?: number
+  baseCountryCode?: string | null
+  baseLatitude?: number | null
+  baseLongitude?: number | null
+  basePostalCode?: string | null
+  baseAddressLine?: string | null
   status?: $Enums.ProStatus
   profileCompleted?: boolean
   completedJobsCount?: number
@@ -1011,6 +1199,12 @@ export type ProProfileUncheckedCreateWithoutAvailabilityInput = {
   avatarUrl?: string | null
   hourlyRate: number
   serviceArea?: string | null
+  serviceRadiusKm?: number
+  baseCountryCode?: string | null
+  baseLatitude?: number | null
+  baseLongitude?: number | null
+  basePostalCode?: string | null
+  baseAddressLine?: string | null
   status?: $Enums.ProStatus
   profileCompleted?: boolean
   completedJobsCount?: number
@@ -1052,6 +1246,12 @@ export type ProProfileUpdateWithoutAvailabilityInput = {
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hourlyRate?: Prisma.FloatFieldUpdateOperationsInput | number
   serviceArea?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  serviceRadiusKm?: Prisma.IntFieldUpdateOperationsInput | number
+  baseCountryCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baseLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  baseLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  basePostalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baseAddressLine?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProStatusFieldUpdateOperationsInput | $Enums.ProStatus
   profileCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   completedJobsCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1079,6 +1279,12 @@ export type ProProfileUncheckedUpdateWithoutAvailabilityInput = {
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hourlyRate?: Prisma.FloatFieldUpdateOperationsInput | number
   serviceArea?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  serviceRadiusKm?: Prisma.IntFieldUpdateOperationsInput | number
+  baseCountryCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baseLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  baseLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  basePostalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baseAddressLine?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProStatusFieldUpdateOperationsInput | $Enums.ProStatus
   profileCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   completedJobsCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1104,6 +1310,12 @@ export type ProProfileCreateWithoutOrdersInput = {
   avatarUrl?: string | null
   hourlyRate: number
   serviceArea?: string | null
+  serviceRadiusKm?: number
+  baseCountryCode?: string | null
+  baseLatitude?: number | null
+  baseLongitude?: number | null
+  basePostalCode?: string | null
+  baseAddressLine?: string | null
   status?: $Enums.ProStatus
   profileCompleted?: boolean
   completedJobsCount?: number
@@ -1131,6 +1343,12 @@ export type ProProfileUncheckedCreateWithoutOrdersInput = {
   avatarUrl?: string | null
   hourlyRate: number
   serviceArea?: string | null
+  serviceRadiusKm?: number
+  baseCountryCode?: string | null
+  baseLatitude?: number | null
+  baseLongitude?: number | null
+  basePostalCode?: string | null
+  baseAddressLine?: string | null
   status?: $Enums.ProStatus
   profileCompleted?: boolean
   completedJobsCount?: number
@@ -1172,6 +1390,12 @@ export type ProProfileUpdateWithoutOrdersInput = {
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hourlyRate?: Prisma.FloatFieldUpdateOperationsInput | number
   serviceArea?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  serviceRadiusKm?: Prisma.IntFieldUpdateOperationsInput | number
+  baseCountryCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baseLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  baseLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  basePostalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baseAddressLine?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProStatusFieldUpdateOperationsInput | $Enums.ProStatus
   profileCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   completedJobsCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1199,6 +1423,12 @@ export type ProProfileUncheckedUpdateWithoutOrdersInput = {
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hourlyRate?: Prisma.FloatFieldUpdateOperationsInput | number
   serviceArea?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  serviceRadiusKm?: Prisma.IntFieldUpdateOperationsInput | number
+  baseCountryCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baseLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  baseLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  basePostalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baseAddressLine?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProStatusFieldUpdateOperationsInput | $Enums.ProStatus
   profileCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   completedJobsCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1224,6 +1454,12 @@ export type ProProfileCreateWithoutReviewsInput = {
   avatarUrl?: string | null
   hourlyRate: number
   serviceArea?: string | null
+  serviceRadiusKm?: number
+  baseCountryCode?: string | null
+  baseLatitude?: number | null
+  baseLongitude?: number | null
+  basePostalCode?: string | null
+  baseAddressLine?: string | null
   status?: $Enums.ProStatus
   profileCompleted?: boolean
   completedJobsCount?: number
@@ -1251,6 +1487,12 @@ export type ProProfileUncheckedCreateWithoutReviewsInput = {
   avatarUrl?: string | null
   hourlyRate: number
   serviceArea?: string | null
+  serviceRadiusKm?: number
+  baseCountryCode?: string | null
+  baseLatitude?: number | null
+  baseLongitude?: number | null
+  basePostalCode?: string | null
+  baseAddressLine?: string | null
   status?: $Enums.ProStatus
   profileCompleted?: boolean
   completedJobsCount?: number
@@ -1292,6 +1534,12 @@ export type ProProfileUpdateWithoutReviewsInput = {
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hourlyRate?: Prisma.FloatFieldUpdateOperationsInput | number
   serviceArea?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  serviceRadiusKm?: Prisma.IntFieldUpdateOperationsInput | number
+  baseCountryCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baseLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  baseLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  basePostalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baseAddressLine?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProStatusFieldUpdateOperationsInput | $Enums.ProStatus
   profileCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   completedJobsCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1319,6 +1567,12 @@ export type ProProfileUncheckedUpdateWithoutReviewsInput = {
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hourlyRate?: Prisma.FloatFieldUpdateOperationsInput | number
   serviceArea?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  serviceRadiusKm?: Prisma.IntFieldUpdateOperationsInput | number
+  baseCountryCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baseLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  baseLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  basePostalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baseAddressLine?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProStatusFieldUpdateOperationsInput | $Enums.ProStatus
   profileCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   completedJobsCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1344,6 +1598,12 @@ export type ProProfileCreateWithoutPaymentsInput = {
   avatarUrl?: string | null
   hourlyRate: number
   serviceArea?: string | null
+  serviceRadiusKm?: number
+  baseCountryCode?: string | null
+  baseLatitude?: number | null
+  baseLongitude?: number | null
+  basePostalCode?: string | null
+  baseAddressLine?: string | null
   status?: $Enums.ProStatus
   profileCompleted?: boolean
   completedJobsCount?: number
@@ -1371,6 +1631,12 @@ export type ProProfileUncheckedCreateWithoutPaymentsInput = {
   avatarUrl?: string | null
   hourlyRate: number
   serviceArea?: string | null
+  serviceRadiusKm?: number
+  baseCountryCode?: string | null
+  baseLatitude?: number | null
+  baseLongitude?: number | null
+  basePostalCode?: string | null
+  baseAddressLine?: string | null
   status?: $Enums.ProStatus
   profileCompleted?: boolean
   completedJobsCount?: number
@@ -1412,6 +1678,12 @@ export type ProProfileUpdateWithoutPaymentsInput = {
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hourlyRate?: Prisma.FloatFieldUpdateOperationsInput | number
   serviceArea?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  serviceRadiusKm?: Prisma.IntFieldUpdateOperationsInput | number
+  baseCountryCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baseLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  baseLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  basePostalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baseAddressLine?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProStatusFieldUpdateOperationsInput | $Enums.ProStatus
   profileCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   completedJobsCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1439,6 +1711,12 @@ export type ProProfileUncheckedUpdateWithoutPaymentsInput = {
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hourlyRate?: Prisma.FloatFieldUpdateOperationsInput | number
   serviceArea?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  serviceRadiusKm?: Prisma.IntFieldUpdateOperationsInput | number
+  baseCountryCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baseLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  baseLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  basePostalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baseAddressLine?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProStatusFieldUpdateOperationsInput | $Enums.ProStatus
   profileCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   completedJobsCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1464,6 +1742,12 @@ export type ProProfileCreateWithoutPayoutProfileInput = {
   avatarUrl?: string | null
   hourlyRate: number
   serviceArea?: string | null
+  serviceRadiusKm?: number
+  baseCountryCode?: string | null
+  baseLatitude?: number | null
+  baseLongitude?: number | null
+  basePostalCode?: string | null
+  baseAddressLine?: string | null
   status?: $Enums.ProStatus
   profileCompleted?: boolean
   completedJobsCount?: number
@@ -1491,6 +1775,12 @@ export type ProProfileUncheckedCreateWithoutPayoutProfileInput = {
   avatarUrl?: string | null
   hourlyRate: number
   serviceArea?: string | null
+  serviceRadiusKm?: number
+  baseCountryCode?: string | null
+  baseLatitude?: number | null
+  baseLongitude?: number | null
+  basePostalCode?: string | null
+  baseAddressLine?: string | null
   status?: $Enums.ProStatus
   profileCompleted?: boolean
   completedJobsCount?: number
@@ -1532,6 +1822,12 @@ export type ProProfileUpdateWithoutPayoutProfileInput = {
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hourlyRate?: Prisma.FloatFieldUpdateOperationsInput | number
   serviceArea?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  serviceRadiusKm?: Prisma.IntFieldUpdateOperationsInput | number
+  baseCountryCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baseLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  baseLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  basePostalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baseAddressLine?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProStatusFieldUpdateOperationsInput | $Enums.ProStatus
   profileCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   completedJobsCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1559,6 +1855,12 @@ export type ProProfileUncheckedUpdateWithoutPayoutProfileInput = {
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hourlyRate?: Prisma.FloatFieldUpdateOperationsInput | number
   serviceArea?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  serviceRadiusKm?: Prisma.IntFieldUpdateOperationsInput | number
+  baseCountryCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baseLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  baseLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  basePostalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baseAddressLine?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProStatusFieldUpdateOperationsInput | $Enums.ProStatus
   profileCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   completedJobsCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1584,6 +1886,12 @@ export type ProProfileCreateWithoutEarningsInput = {
   avatarUrl?: string | null
   hourlyRate: number
   serviceArea?: string | null
+  serviceRadiusKm?: number
+  baseCountryCode?: string | null
+  baseLatitude?: number | null
+  baseLongitude?: number | null
+  basePostalCode?: string | null
+  baseAddressLine?: string | null
   status?: $Enums.ProStatus
   profileCompleted?: boolean
   completedJobsCount?: number
@@ -1611,6 +1919,12 @@ export type ProProfileUncheckedCreateWithoutEarningsInput = {
   avatarUrl?: string | null
   hourlyRate: number
   serviceArea?: string | null
+  serviceRadiusKm?: number
+  baseCountryCode?: string | null
+  baseLatitude?: number | null
+  baseLongitude?: number | null
+  basePostalCode?: string | null
+  baseAddressLine?: string | null
   status?: $Enums.ProStatus
   profileCompleted?: boolean
   completedJobsCount?: number
@@ -1652,6 +1966,12 @@ export type ProProfileUpdateWithoutEarningsInput = {
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hourlyRate?: Prisma.FloatFieldUpdateOperationsInput | number
   serviceArea?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  serviceRadiusKm?: Prisma.IntFieldUpdateOperationsInput | number
+  baseCountryCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baseLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  baseLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  basePostalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baseAddressLine?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProStatusFieldUpdateOperationsInput | $Enums.ProStatus
   profileCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   completedJobsCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1679,6 +1999,12 @@ export type ProProfileUncheckedUpdateWithoutEarningsInput = {
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hourlyRate?: Prisma.FloatFieldUpdateOperationsInput | number
   serviceArea?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  serviceRadiusKm?: Prisma.IntFieldUpdateOperationsInput | number
+  baseCountryCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baseLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  baseLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  basePostalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baseAddressLine?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProStatusFieldUpdateOperationsInput | $Enums.ProStatus
   profileCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   completedJobsCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1704,6 +2030,12 @@ export type ProProfileCreateWithoutPayoutsInput = {
   avatarUrl?: string | null
   hourlyRate: number
   serviceArea?: string | null
+  serviceRadiusKm?: number
+  baseCountryCode?: string | null
+  baseLatitude?: number | null
+  baseLongitude?: number | null
+  basePostalCode?: string | null
+  baseAddressLine?: string | null
   status?: $Enums.ProStatus
   profileCompleted?: boolean
   completedJobsCount?: number
@@ -1731,6 +2063,12 @@ export type ProProfileUncheckedCreateWithoutPayoutsInput = {
   avatarUrl?: string | null
   hourlyRate: number
   serviceArea?: string | null
+  serviceRadiusKm?: number
+  baseCountryCode?: string | null
+  baseLatitude?: number | null
+  baseLongitude?: number | null
+  basePostalCode?: string | null
+  baseAddressLine?: string | null
   status?: $Enums.ProStatus
   profileCompleted?: boolean
   completedJobsCount?: number
@@ -1772,6 +2110,12 @@ export type ProProfileUpdateWithoutPayoutsInput = {
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hourlyRate?: Prisma.FloatFieldUpdateOperationsInput | number
   serviceArea?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  serviceRadiusKm?: Prisma.IntFieldUpdateOperationsInput | number
+  baseCountryCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baseLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  baseLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  basePostalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baseAddressLine?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProStatusFieldUpdateOperationsInput | $Enums.ProStatus
   profileCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   completedJobsCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1799,6 +2143,12 @@ export type ProProfileUncheckedUpdateWithoutPayoutsInput = {
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hourlyRate?: Prisma.FloatFieldUpdateOperationsInput | number
   serviceArea?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  serviceRadiusKm?: Prisma.IntFieldUpdateOperationsInput | number
+  baseCountryCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baseLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  baseLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  basePostalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baseAddressLine?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProStatusFieldUpdateOperationsInput | $Enums.ProStatus
   profileCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   completedJobsCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1824,6 +2174,12 @@ export type ProProfileCreateWithoutCategoryRelationsInput = {
   avatarUrl?: string | null
   hourlyRate: number
   serviceArea?: string | null
+  serviceRadiusKm?: number
+  baseCountryCode?: string | null
+  baseLatitude?: number | null
+  baseLongitude?: number | null
+  basePostalCode?: string | null
+  baseAddressLine?: string | null
   status?: $Enums.ProStatus
   profileCompleted?: boolean
   completedJobsCount?: number
@@ -1851,6 +2207,12 @@ export type ProProfileUncheckedCreateWithoutCategoryRelationsInput = {
   avatarUrl?: string | null
   hourlyRate: number
   serviceArea?: string | null
+  serviceRadiusKm?: number
+  baseCountryCode?: string | null
+  baseLatitude?: number | null
+  baseLongitude?: number | null
+  basePostalCode?: string | null
+  baseAddressLine?: string | null
   status?: $Enums.ProStatus
   profileCompleted?: boolean
   completedJobsCount?: number
@@ -1892,6 +2254,12 @@ export type ProProfileUpdateWithoutCategoryRelationsInput = {
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hourlyRate?: Prisma.FloatFieldUpdateOperationsInput | number
   serviceArea?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  serviceRadiusKm?: Prisma.IntFieldUpdateOperationsInput | number
+  baseCountryCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baseLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  baseLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  basePostalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baseAddressLine?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProStatusFieldUpdateOperationsInput | $Enums.ProStatus
   profileCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   completedJobsCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1919,6 +2287,12 @@ export type ProProfileUncheckedUpdateWithoutCategoryRelationsInput = {
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   hourlyRate?: Prisma.FloatFieldUpdateOperationsInput | number
   serviceArea?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  serviceRadiusKm?: Prisma.IntFieldUpdateOperationsInput | number
+  baseCountryCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baseLatitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  baseLongitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  basePostalCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  baseAddressLine?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumProStatusFieldUpdateOperationsInput | $Enums.ProStatus
   profileCompleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   completedJobsCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2030,6 +2404,12 @@ export type ProProfileSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   avatarUrl?: boolean
   hourlyRate?: boolean
   serviceArea?: boolean
+  serviceRadiusKm?: boolean
+  baseCountryCode?: boolean
+  baseLatitude?: boolean
+  baseLongitude?: boolean
+  basePostalCode?: boolean
+  baseAddressLine?: boolean
   status?: boolean
   profileCompleted?: boolean
   completedJobsCount?: boolean
@@ -2059,6 +2439,12 @@ export type ProProfileSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   avatarUrl?: boolean
   hourlyRate?: boolean
   serviceArea?: boolean
+  serviceRadiusKm?: boolean
+  baseCountryCode?: boolean
+  baseLatitude?: boolean
+  baseLongitude?: boolean
+  basePostalCode?: boolean
+  baseAddressLine?: boolean
   status?: boolean
   profileCompleted?: boolean
   completedJobsCount?: boolean
@@ -2079,6 +2465,12 @@ export type ProProfileSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
   avatarUrl?: boolean
   hourlyRate?: boolean
   serviceArea?: boolean
+  serviceRadiusKm?: boolean
+  baseCountryCode?: boolean
+  baseLatitude?: boolean
+  baseLongitude?: boolean
+  basePostalCode?: boolean
+  baseAddressLine?: boolean
   status?: boolean
   profileCompleted?: boolean
   completedJobsCount?: boolean
@@ -2099,6 +2491,12 @@ export type ProProfileSelectScalar = {
   avatarUrl?: boolean
   hourlyRate?: boolean
   serviceArea?: boolean
+  serviceRadiusKm?: boolean
+  baseCountryCode?: boolean
+  baseLatitude?: boolean
+  baseLongitude?: boolean
+  basePostalCode?: boolean
+  baseAddressLine?: boolean
   status?: boolean
   profileCompleted?: boolean
   completedJobsCount?: boolean
@@ -2108,7 +2506,7 @@ export type ProProfileSelectScalar = {
   updatedAt?: boolean
 }
 
-export type ProProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "displayName" | "email" | "phone" | "bio" | "avatarUrl" | "hourlyRate" | "serviceArea" | "status" | "profileCompleted" | "completedJobsCount" | "isTopPro" | "responseTimeMinutes" | "createdAt" | "updatedAt", ExtArgs["result"]["proProfile"]>
+export type ProProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "displayName" | "email" | "phone" | "bio" | "avatarUrl" | "hourlyRate" | "serviceArea" | "serviceRadiusKm" | "baseCountryCode" | "baseLatitude" | "baseLongitude" | "basePostalCode" | "baseAddressLine" | "status" | "profileCompleted" | "completedJobsCount" | "isTopPro" | "responseTimeMinutes" | "createdAt" | "updatedAt", ExtArgs["result"]["proProfile"]>
 export type ProProfileInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   availability?: boolean | Prisma.ProProfile$availabilityArgs<ExtArgs>
@@ -2151,6 +2549,12 @@ export type $ProProfilePayload<ExtArgs extends runtime.Types.Extensions.Internal
     avatarUrl: string | null
     hourlyRate: number
     serviceArea: string | null
+    serviceRadiusKm: number
+    baseCountryCode: string | null
+    baseLatitude: number | null
+    baseLongitude: number | null
+    basePostalCode: string | null
+    baseAddressLine: string | null
     status: $Enums.ProStatus
     profileCompleted: boolean
     completedJobsCount: number
@@ -2599,6 +3003,12 @@ export interface ProProfileFieldRefs {
   readonly avatarUrl: Prisma.FieldRef<"ProProfile", 'String'>
   readonly hourlyRate: Prisma.FieldRef<"ProProfile", 'Float'>
   readonly serviceArea: Prisma.FieldRef<"ProProfile", 'String'>
+  readonly serviceRadiusKm: Prisma.FieldRef<"ProProfile", 'Int'>
+  readonly baseCountryCode: Prisma.FieldRef<"ProProfile", 'String'>
+  readonly baseLatitude: Prisma.FieldRef<"ProProfile", 'Float'>
+  readonly baseLongitude: Prisma.FieldRef<"ProProfile", 'Float'>
+  readonly basePostalCode: Prisma.FieldRef<"ProProfile", 'String'>
+  readonly baseAddressLine: Prisma.FieldRef<"ProProfile", 'String'>
   readonly status: Prisma.FieldRef<"ProProfile", 'ProStatus'>
   readonly profileCompleted: Prisma.FieldRef<"ProProfile", 'Boolean'>
   readonly completedJobsCount: Prisma.FieldRef<"ProProfile", 'Int'>

@@ -60,6 +60,8 @@ export const TOKENS = {
   IStorageService: "IStorageService",
   IAvatarCache: "IAvatarCache",
   AvatarUrlService: "AvatarUrlService",
+  IIdeUyGeocodingProvider: "IIdeUyGeocodingProvider",
+  LocationService: "LocationService",
 
   // Infrastructure
   Logger: "Logger",

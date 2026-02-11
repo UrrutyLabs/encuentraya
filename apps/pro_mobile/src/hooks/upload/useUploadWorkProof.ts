@@ -38,6 +38,9 @@ export function useUploadWorkProof(orderId: string) {
       });
 
       await uploadFileToPresignedUrl(fileUri, uploadUrl, contentType);
+      if (!storageUrl) {
+        throw new Error("Upload failed: no storage URL returned");
+      }
       return storageUrl;
     },
     [orderId, getPresignedUrl]

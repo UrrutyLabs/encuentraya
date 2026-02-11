@@ -92,8 +92,8 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
 }
 
 /**
- * Get the QueryClient instance
- * Use this in hooks that need direct access to queryClient
+ * Get the QueryClient instance (throws if provider not mounted).
+ * Use this in hooks that need direct access to queryClient.
  */
 export function getQueryClient(): QueryClient {
   if (!queryClientInstance) {
@@ -101,5 +101,13 @@ export function getQueryClient(): QueryClient {
       "QueryClient not initialized. Make sure TRPCProvider is mounted."
     );
   }
+  return queryClientInstance;
+}
+
+/**
+ * Get the QueryClient instance if available (e.g. for sign-out cleanup).
+ * Returns null when TRPCProvider has not mounted yet (e.g. early in app load).
+ */
+export function getQueryClientIfAvailable(): QueryClient | null {
   return queryClientInstance;
 }

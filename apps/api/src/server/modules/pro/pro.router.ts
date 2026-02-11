@@ -26,10 +26,16 @@ export const proRouter = router({
       try {
         return await proService.onboardPro(input);
       } catch (error) {
+        const message =
+          error instanceof Error ? error.message : "Failed to onboard pro";
+        const isValidation =
+          error instanceof Error &&
+          (message.includes("Invalid") ||
+            message.includes("could not be geocoded") ||
+            message.includes("must be"));
         throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message:
-            error instanceof Error ? error.message : "Failed to onboard pro",
+          code: isValidation ? "BAD_REQUEST" : "INTERNAL_SERVER_ERROR",
+          message,
         });
       }
     }),
@@ -40,12 +46,18 @@ export const proRouter = router({
       try {
         return await proService.convertUserToPro(ctx.actor.id, input);
       } catch (error) {
+        const message =
+          error instanceof Error
+            ? error.message
+            : "Failed to convert user to pro";
+        const isValidation =
+          error instanceof Error &&
+          (message.includes("Invalid") ||
+            message.includes("could not be geocoded") ||
+            message.includes("must be"));
         throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message:
-            error instanceof Error
-              ? error.message
-              : "Failed to convert user to pro",
+          code: isValidation ? "BAD_REQUEST" : "INTERNAL_SERVER_ERROR",
+          message,
         });
       }
     }),
@@ -176,10 +188,18 @@ export const proRouter = router({
       try {
         return await proService.updateProfile(ctx.actor.id, input);
       } catch (error) {
+        if (error instanceof TRPCError) throw error;
+        const message =
+          error instanceof Error ? error.message : "Failed to update profile";
+        const isValidation =
+          error instanceof Error &&
+          (message.includes("Invalid") ||
+            message.includes("could not be geocoded") ||
+            message.includes("must be") ||
+            message.includes("Provide exactly one"));
         throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message:
-            error instanceof Error ? error.message : "Failed to update profile",
+          code: isValidation ? "BAD_REQUEST" : "INTERNAL_SERVER_ERROR",
+          message,
         });
       }
     }),

@@ -201,7 +201,13 @@ model ProProfile {
   bio         String?
   avatarUrl   String?
   hourlyRate  Float
-  serviceArea String?
+  serviceArea      String?  // Derived from base address geocode (department) for display only
+  serviceRadiusKm  Int      @default(10)  // Radius in km; client within radius is shown in search
+  baseCountryCode  String?
+  baseLatitude     Float?
+  baseLongitude    Float?
+  basePostalCode   String?
+  baseAddressLine  String?
   status      ProStatus  @default(pending)
   profileCompleted Boolean @default(false)
   completedJobsCount Int   @default(0)

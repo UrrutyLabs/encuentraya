@@ -12,6 +12,7 @@ describe("SearchService", () => {
   let mockSearchCategoryRepository: ReturnType<
     typeof createMockSearchCategoryRepository
   >;
+  let mockLocationService: ReturnType<typeof createMockLocationService>;
 
   function createMockSearchCategoryRepository(): {
     resolveQuery: ReturnType<typeof vi.fn>;
@@ -41,6 +42,14 @@ describe("SearchService", () => {
     };
   }
 
+  function createMockLocationService(): {
+    resolveUserLocation: ReturnType<typeof vi.fn>;
+  } {
+    return {
+      resolveUserLocation: vi.fn().mockResolvedValue(null),
+    };
+  }
+
   function createMockPro(overrides?: Partial<Pro>): Pro {
     return {
       id: "pro-1",
@@ -52,6 +61,7 @@ describe("SearchService", () => {
       hourlyRate: 10000, // 100 UYU/hour in minor units (cents)
       categoryIds: ["cat-plumbing"],
       serviceArea: "Test Area",
+      serviceRadiusKm: 10,
       rating: 4.5,
       reviewCount: 10,
       isApproved: true,
@@ -72,11 +82,13 @@ describe("SearchService", () => {
     mockProService = createMockProService();
     mockAvailabilityService = createMockAvailabilityService();
     mockSearchCategoryRepository = createMockSearchCategoryRepository();
+    mockLocationService = createMockLocationService();
 
     service = new SearchService(
       mockProService as unknown as ProService,
       mockAvailabilityService as unknown as AvailabilityService,
-      mockSearchCategoryRepository as unknown as SearchCategoryRepository
+      mockSearchCategoryRepository as unknown as SearchCategoryRepository,
+      mockLocationService as unknown as import("@modules/location/location.service").LocationService
     );
     vi.clearAllMocks();
   });
@@ -430,6 +442,71 @@ describe("SearchService", () => {
       expect(result).toHaveLength(2);
       expect(result[0].id).toBe("pro-2");
       expect(result[1].id).toBe("pro-3");
+    });
+
+    it("should filter by radius when location is resolved", async () => {
+      // pro-1: 10km from search point (~0.1 deg ≈ 11km) - within 50km radius
+      // pro-2: 500+ km away - excluded
+      const pros = [
+        createMockPro({
+          id: "pro-1",
+          baseLatitude: -34.95,
+          baseLongitude: -56.2,
+          serviceRadiusKm: 50,
+        }),
+        createMockPro({
+          id: "pro-2",
+          baseLatitude: -30,
+          baseLongitude: -58,
+          serviceRadiusKm: 10,
+        }),
+      ];
+      mockProService.searchPros.mockResolvedValue(pros);
+      mockLocationService.resolveUserLocation.mockResolvedValue({
+        latitude: -34.9,
+        longitude: -56.2,
+      });
+
+      const result = await service.searchPros({
+        location: "Bulevar España 1234, 11300 Montevideo",
+      });
+
+      expect(mockLocationService.resolveUserLocation).toHaveBeenCalledWith(
+        "UY",
+        { location: "Bulevar España 1234, 11300 Montevideo" }
+      );
+      expect(result).toHaveLength(1);
+      expect(result[0].id).toBe("pro-1");
+    });
+
+    it("should sort by distance when location is resolved", async () => {
+      const pros = [
+        createMockPro({
+          id: "far",
+          baseLatitude: -34.5,
+          baseLongitude: -56.5,
+          serviceRadiusKm: 100,
+        }),
+        createMockPro({
+          id: "near",
+          baseLatitude: -34.9,
+          baseLongitude: -56.2,
+          serviceRadiusKm: 100,
+        }),
+      ];
+      mockProService.searchPros.mockResolvedValue(pros);
+      mockLocationService.resolveUserLocation.mockResolvedValue({
+        latitude: -34.9,
+        longitude: -56.2,
+      });
+
+      const result = await service.searchPros({
+        location: "Bulevar España 1234, 11300 Montevideo",
+      });
+
+      expect(result).toHaveLength(2);
+      expect(result[0].id).toBe("near");
+      expect(result[1].id).toBe("far");
     });
   });
 });

@@ -6,6 +6,7 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { CrashReportingInit } from "@/components/CrashReportingInit";
 import { CategoriesPrefetcher } from "@/components/CategoriesPrefetcher";
 import { MobileHeaderProvider } from "@/contexts/MobileHeaderContext";
+import { SearchLocationProvider } from "@/contexts/SearchLocationContext";
 
 const inter = Inter({
   variable: "--font-sans",
@@ -31,8 +32,10 @@ export default function RootLayout({
           <CrashReportingInit />
           <TRPCProvider>
             <MobileHeaderProvider>
-              <CategoriesPrefetcher />
-              {children}
+              <SearchLocationProvider>
+                <CategoriesPrefetcher />
+                {children}
+              </SearchLocationProvider>
             </MobileHeaderProvider>
           </TRPCProvider>
         </ErrorBoundary>

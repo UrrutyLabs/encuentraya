@@ -150,6 +150,12 @@ export {
   type OrderDetailView,
 } from "./schemas/order.schema";
 
+// Location schemas
+export {
+  baseLocationSchema,
+  type BaseLocation,
+} from "./schemas/location.schema";
+
 // Format utilities
 export { formatCurrency } from "./utils/format";
 

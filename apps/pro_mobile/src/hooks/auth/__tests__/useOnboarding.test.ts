@@ -68,7 +68,6 @@ describe("useOnboarding", () => {
       phone: "123456789",
       hourlyRate: 50,
       categoryIds: ["cat-1"],
-      serviceArea: "Montevideo",
     };
 
     await act(async () => {
@@ -262,7 +261,6 @@ describe("useOnboarding", () => {
         { categoryId: "cat-hourly", hourlyRateCents: 5000 },
         { categoryId: "cat-fixed", startingFromCents: 10000 },
       ],
-      serviceArea: "Montevideo",
     };
 
     await act(async () => {

@@ -108,6 +108,20 @@ describe("ActiveFilters", () => {
       expect(screen.getByText("Fugas y goteras")).toBeInTheDocument();
     });
 
+    it("should not render location chip (location is always applied but not shown)", () => {
+      mockGet.mockImplementation((key: string) => {
+        if (key === "location") return "Bulevar España 1234, 11300 Montevideo";
+        if (key === "zipCode") return "11300";
+        return null;
+      });
+      const { container } = render(<ActiveFilters onFilterRemove={vi.fn()} />);
+      // Location/zipCode are not displayed as chips - only q, category, subcategory
+      expect(
+        container.querySelector('[aria-label*="Remover ubicación"]')
+      ).toBeNull();
+      expect(screen.queryByText("CP 11300")).not.toBeInTheDocument();
+    });
+
     it("should render all active filters", () => {
       mockGet.mockImplementation((key: string) => {
         if (key === "q") return "plumber";

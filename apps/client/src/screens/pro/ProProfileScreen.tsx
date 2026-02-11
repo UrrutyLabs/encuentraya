@@ -17,6 +17,7 @@ import { useProDetail } from "@/hooks/pro";
 import { useAuth } from "@/hooks/auth";
 import { useCategories, useCategoryBySlug } from "@/hooks/category";
 import { useSubcategoryBySlugAndCategoryId } from "@/hooks/subcategory";
+import { useSearchLocation } from "@/contexts/SearchLocationContext";
 import {
   ProProfileHeader,
   ProBio,
@@ -49,6 +50,7 @@ export function ProProfileScreen() {
   const { pro, isLoading, error } = useProDetail(proId, category?.id);
   const { user, loading: authLoading } = useAuth();
   const { categories } = useCategories();
+  const { initialLocation, initialZipCode } = useSearchLocation();
   const setHeader = useSetMobileHeader();
 
   useEffect(() => {
@@ -88,23 +90,34 @@ export function ProProfileScreen() {
     return null;
   }, [category, pro]);
 
-  // Build breadcrumbs
+  // Build breadcrumbs (include location in hrefs so search respects user's location)
   const breadcrumbItems = useMemo(() => {
     const items: Array<{ label: string; href?: string }> = [
       { label: "Home", href: "/" },
     ];
 
     if (category) {
+      const params = new URLSearchParams({ category: category.slug });
+      if (initialLocation?.trim())
+        params.set("location", initialLocation.trim());
+      if (initialZipCode?.trim()) params.set("zipCode", initialZipCode.trim());
       items.push({
         label: category.name,
-        href: `/search/results?category=${category.slug}`,
+        href: `/search/results?${params.toString()}`,
       });
     }
 
     if (subcategory && category) {
+      const params = new URLSearchParams({
+        category: category.slug,
+        subcategory: subcategory.slug,
+      });
+      if (initialLocation?.trim())
+        params.set("location", initialLocation.trim());
+      if (initialZipCode?.trim()) params.set("zipCode", initialZipCode.trim());
       items.push({
         label: subcategory.name,
-        href: `/search/results?category=${category.slug}&subcategory=${subcategory.slug}`,
+        href: `/search/results?${params.toString()}`,
       });
     }
 
@@ -116,7 +129,7 @@ export function ProProfileScreen() {
     }
 
     return items;
-  }, [category, subcategory, pro]);
+  }, [category, subcategory, pro, initialLocation, initialZipCode]);
 
   // Calculate derived states
   const isActive = useMemo(

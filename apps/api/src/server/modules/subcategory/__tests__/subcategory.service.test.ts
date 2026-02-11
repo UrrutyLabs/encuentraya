@@ -138,6 +138,8 @@ describe("SubcategoryService", () => {
         description: entity.description,
         displayOrder: entity.displayOrder,
         isActive: entity.isActive,
+        configJson: entity.configJson,
+        searchKeywords: entity.searchKeywords,
         createdAt: entity.createdAt,
         updatedAt: entity.updatedAt,
       });
@@ -200,6 +202,8 @@ describe("SubcategoryService", () => {
         description: null,
         displayOrder: 10,
         isActive: false,
+        configJson: entity.configJson,
+        searchKeywords: entity.searchKeywords,
         createdAt: entity.createdAt,
         updatedAt: entity.updatedAt,
       });
@@ -385,6 +389,8 @@ describe("SubcategoryService", () => {
         description: "Test description",
         displayOrder: 5,
         isActive: true,
+        configJson: entity.configJson,
+        searchKeywords: entity.searchKeywords,
         createdAt: now,
         updatedAt: now,
       });
@@ -474,6 +480,8 @@ describe("SubcategoryService", () => {
         description: input.description,
         displayOrder: input.displayOrder,
         isActive: input.isActive,
+        configJson: createdEntity.configJson,
+        searchKeywords: createdEntity.searchKeywords,
         createdAt: createdEntity.createdAt,
         updatedAt: createdEntity.updatedAt,
       });

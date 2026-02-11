@@ -36,11 +36,11 @@ describe("useSearchPros", () => {
       );
 
       expect(mockTrpcClientSearchPros).toHaveBeenCalledWith(
-        {
+        expect.objectContaining({
           categoryId: "cat-plumbing",
           date: undefined,
           timeWindow: undefined,
-        },
+        }),
         {
           refetchOnWindowFocus: false,
         }
@@ -70,11 +70,11 @@ describe("useSearchPros", () => {
       const { result } = renderHook(() => useSearchPros({ date }));
 
       expect(mockTrpcClientSearchPros).toHaveBeenCalledWith(
-        {
+        expect.objectContaining({
           categoryId: undefined,
           date: new Date(date),
           timeWindow: undefined,
-        },
+        }),
         {
           refetchOnWindowFocus: false,
         }
@@ -102,11 +102,11 @@ describe("useSearchPros", () => {
       const { result } = renderHook(() => useSearchPros({ timeWindow }));
 
       expect(mockTrpcClientSearchPros).toHaveBeenCalledWith(
-        {
+        expect.objectContaining({
           categoryId: undefined,
           date: undefined,
           timeWindow: "12:00-15:00",
-        },
+        }),
         {
           refetchOnWindowFocus: false,
         }
@@ -142,11 +142,42 @@ describe("useSearchPros", () => {
       );
 
       expect(mockTrpcClientSearchPros).toHaveBeenCalledWith(
-        {
+        expect.objectContaining({
           categoryId: "cat-plumbing",
           date: new Date(date),
           timeWindow: "12:00-15:00",
+        }),
+        {
+          refetchOnWindowFocus: false,
+        }
+      );
+
+      expect(result.current.pros).toEqual(mockPros);
+    });
+
+    it("should fetch pros with location", () => {
+      const mockPros = [
+        {
+          id: "pro-1",
+          name: "John Doe",
+          hourlyRate: 50,
         },
+      ];
+
+      mockTrpcClientSearchPros.mockReturnValue({
+        data: mockPros,
+        isLoading: false,
+        error: null,
+      });
+
+      const { result } = renderHook(() =>
+        useSearchPros({ location: "Bulevar España 1234, 11300 Montevideo" })
+      );
+
+      expect(mockTrpcClientSearchPros).toHaveBeenCalledWith(
+        expect.objectContaining({
+          location: "Bulevar España 1234, 11300 Montevideo",
+        }),
         {
           refetchOnWindowFocus: false,
         }
@@ -175,11 +206,11 @@ describe("useSearchPros", () => {
       const { result } = renderHook(() => useSearchPros({}));
 
       expect(mockTrpcClientSearchPros).toHaveBeenCalledWith(
-        {
+        expect.objectContaining({
           categoryId: undefined,
           date: undefined,
           timeWindow: undefined,
-        },
+        }),
         {
           refetchOnWindowFocus: false,
         }

@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@lib/supabase/client";
+import { getQueryClientIfAvailable } from "@lib/trpc/Provider";
+import { clearLocalStorageOnSignOut } from "@lib/react-query/persistence";
 import { usePushToken } from "../shared/usePushToken";
 
 export function useAuth() {
@@ -85,12 +87,20 @@ export function useAuth() {
     try {
       setError(null);
 
+      // Clear React Query cache and all local storage FIRST so the next session
+      // (same or different user) never sees previous user's data. Do this before
+      // Supabase signOut so there is no moment where UI still has cached data.
+      // Use getQueryClientIfAvailable so we don't throw when TRPCProvider isn't
+      // mounted (e.g. early app load or certain navigation states).
+      const queryClient = getQueryClientIfAvailable();
+      if (queryClient) {
+        queryClient.clear();
+      }
+      await clearLocalStorageOnSignOut();
+
       // TODO: Unregister push token on logout
-      // For MVP, token stays active but should be unregistered later
       // const currentToken = await getExpoPushToken();
-      // if (currentToken) {
-      //   await unregisterToken(currentToken.token);
-      // }
+      // if (currentToken) await unregisterToken(currentToken.token);
 
       const { error } = await supabase.auth.signOut();
       if (error) {

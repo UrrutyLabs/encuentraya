@@ -3,6 +3,10 @@ import { AvatarUrlService } from "../avatar-url.service";
 import type { IStorageService } from "@modules/upload/storage.types";
 import type { IAvatarCache } from "../avatar-cache.types";
 
+vi.mock("../avatar-config", () => ({
+  AVATAR_USE_REDIS_CACHE: true,
+}));
+
 function createMockStorage(): IStorageService {
   return {
     createPresignedUploadUrl: vi.fn(),

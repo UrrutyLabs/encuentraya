@@ -5,6 +5,13 @@ import { useAuth } from "../useAuth";
 import type { Session, User } from "@supabase/supabase-js";
 
 jest.mock("../../shared/usePushToken");
+jest.mock("@lib/trpc/Provider", () => ({
+  getQueryClient: jest.fn(() => ({ clear: jest.fn() })),
+  getQueryClientIfAvailable: jest.fn(() => ({ clear: jest.fn() })),
+}));
+jest.mock("@lib/react-query/persistence", () => ({
+  clearLocalStorageOnSignOut: jest.fn(() => Promise.resolve()),
+}));
 
 const mockUnregisterToken = jest.fn();
 const mockUsePushToken = usePushToken as jest.Mock;

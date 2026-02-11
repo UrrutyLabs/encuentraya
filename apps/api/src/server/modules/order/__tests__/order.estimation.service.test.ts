@@ -40,6 +40,12 @@ describe("OrderEstimationService", () => {
       hourlyRate: 10000, // 100 UYU/hour in minor units (cents)
       categoryIds: ["cat-plumbing"],
       serviceArea: "Montevideo",
+      baseCountryCode: null,
+      baseLatitude: null,
+      baseLongitude: null,
+      basePostalCode: null,
+      baseAddressLine: null,
+      serviceRadiusKm: 10,
       status: "active",
       profileCompleted: true,
       completedJobsCount: 10,

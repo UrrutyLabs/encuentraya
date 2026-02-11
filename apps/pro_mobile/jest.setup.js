@@ -136,6 +136,10 @@ jest.mock("@lib/trpc/Provider", () => ({
     invalidateQueries: jest.fn(),
     setQueryData: jest.fn(),
     cancelQueries: jest.fn(),
+    clear: jest.fn(),
+  })),
+  getQueryClientIfAvailable: jest.fn(() => ({
+    clear: jest.fn(),
   })),
 }));
 

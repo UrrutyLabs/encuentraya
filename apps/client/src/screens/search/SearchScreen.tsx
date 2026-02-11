@@ -15,6 +15,7 @@ import { LandingFooter } from "@/components/landing/LandingFooter";
 import type { Category, Subcategory } from "@repo/domain";
 import { useCategories } from "@/hooks/category";
 import { useMediaQuery } from "@/hooks/shared/useMediaQuery";
+import { useSearchLocation } from "@/contexts/SearchLocationContext";
 
 /**
  * SearchScreen Component
@@ -36,6 +37,7 @@ import { useMediaQuery } from "@/hooks/shared/useMediaQuery";
 export function SearchScreen() {
   const router = useRouter();
   const { categories } = useCategories();
+  const { initialLocation, initialZipCode } = useSearchLocation();
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(
     null
   );
@@ -108,9 +110,12 @@ export function SearchScreen() {
         params.set("category", selectedCategory.slug);
       }
       params.set("subcategory", subcategory.slug);
+      if (initialLocation?.trim())
+        params.set("location", initialLocation.trim());
+      if (initialZipCode?.trim()) params.set("zipCode", initialZipCode.trim());
       router.push(`/search/results?${params.toString()}`);
     },
-    [router, selectedCategory]
+    [router, selectedCategory, initialLocation, initialZipCode]
   );
 
   return (

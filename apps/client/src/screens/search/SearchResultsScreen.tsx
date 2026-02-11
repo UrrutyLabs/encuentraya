@@ -41,6 +41,8 @@ function SearchResultsContent() {
   const categorySlug = searchParams.get("category") || undefined;
   const dateParam = searchParams.get("date") || "";
   const timeWindowParam = searchParams.get("timeWindow") || "";
+  const locationParam = searchParams.get("location") || undefined;
+  const zipCodeParam = searchParams.get("zipCode") || undefined;
 
   // Fetch category by slug from URL
   const { category } = useCategoryBySlug(categorySlug);
@@ -104,6 +106,7 @@ function SearchResultsContent() {
 
   // When q is in URL (text search), pass it so API resolves to category/subcategory.
   // When category/subcategory are in URL (from typeahead or category picker), use those.
+  // location (full address) enables radius filter and distance sort.
   const filters = useMemo(
     () => ({
       categoryId: category?.id,
@@ -111,8 +114,16 @@ function SearchResultsContent() {
       q: searchQuery.trim() || undefined,
       date: date || undefined,
       timeWindow: (timeWindow || undefined) as TimeWindow | undefined,
+      location: locationParam?.trim() || undefined,
     }),
-    [category?.id, subcategorySlug, searchQuery, date, timeWindow]
+    [
+      category?.id,
+      subcategorySlug,
+      searchQuery,
+      date,
+      timeWindow,
+      locationParam,
+    ]
   );
 
   const { pros: allPros, isLoading, error } = useSearchPros(filters);
@@ -163,12 +174,15 @@ function SearchResultsContent() {
     if (searchQuery) {
       suggestions.push("Probá con otras palabras clave");
     }
+    if (locationParam || zipCodeParam) {
+      suggestions.push("Probá con otra ubicación");
+    }
     if (suggestions.length === 0) {
       suggestions.push("Explorá las categorías disponibles");
       suggestions.push("Intentá buscar sin filtros");
     }
     return suggestions;
-  }, [category, date, timeWindow, searchQuery]);
+  }, [category, date, timeWindow, searchQuery, locationParam, zipCodeParam]);
 
   return (
     <AppShell

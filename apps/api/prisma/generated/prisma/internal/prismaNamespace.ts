@@ -2112,6 +2112,12 @@ export const ProProfileScalarFieldEnum = {
   avatarUrl: 'avatarUrl',
   hourlyRate: 'hourlyRate',
   serviceArea: 'serviceArea',
+  serviceRadiusKm: 'serviceRadiusKm',
+  baseCountryCode: 'baseCountryCode',
+  baseLatitude: 'baseLatitude',
+  baseLongitude: 'baseLongitude',
+  basePostalCode: 'basePostalCode',
+  baseAddressLine: 'baseAddressLine',
   status: 'status',
   profileCompleted: 'profileCompleted',
   completedJobsCount: 'completedJobsCount',
@@ -2608,6 +2614,20 @@ export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaMode
 
 
 /**
+ * Reference to a field of type 'Int'
+ */
+export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
+    
+
+
+/**
+ * Reference to a field of type 'Int[]'
+ */
+export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+    
+
+
+/**
  * Reference to a field of type 'ProStatus'
  */
 export type EnumProStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ProStatus'>
@@ -2625,20 +2645,6 @@ export type ListEnumProStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$Pr
  * Reference to a field of type 'Boolean'
  */
 export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
-    
-
-
-/**
- * Reference to a field of type 'Int'
- */
-export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
-    
-
-
-/**
- * Reference to a field of type 'Int[]'
- */
-export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
     
 
 

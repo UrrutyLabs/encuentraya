@@ -21,6 +21,8 @@ export const clientSearchProsInputSchema = z.object({
   q: z.string().min(1).optional(), // Free-text query; resolved server-side to category/subcategory
   date: z.date().optional(),
   timeWindow: timeWindowSchema.optional(), // 3-hour time window
+  /** Full address for geocoding (e.g. from reverse geocode). Enables radius filter and distance sort. */
+  location: z.string().min(1).optional(),
 });
 
 export type ClientSearchProsInput = z.infer<typeof clientSearchProsInputSchema>;

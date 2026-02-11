@@ -1,5 +1,5 @@
 import { injectable, inject } from "tsyringe";
-import { prisma } from "@infra/db/prisma";
+import { prisma, Prisma } from "@infra/db/prisma";
 import { calculateProfileCompleted } from "./pro.calculations";
 import { TOKENS } from "@/server/container/tokens";
 import type {
@@ -41,6 +41,12 @@ export interface ProProfileEntity {
   categoryIds: string[];
   categoryRelations?: ProCategoryRelation[];
   serviceArea: string | null;
+  serviceRadiusKm: number;
+  baseCountryCode: string | null;
+  baseLatitude: number | null;
+  baseLongitude: number | null;
+  basePostalCode: string | null;
+  baseAddressLine: string | null;
   status: "pending" | "active" | "suspended";
   profileCompleted: boolean;
   completedJobsCount: number;
@@ -63,7 +69,13 @@ export interface ProProfileCreateInput {
   hourlyRate: number;
   categoryIds: string[];
   categoryRates?: CategoryRateItem[];
-  serviceArea?: string;
+  serviceArea?: string | null;
+  serviceRadiusKm?: number;
+  baseCountryCode?: string | null;
+  baseLatitude?: number | null;
+  baseLongitude?: number | null;
+  basePostalCode?: string | null;
+  baseAddressLine?: string | null;
 }
 
 /**
@@ -80,6 +92,12 @@ export interface ProProfileUpdateInput {
   categoryIds?: string[];
   categoryRates?: CategoryRateItem[];
   serviceArea?: string | null;
+  serviceRadiusKm?: number;
+  baseCountryCode?: string | null;
+  baseLatitude?: number | null;
+  baseLongitude?: number | null;
+  basePostalCode?: string | null;
+  baseAddressLine?: string | null;
   profileCompleted?: boolean;
   completedJobsCount?: number;
   isTopPro?: boolean;
@@ -138,6 +156,12 @@ export class ProRepositoryImpl implements ProRepository {
         avatarUrl: input.avatarUrl ?? null,
         hourlyRate: input.hourlyRate,
         serviceArea: input.serviceArea ?? null,
+        serviceRadiusKm: input.serviceRadiusKm ?? 10,
+        baseCountryCode: input.baseCountryCode ?? null,
+        baseLatitude: input.baseLatitude ?? null,
+        baseLongitude: input.baseLongitude ?? null,
+        basePostalCode: input.basePostalCode ?? null,
+        baseAddressLine: input.baseAddressLine ?? null,
         status: "pending",
         // profileCompleted will be calculated based on avatarUrl and bio presence
         profileCompleted: calculateProfileCompleted(input.avatarUrl, input.bio),
@@ -395,6 +419,12 @@ export class ProRepositoryImpl implements ProRepository {
       avatarUrl?: string | null;
       hourlyRate?: number;
       serviceArea?: string | null;
+      serviceRadiusKm?: number;
+      baseCountryCode?: string | null;
+      baseLatitude?: number | null;
+      baseLongitude?: number | null;
+      basePostalCode?: string | null;
+      baseAddressLine?: string | null;
       profileCompleted?: boolean;
       completedJobsCount?: number;
       isTopPro?: boolean;
@@ -421,6 +451,24 @@ export class ProRepositoryImpl implements ProRepository {
     }
     if (data.serviceArea !== undefined) {
       updateData.serviceArea = data.serviceArea ?? null;
+    }
+    if (data.serviceRadiusKm !== undefined) {
+      updateData.serviceRadiusKm = data.serviceRadiusKm;
+    }
+    if (data.baseCountryCode !== undefined) {
+      updateData.baseCountryCode = data.baseCountryCode ?? null;
+    }
+    if (data.baseLatitude !== undefined) {
+      updateData.baseLatitude = data.baseLatitude ?? null;
+    }
+    if (data.baseLongitude !== undefined) {
+      updateData.baseLongitude = data.baseLongitude ?? null;
+    }
+    if (data.basePostalCode !== undefined) {
+      updateData.basePostalCode = data.basePostalCode ?? null;
+    }
+    if (data.baseAddressLine !== undefined) {
+      updateData.baseAddressLine = data.baseAddressLine ?? null;
     }
     if (data.completedJobsCount !== undefined) {
       updateData.completedJobsCount = data.completedJobsCount;
@@ -516,6 +564,12 @@ export class ProRepositoryImpl implements ProRepository {
       categoryIds,
       categoryRelations,
       serviceArea: p.serviceArea ?? null,
+      serviceRadiusKm: p.serviceRadiusKm ?? 10,
+      baseCountryCode: p.baseCountryCode ?? null,
+      baseLatitude: p.baseLatitude ?? null,
+      baseLongitude: p.baseLongitude ?? null,
+      basePostalCode: p.basePostalCode ?? null,
+      baseAddressLine: p.baseAddressLine ?? null,
       status: p.status as "pending" | "active" | "suspended",
       profileCompleted: p.profileCompleted,
       completedJobsCount: p.completedJobsCount,

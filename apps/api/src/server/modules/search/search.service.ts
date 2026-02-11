@@ -3,11 +3,13 @@ import { TOKENS } from "@/server/container/tokens";
 import type { ProService } from "@modules/pro/pro.service";
 import type { AvailabilityService } from "@modules/pro/availability.service";
 import type { SearchCategoryRepository } from "@modules/search/searchCategory.repo";
+import type { LocationService } from "@modules/location/location.service";
 import type {
   Pro,
   CategorySuggestion,
   SubcategorySuggestion,
 } from "@repo/domain";
+import { haversineDistanceKm } from "@/server/shared/haversine";
 
 /**
  * Search service
@@ -21,7 +23,9 @@ export class SearchService {
     @inject(TOKENS.AvailabilityService)
     private readonly availabilityService: AvailabilityService,
     @inject(TOKENS.SearchCategoryRepository)
-    private readonly searchCategoryRepository: SearchCategoryRepository
+    private readonly searchCategoryRepository: SearchCategoryRepository,
+    @inject(TOKENS.LocationService)
+    private readonly locationService: LocationService
   ) {}
 
   /**
@@ -60,18 +64,18 @@ export class SearchService {
    * Business rules:
    * - If q is provided, resolve to categoryId (and optionally subcategory) and use for filtering
    * - Filter by category if provided (or from resolved q)
-   * - Filter by availability:
-   *   - If date only: pros available on that day of week
-   *   - If timeWindow only: pros with availability slots that overlap with the time window
-   *   - If both date and timeWindow: pros available in that time window on that day
+   * - Filter by availability (date/timeWindow)
+   * - If location (full address): geocode and filter by radius (pro.serviceRadiusKm), sort by distance
+   * - Pros without base coords excluded when location filter is used
    * - Only return approved and non-suspended pros
    */
   async searchPros(filters: {
-    categoryId?: string; // FK to Category table
-    subcategory?: string; // Subcategory slug (for future filtering)
-    q?: string; // Free-text query; resolved to categoryId (+ subcategory) on server
+    categoryId?: string;
+    subcategory?: string;
+    q?: string;
     date?: Date;
-    timeWindow?: string; // Format: "HH:MM-HH:MM" (e.g., "09:00-12:00")
+    timeWindow?: string;
+    location?: string; // Full address for geocoding (enables radius filter)
   }): Promise<Pro[]> {
     let categoryId = filters.categoryId;
     let subcategory = filters.subcategory;
@@ -85,7 +89,7 @@ export class SearchService {
     }
 
     // Get pros filtered by database (approved, not suspended, profileCompleted, categoryId)
-    const basicFiltered = await this.proService.searchPros({
+    let results = await this.proService.searchPros({
       categoryId,
     });
 
@@ -95,11 +99,10 @@ export class SearchService {
 
     if (hasDateFilter || hasTimeWindowFilter) {
       const availabilityFiltered = await Promise.all(
-        basicFiltered.map(async (pro) => {
+        results.map(async (pro) => {
           let isAvailable = false;
 
           if (hasDateFilter && hasTimeWindowFilter) {
-            // Both date and timeWindow: check if pro has slots that overlap with the window on that day
             isAvailable =
               await this.availabilityService.isProAvailableInTimeWindow(
                 pro.id,
@@ -107,13 +110,11 @@ export class SearchService {
                 filters.timeWindow!
               );
           } else if (hasDateFilter) {
-            // Date only: check if pro has availability slots for that day of week
             isAvailable = await this.availabilityService.isProAvailableOnDay(
               pro.id,
               filters.date!
             );
           } else if (hasTimeWindowFilter) {
-            // TimeWindow only: check if pro has availability slots that overlap with the window
             isAvailable =
               await this.availabilityService.isProAvailableInTimeWindowOnly(
                 pro.id,
@@ -125,11 +126,71 @@ export class SearchService {
         })
       );
 
-      // Remove null values (pros that don't match availability)
-      return availabilityFiltered.filter((pro): pro is Pro => pro !== null);
+      results = availabilityFiltered.filter((pro): pro is Pro => pro !== null);
     }
 
-    // If no date/timeWindow filter, return basic filtered results
-    return basicFiltered;
+    // Step 3: Resolve user location (full address) and filter by radius
+    const hasLocation = !!filters.location?.trim();
+
+    if (hasLocation) {
+      const resolvedLocation = await this.locationService.resolveUserLocation(
+        "UY",
+        { location: filters.location?.trim() }
+      );
+
+      if (
+        resolvedLocation &&
+        resolvedLocation.latitude != null &&
+        resolvedLocation.longitude != null &&
+        Number.isFinite(resolvedLocation.latitude) &&
+        Number.isFinite(resolvedLocation.longitude)
+      ) {
+        const searchLat = resolvedLocation.latitude;
+        const searchLng = resolvedLocation.longitude;
+
+        // Filter: keep only pros within their serviceRadiusKm (default 10)
+        results = results.filter((pro) => {
+          const lat = pro.baseLatitude;
+          const lng = pro.baseLongitude;
+          if (
+            lat == null ||
+            lng == null ||
+            !Number.isFinite(lat) ||
+            !Number.isFinite(lng)
+          ) {
+            return false;
+          }
+          const radiusKm = pro.serviceRadiusKm ?? 10;
+          const distance = haversineDistanceKm(searchLat, searchLng, lat, lng);
+          return distance <= radiusKm;
+        });
+
+        // Sort by distance (nearest first); secondary: isTopPro, rating, completedJobsCount
+        results = [...results].sort((a, b) => {
+          const distA = haversineDistanceKm(
+            searchLat,
+            searchLng,
+            a.baseLatitude!,
+            a.baseLongitude!
+          );
+          const distB = haversineDistanceKm(
+            searchLat,
+            searchLng,
+            b.baseLatitude!,
+            b.baseLongitude!
+          );
+          if (distA !== distB) return distA - distB;
+          // Secondary: isTopPro, then rating, then completedJobsCount
+          if ((b.isTopPro ? 1 : 0) !== (a.isTopPro ? 1 : 0))
+            return (b.isTopPro ? 1 : 0) - (a.isTopPro ? 1 : 0);
+          const ratingA = a.rating ?? 0;
+          const ratingB = b.rating ?? 0;
+          if (ratingB !== ratingA) return ratingB - ratingA;
+          return (b.completedJobsCount ?? 0) - (a.completedJobsCount ?? 0);
+        });
+      }
+    }
+
+    return results;
   }
 }

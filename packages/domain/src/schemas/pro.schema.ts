@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { pricingModeSchema } from "../enums";
+import { baseLocationSchema } from "./location.schema";
 
 /**
  * Per-category rate for a pro (junction ProProfileCategory).
@@ -55,6 +56,8 @@ export type StartingPriceForCategory = z.infer<
   typeof startingPriceForCategorySchema
 >;
 
+const DEFAULT_SERVICE_RADIUS_KM = 10;
+
 /**
  * Pro (service provider) profile schema
  */
@@ -71,6 +74,17 @@ export const proSchema = z.object({
   /** Set when getById is called with categoryId; used for hire column. */
   startingPriceForCategory: startingPriceForCategorySchema.optional(),
   serviceArea: z.string().optional(),
+  serviceRadiusKm: z
+    .number()
+    .int()
+    .min(1)
+    .max(500)
+    .default(DEFAULT_SERVICE_RADIUS_KM),
+  baseCountryCode: z.string().optional(),
+  baseLatitude: z.number().optional(),
+  baseLongitude: z.number().optional(),
+  basePostalCode: z.string().optional(),
+  baseAddressLine: z.string().optional(),
   rating: z.number().min(0).max(5).optional(),
   reviewCount: z.number().int().min(0).default(0),
   isApproved: z.boolean().default(false),
@@ -104,6 +118,8 @@ const avatarUrlInputSchema = z
   .optional()
   .nullable();
 
+const serviceRadiusKmSchema = z.number().int().min(1).max(500).optional();
+
 const proOnboardInputShape = z.object({
   name: z.string().min(1),
   email: z.string().email(),
@@ -111,7 +127,10 @@ const proOnboardInputShape = z.object({
   hourlyRate: z.number().positive(),
   categoryIds: z.array(z.string()).min(0).optional(),
   categoryRates: z.array(categoryRateInputSchema).optional(),
-  serviceArea: z.string().optional(),
+  baseAddress: z.string().min(1).optional(),
+  baseLocation: baseLocationSchema.optional(),
+  baseCountryCode: z.string().length(2).optional(),
+  serviceRadiusKm: serviceRadiusKmSchema,
   bio: z.string().optional(),
   avatarUrl: avatarUrlInputSchema,
 });
@@ -119,6 +138,7 @@ const proOnboardInputShape = z.object({
 /**
  * Pro onboarding input schema.
  * Provide categoryIds (legacy) or categoryRates (per-category rates by pricingMode).
+ * serviceArea is derived from base address geocode (department) for display.
  */
 export const proOnboardInputSchema = proOnboardInputShape.refine(
   (data) =>
@@ -139,7 +159,6 @@ export type ProUpdateProfileInput = z.infer<typeof proUpdateProfileInputSchema>;
  * Pro set availability input schema (simple version)
  */
 export const proSetAvailabilityInputSchema = z.object({
-  serviceArea: z.string().optional(),
   isAvailable: z.boolean().optional(),
 });
 

@@ -104,6 +104,12 @@ describe("OrderLifecycleService", () => {
       hourlyRate: 10000, // 100 UYU/hour in minor units (cents)
       categoryIds: [],
       serviceArea: null,
+      baseCountryCode: null,
+      baseLatitude: null,
+      baseLongitude: null,
+      basePostalCode: null,
+      baseAddressLine: null,
+      serviceRadiusKm: 10,
       status: "active",
       profileCompleted: false,
       completedJobsCount: 0,

@@ -32,6 +32,7 @@ import { TOKENS } from "@/server/container/tokens";
 import type { Actor } from "@infra/auth/roles";
 import { maskDisplayName } from "@shared/display-name";
 import { calculateIsTopPro } from "./pro.calculations";
+import type { IIdeUyGeocodingProvider } from "@modules/location/ide-geocoding.types";
 
 /**
  * Pro service
@@ -62,8 +63,70 @@ export class ProService {
     @inject(TOKENS.AvatarUrlService)
     private readonly avatarUrlService: AvatarUrlService,
     @inject(TOKENS.IAvatarCache)
-    private readonly avatarCache: IAvatarCache
+    private readonly avatarCache: IAvatarCache,
+    @inject(TOKENS.IIdeUyGeocodingProvider)
+    private readonly ideGeocoding: IIdeUyGeocodingProvider
   ) {}
+
+  /**
+   * Build location fields (serviceArea derived from geocode, base*) from onboarding/update input.
+   * Geocodes baseAddress if provided; serviceArea = department from geocode for display.
+   */
+  private async buildLocationFieldsFromInput(
+    input: Pick<
+      ProOnboardInput,
+      "baseAddress" | "baseLocation" | "baseCountryCode" | "serviceRadiusKm"
+    >
+  ): Promise<{
+    serviceArea: string | null;
+    serviceRadiusKm: number;
+    baseCountryCode: string | null;
+    baseLatitude: number | null;
+    baseLongitude: number | null;
+    basePostalCode: string | null;
+    baseAddressLine: string | null;
+  }> {
+    let baseCountryCode: string | null = input.baseCountryCode ?? null;
+    let baseLatitude: number | null = null;
+    let baseLongitude: number | null = null;
+    let basePostalCode: string | null = null;
+    let baseAddressLine: string | null = null;
+    let serviceArea: string | null = null;
+
+    if (input.baseAddress?.trim()) {
+      const geocoded = await this.ideGeocoding.geocodeAddress(
+        input.baseAddress.trim()
+      );
+      if (!geocoded) {
+        throw new Error(
+          "Address could not be geocoded. Please check and try again."
+        );
+      }
+      baseCountryCode = input.baseCountryCode ?? "UY";
+      baseLatitude = geocoded.latitude;
+      baseLongitude = geocoded.longitude;
+      basePostalCode = geocoded.postalCode ?? null;
+      baseAddressLine =
+        geocoded.addressLine ?? geocoded.postalCode ?? input.baseAddress.trim();
+      serviceArea = geocoded.department?.trim() ?? null;
+    } else if (input.baseLocation) {
+      baseLatitude = input.baseLocation.latitude;
+      baseLongitude = input.baseLocation.longitude;
+      basePostalCode = input.baseLocation.postalCode ?? null;
+      baseAddressLine = input.baseLocation.addressLine ?? null;
+      if (!baseCountryCode) baseCountryCode = "UY";
+    }
+
+    return {
+      serviceArea,
+      serviceRadiusKm: input.serviceRadiusKm ?? 10,
+      baseCountryCode,
+      baseLatitude,
+      baseLongitude,
+      basePostalCode,
+      baseAddressLine,
+    };
+  }
 
   /**
    * Validate categoryRates: each category must exist and have the correct rate by pricingMode (hourly → hourlyRateCents, fixed → startingFromCents).
@@ -113,6 +176,8 @@ export class ProService {
       ? await this.validateCategoryRates(input.categoryRates!)
       : undefined;
 
+    const locationFields = await this.buildLocationFieldsFromInput(input);
+
     const proProfile = await this.proRepository.create({
       userId: user.id,
       displayName: input.name,
@@ -123,7 +188,7 @@ export class ProService {
       hourlyRate: input.hourlyRate,
       categoryIds,
       categoryRates,
-      serviceArea: input.serviceArea,
+      ...locationFields,
     });
 
     return this.mapToDomain(proProfile);
@@ -169,6 +234,8 @@ export class ProService {
       ? await this.validateCategoryRates(input.categoryRates!)
       : undefined;
 
+    const locationFields = await this.buildLocationFieldsFromInput(input);
+
     const proProfile = await this.proRepository.create({
       userId,
       displayName: input.name,
@@ -179,7 +246,7 @@ export class ProService {
       hourlyRate: input.hourlyRate,
       categoryIds,
       categoryRates,
-      serviceArea: input.serviceArea,
+      ...locationFields,
     });
 
     return this.mapToDomain(proProfile);
@@ -287,13 +354,6 @@ export class ProService {
       throw new Error("Pro not found");
     }
 
-    // Update serviceArea if provided
-    if (input.serviceArea !== undefined) {
-      await this.proRepository.update(proId, {
-        serviceArea: input.serviceArea ?? null,
-      });
-    }
-
     // Manage availability slots based on isAvailable flag
     if (input.isAvailable !== undefined) {
       if (input.isAvailable) {
@@ -396,8 +456,46 @@ export class ProService {
         input.categoryRates
       );
     }
-    if (input.serviceArea !== undefined) {
-      updateData.serviceArea = input.serviceArea;
+    if (input.serviceRadiusKm !== undefined) {
+      updateData.serviceRadiusKm = input.serviceRadiusKm;
+    }
+
+    // Base location: from baseAddress (geocode) or baseLocation (direct).
+    // serviceArea is derived from geocode department for display.
+    if (input.baseAddress !== undefined && input.baseAddress.trim() !== "") {
+      const countryCode = input.baseCountryCode ?? "UY";
+      const geocoded = await this.ideGeocoding.geocodeAddress(
+        input.baseAddress.trim()
+      );
+      if (!geocoded) {
+        throw new Error(
+          "Address could not be geocoded. Please check and try again."
+        );
+      }
+      updateData.baseCountryCode = countryCode;
+      updateData.baseLatitude = geocoded.latitude;
+      updateData.baseLongitude = geocoded.longitude;
+      updateData.basePostalCode = geocoded.postalCode ?? null;
+      updateData.baseAddressLine =
+        geocoded.addressLine ?? geocoded.postalCode ?? input.baseAddress.trim();
+      updateData.serviceArea = geocoded.department?.trim() ?? null;
+    }
+    if (input.baseLocation !== undefined) {
+      updateData.baseLatitude = input.baseLocation.latitude;
+      updateData.baseLongitude = input.baseLocation.longitude;
+      updateData.basePostalCode = input.baseLocation.postalCode ?? null;
+      updateData.baseAddressLine = input.baseLocation.addressLine ?? null;
+      if (input.baseCountryCode !== undefined) {
+        updateData.baseCountryCode = input.baseCountryCode;
+      } else if (updateData.baseCountryCode === undefined) {
+        updateData.baseCountryCode = "UY";
+      }
+    }
+    if (
+      input.baseCountryCode !== undefined &&
+      updateData.baseLatitude == null
+    ) {
+      updateData.baseCountryCode = input.baseCountryCode;
     }
 
     const updated = await this.proRepository.update(proProfile.id, updateData);
@@ -783,6 +881,12 @@ export class ProService {
       categoryIds: entity.categoryIds,
       categoryRelations,
       serviceArea: entity.serviceArea ?? undefined,
+      serviceRadiusKm: entity.serviceRadiusKm ?? 10,
+      baseCountryCode: entity.baseCountryCode ?? undefined,
+      baseLatitude: entity.baseLatitude ?? undefined,
+      baseLongitude: entity.baseLongitude ?? undefined,
+      basePostalCode: entity.basePostalCode ?? undefined,
+      baseAddressLine: entity.baseAddressLine ?? undefined,
       rating,
       reviewCount,
       isApproved,

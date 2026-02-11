@@ -11,7 +11,7 @@ import { useSubcategoryBySlugAndCategoryId } from "@/hooks/subcategory";
  * ActiveFilters Component
  *
  * Displays active search filters as removable chips.
- * Shows search query, category, and subcategory filters with remove buttons.
+ * Shows search query, category, and subcategory. Location is always included in search but not shown (not removable).
  *
  * @example
  * ```tsx
@@ -60,6 +60,7 @@ export function ActiveFilters({
     } else if (filterType === "subcategory") {
       params.delete("subcategory");
     }
+    // Location is not removable - always preserved when removing other filters
 
     const queryString = params.toString();
     router.push(`/search/results${queryString ? `?${queryString}` : ""}`);
