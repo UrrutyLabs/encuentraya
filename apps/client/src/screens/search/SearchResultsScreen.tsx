@@ -190,11 +190,11 @@ function SearchResultsContent() {
       }
     >
       <div className="px-4 py-4 md:py-8">
-        {/* Layout: Sidebar + Results (lg+) */}
-        <div className="flex flex-col lg:flex-row gap-6">
+        {/* Layout: Sidebar + Results (lg+) - contained like other pages */}
+        <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-6">
           {/* Left Sidebar - Filters (Desktop lg+) */}
           {(categorySlug || category?.id) && (
-            <aside className="hidden lg:block lg:w-80 lg:shrink-0">
+            <aside className="hidden lg:block lg:w-80 lg:shrink-0 lg:self-start">
               <div className="sticky top-24">
                 {category?.id ? (
                   <SearchFiltersSidebar
@@ -269,9 +269,9 @@ export function SearchResultsScreen() {
       fallback={
         <AppShell showLogin={true}>
           <div className="px-4 py-4 md:py-8">
-            <div className="flex flex-col lg:flex-row gap-6">
+            <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-6">
               {/* Sidebar skeleton (Desktop lg+) */}
-              <aside className="hidden lg:block lg:w-80 lg:shrink-0">
+              <aside className="hidden lg:block lg:w-80 lg:shrink-0 lg:self-start">
                 <div className="sticky top-24">
                   <Card className="p-4 md:p-6">
                     <AvailabilityFilterSectionSkeleton />
