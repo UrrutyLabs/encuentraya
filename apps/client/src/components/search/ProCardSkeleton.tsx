@@ -2,10 +2,10 @@ import { Card } from "@repo/ui";
 
 export function ProCardSkeleton() {
   return (
-    <Card className="animate-pulse">
+    <Card className="animate-pulse overflow-hidden">
       <div className="flex gap-4 p-4">
         {/* Left: Avatar */}
-        <div className="w-24 h-24 md:w-28 md:h-28 rounded-full bg-muted/30 shrink-0" />
+        <div className="w-32 h-32 rounded-full bg-muted/30 shrink-0" />
 
         {/* Center: Content */}
         <div className="flex-1 min-w-0 space-y-1">
@@ -51,14 +51,19 @@ export function ProCardSkeleton() {
           </div>
         </div>
 
-        {/* Right: Rate + Button */}
-        <div className="flex flex-col justify-between items-end shrink-0 gap-3">
-          {/* Top: Rate/hour */}
+        {/* Right: Rate only */}
+        <div className="shrink-0">
           <div className="h-4 bg-muted/30 rounded w-20" />
-
-          {/* Bottom: Button */}
-          <div className="h-10 bg-muted/30 rounded w-24" />
         </div>
+      </div>
+
+      {/* Footer: Bio + Button skeleton */}
+      <div className="flex gap-4 px-4 py-3">
+        <div className="w-32 shrink-0" />
+        <div className="flex-1 min-w-0 border border-muted/20 bg-muted/10 px-3 py-2 min-h-[52px] flex items-center animate-pulse">
+          <div className="h-4 bg-muted/50 rounded w-4/5" />
+        </div>
+        <div className="h-9 bg-muted/30 rounded w-24 shrink-0" />
       </div>
     </Card>
   );

@@ -9,14 +9,14 @@ import {
   useRef,
 } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { Text } from "@repo/ui";
+import { Card, Text } from "@repo/ui";
 import { AppShell } from "@/components/presentational/AppShell";
 import { SearchBar } from "@/components/search/SearchBar";
-import { ActiveFilters } from "@/components/search/ActiveFilters";
 import { ProList } from "@/components/search/ProList";
 import { EmptyState } from "@/components/presentational/EmptyState";
 import { SearchError } from "@/components/search/SearchError";
 import { SearchFiltersSidebar } from "@/components/search/SearchFiltersSidebar";
+import { AvailabilityFilterSectionSkeleton } from "@/components/search/AvailabilityFilterSection";
 import { useSearchPros } from "@/hooks/pro";
 import { useCategoryBySlug, useCategoryConfig } from "@/hooks/category";
 import { useSubcategoryBySlugAndCategoryId } from "@/hooks/subcategory";
@@ -140,10 +140,6 @@ function SearchResultsContent() {
     return allPros;
   }, [allPros, config, filterValues]);
 
-  const handleFilterRemove = useCallback(() => {
-    // Navigation handled by ActiveFilters component
-  }, []);
-
   const handleRetry = useCallback(() => {
     // Force refetch by removing retry param if it exists and refreshing
     const params = new URLSearchParams(searchParams.toString());
@@ -184,27 +180,32 @@ function SearchResultsContent() {
     return suggestions;
   }, [category, date, timeWindow, searchQuery, locationParam, zipCodeParam]);
 
+  const searchBarInitialQuery = searchQuery || subcategory?.name || "";
+
   return (
     <AppShell
       showLogin={true}
       centerContent={
-        <SearchBar initialQuery={searchQuery} preserveParams={true} />
+        <SearchBar initialQuery={searchBarInitialQuery} preserveParams={true} />
       }
     >
       <div className="px-4 py-4 md:py-8">
-        {/* Active Filters */}
-        <ActiveFilters onFilterRemove={handleFilterRemove} />
-
         {/* Layout: Sidebar + Results (lg+) */}
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Left Sidebar - Filters (Desktop lg+) */}
-          {category?.id && (
+          {(categorySlug || category?.id) && (
             <aside className="hidden lg:block lg:w-80 lg:shrink-0">
               <div className="sticky top-24">
-                <SearchFiltersSidebar
-                  categoryId={category.id}
-                  subcategorySlug={subcategorySlug}
-                />
+                {category?.id ? (
+                  <SearchFiltersSidebar
+                    categoryId={category.id}
+                    subcategorySlug={subcategorySlug}
+                  />
+                ) : (
+                  <Card className="p-4 md:p-6">
+                    <AvailabilityFilterSectionSkeleton />
+                  </Card>
+                )}
               </div>
             </aside>
           )}
@@ -234,9 +235,10 @@ function SearchResultsContent() {
                 />
               ) : (
                 <>
-                  {searchQuery.trim() && (
+                  {(searchQuery.trim() || subcategory?.name) && (
                     <Text variant="small" className="mb-1 text-muted" as="p">
-                      Resultados para «{searchQuery.trim()}»
+                      Resultados para «
+                      {searchQuery.trim() || subcategory?.name || ""}»
                     </Text>
                   )}
                   <Text variant="h2" className="mb-4 md:mb-6 text-text">
@@ -247,6 +249,7 @@ function SearchResultsContent() {
                   </Text>
                   <ProList
                     pros={pros}
+                    categoryId={category?.id}
                     categorySlug={category?.slug}
                     subcategorySlug={subcategorySlug}
                   />
@@ -266,9 +269,22 @@ export function SearchResultsScreen() {
       fallback={
         <AppShell showLogin={true}>
           <div className="px-4 py-4 md:py-8">
-            <div className="max-w-6xl mx-auto">
-              <div className="h-16 bg-surface border border-border rounded-lg animate-pulse mb-4" />
-              <ProList pros={[]} isLoading={true} />
+            <div className="flex flex-col lg:flex-row gap-6">
+              {/* Sidebar skeleton (Desktop lg+) */}
+              <aside className="hidden lg:block lg:w-80 lg:shrink-0">
+                <div className="sticky top-24">
+                  <Card className="p-4 md:p-6">
+                    <AvailabilityFilterSectionSkeleton />
+                  </Card>
+                </div>
+              </aside>
+              {/* Main content skeleton */}
+              <div className="flex-1 min-w-0">
+                <div className="max-w-4xl mx-auto">
+                  <div className="h-16 bg-surface border border-border rounded-lg animate-pulse mb-4" />
+                  <ProList pros={[]} isLoading={true} />
+                </div>
+              </div>
             </div>
           </div>
         </AppShell>

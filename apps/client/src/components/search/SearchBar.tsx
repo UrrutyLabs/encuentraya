@@ -2,7 +2,7 @@
 
 import { useState, FormEvent, useEffect, useCallback, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Search } from "lucide-react";
+import { Search, MapPin } from "lucide-react";
 import { Button, Input, Text } from "@repo/ui";
 import { useSearchLocation } from "@/contexts/SearchLocationContext";
 import { useClickOutside } from "@/hooks/shared/useClickOutside";
@@ -28,6 +28,7 @@ export interface SearchBarViewProps {
   onHighlightChange: (index: number) => void;
   onDropdownOpenChange: (open: boolean) => void;
   onSelectSuggestion: (item: SuggestionItem) => void;
+  onFocus?: () => void;
   showDropdown: boolean;
   onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   /** When true, search was submitted empty; show danger state */
@@ -51,6 +52,7 @@ export function SearchBarView({
   onHighlightChange,
   onDropdownOpenChange,
   onSelectSuggestion,
+  onFocus,
   showDropdown,
   onKeyDown,
   showEmptyError = false,
@@ -77,7 +79,7 @@ export function SearchBarView({
   const inputPadding = isLarge
     ? "!pl-14 !pr-5 !py-5 md:!py-4"
     : "!pl-10 !pr-4 !py-2";
-  const zipInputPadding = isLarge ? "!px-4 !py-5 md:!py-4" : "!px-3 !py-2";
+  const zipInputPadding = isLarge ? "!px-0 !py-5 md:!py-4" : "!px-0 !py-2";
   const inputText = isLarge ? "!text-xl md:!text-lg" : "!text-sm";
   const iconSize = isLarge ? "w-6 h-6 left-5" : "w-4 h-4 left-3";
   const buttonPadding = isLarge ? "px-6 py-5 md:py-4" : "px-4 py-2";
@@ -106,9 +108,12 @@ export function SearchBarView({
             value={value}
             onChange={(e) => onChange(e.target.value)}
             onKeyDown={onKeyDown}
-            onFocus={() =>
-              value.trim().length >= 1 && onDropdownOpenChange(true)
-            }
+            onFocus={() => {
+              onFocus?.();
+              if (value.trim().length >= 1) {
+                onDropdownOpenChange(true);
+              }
+            }}
             placeholder="Describí lo que estás precisando"
             className={`w-full h-full border-0 border-r ${inputPadding} ${inputText} rounded-l-lg rounded-r-none! md:rounded-r-none! focus:ring-0 bg-surface ${
               showEmptyError ? "border-danger" : "border-border"
@@ -157,7 +162,11 @@ export function SearchBarView({
             </div>
           )}
         </div>
-        <div className="shrink-0 w-20 sm:w-24 border-0 border-r border-border">
+        <div className="shrink-0 flex items-center gap-1.5 w-24 sm:w-28 border-0 border-r border-border pl-2.5 pr-2 bg-surface">
+          <MapPin
+            className={`shrink-0 ${isLarge ? "w-5 h-5" : "w-4 h-4"} text-muted`}
+            aria-hidden="true"
+          />
           <Input
             type="text"
             inputMode="numeric"
@@ -168,7 +177,7 @@ export function SearchBarView({
             }
             readOnly={isZipReadOnly}
             placeholder="CP"
-            className={`h-full w-full border-0 ${zipInputPadding} ${inputText} rounded-none focus:ring-0 bg-surface text-center ${isZipReadOnly ? "cursor-default" : ""}`}
+            className={`flex-1 min-w-0 h-full border-0 ${zipInputPadding} text-left ${inputText} rounded-none focus:ring-0 bg-transparent text-center ${isZipReadOnly ? "cursor-default" : ""}`}
             aria-label="Código postal (opcional)"
           />
         </div>
@@ -219,6 +228,7 @@ export function SearchBar({
   const [highlightedIndex, setHighlightedIndex] = useState(0);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [showEmptyError, setShowEmptyError] = useState(false);
+  const [hasInteracted, setHasInteracted] = useState(false);
   const prevUrlQueryRef = useRef<string>("");
   const prevUrlZipRef = useRef<string>("");
   const prevUrlLocationRef = useRef<string>("");
@@ -271,16 +281,29 @@ export function SearchBar({
     }
   }, [searchParams, preserveParams]);
 
-  // Open dropdown when debounced query has content; close when cleared
+  // Prefill from subcategory name when preserveParams, no q in URL, and initialQuery becomes available
   useEffect(() => {
-    if (debouncedQuery.length >= 1) {
+    if (
+      preserveParams &&
+      !hasInteracted &&
+      initialQuery.trim() &&
+      !(searchParams.get("q") || "").trim()
+    ) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- prefill from subcategory when no user interaction yet
+      setSearchQuery(initialQuery.trim());
+    }
+  }, [preserveParams, initialQuery, searchParams, hasInteracted]);
+
+  // Open dropdown only when user has interacted (focus or typed) and query has content; close when cleared
+  useEffect(() => {
+    if (hasInteracted && debouncedQuery.length >= 1) {
       // eslint-disable-next-line react-hooks/set-state-in-effect -- sync UI from debounced query
       setIsDropdownOpen(true);
       setHighlightedIndex(0);
     } else {
       setIsDropdownOpen(false);
     }
-  }, [debouncedQuery]);
+  }, [hasInteracted, debouncedQuery]);
 
   // Reset highlight when suggestion list length changes
   useEffect(() => {
@@ -401,9 +424,12 @@ export function SearchBar({
   );
 
   const handleSearchChange = useCallback((value: string) => {
+    setHasInteracted(true);
     setSearchQuery(value);
     setShowEmptyError(false);
   }, []);
+
+  const handleFocus = useCallback(() => setHasInteracted(true), []);
 
   return (
     <SearchBarView
@@ -419,6 +445,7 @@ export function SearchBar({
       onHighlightChange={setHighlightedIndex}
       onDropdownOpenChange={setIsDropdownOpen}
       onSelectSuggestion={onSelectSuggestion}
+      onFocus={handleFocus}
       showDropdown={showDropdown}
       onKeyDown={handleKeyDown}
       showEmptyError={showEmptyError}

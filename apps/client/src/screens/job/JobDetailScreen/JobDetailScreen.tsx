@@ -46,7 +46,10 @@ export function JobDetailScreen() {
       setHeader?.setTitle(null);
       setHeader?.setBackHref(null);
     };
-  }, [job?.displayId, setHeader]);
+    // setHeader (context value) changes when state updates, which would cause an infinite loop.
+    // The underlying setters are stable; we only need to react to job?.displayId changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [job?.displayId]);
 
   const canCancel =
     job &&

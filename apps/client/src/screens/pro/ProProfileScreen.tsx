@@ -62,7 +62,10 @@ export function ProProfileScreen() {
       setHeader?.setTitle(null);
       setHeader?.setBackHref(null);
     };
-  }, [pro?.name, setHeader]);
+    // setHeader (context value) changes when state updates, which would cause an infinite loop.
+    // The underlying setters are stable; we only need to react to pro?.name changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pro?.name]);
 
   // Map categoryIds to Category objects for display
   const proCategories = useMemo(

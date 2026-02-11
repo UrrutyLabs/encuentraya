@@ -6,6 +6,29 @@ import { Calendar } from "lucide-react";
 import { Text, RadioButton } from "@repo/ui";
 
 /**
+ * Skeleton for AvailabilityFilterSection.
+ * Mirrors the layout: title + 3 radio-style option rows.
+ */
+export function AvailabilityFilterSectionSkeleton() {
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center gap-2">
+        <div className="w-4 h-4 bg-muted/50 rounded animate-pulse" />
+        <div className="h-5 bg-muted/50 rounded w-48 animate-pulse" />
+      </div>
+      <div className="space-y-2">
+        {[1, 2, 3].map((i) => (
+          <div
+            key={i}
+            className="h-11 rounded-lg border-2 border-border bg-muted/30 animate-pulse"
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/**
  * AvailabilityFilterSection Component
  *
  * Static filter section for "Cuando queres que empiece?"

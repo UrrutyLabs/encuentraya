@@ -21,6 +21,8 @@ interface ProListProps {
   pros: Pro[];
   /** Whether the list is currently loading */
   isLoading?: boolean;
+  /** Category ID for per-category pricing display */
+  categoryId?: string;
   /** Category slug to pass to pro profile URLs */
   categorySlug?: string;
   /** Subcategory slug to pass to pro profile URLs */
@@ -30,6 +32,7 @@ interface ProListProps {
 export const ProList = memo(function ProList({
   pros,
   isLoading,
+  categoryId,
   categorySlug,
   subcategorySlug,
 }: ProListProps) {
@@ -57,6 +60,7 @@ export const ProList = memo(function ProList({
         <div key={pro.id} role="listitem">
           <ProCard
             pro={pro}
+            categoryId={categoryId}
             categorySlug={categorySlug}
             subcategorySlug={subcategorySlug}
           />

@@ -32,16 +32,12 @@ export const RadioButton = forwardRef<HTMLInputElement, RadioButtonProps>(
   ({ label, containerClassName = "", className = "", ...props }, ref) => {
     return (
       <label
-        className={`flex items-center gap-3 w-full px-4 py-2.5 rounded-lg border-2 transition-colors touch-manipulation cursor-pointer ${
-          props.checked
-            ? "bg-primary/10 border-primary text-primary"
-            : "bg-surface border-border text-text hover:bg-surface/80"
-        } ${containerClassName}`}
+        className={`flex items-center gap-3 w-full px-4 py-2.5 rounded-lg border-2 border-border bg-surface text-text transition-colors touch-manipulation cursor-pointer hover:bg-surface/80 ${containerClassName}`}
       >
         <input
           ref={ref}
           type="radio"
-          className={`w-4 h-4 text-primary border-border focus:ring-2 focus:ring-primary focus:ring-offset-0 cursor-pointer ${
+          className={`w-4 h-4 text-primary border-border focus:ring-0 focus:outline-none cursor-pointer ${
             props.checked ? "border-primary" : "border-border"
           } ${className}`}
           {...props}
