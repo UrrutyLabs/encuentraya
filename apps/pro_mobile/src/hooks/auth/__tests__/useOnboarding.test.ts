@@ -4,7 +4,6 @@ import { trpc } from "@lib/trpc/client";
 import { useQueryClient } from "../../shared/useQueryClient";
 import { invalidateRelatedQueries } from "@lib/react-query/utils";
 import { useOnboarding } from "../useOnboarding";
-import { Category } from "@repo/domain";
 import type { ProOnboardInput } from "@repo/domain";
 
 jest.mock("@lib/trpc/client");

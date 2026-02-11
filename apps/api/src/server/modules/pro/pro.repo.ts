@@ -1,5 +1,5 @@
 import { injectable, inject } from "tsyringe";
-import { prisma, Prisma } from "@infra/db/prisma";
+import { prisma } from "@infra/db/prisma";
 import { calculateProfileCompleted } from "./pro.calculations";
 import { TOKENS } from "@/server/container/tokens";
 import type {

@@ -55,7 +55,6 @@ export function OrderChatScreen({
     items,
     isLoading,
     error,
-    refetch,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,

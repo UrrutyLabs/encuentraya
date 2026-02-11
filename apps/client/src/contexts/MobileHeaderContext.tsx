@@ -61,7 +61,7 @@ export function MobileHeaderProvider({ children }: { children: ReactNode }) {
       setBackHref,
       setHeader,
     }),
-    [state.title, state.backHref, setTitle, setBackHref, setHeader]
+    [state, setTitle, setBackHref, setHeader]
   );
 
   return (

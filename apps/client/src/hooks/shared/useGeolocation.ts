@@ -57,7 +57,8 @@ export function useGeolocation(
 
   useEffect(() => {
     if (runOnMount) {
-      getPosition();
+      const id = setTimeout(() => getPosition(), 0);
+      return () => clearTimeout(id);
     }
   }, [runOnMount, getPosition]);
 

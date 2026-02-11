@@ -21,6 +21,8 @@ export function validateMobileEnv(): void {
   const isDevelopment =
     __DEV__ || process.env.EXPO_PUBLIC_ENVIRONMENT === "development";
 
+  void isDevelopment; // Reserved for future development-specific validation
+
   requireValidEnv({
     // Supabase - Required
     EXPO_PUBLIC_SUPABASE_URL: {

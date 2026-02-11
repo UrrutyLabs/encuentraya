@@ -234,6 +234,7 @@ export function SearchBar({
     if (preserveParams) return;
     if (initialZipCode?.trim() && !appliedInitialZipRef.current) {
       appliedInitialZipRef.current = true;
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- sync from external context (geolocation)
       setZipCode(initialZipCode.trim());
     }
   }, [preserveParams, initialZipCode]);
@@ -264,7 +265,6 @@ export function SearchBar({
       const urlZip = searchParams.get("zipCode") || "";
       if (urlZip !== prevUrlZipRef.current) {
         prevUrlZipRef.current = urlZip;
-        // eslint-disable-next-line react-hooks/set-state-in-effect -- sync from URL
         setZipCode(urlZip);
       }
       prevUrlLocationRef.current = searchParams.get("location") || "";

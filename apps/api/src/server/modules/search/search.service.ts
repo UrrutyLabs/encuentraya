@@ -88,6 +88,8 @@ export class SearchService {
       }
     }
 
+    void subcategory; // Reserved for future subcategory-level DB filtering
+
     // Get pros filtered by database (approved, not suspended, profileCompleted, categoryId)
     let results = await this.proService.searchPros({
       categoryId,

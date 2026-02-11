@@ -752,7 +752,7 @@ describe("OrderLifecycleService", () => {
       } as OrderEntity);
       mockOrderService.getOrderById.mockResolvedValue(updatedOrder);
 
-      const result = await service.acceptQuote(actor, "order-1");
+      await service.acceptQuote(actor, "order-1");
 
       expect(mockOrderRepository.update).toHaveBeenCalledWith("order-1", {
         quoteAcceptedAt: expect.any(Date),

@@ -4,7 +4,7 @@ import type {
   OrderLineItemRepository,
   OrderLineItemEntity,
 } from "./orderLineItem.repo";
-import type { Order, OrderCreateInput } from "@repo/domain";
+import type { Order } from "@repo/domain";
 import {
   OrderStatus,
   PricingMode,
@@ -141,8 +141,9 @@ export class OrderService {
    */
   private mapToDomain(
     entity: OrderEntity,
-    _lineItems: OrderLineItemEntity[]
+    lineItems: OrderLineItemEntity[]
   ): Order {
+    void lineItems; // Reserved for future line items mapping
     return {
       id: entity.id,
       displayId: entity.displayId,

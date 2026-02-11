@@ -18,11 +18,9 @@ const SearchLocationContext = createContext<SearchLocationContextValue | null>(
 );
 
 export function SearchLocationProvider({ children }: { children: ReactNode }) {
-  const {
-    position,
-    error: _geoError,
-    isLoading: geoLoading,
-  } = useGeolocation({ runOnMount: true });
+  const { position, isLoading: geoLoading } = useGeolocation({
+    runOnMount: true,
+  });
   const {
     postalCode,
     department,

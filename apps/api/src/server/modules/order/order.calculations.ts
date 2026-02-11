@@ -7,12 +7,7 @@
 import type { OrderLineItemEntity } from "./orderLineItem.repo";
 import type { OrderLineItemCreateInput } from "./orderLineItem.repo";
 import type { OrderEntity } from "./order.repo";
-import {
-  OrderLineItemType,
-  TaxBehavior,
-  toMinorUnits,
-  roundMinorUnits,
-} from "@repo/domain";
+import { OrderLineItemType, TaxBehavior, roundMinorUnits } from "@repo/domain";
 
 /**
  * Default platform fee rate (10%)

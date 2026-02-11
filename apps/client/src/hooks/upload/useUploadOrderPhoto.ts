@@ -62,6 +62,9 @@ export function useUploadOrderPhoto() {
       });
 
       await uploadFileToPresignedUrl(toUpload, uploadUrl);
+      if (!storageUrl) {
+        throw new Error("Upload failed: no storage URL returned");
+      }
       return storageUrl;
     },
     [getPresignedUrl]

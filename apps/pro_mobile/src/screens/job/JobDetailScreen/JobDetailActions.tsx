@@ -68,8 +68,6 @@ export function JobDetailActions({
   isCompleting,
   isSubmittingCompletion,
 }: JobDetailActionsProps) {
-  const isFixedOrder = order.pricingMode === "fixed";
-
   return (
     <Card style={styles.actionsCard}>
       <View style={styles.sectionHeader}>

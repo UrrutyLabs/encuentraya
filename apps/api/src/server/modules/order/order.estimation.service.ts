@@ -8,7 +8,7 @@ import {
   DEFAULT_PLATFORM_FEE_RATE,
   DEFAULT_TAX_RATE,
 } from "./order.calculations";
-import { toMinorUnits, toMajorUnits, roundMinorUnits } from "@repo/domain";
+import { toMajorUnits, roundMinorUnits } from "@repo/domain";
 import type { OrderEstimateInput, OrderEstimateOutput } from "@repo/domain";
 
 /**
