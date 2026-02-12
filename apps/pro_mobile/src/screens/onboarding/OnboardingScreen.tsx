@@ -1,5 +1,11 @@
 import { useState } from "react";
-import { StyleSheet, ScrollView, ActivityIndicator, View } from "react-native";
+import {
+  StyleSheet,
+  ScrollView,
+  ActivityIndicator,
+  View,
+  TouchableOpacity,
+} from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { Card } from "@components/ui/Card";
 import { Input } from "@components/ui/Input";
@@ -8,10 +14,14 @@ import { Text } from "@components/ui/Text";
 import { CategorySelector } from "@components/presentational/CategorySelector";
 import { theme } from "../../theme";
 import { useOnboarding, useAuth } from "@hooks/auth";
+import { useAddressSuggestions } from "@hooks/location";
 import { Category, toMinorUnits } from "@repo/domain";
 import { CategoryRatesEditor } from "@components/presentational/CategoryRatesEditor";
 import { supabase } from "@lib/supabase/client";
 import { trpc } from "@lib/trpc/client";
+
+const RADIUS_OPTIONS_KM = [5, 10, 15, 25, 50] as const;
+const DEFAULT_RADIUS_KM = 10;
 
 export function OnboardingScreen() {
   const { session, loading: sessionLoading } = useAuth();
@@ -31,7 +41,13 @@ export function OnboardingScreen() {
   const [categoryRates, setCategoryRates] = useState<Record<string, string>>(
     {}
   );
-  const [serviceArea, setServiceArea] = useState("");
+  const [baseAddress, setBaseAddress] = useState("");
+  const [serviceRadiusKm, setServiceRadiusKm] = useState(DEFAULT_RADIUS_KM);
+  const [showAddressSuggestions, setShowAddressSuggestions] = useState(false);
+
+  const addressSuggestions = useAddressSuggestions(
+    showAddressSuggestions ? baseAddress : ""
+  );
 
   // Validation errors
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -120,7 +136,8 @@ export function OnboardingScreen() {
         phone: phone.trim() || undefined,
         hourlyRate: hourlyRateForApi,
         categoryRates: categoryRatesPayload,
-        serviceArea: serviceArea.trim() || undefined,
+        baseAddress: baseAddress.trim() || undefined,
+        serviceRadiusKm,
       });
     } catch {
       // Error is handled by useOnboarding hook
@@ -241,15 +258,77 @@ export function OnboardingScreen() {
           errors={errors}
         />
 
+        <Text variant="small" style={styles.radiusLabel}>
+          Radio de servicio (km)
+        </Text>
+        <View style={styles.radiusRow}>
+          {RADIUS_OPTIONS_KM.map((km) => {
+            const isSelected = serviceRadiusKm === km;
+            return (
+              <TouchableOpacity
+                key={km}
+                onPress={() => setServiceRadiusKm(km)}
+                style={[
+                  styles.radiusChip,
+                  isSelected && styles.radiusChipSelected,
+                ]}
+              >
+                <Text
+                  variant="small"
+                  style={[
+                    styles.radiusChipText,
+                    isSelected && styles.radiusChipTextSelected,
+                  ]}
+                >
+                  {km} km
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+
         <Input
-          label="Zona de servicio (opcional)"
+          label="Dirección base (opcional)"
           icon="map-pin"
-          value={serviceArea}
-          onChangeText={setServiceArea}
-          placeholder="Ej: Montevideo, Centro"
+          value={baseAddress}
+          onChangeText={(text) => {
+            setBaseAddress(text);
+            setShowAddressSuggestions(true);
+          }}
+          onBlur={() => setShowAddressSuggestions(false)}
+          placeholder="Ej: Bvar. España 1234, Montevideo"
           autoCapitalize="words"
           style={styles.input}
         />
+        {showAddressSuggestions &&
+          addressSuggestions.suggestions.length > 0 &&
+          baseAddress.trim().length >= 2 && (
+            <View style={styles.suggestionsList}>
+              {addressSuggestions.suggestions.slice(0, 5).map((s) => (
+                <TouchableOpacity
+                  key={s.id ?? s.label}
+                  onPress={() => {
+                    setBaseAddress(s.label);
+                    setShowAddressSuggestions(false);
+                  }}
+                  style={styles.suggestionItem}
+                >
+                  <Feather
+                    name="map-pin"
+                    size={14}
+                    color={theme.colors.muted}
+                  />
+                  <Text
+                    variant="small"
+                    style={styles.suggestionText}
+                    numberOfLines={1}
+                  >
+                    {s.label}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
 
         {(error || errors.submit) && (
           <View style={styles.errorContainer}>
@@ -329,5 +408,56 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingVertical: theme.spacing[4],
+  },
+  radiusLabel: {
+    marginBottom: theme.spacing[1],
+    color: theme.colors.muted,
+  },
+  radiusRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: theme.spacing[2],
+    marginBottom: theme.spacing[4],
+  },
+  radiusChip: {
+    paddingHorizontal: theme.spacing[3],
+    paddingVertical: theme.spacing[2],
+    borderRadius: theme.radius.md,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surface,
+  },
+  radiusChipSelected: {
+    borderColor: theme.colors.primary,
+    backgroundColor: theme.colors.primary + "20",
+  },
+  radiusChipText: {
+    color: theme.colors.text,
+  },
+  radiusChipTextSelected: {
+    color: theme.colors.primary,
+    fontWeight: "600",
+  },
+  suggestionsList: {
+    marginTop: -theme.spacing[2],
+    marginBottom: theme.spacing[2],
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderRadius: theme.radius.md,
+    backgroundColor: theme.colors.surface,
+    maxHeight: 180,
+  },
+  suggestionItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: theme.spacing[2],
+    paddingHorizontal: theme.spacing[3],
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border,
+  },
+  suggestionText: {
+    marginLeft: theme.spacing[2],
+    flex: 1,
+    color: theme.colors.text,
   },
 });

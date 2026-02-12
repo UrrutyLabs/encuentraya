@@ -27,6 +27,7 @@ const mockPro: Pro = {
   rating: 4.5,
   reviewCount: 10,
   isTopPro: false,
+  serviceRadiusKm: 10,
   createdAt: new Date("2024-01-01"),
   updatedAt: new Date("2024-01-01"),
 };
